@@ -7,6 +7,14 @@ from .stage import Stage
 from datetime import datetime
 import abc
 
+try:
+    # Python 3 support
+    from configparser import ConfigParser
+except ImportError:
+    # Python 2 support
+    from ConfigParser import SafeConfigParser as ConfigParser
+
+
 # Python 2.7 and 3.5 compatible classes:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
@@ -41,14 +49,20 @@ class PipelineData(Frozen):
 
 class Pipeline(ABC):
 
-    def __init__(self, pipeline_stages):
+    def __init__(self, pipeline_stages, config_file=None):
         assert isinstance(pipeline_stages, list), \
                "pipeline_stages must be a list of Stage objects"
+
         self.pipeline_stages = pipeline_stages
+        self.config = None
+        if config_file:
+            self.config = ConfigParser(allow_no_value=True)
+            self.config.read([config_file])
+            LOGGER.info("Logger file %s has been loaded", config_file)
 
     def _execute_stage(self, stage, stage_data):
         stage_start = datetime.now()
-        stage.operate(stage_data)
+        stage.operate(stage_data, self.config)
 
         # Calculate and log stage duration
         stage_execution_time = datetime.now() - stage_start
