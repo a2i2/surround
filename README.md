@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
 ## Examples
 
-See the examples directory.
+See the [examples](https://github.com/dstil/surround/tree/master/examples) directory.
 
 ## Contributing
 
