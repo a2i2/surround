@@ -59,3 +59,8 @@ For guidance on setting up a development environment and how to make a contribut
 ## License
 
 Surround is released under a [BSD-3](https://opensource.org/licenses/BSD-3-Clause) license.
+
+## Release (only for admin)
+1. Update `VERSION` in `setup.py`.
+2. Create repo tag with a version that you set in `setup.py` file.
+3. Push to tag to master.
