@@ -23,7 +23,7 @@ class CustomFileSystemAdapter(FileSystemAdapter):
                     output_file.write("%d\n" % a)
                 else:
                     output_file.write("%d,\"%s\"\n" % (a,b))
-
+        logging.info("File written to %s", output_path)
 
 class ProcessCSV(Stage):
     def operate(self, data, config):
