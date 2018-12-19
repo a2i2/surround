@@ -2,7 +2,7 @@ from surround import Stage, PipelineData, Pipeline
 import logging
 
 class HelloStage(Stage):
-    def operate(self, data):
+    def operate(self, data, config):
         data.text = "hello"
 
 class BasicData(PipelineData):
