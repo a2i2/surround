@@ -55,6 +55,9 @@ class Pipeline(ABC):
 
         self.pipeline_stages = pipeline_stages
         self.config = None
+        self.set_config(config_file)
+
+    def set_config(self, config_file):
         if config_file:
             self.config = ConfigParser(allow_no_value=True)
             self.config.read([config_file])
