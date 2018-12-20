@@ -21,16 +21,6 @@ jobs:
             sudo python setup.py test
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
 
-  verify:
-    docker:
-      - image: circleci/python:2.7.15
-    steps:
-      - checkout
-      - run:
-          name: Verify if package version is same as repo tag
-          command: |
-            VERSION_TAG=$(git tag -l --points-at HEAD) python setup.py verify
-
   release:
     docker:
       - image: circleci/python:2.7.15
@@ -49,7 +39,7 @@ jobs:
             echo -e "password:$PYPI_PASSWORD" >> ~/.pypirc
 
             # Build package
-            python setup.py sdist bdist_wheel
+            VERSION_TAG=$(git tag -l --points-at HEAD) python setup.py sdist bdist_wheel
 
             # Upload package for distribution
             python -m twine upload --repository testpypi dist/*
@@ -62,15 +52,7 @@ workflows:
         version: "2.7.15"
     - test-python-version:
         version: "3.6.5"
-    - verify:
-        filters:
-          tags:
-            only: /^([0-9]+)\.([0-9]+)\.([0-9])?$/
-          branches:
-            ignore: /.*/
     - release:
-        requires:
-          - verify
         filters:
           tags:
             only: /^([0-9]+)\.([0-9]+)\.([0-9])?$/
