@@ -59,3 +59,7 @@ For guidance on setting up a development environment and how to make a contribut
 ## License
 
 Surround is released under a [BSD-3](https://opensource.org/licenses/BSD-3-Clause) license.
+
+## Release (only for admin)
+1. Tag repo with a version that you want this to be released with.
+2. Push to tag to master.

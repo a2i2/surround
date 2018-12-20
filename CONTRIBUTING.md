@@ -67,6 +67,11 @@ Run the basic test suite with:
 
 `python setup.py test`
 
+### Examples
+* Make sure example works
+* Make sure `main.py` class can be executed with `python main.py` so that it can be executed by the CircleCI. If your example requires parameters to run it with, make `main.py` as a wrapper to run your code.
+* Add instruction of how to setup and run your example.
+
 ## Code of Conduct
 
 Everyone interacting in the Surrond project's codebase and issue tracker is expected to follow the [PyPA Code of Conduct][coc].
