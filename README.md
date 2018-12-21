@@ -51,6 +51,11 @@ if __name__ == "__main__":
 
 See the [examples](https://github.com/dstil/surround/tree/master/examples) directory.
 
+### Used packages
+| Package Name  | Version |
+| ------------- | ------- |
+| Flask         | 1.0.2   |
+
 ## Contributing
 
 For guidance on setting up a development environment and how to make a contribution to Surround, see the [contributing guidelines](CONTRIBUTING.md).
