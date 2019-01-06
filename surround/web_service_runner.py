@@ -2,10 +2,12 @@ from .pipeline import PipelineData
 from flask import Flask, jsonify, request
 import abc
 import sys
+import logging
 
 # Python 2.7 and 3.5 compatible classes:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
+LOGGER = logging.getLogger(__name__)
 
 class TestData(PipelineData):
     input = None
@@ -53,17 +55,17 @@ class WebServiceRunner(ABC):
         try:
             metadata['input']
         except KeyError:
-            print('AssertionError: Missing "input" information in metadata')
+            LOGGER.info('AssertionError: Missing "input" information in metadata')
             sys.exit(1)
         try:
             metadata['output']
         except KeyError:
-            print('AssertionError: Missing "output" information in metadata')
+            LOGGER.info('AssertionError: Missing "output" information in metadata')
             sys.exit(1)
         try:
             metadata['version']
         except KeyError:
-            print('AssertionError: Missing "version" information in metadata')
+            LOGGER.info('AssertionError: Missing "version" information in metadata')
             sys.exit(1)
 
         self.app.add_url_rule('/metadata', 'metadata', MetadataAction(metadata))
