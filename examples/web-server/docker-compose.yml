@@ -1,0 +1,16 @@
+---
+version: "3"
+services:
+
+  server:
+    image: server_container
+    build:
+      context: ../../
+      args:
+        BASE_IMAGE: python:3
+    ports:
+      - 5000:5000
+    working_dir: /opt/app
+    volumes:
+      - ./main.py:/opt/app/main.py
+    command: python3 main.py
