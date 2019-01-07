@@ -1,4 +1,4 @@
-from .pipeline import PipelineData
+from surround import PipelineData
 from flask import Flask, jsonify, request
 import abc
 import sys

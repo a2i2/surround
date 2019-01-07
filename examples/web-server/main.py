@@ -1,4 +1,5 @@
-from surround import Stage, PipelineData, Pipeline, WebServiceRunner
+from surround import Stage, PipelineData, Pipeline
+from web_service_runner import WebServiceRunner
 import logging
 
 class ParseData(Stage):

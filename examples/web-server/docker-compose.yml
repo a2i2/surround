@@ -12,5 +12,5 @@ services:
       - 5000:5000
     working_dir: /opt/app
     volumes:
-      - ./main.py:/opt/app/main.py
+      - ./:/opt/app/
     command: python3 main.py
