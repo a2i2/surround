@@ -7,9 +7,9 @@ services:
     build:
       context: ../../
       args:
-        BASE_IMAGE: python:3
+        BASE_IMAGE: python:3.6
     ports:
-      - 5000:5000
+      - 8000:8000
     working_dir: /opt/app
     volumes:
       - ./:/opt/app/

@@ -72,4 +72,4 @@ class WebServiceRunner(ABC):
         self.app.add_url_rule('/predict', 'predict', PredictAction(pipeline, metadata))
 
     def start(self):
-        self.app.run(host='0.0.0.0', debug=True)
+        self.app.run(host='0.0.0.0', debug=True, port=8000)
