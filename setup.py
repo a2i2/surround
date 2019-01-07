@@ -17,5 +17,6 @@ setup(name='surround',
       author_email='scott.barnett@deakin.edu.au',
       packages=['surround'],
       test_suite="surround.tests",
+      include_package_data=True,
       zip_safe=False
 )
