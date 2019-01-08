@@ -1,8 +1,12 @@
 # Web service runner example
 
 ## Setup
-Install `flask` (check version from project [readme](../../README.md)).  
-Install `gunicorn` (check version from project [readme](../../README.md)).
+Install required packages
+| Package Name  | Version |
+| ------------- | ------- |
+| Flask         | 1.0.2   |
+| gunicorn      | 19.9.0  |
+
 ## Run
 Simple run
 ```bash
