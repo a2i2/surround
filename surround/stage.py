@@ -1,10 +1,9 @@
-import abc
+from abc import ABC, abstractmethod
 
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class Stage(ABC):
 
-    @abc.abstractmethod
+    @abstractmethod
     def operate(self, pipeline_data, config=None):
         """
         A stage in a pipeline.

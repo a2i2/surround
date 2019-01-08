@@ -23,11 +23,13 @@ jobs:
           command: |
             sudo python setup.py install
             sudo python setup.py test
+            sudo pip install Flask==1.0.2
+            sudo pip install pyyaml
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
 
   release:
     docker:
-      - image: circleci/python:2.7.15
+      - image: circleci/python:latest
     steps:
       - checkout
       - run:

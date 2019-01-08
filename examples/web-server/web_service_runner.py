@@ -1,11 +1,9 @@
 from surround import PipelineData
 from flask import Flask, jsonify, request
-import abc
+from abc import ABC
 import sys
 import logging
 
-# Python 2.7 and 3.5 compatible classes:
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 LOGGER = logging.getLogger(__name__)
 

@@ -5,18 +5,9 @@
 import logging
 from .stage import Stage
 from datetime import datetime
-import abc
+from configparser import ConfigParser
+from abc import ABC
 
-try:
-    # Python 3 support
-    from configparser import ConfigParser
-except ImportError:
-    # Python 2 support
-    from ConfigParser import SafeConfigParser as ConfigParser
-
-
-# Python 2.7 and 3.5 compatible classes:
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 LOGGER = logging.getLogger(__name__)
 
