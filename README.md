@@ -52,9 +52,10 @@ if __name__ == "__main__":
 See the [examples](https://github.com/dstil/surround/tree/master/examples) directory.
 
 ### Used packages
-| Package Name  | Version |
-| ------------- | ------- |
-| Flask         | 1.0.2   |
+| Package Name  | Version |                        Usage                        |
+| ------------- | ------- |-----------------------------------------------------|
+| Flask         | 1.0.2   | When running `surround` using web runnner           |
+| gunicorn      | 19.9.0  | When running `surround` using web runnner           |
 
 ## Contributing
 
