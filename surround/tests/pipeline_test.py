@@ -9,16 +9,11 @@ class HelloStage(Stage):
         if config:
             data.config_value = config["helloStage"]["suffix"]
 
-
-class FailStage(Stage):
-    def operate(self, data):
-        data.no_text = "hello"
-
-
 class BasicData(PipelineData):
     text = None
     config_value = None
-    stage = None
+    stage1 = None
+    stage2 = None
 
 class TestPipeline(unittest.TestCase):
 
@@ -47,4 +42,5 @@ class TestPipeline(unittest.TestCase):
         config.read_config_files([os.path.join(os.path.dirname(__file__), "stages.yaml")])
         pipeline.set_config(config)
         output = pipeline.process(BasicData())
-        self.assertEqual(output.stage, "second stage")
+        self.assertEqual(output.stage1, "first stage")
+        self.assertEqual(output.stage2, "second stage")
