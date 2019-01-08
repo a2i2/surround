@@ -13,4 +13,4 @@ services:
     working_dir: /opt/app
     volumes:
       - ./:/opt/app/
-    command: python3 main.py
+    command: gunicorn --bind 0.0.0.0:8000 --workers=5 --access-logfile - main:app

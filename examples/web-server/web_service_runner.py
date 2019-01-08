@@ -9,7 +9,7 @@ ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 LOGGER = logging.getLogger(__name__)
 
-class TestData(PipelineData):
+class Data(PipelineData):
     input = None
     output = None
 
@@ -30,7 +30,7 @@ class PredictAction(object):
     def __call__(self, *args):
         response = {}
         if (request.is_json):
-            data = TestData()
+            data = Data()
             data.input = request.get_json()
             self.pipeline.process(data)
             response = {
@@ -70,6 +70,3 @@ class WebServiceRunner(ABC):
 
         self.app.add_url_rule('/metadata', 'metadata', MetadataAction(metadata))
         self.app.add_url_rule('/predict', 'predict', PredictAction(pipeline, metadata))
-
-    def start(self):
-        self.app.run(host='0.0.0.0', debug=True, port=8000)

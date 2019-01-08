@@ -5,6 +5,7 @@ FROM $BASE_IMAGE
 ENV LANG C.UTF-8
 
 RUN pip3 install Flask==1.0.2
+RUN pip3 install gunicorn==19.9.0
 
 # Install surround to base image
 COPY . /opt/surround/
