@@ -2,13 +2,13 @@
 
 ## Setup
 Install required packages
+
 | Package Name  | Version |
 | ------------- | ------- |
 | Flask         | 1.0.2   |
 | gunicorn      | 19.9.0  |
 
-## Run
-Simple run
+Or you can just run this inside a container. To setup docker, copy `Dockerfile` into root directory. Then simply run:
 ```bash
 docker-compose up
 ```
