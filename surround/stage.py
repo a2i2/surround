@@ -4,6 +4,17 @@ ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class Stage(ABC):
 
+    def dump_output(self, dir, output):
+        """
+        Dump the output of each stage.
+
+        :param dir: output directory
+        :type dir: str
+        :param output: output to dump
+        :type output: depends on implementation
+        """
+        pass
+
     @abc.abstractmethod
     def operate(self, pipeline_data, config=None):
         """
