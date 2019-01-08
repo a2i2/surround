@@ -65,7 +65,15 @@ class Pipeline(ABC):
 
     def _execute_stage(self, stage, stage_data):
         stage_start = datetime.now()
-        stage.operate(stage_data, self.config)
+        stage_output = stage.operate(stage_data, self.config)
+
+        if config.get_path("surround.enable_stage_output_dump"):
+            # Create directory for intermediate stage output
+            stage_directory = os.path.join(output_directory, type(stage).__name__)
+            if not os.path.exists(stage_directory):
+                os.makedirs(stage_directory)
+
+            stage.dump_output(stage_directory, stage_output)
 
         # Calculate and log stage duration
         stage_execution_time = datetime.now() - stage_start
