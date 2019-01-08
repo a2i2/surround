@@ -7,6 +7,7 @@ from setuptools import setup
 
 # Collect version from repo tag
 VERSION = os.getenv('VERSION_TAG')
+INSTALL_REQUIRES=open("requirements.txt").read().split("\n")
 
 setup(name='surround',
       version=VERSION,
@@ -18,4 +19,4 @@ setup(name='surround',
       packages=['surround'],
       test_suite='surround.tests',
       include_package_data=True,
-      zip_safe=False)
+      install_requires=INSTALL_REQUIRES)
