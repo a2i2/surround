@@ -1,8 +1,8 @@
-from .pipeline import Pipeline
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import argparse
 import os
-
+from .config import Config
+from .pipeline import Pipeline
 
 def is_valid_dir(parser, arg):
     if not os.path.isdir(arg):
@@ -63,5 +63,7 @@ class FileSystemAdapter():
     def start(self):
         args = self.parser.parse_args()
         if hasattr(args, 'config_file'):
-            self.pipeline.set_config(args.config_file)
+            config = Config()
+            config.read_config_files([args.config_file])
+            self.pipeline.set_config(config)
         self.transform(args)

@@ -29,7 +29,7 @@ class ProcessCSV(Stage):
     def operate(self, data, config):
         data.word_count = len(data.row_dict['Consumer complaint narrative'].split())
 
-        if config.getboolean("ProcessCSV", "include_company"):
+        if config and config.get_path("ProcessCSV.include_company"):
             data.company = data.row_dict['Company']
 
 class BasicData(PipelineData):
