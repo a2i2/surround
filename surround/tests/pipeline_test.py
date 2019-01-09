@@ -4,10 +4,10 @@ from surround import Pipeline, Stage, PipelineData, Config
 from .stages.first_stage import FirstStage
 
 class HelloStage(Stage):
-    def operate(self, data, config):
-        data.text = "hello"
+    def operate(self, pipeline_data, config=None):
+        pipeline_data.text = "hello"
         if config:
-            data.config_value = config["helloStage"]["suffix"]
+            pipeline_data.config_value = config["helloStage"]["suffix"]
 
 class BasicData(PipelineData):
     text = None
@@ -30,7 +30,7 @@ class TestPipeline(unittest.TestCase):
     def test_pipeline_config(self):
         path = os.path.dirname(__file__)
         config = Config()
-        config.read_config_files([os.path.join(os.path.dirname(__file__), "config.yaml")])
+        config.read_config_files([os.path.join(path, "config.yaml")])
         pipeline = Pipeline([HelloStage()], config)
         output = pipeline.process(BasicData())
         self.assertEqual(output.config_value, "Scott")
@@ -39,7 +39,7 @@ class TestPipeline(unittest.TestCase):
         path = os.path.dirname(__file__)
         pipeline = Pipeline([FirstStage()])
         config = Config()
-        config.read_config_files([os.path.join(os.path.dirname(__file__), "stages.yaml")])
+        config.read_config_files([os.path.join(path, "stages.yaml")])
         pipeline.set_config(config)
         output = pipeline.process(BasicData())
         self.assertEqual(output.stage1, "first stage")

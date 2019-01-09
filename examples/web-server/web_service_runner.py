@@ -1,9 +1,8 @@
-from surround import PipelineData
-from flask import Flask, jsonify, request
-from abc import ABC
-import sys
 import logging
-
+import sys
+from abc import ABC
+from flask import Flask, jsonify, request
+from surround import PipelineData
 
 LOGGER = logging.getLogger(__name__)
 
@@ -11,14 +10,14 @@ class Data(PipelineData):
     input = None
     output = None
 
-class MetadataAction(object):
+class MetadataAction():
     def __init__(self, metadata):
         self.metadata = metadata
 
     def __call__(self, *args):
         return jsonify(self.metadata)
 
-class PredictAction(object):
+class PredictAction():
     methods = ['POST']
 
     def __init__(self, pipeline, metadata):
@@ -27,7 +26,7 @@ class PredictAction(object):
 
     def __call__(self, *args):
         response = {}
-        if (request.is_json):
+        if request.is_json:
             data = Data()
             data.input = request.get_json()
             self.pipeline.process(data)
@@ -49,7 +48,7 @@ class WebServiceRunner(ABC):
     def __init__(self, pipeline, metadata=None):
         self.app = Flask(__name__)
 
-        assert (metadata != None), "Metada is required"
+        assert (metadata is not None), "Metada is required"
         try:
             metadata['input']
         except KeyError:

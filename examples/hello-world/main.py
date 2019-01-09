@@ -1,9 +1,9 @@
-from surround import Stage, PipelineData, Pipeline
 import logging
+from surround import Stage, PipelineData, Pipeline
 
 class HelloStage(Stage):
-    def operate(self, data, config):
-        data.text = "hello"
+    def operate(self, pipeline_data, config=None):
+        pipeline_data.text = "hello"
 
 class BasicData(PipelineData):
     text = None

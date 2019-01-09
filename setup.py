@@ -7,7 +7,7 @@ from setuptools import setup
 
 # Collect version from repo tag
 VERSION = os.getenv('VERSION_TAG')
-INSTALL_REQUIRES=open("requirements.txt").read().split("\n")
+INSTALL_REQUIRES = open("requirements.txt").read().split("\n")
 
 setup(name='surround',
       version=VERSION,

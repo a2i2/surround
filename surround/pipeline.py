@@ -4,14 +4,13 @@
 from importlib import import_module
 import logging
 from datetime import datetime
-from configparser import ConfigParser
 from abc import ABC
 from .stage import Stage
 from .config import Config
 
 LOGGER = logging.getLogger(__name__)
 
-class Frozen(object):
+class Frozen():
     """
     A class that can toggle the ability of adding new attributes.
     """
