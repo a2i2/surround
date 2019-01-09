@@ -5,10 +5,6 @@ jobs:
       - image: circleci/python:latest
     steps:
       - checkout
-      - run:
-          name: Prepare image
-          command: |
-            sudo pip install Flask==1.0.2
   test-python-version:
     parameters:
       version:
