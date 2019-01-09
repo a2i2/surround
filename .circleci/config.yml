@@ -20,8 +20,10 @@ jobs:
             sudo python setup.py install
             sudo python setup.py test
             sudo pip3 install pylint
+            pylint setup.py
+            find surround/ -iname "*.py" | xargs pylint
+            find examples/ -iname "*.py" | xargs pylint
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
-            find . -iname "*.py" | xargs pylint 
 
   release:
     docker:
