@@ -1,10 +1,8 @@
 from .pipeline import Pipeline
-import abc
+from abc import ABC, abstractmethod
 import argparse
 import os
 
-# Python 2.7 and 3.5 compatible classes:
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 def is_valid_dir(parser, arg):
     if not os.path.isdir(arg):
@@ -58,7 +56,7 @@ class FileSystemAdapter():
                                      type=lambda x: is_valid_file(self.parser, x))
 
 
-    @abc.abstractmethod
+    @abstractmethod
     def transform(self, input_data):
         pass
 

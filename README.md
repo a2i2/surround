@@ -19,7 +19,7 @@ Surround is a lightweight framework for serving machine learning pipelines in Py
 
 ## Installation
 
-Tested on Python 2.7.15 and 3.6.5
+Tested on Python 3.6.5
 
 * Clone this repository
 * Navigate to the root directory
