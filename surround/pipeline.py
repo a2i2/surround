@@ -1,22 +1,13 @@
 # pipeline.py
 #
 # Manages a set of stages and the data that is passed between them.
-
+from importlib import import_module
 import logging
-from .stage import Stage
 from datetime import datetime
-import abc
-
-try:
-    # Python 3 support
-    from configparser import ConfigParser
-except ImportError:
-    # Python 2 support
-    from ConfigParser import SafeConfigParser as ConfigParser
-
-
-# Python 2.7 and 3.5 compatible classes:
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
+from configparser import ConfigParser
+from abc import ABC
+from .stage import Stage
+from .config import Config
 
 LOGGER = logging.getLogger(__name__)
 
@@ -49,19 +40,30 @@ class PipelineData(Frozen):
 
 class Pipeline(ABC):
 
-    def __init__(self, pipeline_stages, config_file=None):
+    def __init__(self, pipeline_stages, config=None):
         assert isinstance(pipeline_stages, list), \
                "pipeline_stages must be a list of Stage objects"
 
         self.pipeline_stages = pipeline_stages
         self.config = None
-        self.set_config(config_file)
+        if config:
+            self.set_config(config)
 
-    def set_config(self, config_file):
-        if config_file:
-            self.config = ConfigParser(allow_no_value=True)
-            self.config.read([config_file])
-            LOGGER.info("Logger file %s has been loaded", config_file)
+    def set_config(self, config):
+        if not config or not isinstance(config, Config):
+            raise TypeError("config should be of class Config")
+        self.config = config
+        if self.config["surround"]["stages"]:
+            self.pipeline_stages = []
+            result = self.config.get_path(self.config["surround"]["stages"])
+            if not isinstance(result, list):
+                result = [result]
+            for stage in filter(None, result):
+                parts = stage.split(".")
+                module = import_module("." + parts[-2], ".".join(parts[:-2]))
+                klass = getattr(module, parts[-1])
+                self.pipeline_stages.append(klass())
+        return True
 
     def _execute_stage(self, stage, stage_data):
         stage_start = datetime.now()
@@ -74,7 +76,7 @@ class Pipeline(ABC):
 
     def process(self, pipeline_data):
         assert isinstance(pipeline_data, PipelineData), \
-               "Input must be a PipelineData object or inherit from PipelineData"
+            "Input must be a PipelineData object or inherit from PipelineData"
 
         pipeline_data.freeze()
         pipeline_start = datetime.now()
@@ -95,5 +97,5 @@ class Pipeline(ABC):
             if error is None:
                 error = "FAILED"
                 LOGGER.exception("Failed processing pipeline")
-        pipeline_data.thaw()
+                pipeline_data.thaw()
         return pipeline_data
