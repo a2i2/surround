@@ -1,0 +1,96 @@
+import logging
+import argparse
+import os
+from surround import Pipeline, Config
+from .stages import ValidateData, TutorialData
+
+# Data Science projects should use logging over print statements:
+#
+#    import logging
+#    logging.info("print to output")
+#
+# This is so that in a production environment the output is written to
+# log files for debugging rather than to standard out where the output
+# is lost.
+# The command below configures the default logger.
+logging.basicConfig(level=logging.INFO)
+
+# Validation functions for the command line parser below
+
+def is_valid_dir(arg_parser, arg):
+    if not os.path.isdir(arg):
+        arg_parser.error("Invalid directory %s" % arg)
+    else:
+        return arg
+
+def is_valid_file(arg_parser, arg):
+    if not os.path.isfile(arg):
+        arg_parser.error("Invalid file %s" % arg)
+    else:
+        return arg
+
+# Set up the parser for command line arguments
+parser = argparse.ArgumentParser(description="The Surround Command Line Interface")
+parser.add_argument('-o', '--output-dir', required=True, help="Output directory",
+                                     type=lambda x: is_valid_dir(parser, x))
+
+parser.add_argument('-i', '--input-dir', required=True, help="Input directory",
+                                     type=lambda x: is_valid_dir(parser, x))
+parser.add_argument('-c', '--config-file', required=True, help="Path to config file",
+                                     type=lambda x: is_valid_file(parser, x))
+
+def load_data(input_dir, output_dir, config_path):
+
+    # All Surround projects have a Pipeline class which is responsible
+    # for configurating and running a list of stages. In this case the
+    # pipeline has a single stage to run, the ValidateData stage.
+    pipeline = Pipeline([ValidateData()])
+
+    # Config is a dictonary with some utility functions for reading
+    # values in from yaml files. Any value read in from a yaml file
+    # can be overriden with an envionrment vairable with a SURROUND_
+    # prefix and '_' to mark nesting. A yaml file with the following
+    # content:
+    #
+    # output:
+    #   mode: True
+    #
+    # Can be overriden with an envionrment variable:
+    # SURROUND_OUTPUT_MODE
+    config = Config()
+
+    # When specifying multiple config files each config file can
+    # override a previous config's values.
+    config.read_config_files([config_path])
+
+    pipeline.set_config(config)
+
+    # Pipelines operate on an instance of PipelineData. In this case
+    # the input data is a string 'data'. See stages.py for more
+    # details. In most projects the input for a pipeline will be read
+    # from a file stored in the directory intput_dir.
+    data = TutorialData("data")
+
+    # Start running each stage of the pipeline passing the data to
+    # each stage in order. The data variable will be updated with the
+    # output of each stage so there is no return value.
+    pipeline.process(data)
+
+    # Write the output to file
+    with open(os.path.abspath(os.path.join(output_dir, "output.txt")), 'w') as f:
+        f.write(data.output_data)
+
+    # Check and handle any errors
+    if data.error:
+        logging.error("Processing error...")
+
+    # Log all warnings from running the pipeline
+    for warn in data.warnings:
+        logging.warn(warn)
+
+    # Log the result to screen
+    logging.info(data.output_data)
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    load_data(args.input_dir, args.output_dir, args.config_file)
