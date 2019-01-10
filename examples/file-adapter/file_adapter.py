@@ -1,13 +1,13 @@
-from surround import Stage, PipelineData, Pipeline, FileSystemAdapter
 import logging
 import os
 import csv
+from surround import Stage, PipelineData, Pipeline, FileSystemAdapter
 
 class CustomFileSystemAdapter(FileSystemAdapter):
 
-    def transform(self, args):
+    def transform(self, input_data):
         output = []
-        with open(args.file0) as csv_file:
+        with open(input_data.file0) as csv_file:
             content = csv.DictReader(csv_file, delimiter=',', quotechar='"')
             for i, row in enumerate(content):
                 logging.info("Processing row %d", i)
@@ -16,21 +16,21 @@ class CustomFileSystemAdapter(FileSystemAdapter):
                 output.append((data.word_count, data.company))
 
 
-        output_path = os.path.abspath(os.path.join(args.output_dir, "output.txt"))
+        output_path = os.path.abspath(os.path.join(input_data.output_dir, "output.txt"))
         with open(output_path, "w") as output_file:
-            for a,b in output:
+            for a, b in output:
                 if b is None:
                     output_file.write("%d\n" % a)
                 else:
-                    output_file.write("%d,\"%s\"\n" % (a,b))
+                    output_file.write("%d,\"%s\"\n" % (a, b))
         logging.info("File written to %s", output_path)
 
 class ProcessCSV(Stage):
-    def operate(self, data, config):
-        data.word_count = len(data.row_dict['Consumer complaint narrative'].split())
+    def operate(self, pipeline_data, config=None):
+        pipeline_data.word_count = len(pipeline_data.row_dict['Consumer complaint narrative'].split())
 
-        if config.getboolean("ProcessCSV", "include_company"):
-            data.company = data.row_dict['Company']
+        if config and config.get_path("ProcessCSV.include_company"):
+            pipeline_data.company = pipeline_data.row_dict['Company']
 
 class BasicData(PipelineData):
     word_count = None

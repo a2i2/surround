@@ -1,6 +1,5 @@
-import abc
+from abc import ABC, abstractmethod
 
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class Stage(ABC):
 
@@ -17,7 +16,7 @@ class Stage(ABC):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def operate(self, pipeline_data, config=None):
         """
         A stage in a pipeline.
@@ -27,4 +26,3 @@ class Stage(ABC):
         :param config: Contains the settings for each stage.
         :type config: ConfigParser object
         """
-        pass

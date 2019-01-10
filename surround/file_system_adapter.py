@@ -1,10 +1,8 @@
-from .pipeline import Pipeline
-import abc
+from abc import abstractmethod
 import argparse
 import os
-
-# Python 2.7 and 3.5 compatible classes:
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
+from .config import Config
+from .pipeline import Pipeline
 
 def is_valid_dir(parser, arg):
     if not os.path.isdir(arg):
@@ -34,11 +32,13 @@ class FileSystemAdapter():
         self.parser = argparse.ArgumentParser(description=kwargs.get('description'))
 
         if 'output_dir' in kwargs:
-            self.parser.add_argument('-o', '--output-dir', required=True, help=kwargs.get('output_dir'),
+            self.parser.add_argument('-o', '--output-dir',
+                                     required=True, help=kwargs.get('output_dir'),
                                      type=lambda x: is_valid_dir(self.parser, x))
 
         if 'input_dir' in kwargs:
-            self.parser.add_argument('-i', '--input-dir', required=True, help=kwargs.get('input_dir'),
+            self.parser.add_argument('-i', '--input-dir',
+                                     required=True, help=kwargs.get('input_dir'),
                                      type=lambda x: is_valid_dir(self.parser, x))
 
         if 'file0' in kwargs:
@@ -54,16 +54,19 @@ class FileSystemAdapter():
                                      type=lambda x: is_valid_file(self.parser, x))
 
         if 'config_file' in kwargs:
-            self.parser.add_argument('-c', '--config-file', required=True, help=kwargs.get('config_file'),
+            self.parser.add_argument('-c', '--config-file',
+                                     required=True, help=kwargs.get('config_file'),
                                      type=lambda x: is_valid_file(self.parser, x))
 
 
-    @abc.abstractmethod
+    @abstractmethod
     def transform(self, input_data):
         pass
 
     def start(self):
         args = self.parser.parse_args()
         if hasattr(args, 'config_file'):
-            self.pipeline.set_config(args.config_file)
+            config = Config()
+            config.read_config_files([args.config_file])
+            self.pipeline.set_config(config)
         self.transform(args)

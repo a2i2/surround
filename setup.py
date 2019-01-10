@@ -3,11 +3,11 @@ Python package definition for Surround
 """
 import os
 
-from setuptools import setup, find_packages
-
+from setuptools import setup
 
 # Collect version from repo tag
 VERSION = os.getenv('VERSION_TAG')
+INSTALL_REQUIRES = open("requirements.txt").read().split("\n")
 
 setup(name='surround',
       version=VERSION,
@@ -15,7 +15,8 @@ setup(name='surround',
       url='http://github.com/dstil/surround',
       author='Scott Barnett',
       author_email='scott.barnett@deakin.edu.au',
+      data_files=[('', ['surround/defaults.yaml'])],
       packages=['surround'],
-      test_suite="surround.tests",
-      zip_safe=False
-)
+      test_suite='surround.tests',
+      include_package_data=True,
+      install_requires=INSTALL_REQUIRES)

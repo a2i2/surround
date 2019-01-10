@@ -57,6 +57,7 @@ git fetch upstream
 * Create a branch and identify the issue you would like to work on.
 * Using your favorite editor, make your changes, [committing as you go](https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes).
 * Try to follow [PEP8](https://pep8.org/), but you may ignore the line length limit if following it would make the code uglier.
+* Use [YAPF](https://github.com/google/yapf) to check the formatting.
 * Include tests that cover any code changes you make. Make sure the test fails without your patch. [Run the tests](#running-the-tests)
 * Push your commits to GitHub and [create a pull request](https://help.github.com/articles/creating-a-pull-request/).
 * Celebrate 🎉

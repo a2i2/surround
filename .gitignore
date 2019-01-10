@@ -22,3 +22,6 @@ venv.bak/
 .DS_Store
 .vscode
 .python-version
+
+# Ignore text output files
+/examples/file-adapter/data/output.txt
