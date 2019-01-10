@@ -1,8 +1,7 @@
 from abc import abstractmethod
 import argparse
 import os
-from .config import Config
-from .pipeline import Pipeline
+from surround import Config, Pipeline
 
 def is_valid_dir(parser, arg):
     if not os.path.isdir(arg):
@@ -17,7 +16,7 @@ def is_valid_file(parser, arg):
         return arg
 
 
-class FileSystemAdapter():
+class FileSystemRunner():
 
     def __init__(self, pipeline, **kwargs):
         assert isinstance(pipeline, Pipeline), \
