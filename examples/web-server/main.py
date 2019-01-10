@@ -1,11 +1,10 @@
-from threading import Timer
-import os
-import sys
+import time
+import subprocess
 
-def escape():
-    sys.exit(0)
 
-t = Timer(5.0, escape)
-t.start()
-
-os.system('python examples/web-server/sample_web_service.py &')
+process = subprocess.Popen(['python', 'examples/web-server/sample_web_service.py'])
+time.sleep(5)
+process.terminate()
+process.poll()
+if not (process.returncode is None) and process.returncode > 0:
+    raise Exception('Failed to run sampe web service app. Error code: ' + str(process.returncode))
