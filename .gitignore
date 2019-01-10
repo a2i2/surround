@@ -24,5 +24,4 @@ venv.bak/
 .python-version
 
 # Ignore text output files
-/output.txt
-/examples/output.txt
+/examples/file-adapter/data/output.txt
