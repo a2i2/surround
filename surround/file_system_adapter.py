@@ -32,11 +32,13 @@ class FileSystemAdapter():
         self.parser = argparse.ArgumentParser(description=kwargs.get('description'))
 
         if 'output_dir' in kwargs:
-            self.parser.add_argument('-o', '--output-dir', required=True, help=kwargs.get('output_dir'),
+            self.parser.add_argument('-o', '--output-dir',
+                                     required=True, help=kwargs.get('output_dir'),
                                      type=lambda x: is_valid_dir(self.parser, x))
 
         if 'input_dir' in kwargs:
-            self.parser.add_argument('-i', '--input-dir', required=True, help=kwargs.get('input_dir'),
+            self.parser.add_argument('-i', '--input-dir',
+                                     required=True, help=kwargs.get('input_dir'),
                                      type=lambda x: is_valid_dir(self.parser, x))
 
         if 'file0' in kwargs:
@@ -52,7 +54,8 @@ class FileSystemAdapter():
                                      type=lambda x: is_valid_file(self.parser, x))
 
         if 'config_file' in kwargs:
-            self.parser.add_argument('-c', '--config-file', required=True, help=kwargs.get('config_file'),
+            self.parser.add_argument('-c', '--config-file',
+                                     required=True, help=kwargs.get('config_file'),
                                      type=lambda x: is_valid_file(self.parser, x))
 
 

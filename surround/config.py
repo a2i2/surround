@@ -1,8 +1,9 @@
 import ast
 import copy
 import os
-import yaml
 from pkg_resources import resource_stream
+import yaml
+
 ENV_VAR_PREFIX = "SURROUND_"
 
 class Config(dict):

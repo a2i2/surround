@@ -23,6 +23,12 @@ jobs:
           command: |
             sudo python setup.py install
             sudo python setup.py test
+            sudo pip3 install pylint==2.2.2
+            sudo pip3 install Flask==1.0.2
+            sudo pip3 install gunicorn==19.9.0
+            pylint setup.py
+            find surround/ -iname "*.py" | xargs pylint
+            find examples/ -iname "*.py" | xargs pylint
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
 
   release:

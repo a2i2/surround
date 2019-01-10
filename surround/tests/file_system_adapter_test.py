@@ -5,7 +5,7 @@ from surround import FileSystemAdapter, Pipeline
 
 class MyFileSystemAdapter(FileSystemAdapter):
 
-    def transform(self, args):
+    def transform(self, input_data):
         pass
 
 

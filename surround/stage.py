@@ -11,4 +11,3 @@ class Stage(ABC):
                               Stores intermediate data from each stage in the pipeline.
         :param config: A ConfigParser object that contains the settings for each stage.
         """
-        pass
