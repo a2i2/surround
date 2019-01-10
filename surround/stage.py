@@ -3,18 +3,17 @@ from abc import ABC, abstractmethod
 
 class Stage(ABC):
 
-    def dump_output(self, dir, output, config=None):
+    def dump_output(self, output_dir, output, config=None):
         """
         Dump the output of each stage.
 
-        :param dir: output directory
-        :type dir: str
+        :param output_dir: output directory
+        :type output_dir: str
         :param output: output to dump
         :type output: depends on implementation
         :param config: Contains the settings for each stage.
         :type config: ConfigParser object
         """
-        pass
 
     @abstractmethod
     def operate(self, pipeline_data, config=None):
