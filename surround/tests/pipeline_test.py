@@ -4,7 +4,7 @@ from surround import Pipeline, Stage, PipelineData, Config
 from .stages.first_stage import FirstStage
 
 class HelloStage(Stage):
-    def operate(self, pipeline_data, config=None):
+    def operate(self, pipeline_data, config):
         pipeline_data.text = "hello"
         if config:
             pipeline_data.config_value = config["helloStage"]["suffix"]
