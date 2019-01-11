@@ -1,7 +1,7 @@
 pipelines:
-  pipeline2:
+  test:
     - surround.tests.stages.first_stage.FirstStage
     - surround.tests.stages.second_stage.SecondStage
 
 surround:
-  stages: pipelines.pipeline2
+  stages: pipelines.test

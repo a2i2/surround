@@ -1,7 +1,7 @@
 from abc import abstractmethod
 import argparse
 import os
-from surround import Config, Pipeline
+from surround import Config, Surround
 
 def is_valid_dir(parser, arg):
     if not os.path.isdir(arg):
@@ -18,10 +18,10 @@ def is_valid_file(parser, arg):
 
 class FileSystemRunner():
 
-    def __init__(self, pipeline, **kwargs):
-        assert isinstance(pipeline, Pipeline), \
-            "pipeline must be a class or subclass of Pipeline"
-        self.pipeline = pipeline
+    def __init__(self, surround, **kwargs):
+        assert isinstance(surround, Surround), \
+            "surround must be a class or subclass of Surround"
+        self.surround = surround
 
         assert all(isinstance(value, str) for value in kwargs.values()), \
             "Keys should be a string description of that input parameter"
@@ -67,5 +67,5 @@ class FileSystemRunner():
         if hasattr(args, 'config_file'):
             config = Config()
             config.read_config_files([args.config_file])
-            self.pipeline.set_config(config)
+            self.surround.set_config(config)
         self.transform(args)

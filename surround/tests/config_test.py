@@ -7,7 +7,7 @@ from surround import Config
 
 yaml1 = """
 main:
-  pipeline: au.com.first_stage.FirstStage
+  surround: au.com.first_stage.FirstStage
   count: 3
 
 objects:
@@ -59,7 +59,7 @@ class TestConfig(unittest.TestCase):
             },
             'main': {
                 'count': 15,
-                'pipeline': 'au.com.first_stage.FirstStage'
+                'surround': 'au.com.first_stage.FirstStage'
             },
             'objects': [{
                 'node': 43,

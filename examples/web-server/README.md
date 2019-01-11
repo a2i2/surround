@@ -18,7 +18,7 @@ GET `/metadata` to check required input and output
 ```bash
 curl http://localhost:8000/metadata
 ```
-POST `/predict` to run pipeline via http
+POST `/predict` to trigger Surround via http
 ```bash
 curl -d '{"name": "Test"}' -H "Content-Type: application/json" -X POST http://localhost:8000/predict
 ```
