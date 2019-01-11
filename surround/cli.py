@@ -68,34 +68,56 @@ def is_valid_dir(aparser, arg):
     else:
         return arg
 
+def is_valid_name(aparser, arg):
+    if not arg.isalpha() or not arg.islower():
+        aparser.error("Name %s must be lowercase letters" % arg)
+    else:
+        return arg
 
 def main():
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
-    init_parser = sub_parser.add_parser('init', help="Initialiser for new Surround projects")
+    tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
+    init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
     init_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project")
-    init_parser.add_argument('-t', '--tutorial', help="Create the Surround tutorial project", action='store_true')
+    init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
+    init_parser.add_argument('-d', '--description', help="A description for the project")
+    tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
+    tutorial_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating the tutorial project")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init"]
+    tools = ["init", "tutorial"]
     if len(sys.argv) < 2 or not sys.argv[1] in tools:
         print("Invalid subcommand, must be one of %s" % tools)
         parser.print_help()
     else:
-        value = parser.parse_args()
-        if value.tutorial:
-            process(value.path, PROJECTS["new"], "tutorial", None, "tutorial")
+        tool = sys.argv[1]
+        parsed_args = parser.parse_args()
+        if tool == "tutorial":
+            process(parsed_args.path, PROJECTS["new"], "tutorial", None, "tutorial")
+            print("The tutorial project has been created.\n")
+            print("Start by reading the README.md file at:")
+            print(os.path.abspath(os.path.join(parsed_args.path, "tutorial", "README.md")))
         else:
-            while True:
-                project_name = input("Name of project: ")
-                if not project_name.isalpha() or not project_name.islower():
-                    print("Project name requires lowercase letters only")
-                else:
-                    break
-            project_description = input("What is the purpose of this project?: ")
-            process(value.path, PROJECTS["new"], project_name, project_description, "new")
+            if "project_name" in parsed_args and parsed_args.project_name:
+                project_name = parsed_args.project_name
+            else:
+                while True:
+                    project_name = input("Name of project: ")
+                    if not project_name.isalpha() or not project_name.islower():
+                        print("Project name requires lowercase letters only")
+                    else:
+                        break
+
+            if "description" in parsed_args:
+                project_description = parsed_args.description
+            else:
+                project_description = input("What is the purpose of this project?: ")
+
+            process(parsed_args.path, PROJECTS["new"], project_name, project_description, "new")
+            print("Project created at %s/%s" % (parsed_args.path, project_name))
 
 if __name__ == "__main__":
     main()

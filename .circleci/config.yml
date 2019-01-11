@@ -23,13 +23,28 @@ jobs:
           command: |
             sudo python setup.py install
             sudo python setup.py test
+
             sudo pip3 install pylint==2.2.2
             sudo pip3 install Flask==1.0.2
             sudo pip3 install gunicorn==19.9.0
             pylint setup.py
+
             find surround/ -iname "*.py" | xargs pylint
             find examples/ -iname "*.py" | xargs pylint
+
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
+
+            mkdir ./temp
+            surround tutorial ./temp
+            surround init ./temp -p project -d "A test project"
+
+            cd ./temp/tutorial
+            python3 -m tutorial -o data/output/ -i data/input/ -c tutorial/config.yaml
+            [ -f ./data/output/output.txt ]
+
+            cd ../project
+            python3 -m project -o data/output/ -i data/input/ -c project/config.yaml
+            [ -f ./data/output/output.txt ]
 
   release:
     docker:
