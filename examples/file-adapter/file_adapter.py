@@ -26,7 +26,7 @@ class CustomFileSystemAdapter(FileSystemAdapter):
         logging.info("File written to %s", output_path)
 
 class ProcessCSV(Stage):
-    def operate(self, pipeline_data, config=None):
+    def operate(self, pipeline_data, config):
         pipeline_data.word_count = len(pipeline_data.row_dict['Consumer complaint narrative'].split())
 
         if config and config.get_path("ProcessCSV.include_company"):
