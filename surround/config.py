@@ -1,17 +1,18 @@
 import ast
-import copy
 import os
+from collections.abc import Mapping
 from pkg_resources import resource_stream
+
 import yaml
 
 ENV_VAR_PREFIX = "SURROUND_"
 
-class Config(dict):
+class Config(Mapping):
 
     def __init__(self):
-        dict.__init__(self, self.__load_defaults())
+        self._storage = self.__load_defaults()
 
-    def read_config_files(self, yaml_files, add_to_config=True):
+    def read_config_files(self, yaml_files):
         configs = []
         try:
             for path in reversed(yaml_files):
@@ -21,15 +22,15 @@ class Config(dict):
             err.strerror = 'Unable to load configuration file (%s)' % err.strerror
             raise
 
-        self.__merge_configs(configs, add_to_config)
+        self.__merge_configs(configs)
         self.__insert_environment_variables()
         return True
 
-    def read_from_dict(self, config_dict, add_to_config=True):
+    def read_from_dict(self, config_dict):
         if not isinstance(config_dict, dict):
             return TypeError("config_dict should be a dict")
 
-        self.__merge_configs([config_dict], add_to_config)
+        self.__merge_configs([config_dict])
         self.__insert_environment_variables()
         return True
 
@@ -37,8 +38,8 @@ class Config(dict):
         if not isinstance(path, str):
             raise TypeError("path should be a string")
         if not "." in path:
-            return self[path]
-        return self.__iterate_over_dict(self, path.split("."))
+            return self._storage[path]
+        return self.__iterate_over_dict(self._storage, path.split("."))
 
     def __load_defaults(self):
         try:
@@ -49,7 +50,7 @@ class Config(dict):
             raise
         return config
 
-    def __merge_configs(self, configs, add_to_config):
+    def __merge_configs(self, configs):
         """ Merges a list of dictionaries into the dictionary of this class. Note that lists are
         overriden completely not extended.
         """
@@ -60,25 +61,22 @@ class Config(dict):
             if isinstance(src, dict):
                 for k, v in src.items():
                     if k in target:
-                        extend_dict(target[k], v)
+                        if isinstance(target[k], dict):
+                            extend_dict(target[k], v)
+                        else:
+                            target[k] = v
                     else:
-                        target[k] = copy.copy(v)
-            else:
-                target = src
+                        target[k] = v
 
-        if not add_to_config:
-            self.clear()
-
-        for config in configs + [self.__load_defaults()]:
-            extend_dict(self, config)
-
+        for config in configs:
+            extend_dict(self._storage, config)
 
     def __insert_environment_variables(self):
         for var in os.environ:
             if not var.startswith(ENV_VAR_PREFIX) or len(var) == len(ENV_VAR_PREFIX):
                 continue
             surround_variables = [n.lower() for n in var[len(ENV_VAR_PREFIX):].split("_") if n]
-            self.__override_or_add_var(self, surround_variables, os.getenv(var))
+            self.__override_or_add_var(self._storage, surround_variables, os.getenv(var))
 
     def __override_or_add_var(self, config, key_list, value):
         if len(key_list) > 1:
@@ -102,3 +100,12 @@ class Config(dict):
                 return self.__iterate_over_dict(dictionary[key], key_list[1:])
             return dictionary[key]
         return None
+
+    def __getitem__(self, key):
+        return self._storage[key]
+
+    def __iter__(self):
+        return iter(self._storage)
+
+    def __len__(self):
+        return len(self._storage)

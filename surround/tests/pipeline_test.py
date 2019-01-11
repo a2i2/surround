@@ -6,7 +6,7 @@ from .stages.first_stage import FirstStage
 class HelloStage(Stage):
     def operate(self, pipeline_data, config):
         pipeline_data.text = "hello"
-        if config:
+        if config.get_path("helloStage.suffix"):
             pipeline_data.config_value = config["helloStage"]["suffix"]
 
 class BasicData(PipelineData):
