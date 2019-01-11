@@ -1,7 +1,7 @@
 import logging
-from surround import Stage, PipelineData
+from surround import Stage, SurroundData
 
-class {project_name}Data(PipelineData):
+class {project_name}Data(SurroundData):
     input_data = None
     output_data = None
 
