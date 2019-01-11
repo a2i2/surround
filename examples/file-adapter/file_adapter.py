@@ -1,10 +1,11 @@
 import logging
 import os
 import csv
-from surround import Stage, PipelineData, Pipeline, FileSystemAdapter
+from surround import Stage, PipelineData, Pipeline
+from file_system_runner import FileSystemRunner
 
-class CustomFileSystemAdapter(FileSystemAdapter):
 
+class CustomFileSystemRunner(FileSystemRunner):
     def transform(self, input_data):
         output = []
         with open(input_data.file0) as csv_file:
@@ -43,9 +44,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     pipeline = Pipeline([ProcessCSV()])
-    adapter = CustomFileSystemAdapter(pipeline,
-                                      description="A sample project to process a CSV file",
-                                      output_dir="Directory to store the output",
-                                      config_file="Path to configuration file",
-                                      file0="Input CSV file")
+    adapter = CustomFileSystemRunner(pipeline,
+                                     description="A sample project to process a CSV file",
+                                     output_dir="Directory to store the output",
+                                     config_file="Path to configuration file",
+                                     file0="Input CSV file")
     adapter.start()
