@@ -9,8 +9,7 @@ ENV_VAR_PREFIX = "SURROUND_"
 class Config(dict):
 
     def __init__(self):
-        dict.__init__(self, {})
-        self.__load_defaults()
+        dict.__init__(self, self.__load_defaults())
 
     def read_config_files(self, yaml_files, add_to_config=True):
         configs = []

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class Stage(ABC):
 
     @abstractmethod
-    def operate(self, pipeline_data, config=None):
+    def operate(self, pipeline_data, config):
         """
         A stage in a pipeline.
         :param pipeline_data: Instance or child of the PipelineData class.

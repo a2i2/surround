@@ -39,7 +39,7 @@ class PipelineData(Frozen):
 
 class Pipeline(ABC):
 
-    def __init__(self, pipeline_stages, config=None):
+    def __init__(self, pipeline_stages, config=Config()):
         assert isinstance(pipeline_stages, list), \
                "pipeline_stages must be a list of Stage objects"
 
