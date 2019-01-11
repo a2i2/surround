@@ -1,7 +1,7 @@
 import logging
 import argparse
 import os
-from surround import Pipeline, Config
+from surround import Surround, Config
 from .stages import ValidateData, TutorialData
 
 # Data Science projects should use logging over print statements:
@@ -41,21 +41,21 @@ parser.add_argument('-c', '--config-file', required=True, help="Path to config f
 
 def load_data(input_dir, output_dir, config_path):
 
-    # All Surround projects have a Pipeline class which is responsible
-    # for configurating and running a list of stages. In this case the
-    # pipeline has a single stage to run, the ValidateData stage.
-    pipeline = Pipeline([ValidateData()])
+    # All Surround projects have a Surround class which is responsible
+    # for configurating and running a list of stages. In this case
+    # Surround has a single stage to run, the ValidateData stage.
+    surround = Surround([ValidateData()])
 
-    # Config is a dictonary with some utility functions for reading
+    # Config is a dictionary with some utility functions for reading
     # values in from yaml files. Any value read in from a yaml file
-    # can be overriden with an envionrment vairable with a SURROUND_
+    # can be overridden with an environment variable with a SURROUND_
     # prefix and '_' to mark nesting. A yaml file with the following
     # content:
     #
     # output:
     #   mode: True
     #
-    # Can be overriden with an envionrment variable:
+    # Can be overridden with an environment variable:
     # SURROUND_OUTPUT_MODE
     config = Config()
 
@@ -63,18 +63,18 @@ def load_data(input_dir, output_dir, config_path):
     # override a previous config's values.
     config.read_config_files([config_path])
 
-    pipeline.set_config(config)
+    surround.set_config(config)
 
-    # Pipelines operate on an instance of PipelineData. In this case
+    # Surround operates on an instance of SurroundData. In this case
     # the input data is a string 'data'. See stages.py for more
-    # details. In most projects the input for a pipeline will be read
-    # from a file stored in the directory intput_dir.
+    # details. In most projects the input for Surround will be read
+    # from a file stored in the directory input_dir.
     data = TutorialData("data")
 
-    # Start running each stage of the pipeline passing the data to
+    # Start running each stage of Surround by passing the data to
     # each stage in order. The data variable will be updated with the
     # output of each stage so there is no return value.
-    pipeline.process(data)
+    surround.process(data)
 
     # Write the output to file
     with open(os.path.abspath(os.path.join(output_dir, "output.txt")), 'w') as f:

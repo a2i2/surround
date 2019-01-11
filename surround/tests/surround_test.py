@@ -1,46 +1,46 @@
 import unittest
 import os
-from surround import Pipeline, Stage, PipelineData, Config
+from surround import Surround, Stage, SurroundData, Config
 from .stages.first_stage import FirstStage
 
 class HelloStage(Stage):
-    def operate(self, pipeline_data, config=None):
-        pipeline_data.text = "hello"
+    def operate(self, surround_data, config=None):
+        surround_data.text = "hello"
         if config:
-            pipeline_data.config_value = config["helloStage"]["suffix"]
+            surround_data.config_value = config["helloStage"]["suffix"]
 
-class BasicData(PipelineData):
+class BasicData(SurroundData):
     text = None
     config_value = None
     stage1 = None
     stage2 = None
 
-class TestPipeline(unittest.TestCase):
+class TestSurround(unittest.TestCase):
 
     def test_happy_path(self):
-        pipeline = Pipeline([HelloStage()])
-        output = pipeline.process(BasicData())
+        surround = Surround([HelloStage()])
+        output = surround.process(BasicData())
         self.assertEqual(output.text, "hello")
 
     def test_rejecting_attributes(self):
-        pipeline = Pipeline([HelloStage()])
-        output = pipeline.process(BasicData())
+        surround = Surround([HelloStage()])
+        output = surround.process(BasicData())
         self.assertRaises(AttributeError, getattr, output, "no_text")
 
-    def test_pipeline_config(self):
+    def test_surround_config(self):
         path = os.path.dirname(__file__)
         config = Config()
         config.read_config_files([os.path.join(path, "config.yaml")])
-        pipeline = Pipeline([HelloStage()], config)
-        output = pipeline.process(BasicData())
+        surround = Surround([HelloStage()], config)
+        output = surround.process(BasicData())
         self.assertEqual(output.config_value, "Scott")
 
-    def test_pipeline_override(self):
+    def test_surround_override(self):
         path = os.path.dirname(__file__)
-        pipeline = Pipeline([FirstStage()])
+        surround = Surround([FirstStage()])
         config = Config()
         config.read_config_files([os.path.join(path, "stages.yaml")])
-        pipeline.set_config(config)
-        output = pipeline.process(BasicData())
+        surround.set_config(config)
+        output = surround.process(BasicData())
         self.assertEqual(output.stage1, "first stage")
         self.assertEqual(output.stage2, "second stage")

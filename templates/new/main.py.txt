@@ -1,7 +1,7 @@
 import logging
 import argparse
 import os
-from surround import Pipeline, Config
+from surround import Surround, Config
 from .stages import ValidateData, {project_name}Data
 
 logging.basicConfig(level=logging.INFO)
@@ -28,15 +28,15 @@ parser.add_argument('-c', '--config-file', required=True, help="Path to config f
                                      type=lambda x: is_valid_file(parser, x))
 
 def transform(input_dir, output_dir, config_path):
-    pipeline = Pipeline([ValidateData()])
+    surround = Surround([ValidateData()])
     config = Config()
     config.read_config_files([config_path])
-    pipeline.set_config(config)
+    surround.set_config(config)
 
     # TODO: Read data from input directory here
 
     data = {project_name}Data("data")
-    pipeline.process(data)
+    surround.process(data)
     with open(os.path.abspath(os.path.join(output_dir, "output.txt")), 'w') as f:
         f.write(data.output_data)
     logging.info(data.output_data)
