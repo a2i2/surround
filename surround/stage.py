@@ -15,9 +15,10 @@ class Stage(ABC):
 
     @abstractmethod
     def operate(self, surround_data, config):
-        """
-        A stage in a surround.
-        :param surround_data: Instance or child of the SurroundData class.
-                              Stores intermediate data from each stage in Surround.
-        :param config: A ConfigParser object that contains the settings for each stage.
+        """A stage in a surround pipeline.
+
+        :param surround_data: Stores intermediate data from each stage in the pipeline
+        :type surround_data: Instance or child of the SurroundData class
+        :param config: Contains the settings for each stage
+        :type config: <class 'surround.config.Config'>
         """
