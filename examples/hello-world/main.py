@@ -1,15 +1,15 @@
 import logging
-from surround import Stage, PipelineData, Pipeline
+from surround import Stage, SurroundData, Surround
 
 class HelloStage(Stage):
-    def operate(self, pipeline_data, config):
-        pipeline_data.text = "hello"
+    def operate(self, surround_data, config):
+        surround_data.text = "hello"
 
-class BasicData(PipelineData):
+class BasicData(SurroundData):
     text = None
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    pipeline = Pipeline([HelloStage()])
-    output = pipeline.process(BasicData())
+    surround = Surround([HelloStage()])
+    output = surround.process(BasicData())
     print(output.text)

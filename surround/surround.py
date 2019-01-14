@@ -1,4 +1,4 @@
-# pipeline.py
+# surround.py
 #
 # Manages a set of stages and the data that is passed between them.
 from importlib import import_module
@@ -26,10 +26,10 @@ class Frozen():
     def thaw(self):
         self.__isfrozen = False
 
-class PipelineData(Frozen):
+class SurroundData(Frozen):
     """
-    Stores the data to be passed between each stage of a pipeline.
-    Note that different stages of the pipeline are responsible for
+    Stores the data to be passed between each stage in Surround.
+    Note that different stages inside Surround are responsible for
     setting the attributes.
     """
     stage_metadata = []
@@ -37,13 +37,13 @@ class PipelineData(Frozen):
     error = None
     warnings = []
 
-class Pipeline(ABC):
+class Surround(ABC):
 
-    def __init__(self, pipeline_stages, config=Config()):
-        assert isinstance(pipeline_stages, list), \
-               "pipeline_stages must be a list of Stage objects"
+    def __init__(self, surround_stages, config):
+        assert isinstance(surround_stages, list), \
+               "surround_stages must be a list of Stage objects"
 
-        self.pipeline_stages = pipeline_stages
+        self.surround_stages = surround_stages
         self.config = None
         if config:
             self.set_config(config)
@@ -53,7 +53,7 @@ class Pipeline(ABC):
             raise TypeError("config should be of class Config")
         self.config = config
         if self.config["surround"]["stages"]:
-            self.pipeline_stages = []
+            self.surround_stages = []
             result = self.config.get_path(self.config["surround"]["stages"])
             if not isinstance(result, list):
                 result = [result]
@@ -61,7 +61,7 @@ class Pipeline(ABC):
                 parts = stage.split(".")
                 module = import_module("." + parts[-2], ".".join(parts[:-2]))
                 klass = getattr(module, parts[-1])
-                self.pipeline_stages.append(klass())
+                self.surround_stages.append(klass())
         return True
 
     def _execute_stage(self, stage, stage_data):
@@ -73,28 +73,28 @@ class Pipeline(ABC):
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
         LOGGER.info("Stage %s took %s secs", type(stage).__name__, stage_execution_time)
 
-    def process(self, pipeline_data):
-        assert isinstance(pipeline_data, PipelineData), \
-            "Input must be a PipelineData object or inherit from PipelineData"
+    def process(self, surround_data):
+        assert isinstance(surround_data, SurroundData), \
+            "Input must be a SurroundData object or inherit from SurroundData"
 
-        pipeline_data.freeze()
-        pipeline_start = datetime.now()
+        surround_data.freeze()
+        start_time = datetime.now()
         error = None
         try:
-            for stage in self.pipeline_stages:
+            for stage in self.surround_stages:
                 assert isinstance(stage, Stage), \
                     "A stage must be an instance of the Stage class"
-                self._execute_stage(stage, pipeline_data)
-                if pipeline_data.error:
+                self._execute_stage(stage, surround_data)
+                if surround_data.error:
                     break
 
-            pipeline_execution_time = datetime.now() - pipeline_start
-            pipeline_data.execution_time = str(pipeline_execution_time)
-            LOGGER.info("Pipeline took %s secs", pipeline_execution_time)
+            execution_time = datetime.now() - start_time
+            surround_data.execution_time = str(execution_time)
+            LOGGER.info("Surround took %s secs", execution_time)
 
         except Exception:
             if error is None:
                 error = "FAILED"
-                LOGGER.exception("Failed processing pipeline")
-                pipeline_data.thaw()
-        return pipeline_data
+                LOGGER.exception("Failed processing Surround")
+                surround_data.thaw()
+        return surround_data

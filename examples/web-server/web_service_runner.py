@@ -2,11 +2,11 @@ import logging
 import sys
 from abc import ABC
 from flask import Flask, jsonify, request
-from surround import PipelineData
+from surround import SurroundData
 
 LOGGER = logging.getLogger(__name__)
 
-class Data(PipelineData):
+class Data(SurroundData):
     input = None
     output = None
 
@@ -20,16 +20,16 @@ class MetadataAction():
 class PredictAction():
     methods = ['POST']
 
-    def __init__(self, pipeline, metadata):
+    def __init__(self, surround, metadata):
         self.metadata = metadata
-        self.pipeline = pipeline
+        self.surround = surround
 
     def __call__(self, *args):
         response = {}
         if request.is_json:
             data = Data()
             data.input = request.get_json()
-            self.pipeline.process(data)
+            self.surround.process(data)
             response = {
                 "output": data.output,
                 "version": self.metadata['version']
@@ -45,7 +45,7 @@ class PredictAction():
 class WebServiceRunner(ABC):
     app = None
 
-    def __init__(self, pipeline, metadata=None):
+    def __init__(self, surround, metadata=None):
         self.app = Flask(__name__)
 
         assert (metadata is not None), "Metada is required"
@@ -66,4 +66,4 @@ class WebServiceRunner(ABC):
             sys.exit(1)
 
         self.app.add_url_rule('/metadata', 'metadata', MetadataAction(metadata))
-        self.app.add_url_rule('/predict', 'predict', PredictAction(pipeline, metadata))
+        self.app.add_url_rule('/predict', 'predict', PredictAction(surround, metadata))

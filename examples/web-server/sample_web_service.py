@@ -1,14 +1,14 @@
 import logging
 import abc
-from surround import Stage, Pipeline
+from surround import Stage, Surround
 from web_service_runner import WebServiceRunner
 
 # Python 2.7 and 3.5 compatible classes:
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class ParseData(Stage):
-    def operate(self, pipeline_data, config):
-        pipeline_data.output = {"result": "Hi, " + pipeline_data.input['name']}
+    def operate(self, surround_data, config):
+        surround_data.output = {"result": "Hi, " + surround_data.input['name']}
 
 def metadata():
     return {
@@ -23,8 +23,8 @@ def metadata():
         }, "version": "1.0.0"
     }
 
-pipeline = Pipeline([ParseData()])
-runner = WebServiceRunner(pipeline, metadata())
+surround = Surround([ParseData()])
+runner = WebServiceRunner(surround, metadata())
 app = runner.app
 
 if __name__ == "__main__":

@@ -1,0 +1,40 @@
+from surround import Stage, SurroundData
+
+# Surround operates on data objects that inherit from SurroundData.
+# This ensures a consistent interface for each stage of the pipeline.
+# All data that needs to be shared between stages of Surround should
+# be added to this class. SurroundData also has an error and warning
+# field. If a stage updates the error field then processing will
+# finish and the error can be processed. If the warning field is added
+# the processing will continue but the warnings can be viewed once
+# Surround completes.
+class TutorialData(SurroundData):
+    input_data = None
+    output_data = None
+    config_text = None
+
+    # It is a good idea to have a constructor with the input data for the
+    # first stage of Surround as parameters. This ensures that anyone
+    # using Surround knows exactly what data is required to initialise
+    # processing.
+    def __init__(self, input_data):
+        self.input_data = input_data
+
+# A stage in Surround must be an object that inherits from the Stage
+# class and implement the 'operate' method.
+class ValidateData(Stage):
+
+    # The operate method takes two arguments data, an instance of a
+    # SurroundData class, and config, an instance of the Config class
+    # which is a type of dict. This method will never need to be
+    # called directly as it is managed by the Surround class.
+    def operate(self, data, config):
+
+        # Add a warning. This warning will allow the next stages to complete.
+        data.warnings.append("No validation logic has been implemented")
+
+        # To pass data to the next stage in Surround update the
+        # fields on the data object. Remember that 'output_data' must
+        # first be defined in the TutorialData class before it can be
+        # accessed here.
+        data.output_data = "TODO: Validate input data assumptions here"
