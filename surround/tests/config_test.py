@@ -56,6 +56,7 @@ class TestConfig(unittest.TestCase):
         output = {
             'surround' : {
                 "stages" : False,
+                "enable_stage_output_dump": False
             },
             'main': {
                 'count': 15,
