@@ -67,7 +67,7 @@ class TestConfig(unittest.TestCase):
             }],
             'enable_logging': True
         }
-        self.assertDictEqual(config, output)
+        self.assertDictEqual(config.__dict__["_storage"], output)
 
 
     def test_env_config(self):

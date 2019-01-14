@@ -15,7 +15,7 @@ class Config(Mapping):
     def read_config_files(self, yaml_files):
         configs = []
         try:
-            for path in reversed(yaml_files):
+            for path in yaml_files:
                 with open(path) as afile:
                     configs.append(yaml.safe_load(afile.read()))
         except IOError as err:
