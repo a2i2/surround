@@ -4,7 +4,7 @@ from surround import Surround, Stage, SurroundData, Config
 from .stages.first_stage import FirstStage
 
 class HelloStage(Stage):
-    def operate(self, surround_data, config=None):
+    def operate(self, surround_data, config):
         surround_data.text = "hello"
         if config:
             surround_data.config_value = config["helloStage"]["suffix"]

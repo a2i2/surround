@@ -27,7 +27,7 @@ class CustomFileSystemRunner(FileSystemRunner):
         logging.info("File written to %s", output_path)
 
 class ProcessCSV(Stage):
-    def operate(self, surround_data, config=None):
+    def operate(self, surround_data, config):
         surround_data.word_count = len(surround_data.row_dict['Consumer complaint narrative'].split())
 
         if config and config.get_path("ProcessCSV.include_company"):

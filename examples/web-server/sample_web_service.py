@@ -7,7 +7,7 @@ from web_service_runner import WebServiceRunner
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
 class ParseData(Stage):
-    def operate(self, surround_data, config=None):
+    def operate(self, surround_data, config):
         surround_data.output = {"result": "Hi, " + surround_data.input['name']}
 
 def metadata():

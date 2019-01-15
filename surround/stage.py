@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class Stage(ABC):
 
     @abstractmethod
-    def operate(self, surround_data, config=None):
+    def operate(self, surround_data, config):
         """
         A stage in a surround.
         :param surround_data: Instance or child of the SurroundData class.

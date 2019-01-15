@@ -39,7 +39,7 @@ class SurroundData(Frozen):
 
 class Surround(ABC):
 
-    def __init__(self, surround_stages, config=None):
+    def __init__(self, surround_stages, config=Config()):
         assert isinstance(surround_stages, list), \
                "surround_stages must be a list of Stage objects"
 

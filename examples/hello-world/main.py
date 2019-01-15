@@ -2,7 +2,7 @@ import logging
 from surround import Stage, SurroundData, Surround
 
 class HelloStage(Stage):
-    def operate(self, surround_data, config=None):
+    def operate(self, surround_data, config):
         surround_data.text = "hello"
 
 class BasicData(SurroundData):
