@@ -38,21 +38,20 @@ class SurroundData(Frozen):
     warnings = []
 
 class Surround(ABC):
-
     def __init__(self, surround_stages, config=Config()):
         assert isinstance(surround_stages, list), \
                "surround_stages must be a list of Stage objects"
 
         self.surround_stages = surround_stages
+        self.data = None
         self.config = None
         if config:
             self.set_config(config)
 
-    @staticmethod
-    def _log_duration(start_time, surround_data):
+    def _log_duration(self, start_time):
         # Calculate and log stage duration
         execution_time = datetime.now() - start_time
-        surround_data.execution_time = str(execution_time)
+        self.data.execution_time = str(execution_time)
         LOGGER.info("Surround took %s secs", execution_time)
 
     def set_config(self, config):
@@ -71,31 +70,32 @@ class Surround(ABC):
                 self.surround_stages.append(klass())
         return True
 
-    def _execute_stage(self, stage, stage_data):
+    def _execute_stage(self, stage):
         stage_start = datetime.now()
-        stage.operate(stage_data, self.config)
-        stage.log_duration(stage_start, stage_data)
+        stage.operate(self.data, self.config)
+        stage.log_duration(stage_start, self.data)
 
-    def process(self, surround_data):
-        assert isinstance(surround_data, SurroundData), \
+    def process(self, data):
+        self.data = data
+        assert isinstance(self.data, SurroundData), \
             "Input must be a SurroundData object or inherit from SurroundData"
 
-        surround_data.freeze()
+        self.data.freeze()
         start_time = datetime.now()
         error = None
         try:
             for stage in self.surround_stages:
                 assert isinstance(stage, Stage), \
                     "A stage must be an instance of the Stage class"
-                self._execute_stage(stage, surround_data)
-                if surround_data.error:
+                self._execute_stage(stage)
+                if self.data.error:
                     break
 
-            Surround._log_duration(start_time, surround_data)
+            self._log_duration(start_time)
 
         except Exception:
             if error is None:
                 error = "FAILED"
                 LOGGER.exception("Failed processing Surround")
-                surround_data.thaw()
-        return surround_data
+                self.data.thaw()
+        return self.data
