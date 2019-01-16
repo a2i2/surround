@@ -1,2 +1,3 @@
 surround:
     stages: false
+    enable_stage_output_dump: false

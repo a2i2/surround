@@ -68,6 +68,9 @@ class Surround(ABC):
         stage_start = datetime.now()
         stage.operate(stage_data, self.config)
 
+        if self.config["surround"]["enable_stage_output_dump"]:
+            stage.dump_output(stage_data, self.config)
+
         # Calculate and log stage duration
         stage_execution_time = datetime.now() - stage_start
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})

@@ -6,4 +6,5 @@ disable = missing-docstring,
     broad-except,
     no-self-use,
     inconsistent-return-statements,
-    line-too-long
+    line-too-long,
+    duplicate-code
