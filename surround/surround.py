@@ -76,6 +76,17 @@ class Surround(ABC):
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
         LOGGER.info("Stage %s took %s secs", type(stage).__name__, stage_execution_time)
 
+    def init_stages(self):
+        try:
+            for stage in self.surround_stages:
+                assert isinstance(stage, Stage), \
+                    "A stage must be an instance of the Stage class"
+                stage.init_stage(self.config)
+        except Exception:
+            if error is None:
+                error = "FAILED"
+                LOGGER.exception("Failed processing Surround")
+
     def process(self, surround_data):
         assert isinstance(surround_data, SurroundData), \
             "Input must be a SurroundData object or inherit from SurroundData"

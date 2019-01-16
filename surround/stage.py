@@ -20,3 +20,10 @@ class Stage(ABC):
         :param config: Contains the settings for each stage
         :type config: <class 'surround.config.Config'>
         """
+
+    def init_stage(self, config):
+        """Initialise stage with some data
+
+        :param config: Contains the settings for each stage
+        :type config: <class 'surround.config.Config'>
+        """
