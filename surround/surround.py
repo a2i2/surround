@@ -48,6 +48,13 @@ class Surround(ABC):
         if config:
             self.set_config(config)
 
+    @staticmethod
+    def _log_duration(start_time, surround_data):
+        # Calculate and log stage duration
+        execution_time = datetime.now() - start_time
+        surround_data.execution_time = str(execution_time)
+        LOGGER.info("Surround took %s secs", execution_time)
+
     def set_config(self, config):
         if not config or not isinstance(config, Config):
             raise TypeError("config should be of class Config")
@@ -67,11 +74,7 @@ class Surround(ABC):
     def _execute_stage(self, stage, stage_data):
         stage_start = datetime.now()
         stage.operate(stage_data, self.config)
-
-        # Calculate and log stage duration
-        stage_execution_time = datetime.now() - stage_start
-        stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
-        LOGGER.info("Stage %s took %s secs", type(stage).__name__, stage_execution_time)
+        stage.log_duration(stage_start, stage_data)
 
     def process(self, surround_data):
         assert isinstance(surround_data, SurroundData), \
@@ -88,9 +91,7 @@ class Surround(ABC):
                 if surround_data.error:
                     break
 
-            execution_time = datetime.now() - start_time
-            surround_data.execution_time = str(execution_time)
-            LOGGER.info("Surround took %s secs", execution_time)
+            Surround._log_duration(start_time, surround_data)
 
         except Exception:
             if error is None:
