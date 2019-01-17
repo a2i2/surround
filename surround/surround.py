@@ -76,28 +76,31 @@ class Surround(ABC):
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
         LOGGER.info("Stage %s took %s secs", type(stage).__name__, stage_execution_time)
 
+    def init_stages(self):
+        for stage in self.surround_stages:
+            stage.init_stage(self.config)
+
     def process(self, surround_data):
         assert isinstance(surround_data, SurroundData), \
             "Input must be a SurroundData object or inherit from SurroundData"
 
         surround_data.freeze()
         start_time = datetime.now()
-        error = None
+
         try:
             for stage in self.surround_stages:
                 assert isinstance(stage, Stage), \
                     "A stage must be an instance of the Stage class"
                 self._execute_stage(stage, surround_data)
                 if surround_data.error:
+                    LOGGER.error("Error during processing")
+                    LOGGER.error(surround_data.error)
                     break
-
             execution_time = datetime.now() - start_time
             surround_data.execution_time = str(execution_time)
             LOGGER.info("Surround took %s secs", execution_time)
-
         except Exception:
-            if error is None:
-                error = "FAILED"
-                LOGGER.exception("Failed processing Surround")
-                surround_data.thaw()
+            LOGGER.exception("Failed processing Surround")
+
+        surround_data.thaw()
         return surround_data

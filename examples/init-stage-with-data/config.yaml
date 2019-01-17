@@ -1,0 +1,3 @@
+surround:
+    path_to_HelloSurround: examples/init-stage-with-data/data/HelloSurround.txt
+    path_to_HelloWorld: examples/init-stage-with-data/data/HelloWorld.txt
