@@ -71,10 +71,10 @@ if __name__ == "__main__":
 You can use command line to generate a new project or a tutorial.
 
 - To list more information: `surround -h`
-- To generate tutorial: `surround tutorial path`
-- To generate project: `surround init path`
-  - Use `-p` or `--project-name` to specify name: `surround init path -p sample`
-  - Use `-d` or `--description` to specify description: `surround init path -p sample -d sample project`
+- To generate tutorial: `surround tutorial <path-to-dir>`
+- To generate project: `surround init <path-to-dir>`
+  - Use `-p` or `--project-name` to specify name: `surround init <path-to-dir> -p sample`
+  - Use `-d` or `--description` to specify description: `surround init <path-to-dir> -p sample -d sample-project`
 
 ## Examples
 
