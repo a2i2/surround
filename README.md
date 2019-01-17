@@ -12,21 +12,21 @@ Surround is a lightweight framework for serving machine learning pipelines in Py
 ## Components
 Here are some components in this library that you can use to build Surround solution. ![Surround diagram](docs/flow-diagram.png)
 
-1. Surround  
+1. Surround
 A group of many stages (or it can be 1 stage) to transform data into more meaningful data. You can set the order of stages directly on your implementation or via a config file. The config file allows you to define more than 1 pipeline implementation and then you can switch between them easily.
 
-2. Surround Data  
+2. Surround Data
 A sharable object between stages that holds necessary information for each stage. A stage will read some information from Surround Data, process it, then put back new information that will be used by other stage(s). When you extend this class, you can add as many variables as you need to help you transform input data into output data. But there are 4 core variables that are ready for you to utilise:
-* **stage_metadata** is information that can be used to identify a stage.  
-* **execution_time** is recorded time to complete a process.  
-* **error** is information to identify failure of a stage.  
+* **stage_metadata** is information that can be used to identify a stage.
+* **execution_time** is recorded time to complete a process.
+* **error** is information to identify failure of a stage.
 * **warnings** is information when transformation is not 100% right.
 
-3. Stage  
-An implementation of data transformation. Here is where Surround Data is modified to achieve the result that you need. Each stage is only aimed to perform a set of related action. 1st stage can be a stage where you prepare data to be processed and last stage can be where your populate data to be sent back to the user.  
+3. Stage
+An implementation of data transformation. Here is where Surround Data is modified to achieve the result that you need. Each stage is only aimed to perform a set of related action. 1st stage can be a stage where you prepare data to be processed and last stage can be where your populate data to be sent back to the user.
 * **operate** is a function that you need to override when you extend stage class. It should contain data transformation implementation.
 
-4. Runner (optional) ***Implementation is coming later***  
+4. Runner (optional) ***Implementation is coming later***
 An interface to connect Surround to/from data. If you need to have this now, please look at [file adapter](examples/file-adapter) and [web server](examples/web-server) examples for implementation.
 
 ## When to use Surround?
