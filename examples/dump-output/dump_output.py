@@ -4,20 +4,20 @@ from surround import Stage, SurroundData, Surround
 from file_system_runner import FileSystemRunner
 
 class WriteHello(Stage):
-    def dump_output(self, output, config):
+    def dump_output(self, surround_data, config):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         text_file = open(dir_path + "/stages/WriteHello/Output.txt", "w")
-        text_file.write(output.text)
+        text_file.write(surround_data.text)
         text_file.close()
 
     def operate(self, surround_data, config):
         surround_data.text = "Hello"
 
 class WriteWorld(Stage):
-    def dump_output(self, output, config):
+    def dump_output(self, surround_data, config):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         text_file = open(dir_path + "/stages/WriteWorld/Output.txt", "w")
-        text_file.write(output.text)
+        text_file.write(surround_data.text)
         text_file.close()
 
     def operate(self, surround_data, config):

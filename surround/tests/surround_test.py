@@ -6,7 +6,7 @@ from .stages.first_stage import FirstStage
 class HelloStage(Stage):
     def operate(self, surround_data, config):
         surround_data.text = "hello"
-        if config:
+        if "helloStage" in config:
             surround_data.config_value = config["helloStage"]["suffix"]
 
 class BasicData(SurroundData):

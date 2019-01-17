@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 
 
 class Stage(ABC):
-    def dump_output(self, output, config):
+    def dump_output(self, surround_data, config):
         """Dump the output of each stage.
 
-        :param output: Output to dump
-        :type output: Same as surround_data (depends on implementation)
+        :param surround_data: Stores intermediate data from each stage in the pipeline
+        :type surround_data: Instance or child of the SurroundData class
         :param config: Config of the pipeline
         :type config: <class 'surround.config.Config'>
         """
