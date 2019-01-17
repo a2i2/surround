@@ -67,6 +67,15 @@ if __name__ == "__main__":
     print(output.text)
 ```
 
+## Command Line
+You can use command line to generate a new project or a tutorial.
+
+- To list more information: `surround -h`
+- To generate tutorial: `surround tutorial path`
+- To generate project: `surround init path`
+  - Use `-p` or `--project-name` to specify name: `surround init path -p sample`
+  - Use `-d` or `--description` to specify description: `surround init path -p sample -d sample project`
+
 ## Examples
 
 See the [examples](https://github.com/dstil/surround/tree/master/examples) directory.
