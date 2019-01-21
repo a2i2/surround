@@ -111,7 +111,7 @@ def main():
                     else:
                         break
 
-            if "description" in parsed_args:
+            if parsed_args.description:
                 project_description = parsed_args.description
             else:
                 project_description = input("What is the purpose of this project?: ")
