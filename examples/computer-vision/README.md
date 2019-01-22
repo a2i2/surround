@@ -32,3 +32,9 @@ manipulation:
 ```bash
 pip install opencv-python==3.4.5.20
 ```
+
+To install the `face_recognition` library
+```bash
+pip install dlib==19.15.0    # requirement for face recognition
+pip install face_recognition
+```
