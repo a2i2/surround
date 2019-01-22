@@ -26,3 +26,9 @@ python main.py
 * Python package manager: Anaconda
 * conda version: 4.4.10
 * python version: 3.6.5
+
+To install the `opencv` library for image and video 
+manipulation:
+```bash
+pip install opencv-python==3.4.5.20
+```
