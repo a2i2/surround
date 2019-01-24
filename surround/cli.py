@@ -55,12 +55,14 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
         with open(file_path, 'w') as f:
             f.write(actual_contents)
 
-def process(path, project, project_name, project_description, folder):
-    project_dir = os.path.join(path, project_name)
+def process(project_dir, project, project_name, project_description, folder):
+    if os.path.exists(project_dir):
+        return False
     os.makedirs(project_dir)
     process_directories(project["dirs"], project_dir, project_name)
     process_files(project["files"], project_dir, project_name, project_description)
     process_templates(project["templates"], folder, project_dir, project_name, project_description)
+    return True
 
 def is_valid_dir(aparser, arg):
     if not os.path.isdir(arg) or not os.access(arg, os.W_OK | os.X_OK):
@@ -96,10 +98,13 @@ def main():
         tool = sys.argv[1]
         parsed_args = parser.parse_args()
         if tool == "tutorial":
-            process(parsed_args.path, PROJECTS["new"], "tutorial", None, "tutorial")
-            print("The tutorial project has been created.\n")
-            print("Start by reading the README.md file at:")
-            print(os.path.abspath(os.path.join(parsed_args.path, "tutorial", "README.md")))
+            new_dir = os.path.join(parsed_args.path, "tutorial")
+            if process(new_dir, PROJECTS["new"], "tutorial", None, "tutorial"):
+                print("The tutorial project has been created.\n")
+                print("Start by reading the README.md file at:")
+                print(os.path.abspath(os.path.join(parsed_args.path, "tutorial", "README.md")))
+            else:
+                print("Directory %s already exists" % new_dir)
         else:
             if "project_name" in parsed_args and parsed_args.project_name:
                 project_name = parsed_args.project_name
@@ -116,8 +121,11 @@ def main():
             else:
                 project_description = input("What is the purpose of this project?: ")
 
-            process(parsed_args.path, PROJECTS["new"], project_name, project_description, "new")
-            print("Project created at %s/%s" % (parsed_args.path, project_name))
+            new_dir = os.path.join(parsed_args.path, project_name)
+            if process(new_dir, PROJECTS["new"], project_name, project_description, "new"):
+                print("Project created at %s/%s" % (parsed_args.path, project_name))
+            else:
+                print("Directory %s already exists" % new_dir)
 
 if __name__ == "__main__":
     main()
