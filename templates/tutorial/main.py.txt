@@ -81,7 +81,7 @@ def load_data(input_dir, output_dir, config_path):
         f.write(data.output_data)
 
     # Check and handle any errors
-    if data.error:
+    if data.errors:
         logging.error("Processing error...")
 
     # Log all warnings from running the pipeline

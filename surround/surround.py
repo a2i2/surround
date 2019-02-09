@@ -34,7 +34,7 @@ class SurroundData(Frozen):
     """
     stage_metadata = []
     execution_time = None
-    error = None
+    errors = []
     warnings = []
 
 class Surround(ABC):
@@ -92,9 +92,9 @@ class Surround(ABC):
                 assert isinstance(stage, Stage), \
                     "A stage must be an instance of the Stage class"
                 self._execute_stage(stage, surround_data)
-                if surround_data.error:
+                if surround_data.errors:
                     LOGGER.error("Error during processing")
-                    LOGGER.error(surround_data.error)
+                    LOGGER.error(surround_data.errors)
                     break
             execution_time = datetime.now() - start_time
             surround_data.execution_time = str(execution_time)
