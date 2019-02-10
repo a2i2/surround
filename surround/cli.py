@@ -163,19 +163,25 @@ def main():
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
     tools = ["init", "tutorial", "lint", "run"]
-    if len(sys.argv) < 2 or not sys.argv[1] in tools:
-        print("Invalid subcommand, must be one of %s" % tools)
-        parser.print_help()
-    else:
-        tool = sys.argv[1]
-        parsed_args = parser.parse_args()
-        if tool == "tutorial":
-            parse_tutorial_args(parsed_args)
-        elif tool == "lint":
-            parse_lint_args(parsed_args)
-        elif tool == "run":
-            parse_run_args(parsed_args)
+    try:
+        if sys.argv[1] in ['-h', '--help']:
+            parser.print_help()
+        elif len(sys.argv) < 2 or not sys.argv[1] in tools:
+            print("Invalid subcommand, must be one of %s" % tools)
+            parser.print_help()
         else:
-            parse_init_args(parsed_args)
+            tool = sys.argv[1]
+            parsed_args = parser.parse_args()
+            if tool == "tutorial":
+                parse_tutorial_args(parsed_args)
+            elif tool == "lint":
+                parse_lint_args(parsed_args)
+            elif tool == "run":
+                parse_run_args(parsed_args)
+            else:
+                parse_init_args(parsed_args)
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt")
+
 if __name__ == "__main__":
     main()
