@@ -9,8 +9,14 @@ ENV_VAR_PREFIX = "SURROUND_"
 
 class Config(Mapping):
 
-    def __init__(self):
+    def __init__(self, project_root=None):
         self._storage = self.__load_defaults()
+
+        # Set framework paths
+        if project_root:
+            self._storage["output_path"] = os.path.join(project_root, "output")
+            self._storage["data_path"] = os.path.join(project_root, "data")
+            self._storage["model_path"] = os.path.join(project_root, "model")
 
     def read_config_files(self, yaml_files):
         configs = []

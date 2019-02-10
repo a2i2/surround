@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import logging
+import subprocess
 
 from .linter import Linter
 
@@ -9,8 +10,7 @@ PROJECTS = {
     "new" : {
         "dirs" : [
             "data",
-            "data/output",
-            "data/input",
+            "output",
             "docs",
             "models",
             "notebooks",
@@ -90,6 +90,17 @@ def parse_lint_args(args):
         for e in errors + warnings:
             print(e)
 
+def parse_run_args(args):
+    errors, warnings = Linter().check_project(PROJECTS, args.path)
+    if errors:
+        print("Invalid Surround project")
+    for e in errors + warnings:
+        print(e)
+    if not errors:
+        path = os.path.abspath(args.path)
+        run_process = subprocess.Popen(['python3', '-m', os.path.basename(path)], cwd=path)
+        run_process.wait()
+
 def parse_tutorial_args(args):
     new_dir = os.path.join(args.path, "tutorial")
     if process(new_dir, PROJECTS["new"], "tutorial", None, "tutorial"):
@@ -129,23 +140,29 @@ def main():
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
+
+
+    tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
+    tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
+    tutorial_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating the tutorial project", nargs='?', default="./")
+
+    init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
+    init_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project", nargs='?', default="./")
+    init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
+    init_parser.add_argument('-d', '--description', help="A description for the project")
+
+    run_parser = sub_parser.add_parser('run', help="Run a Surround project")
+    run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project", nargs="?", default="./")
+
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
-
     linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
 
-    tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
-    init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
-    init_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project")
-    init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
-    init_parser.add_argument('-d', '--description', help="A description for the project")
-    tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
-    tutorial_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating the tutorial project")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "tutorial", "lint"]
+    tools = ["init", "tutorial", "lint", "run"]
     if len(sys.argv) < 2 or not sys.argv[1] in tools:
         print("Invalid subcommand, must be one of %s" % tools)
         parser.print_help()
@@ -156,6 +173,8 @@ def main():
             parse_tutorial_args(parsed_args)
         elif tool == "lint":
             parse_lint_args(parsed_args)
+        elif tool == "run":
+            parse_run_args(parsed_args)
         else:
             parse_init_args(parsed_args)
 if __name__ == "__main__":
