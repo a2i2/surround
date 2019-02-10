@@ -103,4 +103,3 @@ class Surround(ABC):
             LOGGER.exception("Failed processing Surround")
 
         surround_data.thaw()
-        return surround_data
