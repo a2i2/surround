@@ -9,6 +9,7 @@ from .linter import Linter
 PROJECTS = {
     "new" : {
         "dirs" : [
+            ".surround",
             "data",
             "output",
             "docs",
