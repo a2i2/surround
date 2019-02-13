@@ -183,6 +183,11 @@ def main():
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
 
 
+    # Remote
+    remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
+    remote_parser.add_argument('name', help="Name of the remote")
+    remote_parser.add_argument('path', help="Url of the remote")
+
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
     tools = ["init", "tutorial", "lint", "run"]
