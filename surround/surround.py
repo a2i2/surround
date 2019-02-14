@@ -41,9 +41,7 @@ class SurroundData(Frozen):
 
 class Surround(ABC):
 
-    def __init__(self, surround_stages, module=None):
-        assert isinstance(surround_stages, list), \
-               "surround_stages must be a list of Stage objects"
+    def __init__(self, surround_stages=None, module=None):
         self.surround_stages = surround_stages
 
         if module:
@@ -56,10 +54,7 @@ class Surround(ABC):
                 raise ValueError("Invalid Python module %s" % module)
 
             self.set_config(Config(root_path))
-            config_path = os.path.join(package_path, 'config')
-            if os.path.exists(config_path):
-                LOGGER.info("Loading project config")
-                self.config.read_config_files(config_path)
+
 
             if not os.path.exists(self.config["output_path"]):
                 os.makedirs(self.config["output_path"])

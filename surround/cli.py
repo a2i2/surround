@@ -20,13 +20,15 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround==0.1"),
+            ("requirements.txt", "surround==0.0.2"),
             ("{project_name}/config.yaml", "output:\n  text: Hello World")
         ],
         "templates" : [
+            # File name, template name, capitalize project name
             ("README.md", "README.md.txt", False),
             ("{project_name}/stages.py", "stages.py.txt", True),
-            ("{project_name}/__main__.py", "main.py.txt", True)
+            ("{project_name}/__main__.py", "main.py.txt", True),
+            ("dodo.py", "dodo.py.txt", False)
         ]
     }
 }
@@ -91,14 +93,32 @@ def parse_lint_args(args):
             print(e)
 
 def parse_run_args(args):
-    errors, warnings = Linter().check_project(PROJECTS, args.path)
+    deploy = {
+        "new": {
+            "dirs": [
+                "models",
+                "{project_name}",
+            ],
+            "files" : [
+                ("{project_name}/config.yaml", "output:\n  text: Hello World"),
+                ("dodo.py", "")
+            ]
+        }
+    }
+
+    path = os.getcwd()
+    errors, warnings = Linter().check_project(deploy, path)
     if errors:
         print("Invalid Surround project")
     for e in errors + warnings:
         print(e)
     if not errors:
-        path = os.path.abspath(args.path)
-        run_process = subprocess.Popen(['python3', '-m', os.path.basename(path)], cwd=path)
+        print("Project tasks:")
+        if args.task:
+            task = args.task
+        else:
+            task = 'list'
+        run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
         run_process.wait()
 
 def parse_tutorial_args(args):
@@ -129,7 +149,7 @@ def parse_init_args(args):
 
     new_dir = os.path.join(args.path, project_name)
     if process(new_dir, PROJECTS["new"], project_name, project_description, "new"):
-        print("Project created at %s/%s" % (args.path, project_name))
+        print("Project created at %s" % os.path.join(os.path.abspath(args.path), project_name))
     else:
         print("Directory %s already exists" % new_dir)
 
@@ -151,8 +171,8 @@ def main():
     init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
     init_parser.add_argument('-d', '--description', help="A description for the project")
 
-    run_parser = sub_parser.add_parser('run', help="Run a Surround project")
-    run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project", nargs="?", default="./")
+    run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
+    run_parser.add_argument('task', help="Task defined in project dodo.py file.", nargs='?')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
@@ -164,7 +184,7 @@ def main():
     # is missing the 'required' keyword
     tools = ["init", "tutorial", "lint", "run"]
     try:
-        if sys.argv[1] in ['-h', '--help']:
+        if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
         elif len(sys.argv) < 2 or not sys.argv[1] in tools:
             print("Invalid subcommand, must be one of %s" % tools)
