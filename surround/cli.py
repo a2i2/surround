@@ -189,6 +189,11 @@ def main():
     remote_parser.add_argument('name', help="Name of the remote")
     remote_parser.add_argument('path', help="Url of the remote")
 
+    # pull
+    pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
+    pull_parser.add_argument('file', help="Name of the directory")
+
+
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
     tools = ["init", "tutorial", "lint", "run"]
