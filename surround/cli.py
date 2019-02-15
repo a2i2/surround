@@ -198,6 +198,9 @@ def main():
     pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
     pull_parser.add_argument('file', help="file to pull")
 
+    # push
+    push_parser = sub_parser.add_parser('push', help="Push data to remote")
+    push_parser.add_argument('file', help="file to push")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword

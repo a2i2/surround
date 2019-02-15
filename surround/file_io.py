@@ -52,3 +52,21 @@ def pull_data(file_):
     config.read_config_files([".surround/config.yaml"])
 
     copyfile(config['data'] + "/" + remote_dir_name + "/" + file_to_pull, os.path.splitext(file_)[0])
+
+def push_data(file_):
+    """Push data to remote
+
+        :param file_: Path to yaml file that contains information about file to push
+        :type file_: str
+    """
+    config = Config()
+
+    # Get file to push
+    config.read_config_files([file_])
+    remote_dir_name = config['dir-name']
+    file_to_push = os.path.splitext(os.path.basename(file_))[0]
+
+    # Read remotes
+    config.read_config_files([".surround/config.yaml"])
+
+    copyfile(os.path.splitext(file_)[0], config['data'] + "/" + remote_dir_name + "/" + file_to_push)
