@@ -23,6 +23,17 @@ def write_remote_to_file(filename, name, path):
     file_.write(name + " = " + path)
     file_.close()
 
+def add_data(file_, remote_dir):
+    """Add data to remote
+
+        :param file_: file to add
+        :type file_: str
+        :param remote_dir: add to dir
+        :type remote_dir: str
+    """
+    file_ = open(file_ + ".yaml", "w")
+    file_.write("dir-name: " + remote_dir)
+    file_.close()
 
 def pull_data(file_):
     """Pull data from remote
