@@ -1,6 +1,7 @@
 import os
-import json
 from shutil import copyfile
+
+from .config import Config
 
 '''
 Handles file I/O
@@ -22,15 +23,21 @@ def write_remote_to_file(filename, name, path):
     file_.write(name + " = " + path)
     file_.close()
 
-def read_file(filename):
-    with open(filename) as json_file:
-        data = json.load(json_file)
-        json_file.close()
-
-    return data
 
 def pull_data(file_):
-    input_file = read_file(file_)
-    filename = os.path.splitext(os.path.basename(file_))[0]
+    """Pull data from remote
 
-    copyfile("/Users/akshat/Desktop/esolutions/" + input_file['dir-name'] + "/" + filename, os.path.splitext(file_)[0])
+        :param file_: Path to yaml file that contains information about file to pull
+        :type file_: str
+    """
+    config = Config()
+
+    # Get file to pull
+    config.read_config_files([file_])
+    remote_dir_name = config['dir-name']
+    file_to_pull = os.path.splitext(os.path.basename(file_))[0]
+
+    # Read remotes
+    config.read_config_files([".surround/config.yaml"])
+
+    copyfile(config['data'] + "/" + remote_dir_name + "/" + file_to_pull, os.path.splitext(file_)[0])
