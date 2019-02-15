@@ -196,7 +196,7 @@ def main():
 
     # pull
     pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
-    pull_parser.add_argument('file', help="Name of the directory")
+    pull_parser.add_argument('file', help="file to pull")
 
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
