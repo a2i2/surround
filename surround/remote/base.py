@@ -39,3 +39,11 @@ class BaseRemote(ABC):
         :param file_: file to pull
         :type file_: str
         """
+
+    @abstractmethod
+    def push(self, file_=None):
+        """Push data to remote
+
+        :param file_: file to push
+        :type file_: str
+        """
