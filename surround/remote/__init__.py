@@ -1,1 +1,2 @@
-__all__ = ["base"]
+__all__ = ["base", "local"]
+from .local import Local

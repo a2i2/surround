@@ -48,3 +48,11 @@ class BaseRemote(ABC):
         :param file_: file to push
         :type file_: str
         """
+
+    def get_file_name(self, file_):
+        """Extract filename from path
+
+        :param file_: path to file
+        :type file_: str
+        """
+        return os.path.basename(file_)
