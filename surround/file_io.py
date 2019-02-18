@@ -18,9 +18,12 @@ __date__ = '2019/02/14'
     @param {str} path: path to the remote
 '''
 def write_remote_to_file(filename, name, path):
+    # Make directory if not exists
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     file_ = open(filename, "a")
     file_.write("\n")
-    file_.write(name + " = " + path)
+    file_.write(name + ": " + path)
     file_.close()
 
 def add_data(file_, remote_dir):

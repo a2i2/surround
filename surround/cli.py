@@ -188,6 +188,7 @@ def main():
     remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
     remote_parser.add_argument('name', help="Name of the remote")
     remote_parser.add_argument('path', help="Url of the remote")
+    remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
 
     # Add
     add_parser = sub_parser.add_parser('add', help="Add data to remote")
