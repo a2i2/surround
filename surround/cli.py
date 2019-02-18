@@ -193,7 +193,6 @@ def main():
     # Add
     add_parser = sub_parser.add_parser('add', help="Add data to remote")
     add_parser.add_argument('file', help="file to add")
-    add_parser.add_argument('dir', help="Add to dir")
 
     # pull
     pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
