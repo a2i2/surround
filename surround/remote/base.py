@@ -22,10 +22,8 @@ class BaseRemote(ABC):
         # Make directory if not exists
         os.makedirs(os.path.dirname(file_), exist_ok=True)
 
-        file_ = open(file_, "a")
-        file_.write("\n")
-        file_.write(name + ": " + path)
-        file_.close()
+        with open(file_, "a") as f:
+            f.write(name + ": " + path + "\n")
 
     @abstractmethod
     def add(self, file_):
