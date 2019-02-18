@@ -49,6 +49,7 @@ To run the tests: `python3 setup.py test`
 
 ## A Simple Example
 
+A short explanation is provided in the hello-world example's [README](examples/hello-world/) file.
 ```python
 from surround import Stage, SurroundData, Surround
 import logging
