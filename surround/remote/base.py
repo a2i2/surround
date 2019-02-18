@@ -23,3 +23,11 @@ class BaseRemote(ABC):
         file_.write("\n")
         file_.write(name + ": " + path)
         file_.close()
+
+    @abstractmethod
+    def add(self, file_):
+        """Add data to remote
+
+        :param file_: file to add
+        :type file_: str
+        """
