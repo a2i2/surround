@@ -62,12 +62,6 @@ def process(path, project, project_name, project_description, folder):
     process_files(project["files"], project_dir, project_name, project_description)
     process_templates(project["templates"], folder, project_dir, project_name, project_description)
 
-def is_valid_dir(aparser, arg):
-    if not os.path.isdir(arg) or not os.access(arg, os.W_OK | os.X_OK):
-        aparser.error("Invalid directory or can't write to %s" % arg)
-    else:
-        return arg
-
 def is_valid_name(aparser, arg):
     if not arg.isalpha() or not arg.islower():
         aparser.error("Name %s must be lowercase letters" % arg)
@@ -80,11 +74,11 @@ def main():
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
     tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
     init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
-    init_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project")
+    init_parser.add_argument('path', help="Path for creating a Surround project")
     init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
     init_parser.add_argument('-d', '--description', help="A description for the project")
     tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
-    tutorial_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating the tutorial project")
+    tutorial_parser.add_argument('path', help="Path for creating the tutorial project")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
