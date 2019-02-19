@@ -1,5 +1,6 @@
 import os
 from abc import ABC, abstractmethod
+from surround.config import Config
 
 '''
     Interface for remote
@@ -24,6 +25,19 @@ class BaseRemote(ABC):
 
         with open(file_, "a") as f:
             f.write(name + ": " + path + "\n")
+
+    def read_data_from_surround_local_config(self, file_):
+        """Get the associated data file
+
+        :param file_: associated data file
+        :type file_: str
+        """
+
+        config = Config()
+
+        # Get file
+        config.read_config_files([".surround/config.yaml"])
+        return config["data"][file_]
 
     @abstractmethod
     def add(self, file_):

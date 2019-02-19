@@ -1,5 +1,4 @@
 from shutil import copyfile
-from surround.config import Config
 from .base import BaseRemote
 
 __author__ = 'Akshat Bajaj'
@@ -12,11 +11,7 @@ class Local(BaseRemote):
             f.write(name + ": " + file_ + "\n")
 
     def pull(self, file_=None):
-        config = Config()
-
-        # Get file to pull
-        config.read_config_files([".surround/config.yaml"])
-        file_to_pull = config[file_]
+        file_to_pull = self.read_data_from_surround_local_config(file_)
         copyfile(file_to_pull, 'data/input/' + file_)
 
     def push(self, file_=None):
