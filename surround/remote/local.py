@@ -15,4 +15,5 @@ class Local(BaseRemote):
         copyfile(file_to_pull, 'data/input/' + file_)
 
     def push(self, file_=None):
-        pass
+        file_to_push = self.read_data_from_surround_local_config(file_)
+        copyfile('data/input/' + file_, file_to_push)

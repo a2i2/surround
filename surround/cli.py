@@ -200,7 +200,7 @@ def main():
 
     # push
     push_parser = sub_parser.add_parser('push', help="Push data to remote")
-    push_parser.add_argument('file', help="file to push")
+    push_parser.add_argument('-f', '--file', help="file to push (from .surround/config.yaml)")
 
     # Local Remote
     local = Local()
