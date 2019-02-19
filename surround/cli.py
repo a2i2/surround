@@ -196,11 +196,14 @@ def main():
 
     # pull
     pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
-    pull_parser.add_argument('file', help="file to pull")
+    pull_parser.add_argument('-f', '--file', help="file to pull(from .surround/config.yaml)")
 
     # push
     push_parser = sub_parser.add_parser('push', help="Push data to remote")
     push_parser.add_argument('file', help="file to push")
+
+    # Local Remote
+    local = Local()
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
