@@ -11,6 +11,7 @@ __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/18'
 
 class BaseRemote(object):
+
     def write_remote_to_file(self, file_, name, path):
         """Write remote to a file
 
@@ -27,70 +28,42 @@ class BaseRemote(object):
         with open(file_, "a") as f:
             f.write(name + ": " + path + "\n")
 
-    def read_data_from_surround_local_config(self, file_):
-        """Get the associated data file
-
-        :param file_: associated data file
-        :type file_: str
-        """
-
-        config = Config()
-
-        # Get file
-        config.read_config_files([".surround/config.yaml"])
-        return config["data"][file_]
-
-    def read_remote_from_surround_global_config(self, remote):
-        """Get global remote
-
-        :param remote: remote to find
-        :type remote: str
-        """
-
-        config = Config()
-
-        home = str(Path.home())
-
-        if Path(home + "/.surround/config.yaml").exists():
-            config.read_config_files([home + "/.surround/config.yaml"])
-            remotes = config.get("remote", None)
-            if remotes:
-                remote_to_get = remotes.get(remote, None)
-                return remote_to_get
-            else:
-                return None
+    def read_from_config(self, what_to_read, key):
+        local = self.read_from_local_config(what_to_read, key)
+        
+        if local:
+            return local
         else:
-            print("No global config, try setting up a global remote first")
+            print("Not found in local, searching in global config")
+            return self.read_from_global_config(what_to_read, key)
 
-    def read_remote_from_surround_local_config(self, remote):
-        """Get local remote
-
-        :param remote: remote to find
-        :type remote: str
-        """
-
+    def read_from_local_config(self, what_to_read, key):
         config = Config()
 
         if Path(".surround/config.yaml").exists():
             config.read_config_files([".surround/config.yaml"])
-            remotes = config.get("remote", None)
-            if remotes:
-                remote_to_get = remotes.get(remote, None)
-                return remote_to_get
+            read_items = config.get(what_to_read, None)
+            if read_items:
+                return read_items.get(key, None)
             else:
                 return None
         else:
-            print("No local remote, searching in global remotes")
+            print("No local config")
+            return None
 
-    def read_remote_from_surround_config(self, remote):
-        local_remote = self.read_remote_from_surround_local_config(remote)
-        global_remote = self.read_remote_from_surround_global_config(remote)
-        if local_remote:
-            return local_remote
-        elif global_remote:
-            return global_remote
+    def read_from_global_config(self, what_to_read, key):
+        config = Config()
+        home = str(Path.home())
+
+        if Path(home + "/.surround/config.yaml").exists():
+            config.read_config_files([home + "/.surround/config.yaml"])
+            read_items = config.get(what_to_read, None)
+            if read_items:
+                return read_items.get(key, None)
+            else:
+                return None
         else:
-            print("No remote named " + remote)
+            print("No global config")
 
     @abstractmethod
     def add(self, file_):
