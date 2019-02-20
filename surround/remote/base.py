@@ -1,4 +1,5 @@
 import os
+import yaml
 from abc import abstractmethod
 from pathlib import Path
 from surround.config import Config
@@ -12,9 +13,11 @@ __date__ = '2019/02/18'
 
 class BaseRemote(object):
 
-    def write_remote_to_file(self, file_, name, path):
-        """Write remote to a file
+    def write_config(self, what_to_write, file_, name, path):
+        """Write config to a file
 
+        :param what_to_write: For example remote, data, model etc.
+        :type what_to_write: str
         :param file_: file to write
         :type file_: str
         :param name: name of the remote
@@ -22,15 +25,26 @@ class BaseRemote(object):
         :param path: path to the remote
         :type path: str
         """
+
         # Make directory if not exists
         os.makedirs(os.path.dirname(file_), exist_ok=True)
 
-        with open(file_, "a") as f:
-            f.write(name + ": " + path + "\n")
+        if os.path.exists(file_):
+            with open(file_, "r") as f:
+                read_config = yaml.load(f) or {}
+        else:
+            read_config = {}
+
+        read_config[what_to_write] = {
+            name: path
+        }
+
+        with open(file_, "w") as f:
+            yaml.dump(read_config, f, default_flow_style=False)
 
     def read_from_config(self, what_to_read, key):
         local = self.read_from_local_config(what_to_read, key)
-        
+
         if local:
             return local
         else:
