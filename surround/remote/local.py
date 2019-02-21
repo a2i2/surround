@@ -15,10 +15,11 @@ class Local(BaseRemote):
 
             with open(".surround/config.yaml", "r") as f:
                 read_config = yaml.load(f) or {}
+                project_name = read_config["project-info"]['project-name']
 
             if "remote" in read_config and add_to in read_config["remote"]:
                 # Append filename
-                path_to_file = read_config["remote"][add_to] + "/" + name
+                path_to_file = read_config["remote"][add_to] + "/" + project_name + "/" + name
                 self.write_config(add_to, ".surround/config.yaml", name, path_to_file)
                 return "File added successfully"
             else:
@@ -27,7 +28,7 @@ class Local(BaseRemote):
                 if Path(home + "/.surround/config.yaml").exists():
                     if "remote" in read_config and add_to in read_config["remote"]:
                         # Append filename
-                        path_to_file = read_config["remote"][add_to] + "/" + name
+                        path_to_file = read_config["remote"][add_to] + "/" + project_name + "/" + name
                         self.write_config(add_to, home + "/.surround/config.yaml", name, path_to_file)
                         return "File added successfully"
                     else:
