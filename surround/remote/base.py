@@ -26,9 +26,6 @@ class BaseRemote():
         :type path: str
         """
 
-        # Make directory if not exists
-        os.makedirs(os.path.dirname(file_), exist_ok=True)
-
         if os.path.exists(file_):
             with open(file_, "r") as f:
                 read_config = yaml.load(f) or {}
