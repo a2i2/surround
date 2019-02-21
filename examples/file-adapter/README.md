@@ -19,7 +19,14 @@ client's complaint (column 'Consumer complaint narrative').
  and company values are extracted from the row_dict field, and set on their corresponding fields in the `BasicData` object.
   
 ## Run
+The easiest way to run the example is by running `main.py` from surround's root folder. The arguments needed are pre-set in `main.py`:
+```bash
+python3 examples/file-adapter/main.py
+```
+To use different arguments, we can either modify them in `main.py`, or run `file_adapter.py` from the example's folder and specify 
+the arguments in the command line:
 ```bash
 python3 file_adapter.py -f0=data/input.csv -c=config.yaml -o data/
 ```
+
 

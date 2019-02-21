@@ -11,3 +11,7 @@ From surround's root folder, run
 ```bash
 python3 examples/init-stage-with-data/main.py
 ```
+Or from the project's local folder:
+```bash
+python3 main.py
+```

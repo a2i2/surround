@@ -12,6 +12,13 @@ method of each stage after `operate()`.
 
 
 ## Run
+The easiest way to run the example is by running `main.py` from surround's root folder. The arguments needed are pre-set in `main.py`:
+```bash
+python3 examples/dump-output/main.py
+ ```
+To use different arguments, we can either modify them in `main.py`, or run `dump_output.py` from the example's folder and specify 
+the arguments in the command line: 
+
 ```bash
 python3 dump_output.py -c=config.yaml
 ```

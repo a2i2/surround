@@ -9,6 +9,12 @@ for the corresponding stage, the file contents are saved in the data variable.
 Note that although a `BasicData` object is initialised, it is not modified throughout this example. Instead, internal data 
 objects are used in each stage.
 ## Run
+From surround's root folder, run:
+```bash
+python3 examples/init-stage-with-data/main.py
+```
+
+To run from the project's folder, change the paths in `main.py` and `config.yaml`, and run:
 ```bash
 python3 main.py
 ```
