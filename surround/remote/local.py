@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from shutil import copyfile
 import yaml
@@ -43,20 +44,25 @@ class Local(BaseRemote):
             file_to_pull = self.read_from_config(what_to_pull, file_)
             if file_to_pull:
                 copyfile(file_to_pull, 'data/input/' + file_)
+                return "File pulled successfully"
             else:
-                print("File not added")
-                print("Add that by surround add")
+                return "File not added, add that by surround add"
         else:
-            pass
-
+            """
+            Add code to pull all files
+            """
 
     def push(self, what_to_push, file_=None):
         if file_:
-            file_to_push = self.read_from_config(what_to_push, file_)
+            filename = self.get_file_name(file_)
+            file_to_push = self.read_from_config(what_to_push, filename)
+            os.makedirs(os.path.dirname(file_to_push), exist_ok=True)
             if file_to_push:
-                copyfile('data/input/' + file_, file_to_push)
+                copyfile('data/input/' + filename, file_to_push)
+                return "File pushed successfully"
             else:
-                print("File not added")
-                print("Add that by surround add")
+                return "File not added, add that by surround add"
         else:
-            pass
+            """
+            Add code to push all files
+            """
