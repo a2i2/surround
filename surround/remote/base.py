@@ -35,9 +35,12 @@ class BaseRemote(object):
         else:
             read_config = {}
 
-        read_config[what_to_write] = {
-            name: path
-        }
+        if what_to_write in read_config:
+            read_config[what_to_write][name] = path
+        else:
+            read_config[what_to_write] = {
+                name: path
+            }
 
         with open(file_, "w") as f:
             yaml.dump(read_config, f, default_flow_style=False)
