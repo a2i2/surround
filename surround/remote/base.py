@@ -1,7 +1,7 @@
 import os
-import yaml
 from abc import abstractmethod
 from pathlib import Path
+import yaml
 from surround.config import Config
 
 '''
@@ -11,7 +11,7 @@ from surround.config import Config
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/18'
 
-class BaseRemote(object):
+class BaseRemote():
 
     def write_config(self, what_to_write, file_, name, path):
         """Write config to a file
@@ -83,7 +83,7 @@ class BaseRemote(object):
             print("No global config")
 
     @abstractmethod
-    def add(self, file_):
+    def add(self, add_to, file_):
         """Add data to remote
 
         :param file_: file to add
@@ -91,7 +91,7 @@ class BaseRemote(object):
         """
 
     @abstractmethod
-    def pull(self, file_=None):
+    def pull(self, what_to_pull, file_=None):
         """Pull data from remote
 
         :param file_: file to pull
@@ -99,7 +99,7 @@ class BaseRemote(object):
         """
 
     @abstractmethod
-    def push(self, file_=None):
+    def push(self, what_to_push, file_=None):
         """Push data to remote
 
         :param file_: file to push
