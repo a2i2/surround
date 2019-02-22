@@ -48,7 +48,6 @@ class BaseRemote():
         if local:
             return local
         else:
-            print("Not found in local, searching in global config")
             return self.read_from_global_config(what_to_read, key)
 
     def read_from_local_config(self, what_to_read, key):
@@ -62,7 +61,6 @@ class BaseRemote():
             else:
                 return None
         else:
-            print("No local config")
             return None
 
     def read_from_global_config(self, what_to_read, key):
@@ -77,7 +75,7 @@ class BaseRemote():
             else:
                 return None
         else:
-            print("No global config")
+            return None
 
     @abstractmethod
     def add(self, add_to, file_):
