@@ -77,6 +77,25 @@ class BaseRemote():
         else:
             return None
 
+    def read_all_from_local_config(self, what_to_read):
+        config = Config()
+
+        if Path(".surround/config.yaml").exists():
+            config.read_config_files([".surround/config.yaml"])
+            read_items = config.get(what_to_read)
+            if read_items:
+                return read_items
+
+    def read_all_from_global_config(self, what_to_read):
+        config = Config()
+        home = str(Path.home())
+
+        if Path(home + "/.surround/config.yaml").exists():
+            config.read_config_files([home + "/.surround/config.yaml"])
+            read_items = config.get(what_to_read)
+            if read_items:
+                return read_items
+
     @abstractmethod
     def add(self, add_to, file_):
         """Add data to remote

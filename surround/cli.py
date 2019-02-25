@@ -186,8 +186,9 @@ def main():
 
     # Remote
     remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
-    remote_parser.add_argument('name', help="Name of the remote")
-    remote_parser.add_argument('path', help="Url of the remote")
+    remote_parser.add_argument('-n', '--name', help="Name of the remote")
+    remote_parser.add_argument('-p', '--path', help="Url of the remote")
+    remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
 
     # Add
