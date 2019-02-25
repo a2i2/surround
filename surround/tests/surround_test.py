@@ -19,21 +19,24 @@ class TestSurround(unittest.TestCase):
 
     def test_happy_path(self):
         surround = Surround([HelloStage()])
-        output = surround.process(BasicData())
-        self.assertEqual(output.text, "hello")
+        data = BasicData()
+        surround.process(data)
+        self.assertEqual(data.text, "hello")
 
     def test_rejecting_attributes(self):
         surround = Surround([HelloStage()])
-        output = surround.process(BasicData())
-        self.assertRaises(AttributeError, getattr, output, "no_text")
+        data = BasicData()
+        surround.process(data)
+        self.assertRaises(AttributeError, getattr, data, "no_text")
 
     def test_surround_config(self):
         path = os.path.dirname(__file__)
         config = Config()
         config.read_config_files([os.path.join(path, "config.yaml")])
         surround = Surround([HelloStage()], config)
-        output = surround.process(BasicData())
-        self.assertEqual(output.config_value, "Scott")
+        data = BasicData()
+        surround.process(data)
+        self.assertEqual(data.config_value, "Scott")
 
     def test_surround_override(self):
         path = os.path.dirname(__file__)
@@ -41,6 +44,7 @@ class TestSurround(unittest.TestCase):
         config = Config()
         config.read_config_files([os.path.join(path, "stages.yaml")])
         surround.set_config(config)
-        output = surround.process(BasicData())
-        self.assertEqual(output.stage1, "first stage")
-        self.assertEqual(output.stage2, "second stage")
+        data = BasicData()
+        surround.process(data)
+        self.assertEqual(data.stage1, "first stage")
+        self.assertEqual(data.stage2, "second stage")

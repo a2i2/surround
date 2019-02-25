@@ -11,5 +11,6 @@ class BasicData(SurroundData):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     surround = Surround([HelloStage()])
-    output = surround.process(BasicData())
-    print(output.text)
+    data = BasicData()
+    surround.process(data)
+    print(data.text)
