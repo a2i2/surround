@@ -106,7 +106,7 @@ def parse_run_args(args):
         }
     }
 
-    path = os.getcwd()
+    path = args.path
     errors, warnings = Linter().check_project(deploy, path)
     if errors:
         print("Invalid Surround project")
@@ -172,7 +172,8 @@ def main():
     init_parser.add_argument('-d', '--description', help="A description for the project")
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
-    run_parser.add_argument('task', help="Task defined in project dodo.py file.", nargs='?')
+    run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
+    run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)

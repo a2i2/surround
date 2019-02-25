@@ -75,7 +75,7 @@ You can use command line to generate a new project or a tutorial.
 - To generate project: `surround init <path-to-dir>`
   - Use `-p` or `--project-name` to specify name: `surround init <path-to-dir> -p sample`
   - Use `-d` or `--description` to specify description: `surround init <path-to-dir> -p sample -d sample-project`
-- To run a Surround project: `surround run <path-to-dir>`
+- To run a Surround project: `surround run <project doit task>`. Note the Surround project must have a `dodo.py` file with tasks for this command to work.
 
 ## Examples
 
