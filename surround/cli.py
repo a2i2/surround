@@ -89,6 +89,8 @@ def parse_lint_args(args):
         errors, warnings = linter.check_project(PROJECTS, args.path)
         for e in errors + warnings:
             print(e)
+        if not errors and not warnings:
+            print("All checks passed")
 
 def parse_tutorial_args(args):
     new_dir = os.path.join(args.path, "tutorial")
