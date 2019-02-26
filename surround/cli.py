@@ -208,10 +208,6 @@ def main():
     push_parser.add_argument('-r', '--remote', help="remote to push")
     push_parser.add_argument('-f', '--file', help="file to push (from .surround/config.yaml)")
 
-    # Local Remote
-    local = Local()
-    base_class = base.BaseRemote()
-
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
     tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push"]
