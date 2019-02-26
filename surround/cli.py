@@ -3,7 +3,9 @@ import os
 import sys
 import logging
 import subprocess
+from pathlib import Path
 
+from .remote import Local, base
 from .linter import Linter
 
 PROJECTS = {
@@ -22,7 +24,8 @@ PROJECTS = {
         ],
         "files": [
             ("requirements.txt", "surround==0.0.2"),
-            ("{project_name}/config.yaml", "output:\n  text: Hello World")
+            ("{project_name}/config.yaml", "output:\n  text: Hello World"),
+            (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
             # File name, template name, capitalize project name
@@ -156,6 +159,15 @@ def parse_init_args(args):
     else:
         print("Directory %s already exists" % new_dir)
 
+def is_surround_project():
+    """Whether inside surround project root directory
+    Check for the .surround folder
+    """
+    file_ = Path(".surround/config.yaml")
+    if file_.exists():
+        return True
+    else:
+        return False
 
 
 def main():
@@ -213,7 +225,7 @@ def main():
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "tutorial", "lint", "run"]
+    tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -229,6 +241,84 @@ def main():
                 parse_lint_args(parsed_args)
             elif tool == "run":
                 parse_run_args(parsed_args)
+            elif tool == "remote":
+                remote_name = parsed_args.name
+                remote_path = parsed_args.path
+                global_ = parsed_args.glob
+                add = parsed_args.add
+                verify = parsed_args.verify
+                if add:
+                    if global_:
+                        # Make directory if not exists
+                        home = str(Path.home())
+                        os.makedirs(os.path.dirname(home + "/.surround/config.yaml"), exist_ok=True)
+                        if remote_name and remote_path:
+                            base_class.write_config("remote", home + "/.surround/config.yaml", remote_name, remote_path)
+                        else:
+                            print("Supply remote name and path")
+                    else:
+                        if is_surround_project():
+                            if remote_name and remote_path:
+                                base_class.write_config("remote", ".surround/config.yaml", remote_name, remote_path)
+                            else:
+                                print("Supply remote name and path")
+                        else:
+                            print("Not a surround project")
+                            print("Goto project root directory")
+                else:
+                    if global_:
+                        remotes = base_class.read_all_from_global_config("remote")
+                        for key, value in remotes.items():
+                            if key:
+                                if verify:
+                                    print(key + ": " + value)
+                                else:
+                                    print(key)
+                    else:
+                        if is_surround_project():
+                            remotes = base_class.read_all_from_local_config("remote")
+                            for key, value in remotes.items():
+                                if key:
+                                    if verify:
+                                        print(key + ": " + value)
+                                    else:
+                                        print(key)
+                        else:
+                            print("Not a surround project")
+                            print("Goto project root directory")
+            elif tool == "add":
+                if is_surround_project():
+                    remote = parsed_args.remote
+                    file_to_add = parsed_args.file
+                    message = local.add(remote, file_to_add)
+                    print(message)
+                else:
+                    print("Not a surround project")
+                    print("Goto project root directory")
+            elif tool == "pull":
+                if is_surround_project():
+                    remote = base_class.read_from_config("remote", parsed_args.remote)
+                    if remote:
+                        file_ = parsed_args.file
+                        message = local.pull(parsed_args.remote, file_)
+                        print(message)
+                    else:
+                        print("Supply remote to pull from")
+                else:
+                    print("Not a surround project")
+                    print("Goto project root directory")
+            elif tool == "push":
+                if is_surround_project():
+                    remote = base_class.read_from_config("remote", parsed_args.remote)
+                    if remote:
+                        file_ = parsed_args.file
+                        message = local.push(parsed_args.remote, file_)
+                        print(message)
+                    else:
+                        print("Supply remote to push to")
+                else:
+                    print("Not a surround project")
+                    print("Goto project root directory")
             else:
                 parse_init_args(parsed_args)
     except KeyboardInterrupt:
