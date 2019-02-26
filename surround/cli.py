@@ -159,17 +159,6 @@ def parse_init_args(args):
     else:
         print("Directory %s already exists" % new_dir)
 
-def is_surround_project():
-    """Whether inside surround project root directory
-    Check for the .surround folder
-    """
-    file_ = Path(".surround/config.yaml")
-    if file_.exists():
-        return True
-    else:
-        return False
-
-
 def main():
     logging.disable(logging.CRITICAL)
 
