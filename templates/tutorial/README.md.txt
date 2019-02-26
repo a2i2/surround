@@ -2,13 +2,13 @@
 
 Welcome to the Surround tutorial project!!!
 
-## View help
-
-`python3 -m tutorial -h`
-
 ## Run the project
 
-`python3 -m tutorial -o data/output/ -i data/input/ -c tutorial/config.yaml`
+`surround run`
+
+## For help with Surround
+
+`surround -h`
 
 ## Project structure
 
@@ -20,11 +20,11 @@ Welcome to the Surround tutorial project!!!
 ├── models                          # Holds trained or downloaded models (not managed by git!)
 ├── notebooks                       # Store Jupyter notebooks for data analysis
 ├── scripts                         # Miscellaneous scripts e.g. for calculating metrics
+├── output                          # Save all output files here except for model files (not managed by git!)
 ├── starter                         # Python package for the new project
 │   ├── config.yaml
 │   ├── __main__.py                 # Entry point for running the application
 │   └── stages.py                   # Core functionality for the project starts in this module
-└── data                            # Data files are stored here (not managed by git!)
-    ├── input                       # Input data for the project goes here
-    └── output                      # Save all files here except model files
+└── data                            # Input data files are stored here (not managed by git!)
+
 </pre>

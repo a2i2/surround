@@ -34,8 +34,7 @@ class CheckFiles(LinterStage):
         LinterStage.__init__(self, "FILES", "Check for Surround project files")
 
     def operate(self, surround_data, config):
-        for result in surround_data.project_structure["new"][
-                "files"] + surround_data.project_structure["new"]["templates"]:
+        for result in surround_data.project_structure["new"]["files"] + surround_data.project_structure["new"]["templates"]:
             file_name = result[0]
             path = os.path.join(
                 surround_data.project_root,

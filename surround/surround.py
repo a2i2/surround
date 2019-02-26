@@ -3,6 +3,8 @@
 # Manages a set of stages and the data that is passed between them.
 from importlib import import_module
 import logging
+import sys
+import os
 from datetime import datetime
 from abc import ABC
 from .stage import Stage
@@ -39,14 +41,25 @@ class SurroundData(Frozen):
 
 class Surround(ABC):
 
-    def __init__(self, surround_stages, config=Config()):
-        assert isinstance(surround_stages, list), \
-               "surround_stages must be a list of Stage objects"
-
+    def __init__(self, surround_stages=None, module=None):
         self.surround_stages = surround_stages
-        self.config = None
-        if config:
-            self.set_config(config)
+
+        if module:
+            # Module already imported and has a file attribute
+            mod = sys.modules.get(module)
+            if mod is not None and hasattr(mod, '__file__'):
+                package_path = os.path.dirname(os.path.abspath(mod.__file__))
+                root_path = os.path.dirname(package_path)
+            else:
+                raise ValueError("Invalid Python module %s" % module)
+
+            self.set_config(Config(root_path))
+
+
+            if not os.path.exists(self.config["output_path"]):
+                os.makedirs(self.config["output_path"])
+        else:
+            self.set_config(Config())
 
     def set_config(self, config):
         if not config or not isinstance(config, Config):
@@ -62,7 +75,6 @@ class Surround(ABC):
                 module = import_module("." + parts[-2], ".".join(parts[:-2]))
                 klass = getattr(module, parts[-1])
                 self.surround_stages.append(klass())
-        return True
 
     def _execute_stage(self, stage, stage_data):
         stage_start = datetime.now()
