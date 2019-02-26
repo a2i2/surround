@@ -2,11 +2,13 @@ import os
 from pathlib import Path
 
 from . import base
+from . import local
 
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/26'
 
 BASE_REMOTE = base.BaseRemote()
+LOCAL = local.Local()
 
 def is_surround_project():
     """Whether inside surround project root directory
@@ -63,3 +65,13 @@ def parse_remote_args(parsed_args):
             else:
                 print("Not a surround project")
                 print("Goto project root directory")
+
+def parse_add_args(parsed_args):
+    if is_surround_project():
+        remote = parsed_args.remote
+        file_to_add = parsed_args.file
+        message = LOCAL.add(remote, file_to_add)
+        print(message)
+    else:
+        print("Not a surround project")
+        print("Goto project root directory")

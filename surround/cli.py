@@ -244,14 +244,7 @@ def main():
             elif tool == "remote":
                 remote_cli.parse_remote_args(parsed_args)
             elif tool == "add":
-                if is_surround_project():
-                    remote = parsed_args.remote
-                    file_to_add = parsed_args.file
-                    message = local.add(remote, file_to_add)
-                    print(message)
-                else:
-                    print("Not a surround project")
-                    print("Goto project root directory")
+                remote_cli.parse_add_args(parsed_args)
             elif tool == "pull":
                 if is_surround_project():
                     remote = base_class.read_from_config("remote", parsed_args.remote)
