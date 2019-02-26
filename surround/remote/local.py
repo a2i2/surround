@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from shutil import copyfile
-import yaml
 from .base import BaseRemote
 
 __author__ = 'Akshat Bajaj'
@@ -13,29 +12,16 @@ class Local(BaseRemote):
         f = Path(file_)
         if f.is_file():
             name = self.get_file_name(file_)
+            project_name = self.read_from_local_config("project-info", "project-name")
+            path_to_remote = self.read_from_config("remote", add_to)
 
-            with open(".surround/config.yaml", "r") as f:
-                read_config = yaml.load(f) or {}
-                project_name = read_config["project-info"]['project-name']
-
-            if "remote" in read_config and add_to in read_config["remote"]:
+            if path_to_remote:
                 # Append filename
-                path_to_file = read_config["remote"][add_to] + "/" + project_name + "/" + name
+                path_to_file = path_to_remote + "/" + project_name + "/" + name
                 self.write_config(add_to, ".surround/config.yaml", name, path_to_file)
                 return "File added successfully"
             else:
-                home = str(Path.home())
-
-                if Path(home + "/.surround/config.yaml").exists():
-                    if "remote" in read_config and add_to in read_config["remote"]:
-                        # Append filename
-                        path_to_file = read_config["remote"][add_to] + "/" + project_name + "/" + name
-                        self.write_config(add_to, home + "/.surround/config.yaml", name, path_to_file)
-                        return "File added successfully"
-                    else:
-                        return "No remote named" + add_to
-                else:
-                    return "No remote named" + add_to
+                return "No remote named " + path_to_remote
         else:
             return file_ + " not found"
 
