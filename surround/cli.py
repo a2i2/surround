@@ -248,17 +248,7 @@ def main():
             elif tool == "pull":
                 remote_cli.parse_pull_args(parsed_args)
             elif tool == "push":
-                if is_surround_project():
-                    remote = base_class.read_from_config("remote", parsed_args.remote)
-                    if remote:
-                        file_ = parsed_args.file
-                        message = local.push(parsed_args.remote, file_)
-                        print(message)
-                    else:
-                        print("Supply remote to push to")
-                else:
-                    print("Not a surround project")
-                    print("Goto project root directory")
+                remote_cli.parse_push_args(parsed_args)
             else:
                 parse_init_args(parsed_args)
     except KeyboardInterrupt:

@@ -88,3 +88,16 @@ def parse_pull_args(parsed_args):
     else:
         print("Not a surround project")
         print("Goto project root directory")
+
+def parse_push_args(parsed_args):
+    if is_surround_project():
+        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
+        if remote:
+            file_ = parsed_args.file
+            message = LOCAL.push(parsed_args.remote, file_)
+            print(message)
+        else:
+            print("Supply remote to push to")
+    else:
+        print("Not a surround project")
+        print("Goto project root directory")
