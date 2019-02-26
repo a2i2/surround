@@ -246,17 +246,7 @@ def main():
             elif tool == "add":
                 remote_cli.parse_add_args(parsed_args)
             elif tool == "pull":
-                if is_surround_project():
-                    remote = base_class.read_from_config("remote", parsed_args.remote)
-                    if remote:
-                        file_ = parsed_args.file
-                        message = local.pull(parsed_args.remote, file_)
-                        print(message)
-                    else:
-                        print("Supply remote to pull from")
-                else:
-                    print("Not a surround project")
-                    print("Goto project root directory")
+                remote_cli.parse_pull_args(parsed_args)
             elif tool == "push":
                 if is_surround_project():
                     remote = base_class.read_from_config("remote", parsed_args.remote)
