@@ -6,7 +6,7 @@ from . import base
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/26'
 
-base_class = base.BaseRemote()
+BASE_REMOTE = base.BaseRemote()
 
 def is_surround_project():
     """Whether inside surround project root directory
@@ -30,13 +30,13 @@ def parse_remote_args(parsed_args):
             home = str(Path.home())
             os.makedirs(os.path.dirname(home + "/.surround/config.yaml"), exist_ok=True)
             if remote_name and remote_path:
-                base_class.write_config("remote", home + "/.surround/config.yaml", remote_name, remote_path)
+                BASE_REMOTE.write_config("remote", home + "/.surround/config.yaml", remote_name, remote_path)
             else:
                 print("Supply remote name and path")
         else:
             if is_surround_project():
                 if remote_name and remote_path:
-                    base_class.write_config("remote", ".surround/config.yaml", remote_name, remote_path)
+                    BASE_REMOTE.write_config("remote", ".surround/config.yaml", remote_name, remote_path)
                 else:
                     print("Supply remote name and path")
             else:
@@ -44,7 +44,7 @@ def parse_remote_args(parsed_args):
                 print("Goto project root directory")
     else:
         if global_:
-            remotes = base_class.read_all_from_global_config("remote")
+            remotes = BASE_REMOTE.read_all_from_global_config("remote")
             for key, value in remotes.items():
                 if key:
                     if verify:
@@ -53,7 +53,7 @@ def parse_remote_args(parsed_args):
                         print(key)
         else:
             if is_surround_project():
-                remotes = base_class.read_all_from_local_config("remote")
+                remotes = BASE_REMOTE.read_all_from_local_config("remote")
                 for key, value in remotes.items():
                     if key:
                         if verify:
