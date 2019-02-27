@@ -35,13 +35,12 @@ class Local(BaseRemote):
             Add code to pull all files
             """
 
-    def push(self, what_to_push, file_=None):
-        if file_:
-            filename = self.get_file_name(file_)
-            file_to_push = self.read_from_config(what_to_push, filename)
+    def push(self, what_to_push, key=None):
+        if key:
+            file_to_push = self.read_from_config(what_to_push, key)
             os.makedirs(os.path.dirname(file_to_push), exist_ok=True)
             if file_to_push:
-                copyfile(what_to_push + '/' + filename, file_to_push)
+                copyfile(what_to_push + '/' + key, file_to_push)
                 return "File pushed successfully"
             else:
                 return "File not added, add that by surround add"

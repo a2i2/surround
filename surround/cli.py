@@ -205,7 +205,7 @@ def main():
     # push
     push_parser = sub_parser.add_parser('push', help="Push data to remote")
     push_parser.add_argument('-r', '--remote', help="remote to push")
-    push_parser.add_argument('-f', '--file', help="file to push (from .surround/config.yaml)")
+    push_parser.add_argument('-k', '--key', help="key of file to push (from .surround/config.yaml)")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword

@@ -113,11 +113,11 @@ class BaseRemote():
         """
 
     @abstractmethod
-    def push(self, what_to_push, file_=None):
+    def push(self, what_to_push, key=None):
         """Push data to remote
 
         :param file_: file to push
-        :type file_: str
+        :type key: str
         """
 
     def get_file_name(self, file_):
