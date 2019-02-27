@@ -15,10 +15,7 @@ def is_surround_project():
     Check for the .surround folder
     """
     file_ = Path(".surround/config.yaml")
-    if file_.exists():
-        return True
-    else:
-        return False
+    return file_.exists()
 
 def parse_remote_args(remote_parser, parsed_args):
     remote_name = parsed_args.name
