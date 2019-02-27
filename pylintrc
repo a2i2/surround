@@ -12,4 +12,5 @@ disable = missing-docstring,
     no-else-return,
     too-many-locals,
     too-many-branches,
-    too-many-statements
+    too-many-statements,
+    too-many-nested-blocks
