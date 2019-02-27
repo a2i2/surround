@@ -4,10 +4,6 @@ from pathlib import Path
 import yaml
 from surround.config import Config
 
-'''
-    Interface for remote
-'''
-
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/18'
 
