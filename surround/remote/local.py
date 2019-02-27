@@ -17,10 +17,8 @@ class Local(BaseRemote):
             if Path(path_to_local_file).is_file() or Path(path_to_remote_file).is_file():
                 self.write_config(add_to, ".surround/config.yaml", key, path_to_remote_file)
                 return "info: file added successfully"
-            else:
-                return "error: " + key + " not found."
-        else:
-            return "error: no remote named " + add_to
+            return "error: " + key + " not found."
+        return "error: no remote named " + add_to
 
     def pull(self, what_to_pull, key=None):
         if key:
@@ -28,14 +26,13 @@ class Local(BaseRemote):
             if file_to_pull:
                 copyfile(file_to_pull, what_to_pull + '/' + key)
                 return "info: " + key + " pulled successfully"
-            else:
-                return "error: file not added, add that by surround add"
-        else:
-            files_to_pull = self.read_all_from_local_config(what_to_pull)
-            for file_to_pull in files_to_pull:
-                self.pull(what_to_pull, file_to_pull)
+            return "error: file not added, add that by surround add"
 
-            return "info: all files pulled successfully"
+        files_to_pull = self.read_all_from_local_config(what_to_pull)
+        for file_to_pull in files_to_pull:
+            self.pull(what_to_pull, file_to_pull)
+
+        return "info: all files pulled successfully"
 
     def push(self, what_to_push, key=None):
         if key:
@@ -44,11 +41,10 @@ class Local(BaseRemote):
             if file_to_push:
                 copyfile(what_to_push + '/' + key, file_to_push)
                 return "info: " + key + " pushed successfully"
-            else:
-                return "error: file not added, add that by surround add"
-        else:
-            files_to_push = self.read_all_from_local_config(what_to_push)
-            for file_to_push in files_to_push:
-                self.push(what_to_push, file_to_push)
+            return "error: file not added, add that by surround add"
 
-            return "info: all files pushed successfully"
+        files_to_push = self.read_all_from_local_config(what_to_push)
+        for file_to_push in files_to_push:
+            self.push(what_to_push, file_to_push)
+
+        return "info: all files pushed successfully"
