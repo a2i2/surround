@@ -19,11 +19,11 @@ class Local(BaseRemote):
                 # Append filename
                 path_to_file = path_to_remote + "/" + project_name + "/" + name
                 self.write_config(add_to, ".surround/config.yaml", name, path_to_file)
-                return "File added successfully"
+                return "info: file added successfully"
             else:
-                return "No remote named " + path_to_remote
+                return "error: no remote named " + add_to
         else:
-            return file_ + " not found"
+            return "error: " + file_ + " not found"
 
     def pull(self, what_to_pull, file_=None):
         if file_:

@@ -89,8 +89,8 @@ def parse_add_args(parsed_args):
         message = LOCAL.add(remote, file_to_add)
         print(message)
     else:
-        print("Not a surround project")
-        print("Goto project root directory")
+        print("error: not a surround project")
+        print("error: goto project root directory")
 
 def parse_pull_args(parsed_args):
     if is_surround_project():
