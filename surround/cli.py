@@ -199,12 +199,12 @@ def main():
 
     # pull
     pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
-    pull_parser.add_argument('-r', '--remote', help="remote to pull")
+    pull_parser.add_argument('remote', help="remote to pull")
     pull_parser.add_argument('-k', '--key', help="key of file to pull (from .surround/config.yaml)")
 
     # push
     push_parser = sub_parser.add_parser('push', help="Push data to remote")
-    push_parser.add_argument('-r', '--remote', help="remote to push")
+    push_parser.add_argument('remote', help="remote to push")
     push_parser.add_argument('-k', '--key', help="key of file to push (from .surround/config.yaml)")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
