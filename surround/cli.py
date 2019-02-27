@@ -183,33 +183,11 @@ def main():
     linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
 
-
-    # Remote
-    remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
-    remote_parser.add_argument('-n', '--name', help="Name of the remote")
-    remote_parser.add_argument('-p', '--path', help="Url of the remote")
-    remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
-    remote_parser.add_argument('-v', '--verify', help="Verify remote", action='store_true')
-    remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
-
-    # Add
-    add_parser = sub_parser.add_parser('add', help="Add data to remote")
-    add_parser.add_argument('remote', help="remote to add to")
-    add_parser.add_argument('key', help="name of file to add")
-
-    # pull
-    pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
-    pull_parser.add_argument('remote', help="remote to pull")
-    pull_parser.add_argument('-k', '--key', help="key of file to pull (from .surround/config.yaml)")
-
-    # push
-    push_parser = sub_parser.add_parser('push', help="Push data to remote")
-    push_parser.add_argument('remote', help="remote to push")
-    push_parser.add_argument('-k', '--key', help="key of file to push (from .surround/config.yaml)")
-
-    # list
-    list_parser = sub_parser.add_parser('list', help="List data in remote")
-    list_parser.add_argument('remote', help="remote to list")
+    remote_parser = remote_cli.add_remote_parser(sub_parser)
+    remote_cli.create_add_parser(sub_parser)
+    remote_cli.add_pull_parser(sub_parser)
+    remote_cli.add_push_parser(sub_parser)
+    remote_cli.add_list_parser(sub_parser)
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword

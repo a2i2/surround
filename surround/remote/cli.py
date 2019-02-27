@@ -17,6 +17,34 @@ def is_surround_project():
     file_ = Path(".surround/config.yaml")
     return file_.exists()
 
+def add_remote_parser(sub_parser):
+    remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
+    remote_parser.add_argument('-n', '--name', help="Name of the remote")
+    remote_parser.add_argument('-p', '--path', help="Url of the remote")
+    remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
+    remote_parser.add_argument('-v', '--verify', help="Verify remote", action='store_true')
+    remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
+    return remote_parser
+
+def create_add_parser(sub_parser):
+    add_parser = sub_parser.add_parser('add', help="Add data to remote")
+    add_parser.add_argument('remote', help="remote to add to")
+    add_parser.add_argument('key', help="name of file to add")
+
+def add_pull_parser(sub_parser):
+    pull_parser = sub_parser.add_parser('pull', help="Pull the data from remote")
+    pull_parser.add_argument('remote', help="remote to pull")
+    pull_parser.add_argument('-k', '--key', help="key of file to pull (from .surround/config.yaml)")
+
+def add_push_parser(sub_parser):
+    push_parser = sub_parser.add_parser('push', help="Push data to remote")
+    push_parser.add_argument('remote', help="remote to push")
+    push_parser.add_argument('-k', '--key', help="key of file to push (from .surround/config.yaml)")
+
+def add_list_parser(sub_parser):
+    list_parser = sub_parser.add_parser('list', help="List data in remote")
+    list_parser.add_argument('remote', help="remote to list")
+
 def parse_remote_args(remote_parser, parsed_args):
     remote_name = parsed_args.name
     remote_path = parsed_args.path
