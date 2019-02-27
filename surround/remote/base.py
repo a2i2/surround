@@ -97,11 +97,11 @@ class BaseRemote():
                 return read_items
 
     @abstractmethod
-    def add(self, add_to, file_):
+    def add(self, add_to, key):
         """Add data to remote
 
         :param file_: file to add
-        :type file_: str
+        :type key: str
         """
 
     @abstractmethod

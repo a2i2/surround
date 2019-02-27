@@ -7,23 +7,20 @@ __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/18'
 
 class Local(BaseRemote):
-    def add(self, add_to, file_):
-        # Check file is valid
-        f = Path(file_)
-        if f.is_file():
-            name = self.get_file_name(file_)
-            project_name = self.read_from_local_config("project-info", "project-name")
-            path_to_remote = self.read_from_config("remote", add_to)
-
-            if path_to_remote:
-                # Append filename
-                path_to_file = path_to_remote + "/" + project_name + "/" + name
-                self.write_config(add_to, ".surround/config.yaml", name, path_to_file)
+    def add(self, add_to, key):
+        project_name = self.read_from_local_config("project-info", "project-name")
+        path_to_local_file = Path("data/" + key)
+        path_to_remote = self.read_from_config("remote", add_to)
+        if path_to_remote:
+            # Append filename
+            path_to_remote_file = path_to_remote + "/" + project_name + "/" + key
+            if Path(path_to_local_file).is_file() or Path(path_to_remote_file).is_file():
+                self.write_config(add_to, ".surround/config.yaml", key, path_to_remote_file)
                 return "info: file added successfully"
             else:
-                return "error: no remote named " + add_to
+                return "error: " + key + " not found."
         else:
-            return "error: " + file_ + " not found"
+            return "error: no remote named " + add_to
 
     def pull(self, what_to_pull, file_=None):
         if file_:

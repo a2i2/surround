@@ -85,7 +85,7 @@ def parse_remote_args(remote_parser, parsed_args):
 def parse_add_args(parsed_args):
     if is_surround_project():
         remote = parsed_args.remote
-        file_to_add = parsed_args.file
+        file_to_add = parsed_args.key
         message = LOCAL.add(remote, file_to_add)
         print(message)
     else:
