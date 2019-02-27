@@ -3,9 +3,8 @@ import os
 import sys
 import logging
 import subprocess
-from pathlib import Path
 
-from .remote import Local, base, cli as remote_cli
+from .remote import cli as remote_cli
 from .linter import Linter
 
 PROJECTS = {
@@ -227,7 +226,7 @@ def main():
             elif tool == "run":
                 parse_run_args(parsed_args)
             elif tool == "remote":
-                remote_cli.parse_remote_args(parsed_args)
+                remote_cli.parse_remote_args(remote_parser, parsed_args)
             elif tool == "add":
                 remote_cli.parse_add_args(parsed_args)
             elif tool == "pull":

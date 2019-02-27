@@ -20,30 +20,40 @@ def is_surround_project():
     else:
         return False
 
-def parse_remote_args(parsed_args):
+def parse_remote_args(remote_parser, parsed_args):
     remote_name = parsed_args.name
     remote_path = parsed_args.path
     global_ = parsed_args.glob
     add = parsed_args.add
     verify = parsed_args.verify
     if add:
-        if global_:
-            # Make directory if not exists
-            home = str(Path.home())
-            os.makedirs(os.path.dirname(home + "/.surround/config.yaml"), exist_ok=True)
-            if remote_name and remote_path:
-                BASE_REMOTE.write_config("remote", home + "/.surround/config.yaml", remote_name, remote_path)
-            else:
-                print("Supply remote name and path")
+        if verify:
+            print("error: unknown switch [-v VERIFY]")
+            remote_parser.print_usage()
+            print("[-a ADD] and [-v VERIFY] are mutually exclusive")
         else:
-            if is_surround_project():
+            if global_:
+                # Make directory if not exists
+                home = str(Path.home())
+                os.makedirs(os.path.dirname(home + "/.surround/config.yaml"), exist_ok=True)
                 if remote_name and remote_path:
-                    BASE_REMOTE.write_config("remote", ".surround/config.yaml", remote_name, remote_path)
+                    BASE_REMOTE.write_config("remote", home + "/.surround/config.yaml", remote_name, remote_path)
                 else:
-                    print("Supply remote name and path")
+                    print("error: supply remote name and path")
+                    remote_parser.print_usage()
+                    print("error: [-a ADD] [-n NAME] [-p PATH] are mutually inclusive")
             else:
-                print("Not a surround project")
-                print("Goto project root directory")
+                if is_surround_project():
+                    if remote_name and remote_path:
+                        BASE_REMOTE.write_config("remote", ".surround/config.yaml", remote_name, remote_path)
+                    else:
+                        print("error: supply remote name and path")
+                        remote_parser.print_usage()
+                        print("error: [-a ADD] [-n NAME] [-p PATH] are mutually inclusive")
+
+                else:
+                    print("error: not a surround project")
+                    print("error: goto project root directory")
     else:
         if global_:
             remotes = BASE_REMOTE.read_all_from_global_config("remote")
@@ -55,7 +65,7 @@ def parse_remote_args(parsed_args):
                         else:
                             print(key)
             else:
-                print("No global remote")
+                print("info: no global remote")
         else:
             if is_surround_project():
                 remotes = BASE_REMOTE.read_all_from_local_config("remote")
@@ -67,10 +77,10 @@ def parse_remote_args(parsed_args):
                             else:
                                 print(key)
                 else:
-                    print("No local remote")
+                    print("info: no local remote")
             else:
-                print("Not a surround project")
-                print("Goto project root directory")
+                print("error: not a surround project")
+                print("error: goto project root directory")
 
 def parse_add_args(parsed_args):
     if is_surround_project():
