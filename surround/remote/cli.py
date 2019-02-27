@@ -47,21 +47,27 @@ def parse_remote_args(parsed_args):
     else:
         if global_:
             remotes = BASE_REMOTE.read_all_from_global_config("remote")
-            for key, value in remotes.items():
-                if key:
-                    if verify:
-                        print(key + ": " + value)
-                    else:
-                        print(key)
-        else:
-            if is_surround_project():
-                remotes = BASE_REMOTE.read_all_from_local_config("remote")
+            if remotes:
                 for key, value in remotes.items():
                     if key:
                         if verify:
                             print(key + ": " + value)
                         else:
                             print(key)
+            else:
+                print("No global remote")
+        else:
+            if is_surround_project():
+                remotes = BASE_REMOTE.read_all_from_local_config("remote")
+                if remotes:
+                    for key, value in remotes.items():
+                        if key:
+                            if verify:
+                                print(key + ": " + value)
+                            else:
+                                print(key)
+                else:
+                    print("No local remote")
             else:
                 print("Not a surround project")
                 print("Goto project root directory")
