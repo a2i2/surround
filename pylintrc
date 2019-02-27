@@ -8,7 +8,6 @@ disable = missing-docstring,
     inconsistent-return-statements,
     line-too-long,
     duplicate-code,
-    too-many-locals,
     too-many-branches,
     too-many-statements,
     too-many-nested-blocks
