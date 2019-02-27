@@ -100,10 +100,10 @@ def parse_pull_args(parsed_args):
             message = LOCAL.pull(parsed_args.remote, key)
             print(message)
         else:
-            print("Supply remote to pull from")
+            print("error: supply remote to pull from")
     else:
-        print("Not a surround project")
-        print("Goto project root directory")
+        print("error: not a surround project")
+        print("error: goto project root directory")
 
 def parse_push_args(parsed_args):
     if is_surround_project():
@@ -113,7 +113,7 @@ def parse_push_args(parsed_args):
             message = LOCAL.push(parsed_args.remote, key)
             print(message)
         else:
-            print("Supply remote to push to")
+            print("error: supply remote to push to")
     else:
-        print("Not a surround project")
-        print("Goto project root directory")
+        print("error: not a surround project")
+        print("error: goto project root directory")

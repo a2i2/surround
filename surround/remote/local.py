@@ -27,9 +27,9 @@ class Local(BaseRemote):
             file_to_pull = self.read_from_config(what_to_pull, key)
             if file_to_pull:
                 copyfile(file_to_pull, what_to_pull + '/' + key)
-                return "File pulled successfully"
+                return "info: file pulled successfully"
             else:
-                return "File not added, add that by surround add"
+                return "error: file not added, add that by surround add"
         else:
             """
             Add code to pull all files
@@ -41,9 +41,9 @@ class Local(BaseRemote):
             os.makedirs(os.path.dirname(file_to_push), exist_ok=True)
             if file_to_push:
                 copyfile(what_to_push + '/' + key, file_to_push)
-                return "File pushed successfully"
+                return "info: file pushed successfully"
             else:
-                return "File not added, add that by surround add"
+                return "error: file not added, add that by surround add"
         else:
             """
             Add code to push all files
