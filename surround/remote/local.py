@@ -27,13 +27,15 @@ class Local(BaseRemote):
             file_to_pull = self.read_from_config(what_to_pull, key)
             if file_to_pull:
                 copyfile(file_to_pull, what_to_pull + '/' + key)
-                return "info: file pulled successfully"
+                return "info: " + key + " pulled successfully"
             else:
                 return "error: file not added, add that by surround add"
         else:
-            """
-            Add code to pull all files
-            """
+            files_to_pull = self.read_all_from_local_config(what_to_pull)
+            for file_to_pull in files_to_pull:
+                self.pull(what_to_pull, file_to_pull)
+
+            return "info: all files pulled successfully"
 
     def push(self, what_to_push, key=None):
         if key:
@@ -45,6 +47,8 @@ class Local(BaseRemote):
             else:
                 return "error: file not added, add that by surround add"
         else:
-            """
-            Add code to push all files
-            """
+            files_to_push = self.read_all_from_local_config(what_to_push)
+            for file_to_push in files_to_push:
+                self.push(what_to_push, file_to_push)
+
+            return "info: all files pushed successfully"
