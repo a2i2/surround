@@ -105,11 +105,11 @@ class BaseRemote():
         """
 
     @abstractmethod
-    def pull(self, what_to_pull, file_=None):
+    def pull(self, what_to_pull, key=None):
         """Pull data from remote
 
         :param file_: file to pull
-        :type file_: str
+        :type key: str
         """
 
     @abstractmethod

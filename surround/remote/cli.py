@@ -96,8 +96,8 @@ def parse_pull_args(parsed_args):
     if is_surround_project():
         remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
         if remote:
-            file_ = parsed_args.file
-            message = LOCAL.pull(parsed_args.remote, file_)
+            key = parsed_args.key
+            message = LOCAL.pull(parsed_args.remote, key)
             print(message)
         else:
             print("Supply remote to pull from")

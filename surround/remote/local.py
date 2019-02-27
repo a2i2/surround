@@ -22,11 +22,11 @@ class Local(BaseRemote):
         else:
             return "error: no remote named " + add_to
 
-    def pull(self, what_to_pull, file_=None):
-        if file_:
-            file_to_pull = self.read_from_config(what_to_pull, file_)
+    def pull(self, what_to_pull, key=None):
+        if key:
+            file_to_pull = self.read_from_config(what_to_pull, key)
             if file_to_pull:
-                copyfile(file_to_pull, what_to_pull + '/' + file_)
+                copyfile(file_to_pull, what_to_pull + '/' + key)
                 return "File pulled successfully"
             else:
                 return "File not added, add that by surround add"
