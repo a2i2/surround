@@ -43,7 +43,7 @@ class Local(BaseRemote):
             os.makedirs(os.path.dirname(file_to_push), exist_ok=True)
             if file_to_push:
                 copyfile(what_to_push + '/' + key, file_to_push)
-                return "info: file pushed successfully"
+                return "info: " + key + " pushed successfully"
             else:
                 return "error: file not added, add that by surround add"
         else:
