@@ -117,3 +117,10 @@ def parse_push_args(parsed_args):
     else:
         print("error: not a surround project")
         print("error: goto project root directory")
+
+def parse_list_args(parsed_args):
+    project_name = BASE_REMOTE.read_from_local_config("project-info", "project-name")
+    path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
+    path_to_remote_files = path_to_remote + "/" + project_name
+    message = os.listdir(path_to_remote_files)
+    print(message)

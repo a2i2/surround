@@ -207,9 +207,13 @@ def main():
     push_parser.add_argument('remote', help="remote to push")
     push_parser.add_argument('-k', '--key', help="key of file to push (from .surround/config.yaml)")
 
+    # list
+    list_parser = sub_parser.add_parser('list', help="List data in remote")
+    list_parser.add_argument('remote', help="remote to list")
+
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push"]
+    tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push", "list"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -233,6 +237,8 @@ def main():
                 remote_cli.parse_pull_args(parsed_args)
             elif tool == "push":
                 remote_cli.parse_push_args(parsed_args)
+            elif tool == "list":
+                remote_cli.parse_list_args(parsed_args)
             else:
                 parse_init_args(parsed_args)
     except KeyboardInterrupt:
