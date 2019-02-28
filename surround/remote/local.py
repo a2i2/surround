@@ -26,6 +26,7 @@ class Local(BaseRemote):
     def pull(self, what_to_pull, key=None):
         if key:
             file_to_pull = self.read_from_config(what_to_pull, key)
+            os.makedirs(what_to_pull, exist_ok=True)
             if file_to_pull:
                 copyfile(file_to_pull, os.path.join(what_to_pull, key))
                 return "info: " + key + " pulled successfully"
