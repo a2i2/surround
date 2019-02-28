@@ -93,9 +93,13 @@ def print_remote_info(parsed_args, remotes):
 def parse_remote_args(remote_parser, parsed_args):
     global_ = parsed_args.glob
     add = parsed_args.add
+    remote_name = parsed_args.name
+    remote_url = parsed_args.url
 
     if add:
         add_remote(remote_parser, parsed_args)
+    elif remote_name or remote_url:
+        print("error: unknown switch [-n NAME] [-u URL]")
     else:
         if global_:
             remotes = BASE_REMOTE.read_all_from_global_config("remote")
