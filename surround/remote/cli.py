@@ -68,8 +68,8 @@ def add_remote(remote_parser, parsed_args):
         if global_:
             # Make directory if not exists
             home = str(Path.home())
-            os.makedirs(os.path.dirname(home + "/.surround/config.yaml"), exist_ok=True)
-            write_remote_config(parsed_args, remote_parser, home + "/.surround/config.yaml")
+            os.makedirs(os.path.dirname(os.path.join(home, ".surround/config.yaml")), exist_ok=True)
+            write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"))
         else:
             if is_surround_project():
                 write_remote_config(parsed_args, remote_parser, ".surround/config.yaml")
@@ -147,6 +147,6 @@ def parse_push_args(parsed_args):
 def parse_list_args(parsed_args):
     project_name = BASE_REMOTE.read_from_local_config("project-info", "project-name")
     path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-    path_to_remote_files = path_to_remote + "/" + project_name
+    path_to_remote_files = os.path.join(path_to_remote, project_name)
     message = os.listdir(path_to_remote_files)
     print(message)
