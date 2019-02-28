@@ -22,7 +22,7 @@ def add_remote_parser(sub_parser):
     remote_parser.add_argument('-n', '--name', help="Name of the remote")
     remote_parser.add_argument('-p', '--path', help="Url of the remote")
     remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
-    remote_parser.add_argument('-v', '--verify', help="Verify remote", action='store_true')
+    remote_parser.add_argument('-v', '--verbose', help="verbose remote", action='store_true')
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
     return remote_parser
 
@@ -57,13 +57,13 @@ def write_remote_config(parsed_args, remote_parser, file_to_write):
         print("error: [-a ADD] [-n NAME] [-p PATH] are mutually inclusive")
 
 def add_remote(remote_parser, parsed_args):
-    verify = parsed_args.verify
+    verbose = parsed_args.verbose
     global_ = parsed_args.glob
 
-    if verify:
-        print("error: unknown switch [-v VERIFY]")
+    if verbose:
+        print("error: unknown switch [-v verbose]")
         remote_parser.print_usage()
-        print("[-a ADD] and [-v VERIFY] are mutually exclusive")
+        print("[-a ADD] and [-v verbose] are mutually exclusive")
     else:
         if global_:
             # Make directory if not exists
@@ -78,17 +78,17 @@ def add_remote(remote_parser, parsed_args):
                 print("error: goto project root directory")
 
 def print_remote_info(parsed_args, remotes):
-    verify = parsed_args.verify
+    verbose = parsed_args.verbose
 
     if remotes:
         for key, value in remotes.items():
             if key:
-                if verify:
+                if verbose:
                     print(key + ": " + value)
                 else:
                     print(key)
     else:
-        print("info: no global remote")
+        print("info: no remote found")
 
 def parse_remote_args(remote_parser, parsed_args):
     global_ = parsed_args.glob
