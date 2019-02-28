@@ -150,6 +150,10 @@ def parse_push_args(parsed_args):
 
 def parse_list_args(parsed_args):
     project_name = BASE_REMOTE.read_from_local_config("project-info", "project-name")
+    if project_name is None:
+        print("error: project name not present in config")
+        return
+
     path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
     path_to_remote_files = os.path.join(path_to_remote, project_name)
     message = os.listdir(path_to_remote_files)

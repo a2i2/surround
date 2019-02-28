@@ -9,6 +9,9 @@ __date__ = '2019/02/18'
 class Local(BaseRemote):
     def add(self, add_to, key):
         project_name = self.read_from_local_config("project-info", "project-name")
+        if project_name is None:
+            return "error: project name not present in config"
+
         path_to_local_file = Path(os.path.join("data", key))
         path_to_remote = self.read_from_config("remote", add_to)
         if path_to_remote:
