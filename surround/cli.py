@@ -158,6 +158,26 @@ def parse_init_args(args):
     else:
         print("Directory %s already exists" % new_dir)
 
+def parse_tool_args(parsed_args, remote_parser, tool):
+    if tool == "tutorial":
+        parse_tutorial_args(parsed_args)
+    elif tool == "lint":
+        parse_lint_args(parsed_args)
+    elif tool == "run":
+        parse_run_args(parsed_args)
+    elif tool == "remote":
+        remote_cli.parse_remote_args(remote_parser, parsed_args)
+    elif tool == "add":
+        remote_cli.parse_add_args(parsed_args)
+    elif tool == "pull":
+        remote_cli.parse_pull_args(parsed_args)
+    elif tool == "push":
+        remote_cli.parse_push_args(parsed_args)
+    elif tool == "list":
+        remote_cli.parse_list_args(parsed_args)
+    else:
+        parse_init_args(parsed_args)
+
 def main():
     logging.disable(logging.CRITICAL)
 
@@ -201,24 +221,7 @@ def main():
         else:
             tool = sys.argv[1]
             parsed_args = parser.parse_args()
-            if tool == "tutorial":
-                parse_tutorial_args(parsed_args)
-            elif tool == "lint":
-                parse_lint_args(parsed_args)
-            elif tool == "run":
-                parse_run_args(parsed_args)
-            elif tool == "remote":
-                remote_cli.parse_remote_args(remote_parser, parsed_args)
-            elif tool == "add":
-                remote_cli.parse_add_args(parsed_args)
-            elif tool == "pull":
-                remote_cli.parse_pull_args(parsed_args)
-            elif tool == "push":
-                remote_cli.parse_push_args(parsed_args)
-            elif tool == "list":
-                remote_cli.parse_list_args(parsed_args)
-            else:
-                parse_init_args(parsed_args)
+            parse_tool_args(parsed_args, remote_parser, tool)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 
