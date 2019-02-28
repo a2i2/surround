@@ -20,7 +20,7 @@ def is_surround_project():
 def add_remote_parser(sub_parser):
     remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
     remote_parser.add_argument('-n', '--name', help="Name of the remote")
-    remote_parser.add_argument('-p', '--path', help="Url of the remote")
+    remote_parser.add_argument('-u', '--url', help="Url of the remote")
     remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
     remote_parser.add_argument('-v', '--verbose', help="verbose remote", action='store_true')
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
@@ -47,23 +47,23 @@ def add_list_parser(sub_parser):
 
 def write_remote_config(parsed_args, remote_parser, file_to_write):
     remote_name = parsed_args.name
-    remote_path = parsed_args.path
+    remote_url = parsed_args.url
 
-    if remote_name and remote_path:
-        BASE_REMOTE.write_config("remote", file_to_write, remote_name, remote_path)
+    if remote_name and remote_url:
+        BASE_REMOTE.write_config("remote", file_to_write, remote_name, remote_url)
     else:
-        print("error: supply remote name and path")
+        print("error: supply remote name and url")
         remote_parser.print_usage()
-        print("error: [-a ADD] [-n NAME] [-p PATH] are mutually inclusive")
+        print("error: [-a ADD] [-n NAME] [-u URL] are mutually inclusive")
 
 def add_remote(remote_parser, parsed_args):
     verbose = parsed_args.verbose
     global_ = parsed_args.glob
 
     if verbose:
-        print("error: unknown switch [-v verbose]")
+        print("error: unknown switch [-v VERBOSE]")
         remote_parser.print_usage()
-        print("[-a ADD] and [-v verbose] are mutually exclusive")
+        print("[-a ADD] and [-v VERBOSE] are mutually exclusive")
     else:
         if global_:
             # Make directory if not exists
