@@ -26,6 +26,9 @@ class Local(BaseRemote):
     def pull(self, what_to_pull, key=None):
         if key:
             file_to_pull = self.read_from_config(what_to_pull, key)
+            if Path(os.path.join(what_to_pull, key)).exists():
+                return "info: " + os.path.join(what_to_pull, key) + " already exists"
+
             os.makedirs(what_to_pull, exist_ok=True)
             if file_to_pull:
                 copyfile(file_to_pull, os.path.join(what_to_pull, key))
@@ -40,10 +43,15 @@ class Local(BaseRemote):
 
     def push(self, what_to_push, key=None):
         if key:
-            file_to_push = self.read_from_config(what_to_push, key)
-            os.makedirs(os.path.dirname(file_to_push), exist_ok=True)
-            if file_to_push:
-                copyfile(os.path.join(what_to_push, key), file_to_push)
+            project_name = self.read_from_local_config("project-info", "project-name")
+            path_to_remote = self.read_from_config("remote", what_to_push)
+            path_to_remote_file = os.path.join(path_to_remote, project_name, key)
+            if Path(path_to_remote_file).exists():
+                return "info: " + path_to_remote_file + " already exists"
+
+            os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
+            if path_to_remote_file:
+                copyfile(os.path.join(what_to_push, key), path_to_remote_file)
                 return "info: " + key + " pushed successfully"
             return "error: file not added, add that by surround add"
 
