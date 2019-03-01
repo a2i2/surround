@@ -157,7 +157,8 @@ def parse_list_args(parsed_args):
     path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
     if path_to_remote:
         path_to_remote_files = os.path.join(path_to_remote, project_name)
-        message = os.listdir(path_to_remote_files)
-        print(message)
+        remote_files = os.listdir(path_to_remote_files)
+        for remote_file in remote_files:
+            print(remote_file)
     else:
         print("error: no remote named " + parsed_args.remote)
