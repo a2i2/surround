@@ -18,7 +18,7 @@ class Local(BaseRemote):
             # Append filename
             path_to_remote_file = os.path.join(path_to_remote, project_name, key)
             if Path(path_to_local_file).is_file() or Path(path_to_remote_file).is_file():
-                self.write_config(add_to, ".surround/config.yaml", key, path_to_remote_file)
+                self.write_config(add_to, ".surround/config.yaml", key)
                 return "info: file added successfully"
             return "error: " + key + " not found."
         return "error: no remote named " + add_to

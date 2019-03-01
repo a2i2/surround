@@ -9,7 +9,7 @@ __date__ = '2019/02/18'
 
 class BaseRemote():
 
-    def write_config(self, what_to_write, file_, name, path):
+    def write_config(self, what_to_write, file_, name, path=None):
         """Write config to a file
 
         :param what_to_write: For example remote, data, model etc.
@@ -28,12 +28,20 @@ class BaseRemote():
         else:
             read_config = {}
 
-        if what_to_write in read_config:
-            read_config[what_to_write][name] = path
+        if path is None:
+            if what_to_write in read_config and name not in read_config[what_to_write]:
+                read_config[what_to_write].append(name)
+            else:
+                read_config[what_to_write] = [name]
+
+            print(read_config)
         else:
-            read_config[what_to_write] = {
-                name: path
-            }
+            if what_to_write in read_config:
+                read_config[what_to_write][name] = path
+            else:
+                read_config[what_to_write] = {
+                    name: path
+                }
 
         with open(file_, "w") as f:
             yaml.dump(read_config, f, default_flow_style=False)
