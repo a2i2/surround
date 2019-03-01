@@ -25,7 +25,12 @@ class Local(BaseRemote):
 
     def pull(self, what_to_pull, key=None):
         if key:
-            file_to_pull = self.read_from_config(what_to_pull, key)
+            project_name = self.read_from_local_config("project-info", "project-name")
+            if project_name is None:
+                return "error: project name not present in config"
+
+            path_to_remote = self.read_from_config("remote", what_to_pull)
+            file_to_pull = os.path.join(path_to_remote, project_name, key)
             if Path(os.path.join(what_to_pull, key)).exists():
                 return "info: " + os.path.join(what_to_pull, key) + " already exists"
 
