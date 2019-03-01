@@ -33,8 +33,6 @@ class BaseRemote():
                 read_config[what_to_write].append(name)
             else:
                 read_config[what_to_write] = [name]
-
-            print(read_config)
         else:
             if what_to_write in read_config:
                 read_config[what_to_write][name] = path
