@@ -55,10 +55,10 @@ class Local(BaseRemote):
                 return "info: " + path_to_remote_file + " already exists"
 
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
-            if path_to_remote_file:
+            if path_to_remote_file and Path(os.path.join(what_to_push, key)).exists():
                 copyfile(os.path.join(what_to_push, key), path_to_remote_file)
                 return "info: " + key + " pushed successfully"
-            return "error: file not added, add that by surround add"
+            return "error: file does not exist"
 
         files_to_push = self.read_all_from_local_config(what_to_push)
         for file_to_push in files_to_push:
