@@ -156,6 +156,7 @@ def parse_list_args(parsed_args):
 
     path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
     if path_to_remote:
+        os.makedirs(os.path.join(path_to_remote, project_name), exist_ok=True)
         path_to_remote_files = os.path.join(path_to_remote, project_name)
         remote_files = os.listdir(path_to_remote_files)
         for remote_file in remote_files:
