@@ -35,10 +35,10 @@ class Local(BaseRemote):
                 return "info: " + os.path.join(what_to_pull, key) + " already exists"
 
             os.makedirs(what_to_pull, exist_ok=True)
-            if file_to_pull:
+            if Path(file_to_pull).exists():
                 copyfile(file_to_pull, os.path.join(what_to_pull, key))
                 return "info: " + key + " pulled successfully"
-            return "error: file not added, add that by surround add"
+            return "error: file does not exist"
 
         files_to_pull = self.read_all_from_local_config(what_to_pull)
         if files_to_pull:
