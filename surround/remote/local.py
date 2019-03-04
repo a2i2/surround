@@ -41,10 +41,12 @@ class Local(BaseRemote):
             return "error: file not added, add that by surround add"
 
         files_to_pull = self.read_all_from_local_config(what_to_pull)
-        for file_to_pull in files_to_pull:
-            self.pull(what_to_pull, file_to_pull)
+        if files_to_pull:
+            for file_to_pull in files_to_pull:
+                self.pull(what_to_pull, file_to_pull)
 
-        return "info: all files pulled successfully"
+            return "info: all files pulled successfully"
+        return "error: No file added to " + what_to_pull
 
     def push(self, what_to_push, key=None):
         if key:
