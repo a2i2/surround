@@ -61,7 +61,8 @@ class Local(BaseRemote):
             return "error: file does not exist"
 
         files_to_push = self.read_all_from_local_config(what_to_push)
-        for file_to_push in files_to_push:
-            self.push(what_to_push, file_to_push)
-
-        return "info: all files pushed successfully"
+        if files_to_push:
+            for file_to_push in files_to_push:
+                self.push(what_to_push, file_to_push)
+            return "info: all files pushed successfully"
+        return "error: No file added to " + what_to_push

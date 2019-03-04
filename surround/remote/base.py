@@ -69,9 +69,8 @@ class BaseRemote():
 
         if Path(".surround/config.yaml").exists():
             config.read_config_files([".surround/config.yaml"])
-            read_items = config.get(what_to_read)
-            if read_items:
-                return read_items
+            read_items = config.get(what_to_read, None)
+            return read_items
 
     def read_all_from_global_config(self, what_to_read):
         config = Config()
@@ -79,9 +78,8 @@ class BaseRemote():
 
         if Path(os.path.join(home, ".surround/config.yaml")).exists():
             config.read_config_files([os.path.join(home, ".surround/config.yaml")])
-            read_items = config.get(what_to_read)
-            if read_items:
-                return read_items
+            read_items = config.get(what_to_read, None)
+            return read_items
 
     @abstractmethod
     def add(self, add_to, key):
