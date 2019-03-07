@@ -35,7 +35,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     surround = Surround([HelloSurround(), HelloWorld()])
     surround_config = Config()
-    surround_config.read_config_files(["temp/init-stage-with-data/config.yaml"])
+    surround_config.read_config_files(["surround/init-stage-with-data/config.yaml"])
     surround.set_config(surround_config)
     surround.init_stages()
     # surround.process(BasicData())
