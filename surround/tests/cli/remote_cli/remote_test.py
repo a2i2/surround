@@ -25,3 +25,12 @@ class RemoteTest(unittest.TestCase):
 
         process = subprocess.run(['surround', 'remote', '-v'], encoding='utf-8', stdout=subprocess.PIPE, cwd='remote')
         self.assertEqual(process.stdout, "data: " + os.getcwd() + "\n")
+
+        is_remote = os.path.isdir(os.path.join(os.getcwd() + "/remote"))
+        self.assertEqual(is_remote, True)
+
+        # Remove residual files
+        subprocess.run(['rm', '-r', './remote'], encoding='utf-8', stdout=subprocess.PIPE)
+
+        is_remote = os.path.isdir(os.path.join(os.getcwd() + "/remote"))
+        self.assertEqual(is_remote, False)
