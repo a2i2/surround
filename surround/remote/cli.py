@@ -133,8 +133,13 @@ def parse_pull_args(parsed_args):
         remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
         if remote:
             key = parsed_args.key
-            message = LOCAL.pull(parsed_args.remote, key)
-            print(message)
+            if key:
+                message = LOCAL.pull(parsed_args.remote, key)
+                print(message)
+            else:
+                messages = LOCAL.pull(parsed_args.remote, key)
+                for message in messages:
+                    print(message)
         else:
             print("error: supply remote to pull from")
     else:
@@ -146,8 +151,13 @@ def parse_push_args(parsed_args):
         remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
         if remote:
             key = parsed_args.key
-            message = LOCAL.push(parsed_args.remote, key)
-            print(message)
+            if key:
+                message = LOCAL.push(parsed_args.remote, key)
+                print(message)
+            else:
+                messages = LOCAL.push(parsed_args.remote, key)
+                for message in messages:
+                    print(message)
         else:
             print("error: supply remote to push to")
     else:
