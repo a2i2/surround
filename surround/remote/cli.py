@@ -22,6 +22,7 @@ def add_remote_parser(sub_parser):
     remote_parser.add_argument('-n', '--name', help="Name of the remote")
     remote_parser.add_argument('-u', '--url', help="Url of the remote")
     remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
+    remote_parser.add_argument('-t', '--type', choices=['data', 'model'])
     remote_parser.add_argument('-v', '--verbose', help="verbose remote", action='store_true')
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
     return remote_parser
@@ -95,9 +96,13 @@ def parse_remote_args(remote_parser, parsed_args):
     add = parsed_args.add
     remote_name = parsed_args.name
     remote_url = parsed_args.url
+    type_ = parsed_args.type
 
-    if add:
+    if add and type_:
         add_remote(remote_parser, parsed_args)
+    elif add:
+        print("error: Supply type [-t TYPE]")
+        print("error: [-a ADD] [-t TYPE] are mutually inclusive")
     elif remote_name or remote_url:
         print("error: unknown switch [-n NAME] [-u URL]")
     else:
