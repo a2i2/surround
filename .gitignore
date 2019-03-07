@@ -1,14 +1,32 @@
 # Compiled python modules.
 *.pyc
+*$py.class
+__pycache__/
 
 # Setuptools distribution folder.
 /dist/
 
-# Python egg metadata, regenerated from source files by setuptools.
-**/*.egg-info
+# Distribution / packaging
+build/
 
-/__pycache__/
-/build/
+## Python egg metadata, regenerated from source files by setuptools.
+**/*.egg-info
+.eggs/
+eggs/
+develop-eggs/
+*.egg
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 
 # Environments
 .env
@@ -19,8 +37,13 @@ ENV/
 env.bak/
 venv.bak/
 
+# OS
 .DS_Store
+
+# Editor
 .vscode
+
+#pyenv
 .python-version
 
 # Ignore text output files

@@ -4,11 +4,13 @@ import sys
 import logging
 import subprocess
 
+from .remote import cli as remote_cli
 from .linter import Linter
 
 PROJECTS = {
     "new" : {
         "dirs" : [
+            ".surround",
             "data",
             "output",
             "docs",
@@ -21,7 +23,8 @@ PROJECTS = {
         ],
         "files": [
             ("requirements.txt", "surround==0.0.2"),
-            ("{project_name}/config.yaml", "output:\n  text: Hello World")
+            ("{project_name}/config.yaml", "output:\n  text: Hello World"),
+            (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
             # File name, template name, capitalize project name
@@ -155,7 +158,25 @@ def parse_init_args(args):
     else:
         print("Directory %s already exists" % new_dir)
 
-
+def parse_tool_args(parsed_args, remote_parser, tool):
+    if tool == "tutorial":
+        parse_tutorial_args(parsed_args)
+    elif tool == "lint":
+        parse_lint_args(parsed_args)
+    elif tool == "run":
+        parse_run_args(parsed_args)
+    elif tool == "remote":
+        remote_cli.parse_remote_args(remote_parser, parsed_args)
+    elif tool == "add":
+        remote_cli.parse_add_args(parsed_args)
+    elif tool == "pull":
+        remote_cli.parse_pull_args(parsed_args)
+    elif tool == "push":
+        remote_cli.parse_push_args(parsed_args)
+    elif tool == "list":
+        remote_cli.parse_list_args(parsed_args)
+    else:
+        parse_init_args(parsed_args)
 
 def main():
     logging.disable(logging.CRITICAL)
@@ -182,10 +203,15 @@ def main():
     linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
 
+    remote_parser = remote_cli.add_remote_parser(sub_parser)
+    remote_cli.create_add_parser(sub_parser)
+    remote_cli.add_pull_parser(sub_parser)
+    remote_cli.add_push_parser(sub_parser)
+    remote_cli.add_list_parser(sub_parser)
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "tutorial", "lint", "run"]
+    tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push", "list"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -195,14 +221,7 @@ def main():
         else:
             tool = sys.argv[1]
             parsed_args = parser.parse_args()
-            if tool == "tutorial":
-                parse_tutorial_args(parsed_args)
-            elif tool == "lint":
-                parse_lint_args(parsed_args)
-            elif tool == "run":
-                parse_run_args(parsed_args)
-            else:
-                parse_init_args(parsed_args)
+            parse_tool_args(parsed_args, remote_parser, tool)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 
