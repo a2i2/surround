@@ -46,18 +46,19 @@ def add_list_parser(sub_parser):
     list_parser = sub_parser.add_parser('list', help="List file in remote")
     list_parser.add_argument('remote', help="remote to list")
 
-def write_remote_config(parsed_args, remote_parser, file_to_write):
+def write_remote_config(parsed_args, remote_parser, file_to_write, type_):
     remote_name = parsed_args.name
     remote_url = parsed_args.url
 
     if remote_name and remote_url:
         BASE_REMOTE.write_config("remote", file_to_write, remote_name, remote_url)
+        BASE_REMOTE.write_config("remote-type", file_to_write, remote_name, type_)
     else:
         print("error: supply remote name and url")
         remote_parser.print_usage()
         print("error: [-a ADD] [-n NAME] [-u URL] are mutually inclusive")
 
-def add_remote(remote_parser, parsed_args):
+def add_remote(remote_parser, parsed_args, type_):
     verbose = parsed_args.verbose
     global_ = parsed_args.glob
 
@@ -70,10 +71,10 @@ def add_remote(remote_parser, parsed_args):
             # Make directory if not exists
             home = str(Path.home())
             os.makedirs(os.path.dirname(os.path.join(home, ".surround/config.yaml")), exist_ok=True)
-            write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"))
+            write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"), type_)
         else:
             if is_surround_project():
-                write_remote_config(parsed_args, remote_parser, ".surround/config.yaml")
+                write_remote_config(parsed_args, remote_parser, ".surround/config.yaml", type_)
             else:
                 print("error: not a surround project")
                 print("error: goto project root directory")
@@ -99,7 +100,7 @@ def parse_remote_args(remote_parser, parsed_args):
     type_ = parsed_args.type
 
     if add and type_:
-        add_remote(remote_parser, parsed_args)
+        add_remote(remote_parser, parsed_args, type_)
     elif add:
         print("error: Supply type [-t TYPE]")
         print("error: [-a ADD] [-t TYPE] are mutually inclusive")
