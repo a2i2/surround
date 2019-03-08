@@ -11,10 +11,3 @@ Welcome to surround's documentation!
    :caption: Contents:
 
    surround.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
