@@ -3,9 +3,11 @@ import os
 import sys
 import logging
 import subprocess
+import tornado.ioloop
 
 from .remote import cli as remote_cli
 from .linter import Linter
+from .runner.web import api
 
 PROJECTS = {
     "new" : {
@@ -112,6 +114,7 @@ def parse_run_args(args):
     }
 
     path = args.path
+    web = args.web
     errors, warnings = Linter().check_project(deploy, path)
     if errors:
         print("Invalid Surround project")
@@ -123,8 +126,16 @@ def parse_run_args(args):
             task = args.task
         else:
             task = 'list'
-        run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
-        run_process.wait()
+
+        if web:
+            api.Predict.task = task
+            api.Predict.path = path
+            app = api.make_app()
+            app.listen(8889)
+            tornado.ioloop.IOLoop.current().start()
+        else:
+            run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
+            run_process.wait()
 
 def parse_tutorial_args(args):
     new_dir = os.path.join(args.path, "tutorial")
@@ -197,6 +208,7 @@ def main():
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
     run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
+    run_parser.add_argument('-w', '--web', help="Web Runner", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
