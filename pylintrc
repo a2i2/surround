@@ -7,4 +7,5 @@ disable = missing-docstring,
     no-self-use,
     inconsistent-return-statements,
     line-too-long,
-    duplicate-code
+    duplicate-code,
+    abstract-method
