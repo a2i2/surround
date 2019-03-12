@@ -48,3 +48,6 @@ venv.bak/
 
 # Ignore text output files
 /examples/file-adapter/data/output.txt
+
+# Sphinx generated files
+/docs/build
