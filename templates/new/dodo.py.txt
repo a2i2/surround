@@ -1,7 +1,16 @@
+import os
+
 DOIT_CONFIG = {{'verbosity':2}}
+
+def task_build():
+    """Build the Docker image for the current project"""
+
+    return {{
+        'actions': ['docker build --tag={project_name} .']
+    }}
 
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["python3 -m {project_name}"],
+        'actions': ["docker run {project_name}"],
     }}
