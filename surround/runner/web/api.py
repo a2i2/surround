@@ -1,9 +1,6 @@
 import tornado.ioloop
 import tornado.web
 
-__author__ = 'Akshat Bajaj'
-__date__ = '2019/03/08'
-
 class HealthCheck(tornado.web.RequestHandler):
     def get(self):
         self.write("OK!")
