@@ -4,7 +4,7 @@ import tornado.options
 
 @tornado.gen.coroutine
 def json_fetch(http_client, body):
-    response = yield http_client.fetch("http://localhost:8889/predict", method='POST', body=body)
+    response = yield http_client.fetch("http://localhost:8888/predict", method='POST', body=body)
     raise gen.Return(response)
 
 @tornado.gen.coroutine

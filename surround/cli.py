@@ -122,7 +122,6 @@ def parse_run_args(args):
     for e in errors + warnings:
         print(e)
     if not errors:
-        print("Project tasks:")
         if args.task:
             task = args.task
         else:
@@ -133,9 +132,13 @@ def parse_run_args(args):
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             app = api.make_app(module.WebWrapper())
-            app.listen(8889)
+            app.listen(8888)
+            print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
+            print("Available endpoints:")
+            print("* POST /predict         # Send JSON data to the Surround pipeline")
             tornado.ioloop.IOLoop.current().start()
         else:
+            print("Project tasks:")
             run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
             run_process.wait()
 
