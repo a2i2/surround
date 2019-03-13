@@ -19,7 +19,7 @@ A group of many stages (or it can be 1 stage) to transform data into more meanin
 A sharable object between stages that holds necessary information for each stage. A stage will read some information from Surround Data, process it, then put back new information that will be used by other stage(s). When you extend this class, you can add as many variables as you need to help you transform input data into output data. But there are 4 core variables that are ready for you to utilise:
 * **stage_metadata** is information that can be used to identify a stage.
 * **execution_time** is recorded time to complete a process.
-* **error** is information to identify failure of a stage.
+* **errors** is information to identify failure of a stage.
 * **warnings** is information when transformation is not 100% right.
 
 3. Stage
@@ -76,6 +76,7 @@ You can use command line to generate a new project or a tutorial.
 - To generate project: `surround init <path-to-dir>`
   - Use `-p` or `--project-name` to specify name: `surround init <path-to-dir> -p sample`
   - Use `-d` or `--description` to specify description: `surround init <path-to-dir> -p sample -d sample-project`
+- To run a Surround project: `surround run <project doit task>`. Note the Surround project must have a `dodo.py` file with tasks for this command to work.
 
 ## Examples
 

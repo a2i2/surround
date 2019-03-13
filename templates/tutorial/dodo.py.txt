@@ -1,0 +1,11 @@
+# All tasks for running the project goes here.
+# These tasks can be triggered by running `surround run <name of task>`.
+# To list all available tasks run `surround run` in the project root directory.
+
+DOIT_CONFIG = {{'verbosity':2}}
+
+def task_dev():
+    """Run the main task for the project"""
+    return {{
+        'actions': ["python3 -m {project_name}"],
+    }}

@@ -3,9 +3,9 @@ from surround import Stage, SurroundData
 # Surround operates on data objects that inherit from SurroundData.
 # This ensures a consistent interface for each stage of the pipeline.
 # All data that needs to be shared between stages of Surround should
-# be added to this class. SurroundData also has an error and warning
-# field. If a stage updates the error field then processing will
-# finish and the error can be processed. If the warning field is added
+# be added to this class. SurroundData also has errors and warnings
+# fields. If a stage updates the errors field then processing will
+# finish and the errors can be processed. If the warning field is added
 # the processing will continue but the warnings can be viewed once
 # Surround completes.
 class TutorialData(SurroundData):
