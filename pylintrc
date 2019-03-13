@@ -8,4 +8,5 @@ disable = missing-docstring,
     inconsistent-return-statements,
     line-too-long,
     duplicate-code,
-    abstract-method
+    abstract-method,
+    attribute-defined-outside-init
