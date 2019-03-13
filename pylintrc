@@ -9,4 +9,5 @@ disable = missing-docstring,
     line-too-long,
     duplicate-code,
     abstract-method,
-    attribute-defined-outside-init
+    attribute-defined-outside-init,
+    relative-beyond-top-level
