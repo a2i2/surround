@@ -4,6 +4,10 @@ import tornado.web
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/03/08'
 
+class HealthCheck(tornado.web.RequestHandler):
+    def get(self):
+        self.write("OK!")
+
 class Predict(tornado.web.RequestHandler):
     def initialize(self, wrapper):
         self.wrapper = wrapper
@@ -16,5 +20,6 @@ def make_app(wrapper_object):
     predict_init_args = dict(wrapper=wrapper_object)
 
     return tornado.web.Application([
+        (r"/", HealthCheck),
         (r"/predict", Predict, predict_init_args),
     ])
