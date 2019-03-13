@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 import subprocess
+import importlib.util
 import tornado.ioloop
 
 from .remote import cli as remote_cli
@@ -128,9 +129,10 @@ def parse_run_args(args):
             task = 'list'
 
         if web:
-            api.Predict.task = task
-            api.Predict.path = path
-            app = api.make_app()
+            spec = importlib.util.spec_from_file_location("stages", os.getcwd() + "/" + os.path.basename(os.getcwd()) + "/" + "stages.py")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            app = api.make_app(module.WebWrapper())
             app.listen(8889)
             tornado.ioloop.IOLoop.current().start()
         else:
