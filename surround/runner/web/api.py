@@ -1,9 +1,13 @@
 import tornado.ioloop
 import tornado.web
+import pkg_resources
 
 class HealthCheck(tornado.web.RequestHandler):
     def get(self):
-        self.write("OK!")
+        self.write(dict(
+            app="Surround Server",
+            version=pkg_resources.get_distribution("surround").version
+        ))
 
 class Predict(tornado.web.RequestHandler):
     def initialize(self, wrapper):
