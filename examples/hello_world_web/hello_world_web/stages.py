@@ -16,7 +16,7 @@ class RotateImage(Stage):
     def operate(self, surround_data, config):
         print(surround_data.uploaded_data)
 
-class WebWrapper(Wrapper):
+class PipelineWrapper(Wrapper):
     def __init__(self):
         surround = Surround([HelloStage(), RotateImage()])
         self.config = surround.config
