@@ -27,8 +27,11 @@ class Predict(tornado.web.RequestHandler):
         self.wrapper = wrapper
 
     def post(self):
-        fileinfo = self.request.files['data'][0]
-        self.wrapper.run(fileinfo['body'])
+        if self.wrapper.type_of_uploaded_object == "image":
+            fileinfo = self.request.files['data'][0]
+            self.wrapper.run(fileinfo['body'])
+        else:
+            self.wrapper.run(None)
         self.write("Task executed successfully")
 
 def make_app(wrapper_object):
