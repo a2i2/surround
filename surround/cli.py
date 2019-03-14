@@ -139,8 +139,9 @@ def parse_run_args(args):
             app.listen(8888)
             print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
             print("Available endpoints:")
-            print("* GET /                 # Health check")
-            print("* POST /predict         # Send JSON data to the Surround pipeline")
+            print("* GET  /                 # Health check")
+            print("* GET  /upload           # Upload data")
+            print("* POST /predict          # Send data to the Surround pipeline")
             tornado.ioloop.IOLoop.current().start()
         else:
             print("Project tasks:")

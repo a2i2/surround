@@ -1,4 +1,5 @@
 import datetime
+import os
 import tornado.ioloop
 import tornado.web
 import pkg_resources
@@ -14,11 +15,21 @@ class HealthCheck(tornado.web.RequestHandler):
             uptime=str(datetime.datetime.now() - START_TIME)
         ))
 
+class Upload(tornado.web.RequestHandler):
+    def get_template_path(self):
+        return os.getcwd()
+
+    def get(self):
+        self.render("template.html")
+
 class Predict(tornado.web.RequestHandler):
     def initialize(self, wrapper):
         self.wrapper = wrapper
 
     def post(self):
+        fileinfo = self.request.files['data'][0]
+        print(fileinfo)
+
         self.wrapper.run()
         self.write("Task executed successfully")
 
@@ -27,5 +38,6 @@ def make_app(wrapper_object):
 
     return tornado.web.Application([
         (r"/", HealthCheck),
+        (r"/upload", Upload),
         (r"/predict", Predict, predict_init_args),
     ])
