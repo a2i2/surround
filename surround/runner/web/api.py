@@ -28,9 +28,7 @@ class Predict(tornado.web.RequestHandler):
 
     def post(self):
         fileinfo = self.request.files['data'][0]
-        print(fileinfo)
-
-        self.wrapper.run()
+        self.wrapper.run(fileinfo['body'])
         self.write("Task executed successfully")
 
 def make_app(wrapper_object):

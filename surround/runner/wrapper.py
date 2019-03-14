@@ -5,5 +5,5 @@ class Wrapper(ABC):
         self.surround = surround
 
     @abstractmethod
-    def run(self):
+    def run(self, uploaded_data):
         pass
