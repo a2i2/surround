@@ -1,12 +1,17 @@
+import datetime
 import tornado.ioloop
 import tornado.web
 import pkg_resources
+
+# Get time for uptime calculation.
+START_TIME = datetime.datetime.now()
 
 class HealthCheck(tornado.web.RequestHandler):
     def get(self):
         self.write(dict(
             app="Surround Server",
-            version=pkg_resources.get_distribution("surround").version
+            version=pkg_resources.get_distribution("surround").version,
+            uptime=str(datetime.datetime.now() - START_TIME)
         ))
 
 class Predict(tornado.web.RequestHandler):
