@@ -115,8 +115,7 @@ def parse_run_args(args):
     }
 
     path = args.path
-    web = args.web
-    classname = args.classname
+    classname = args.web
     errors, warnings = Linter().check_project(deploy, path)
     if errors:
         print("Invalid Surround project")
@@ -128,7 +127,7 @@ def parse_run_args(args):
         else:
             task = 'list'
 
-        if web:
+        if classname:
             spec = importlib.util.spec_from_file_location("stages", os.getcwd() + "/" + os.path.basename(os.getcwd()) + "/" + "stages.py")
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
@@ -219,8 +218,8 @@ def main():
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
     run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
-    run_parser.add_argument('-w', '--web', help="Web Runner", action='store_true')
-    run_parser.add_argument('-c', '--classname', help="Name of the class inherited from Wrapper")
+    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper")
+    # run_parser.add_argument('-c', '--classname', help="Name of the class inherited from Wrapper")
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
