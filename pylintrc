@@ -11,5 +11,4 @@ disable = missing-docstring,
     abstract-method,
     attribute-defined-outside-init,
     relative-beyond-top-level,
-    eval-used,
     unused-argument

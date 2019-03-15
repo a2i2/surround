@@ -1,9 +1,9 @@
 import argparse
 import os
 import sys
+import inspect
 import logging
 import subprocess
-import importlib.util
 import tornado.ioloop
 
 from .remote import cli as remote_cli
@@ -89,6 +89,51 @@ def is_valid_name(aparser, arg):
     else:
         return arg
 
+def load_modules_from_path(path):
+    """Import all modules from the given directory
+
+    :param path: Path to the directory
+    :type path: string
+    """
+    # Check and fix the path
+    if path[-1:] != '/':
+        path += '/'
+
+    # Get a list of files in the directory, if the directory exists
+    if not os.path.exists(path):
+        raise OSError("Directory does not exist: %s" % path)
+
+    # Add path to the system path
+    sys.path.append(path)
+    # Load all the files in path
+    for f in os.listdir(path):
+        # Ignore anything that isn't a .py file
+        if len(f) > 3 and f[-3:] == '.py':
+            modname = f[:-3]
+            # Import the module
+            __import__(modname, globals(), locals(), ['*'])
+
+def load_class_from_name(modulename, classname):
+    """Import class from given module
+
+    :param modulename: Name of the module
+    :type modulename: string
+    :param classname: Name of the class
+    :type classname: string
+    """
+
+    # Import the module
+    __import__(modulename, globals(), locals(), ['*'])
+
+    # Get the class
+    cls = getattr(sys.modules[modulename], classname)
+
+    # Check cls
+    if not inspect.isclass(cls):
+        raise TypeError("%s is not a class" % classname)
+
+    return cls
+
 def parse_lint_args(args):
     linter = Linter()
     if args.list:
@@ -128,13 +173,23 @@ def parse_run_args(args):
             task = 'list'
 
         if classname:
-            spec = importlib.util.spec_from_file_location("stages", os.getcwd() + "/" + os.path.basename(os.getcwd()) + "/" + "stages.py")
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+            obj = None
+            loaded_class = None
+            load_modules_from_path(os.getcwd() + "/" + os.path.basename(os.getcwd()))
+            for file_ in os.listdir(os.getcwd() + "/" + os.path.basename(os.getcwd())):
+                if file_.endswith(".py"):
+                    modulename = os.path.splitext(file_)[0]
+                    if hasattr(sys.modules[modulename], classname):
+                        print("has")
+                        loaded_class = load_class_from_name(modulename, classname)
+                        obj = loaded_class()
+                        break
 
-            obj = eval("module" + "." + str(classname) + "()")
+            if obj is None:
+                print("error: " + classname + " not found")
+                return
+
             app = api.make_app(obj)
-
             app.listen(8888)
             print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
             print("Available endpoints:")
