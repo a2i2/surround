@@ -1,5 +1,5 @@
 import logging
-from .stages import PipelineWrapper
+from .wrapper import PipelineWrapper
 
 logging.basicConfig(level=logging.INFO)
 

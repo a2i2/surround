@@ -105,13 +105,15 @@ def load_modules_from_path(path):
 
     # Add path to the system path
     sys.path.append(path)
-    # Load all the files in path
-    for f in os.listdir(path):
-        # Ignore anything that isn't a .py file
-        if len(f) > 3 and f[-3:] == '.py':
-            modname = f[:-3]
-            # Import the module
-            __import__(modname, globals(), locals(), ['*'])
+
+    # Another possibility
+    # Load all the files, check: https://github.com/dstil/surround/pull/68/commits/2175f1ae11ad903d6513e4f288d80d182499bf38
+
+    # For now, just load the wrapper.py
+    modname = "wrapper"
+
+    # Import the module
+    __import__(modname, globals(), locals(), ['*'])
 
 def load_class_from_name(modulename, classname):
     """Import class from given module
@@ -180,13 +182,13 @@ def parse_run_args(args):
             for file_ in os.listdir(path_to_modules):
                 if file_.endswith(".py"):
                     modulename = os.path.splitext(file_)[0]
-                    if hasattr(sys.modules[modulename], classname):
+                    if modulename == "wrapper" and hasattr(sys.modules[modulename], classname):
                         loaded_class = load_class_from_name(modulename, classname)
                         obj = loaded_class()
                         break
 
             if obj is None:
-                print("error: " + classname + " not found")
+                print("error: " + classname + " not found in the module wrapper")
                 return
 
             app = api.make_app(obj)
