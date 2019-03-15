@@ -175,8 +175,9 @@ def parse_run_args(args):
         if classname:
             obj = None
             loaded_class = None
-            load_modules_from_path(os.getcwd() + "/" + os.path.basename(os.getcwd()))
-            for file_ in os.listdir(os.getcwd() + "/" + os.path.basename(os.getcwd())):
+            path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
+            load_modules_from_path(path_to_modules)
+            for file_ in os.listdir(path_to_modules):
                 if file_.endswith(".py"):
                     modulename = os.path.splitext(file_)[0]
                     if hasattr(sys.modules[modulename], classname):
