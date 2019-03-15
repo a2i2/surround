@@ -219,7 +219,6 @@ def main():
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
     run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
     run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper")
-    # run_parser.add_argument('-c', '--classname', help="Name of the class inherited from Wrapper")
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
