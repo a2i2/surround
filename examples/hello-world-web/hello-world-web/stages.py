@@ -1,5 +1,4 @@
-from surround import Stage, SurroundData
-from surround.runner.wrapper import Wrapper
+from surround import Stage, SurroundData, Wrapper
 from surround import Surround
 
 class HelloStage(Stage):
