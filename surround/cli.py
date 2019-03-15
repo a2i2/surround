@@ -181,7 +181,6 @@ def parse_run_args(args):
                 if file_.endswith(".py"):
                     modulename = os.path.splitext(file_)[0]
                     if hasattr(sys.modules[modulename], classname):
-                        print("has")
                         loaded_class = load_class_from_name(modulename, classname)
                         obj = loaded_class()
                         break
