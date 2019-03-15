@@ -24,7 +24,6 @@ class PipelineWrapper(Wrapper):
         super().__init__(surround, type_of_uploaded_object)
 
     def run(self, uploaded_data):
-        if super().run(uploaded_data):
-            data = BasicData(uploaded_data)
-            self.surround.process(data)
-            print(data.text)
+        data = BasicData(uploaded_data)
+        self.surround.process(data)
+        print(data.text)
