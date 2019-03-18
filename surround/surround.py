@@ -5,6 +5,7 @@ from importlib import import_module
 import logging
 import sys
 import os
+from enum import Enum
 from datetime import datetime
 from abc import ABC
 from .stage import Stage
@@ -116,6 +117,10 @@ class Surround(ABC):
 
         surround_data.thaw()
 
+class AllowedTypes(Enum):
+    JSON = "json"
+    IMAGE = "image"
+
 class Wrapper():
     def __init__(self, surround, type_of_uploaded_object=None):
         self.surround = surround
@@ -133,13 +138,12 @@ class Wrapper():
         return self.validate_type_of_uploaded_object()
 
     def validate_type_of_uploaded_object(self):
-        allowed_types = ['json', 'image']
-        for type_ in allowed_types:
-            if self.type_of_uploaded_object == type_:
+        for type_ in AllowedTypes:
+            if self.type_of_uploaded_object == type_.value:
                 return True
         print("error: selected upload type not allowed")
         print("Choose from: ")
-        for type_ in allowed_types:
+        for type_ in AllowedTypes:
             print(type_)
         return False
 
