@@ -12,4 +12,5 @@ class BasicData(SurroundData):
 
 class RotateImage(Stage):
     def operate(self, surround_data, config):
-        print(surround_data.uploaded_data)
+        """Add operate code
+        """
