@@ -1,23 +1,11 @@
 import logging
-import argparse
-import os
-from surround import Surround
-from .stages import ValidateData, {project_name}Data
+from .wrapper import PipelineWrapper
 
 logging.basicConfig(level=logging.INFO)
 
 def main():
-    surround = Surround([ValidateData()], __name__)
-    config = surround.config
-
-    # TODO: Read data from input directory here
-    # os.path.join(config["data_path"], "your file here")
-
-    data = {project_name}Data("data")
-    surround.process(data)
-    with open(os.path.abspath(os.path.join(config["output_path"], "output.txt")), 'w') as f:
-        f.write(data.output_data)
-    logging.info(data.output_data)
+    wrapper = PipelineWrapper()
+    wrapper.run(None)
 
 if __name__ == "__main__":
     main()

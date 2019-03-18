@@ -20,7 +20,7 @@ class Upload(tornado.web.RequestHandler):
         return os.getcwd()
 
     def get(self):
-        self.render("template.html")
+        self.render("upload.html")
 
 class Predict(tornado.web.RequestHandler):
     def initialize(self, wrapper):
