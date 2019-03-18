@@ -127,7 +127,7 @@ class Wrapper():
         if type_of_uploaded_object:
             self.type_of_uploaded_object = type_of_uploaded_object
         else:
-            self.type_of_uploaded_object = "json"
+            self.type_of_uploaded_object = AllowedTypes.JSON
         self.surround.init_stages()
 
     def run(self, uploaded_data):
@@ -139,7 +139,7 @@ class Wrapper():
 
     def validate_type_of_uploaded_object(self):
         for type_ in AllowedTypes:
-            if self.type_of_uploaded_object == type_.value:
+            if self.type_of_uploaded_object == type_:
                 return True
         print("error: selected upload type not allowed")
         print("Choose from: ")

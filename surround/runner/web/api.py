@@ -3,6 +3,7 @@ import os
 import tornado.ioloop
 import tornado.web
 import pkg_resources
+from surround import AllowedTypes
 
 # Get time for uptime calculation.
 START_TIME = datetime.datetime.now()
@@ -27,7 +28,7 @@ class Predict(tornado.web.RequestHandler):
         self.wrapper = wrapper
 
     def post(self):
-        if self.wrapper.type_of_uploaded_object == "image":
+        if self.wrapper.type_of_uploaded_object == AllowedTypes.IMAGE:
             fileinfo = self.request.files['data'][0]
             self.wrapper.process(fileinfo['body'])
         else:
