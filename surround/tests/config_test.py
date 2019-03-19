@@ -54,6 +54,9 @@ class TestConfig(unittest.TestCase):
         config = Config()
         config.read_config_files([self.f1.name, self.f2.name])
         output = {
+            'company': 'a2i2',
+            'image': 'dock',
+            'version': 'latest',
             'surround' : {
                 "stages" : False,
                 "enable_stage_output_dump": False

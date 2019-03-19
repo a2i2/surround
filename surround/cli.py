@@ -4,11 +4,15 @@ import sys
 import inspect
 import logging
 import subprocess
-import tornado.ioloop
+
+try:
+    import tornado.ioloop
+    from .runner.web import api
+except ImportError:
+    pass
 
 from .remote import cli as remote_cli
 from .linter import Linter
-from .runner.web import api
 
 PROJECTS = {
     "new" : {
@@ -25,7 +29,7 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround==0.0.2"),
+            ("requirements.txt", "surround==0.0.3\ntornado==6.0.1"),
             ("{project_name}/config.yaml", "output:\n  text: Hello World"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
@@ -37,7 +41,8 @@ PROJECTS = {
             ("{project_name}/__init__.py", "init.py.txt", True),
             ("{project_name}/wrapper.py", "wrapper.py.txt", True),
             ("upload.html", "upload.html.txt", False),
-            ("dodo.py", "dodo.py.txt", False)
+            ("dodo.py", "dodo.py.txt", False),
+            ("Dockerfile", "Dockerfile.txt", False)
         ]
     }
 }

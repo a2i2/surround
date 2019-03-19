@@ -1,7 +1,26 @@
+import os
+from surround import Config
+
+CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
+IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
+
+def task_build():
+    """Build the Docker image for the current project"""
+    return {{
+        'actions': ['docker build --build-arg BASE_IMAGE=%s -t %s .'
+                    % (CONFIG.get_path("surround.base_image"), IMAGE)]
+    }}
 
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["python3 -m {project_name}"],
+        'actions': ["docker run --volume %s/:/opt/dock %s" % (CONFIG["project_root"], IMAGE)]
+    }}
+
+def task_prod():
+    """Run the main task inside a Docker container for use in production """
+    return {{
+        'actions': ["docker run %s" % IMAGE],
+        'task_dep': ["build"]
     }}
