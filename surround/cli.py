@@ -25,7 +25,7 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround==0.0.2"),
+            ("requirements.txt", "surround==0.0.3\ntornado==6.0.1"),
             ("{project_name}/config.yaml", "output:\n  text: Hello World"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
