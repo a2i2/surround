@@ -5,6 +5,7 @@ from importlib import import_module
 import logging
 import sys
 import os
+from enum import Enum
 from datetime import datetime
 from abc import ABC
 from .stage import Stage
@@ -115,3 +116,37 @@ class Surround(ABC):
             LOGGER.exception("Failed processing Surround")
 
         surround_data.thaw()
+
+class AllowedTypes(Enum):
+    JSON = "json"
+    IMAGE = "image"
+
+class Wrapper():
+    def __init__(self, surround, type_of_uploaded_object=None):
+        self.surround = surround
+        if type_of_uploaded_object:
+            self.type_of_uploaded_object = type_of_uploaded_object
+        else:
+            self.type_of_uploaded_object = AllowedTypes.JSON
+        self.surround.init_stages()
+
+    def run(self, input_data):
+        if self.validate() is False:
+            sys.exit()
+
+    def validate(self):
+        return self.validate_type_of_uploaded_object()
+
+    def validate_type_of_uploaded_object(self):
+        for type_ in AllowedTypes:
+            if self.type_of_uploaded_object == type_:
+                return True
+        print("error: selected upload type not allowed")
+        print("Choose from: ")
+        for type_ in AllowedTypes:
+            print(type_)
+        return False
+
+    def process(self, input_data):
+        Wrapper.run(self, input_data)
+        self.run(input_data)

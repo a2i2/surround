@@ -1,0 +1,17 @@
+import os
+from surround import Surround, Wrapper, AllowedTypes
+from stages import ValidateData, {project_name}Data
+
+class PipelineWrapper(Wrapper):
+    def __init__(self):
+        surround = Surround([ValidateData()], __name__)
+        type_of_uploaded_object = AllowedTypes.IMAGE
+        self.config = surround.config
+        super().__init__(surround, type_of_uploaded_object)
+
+    def run(self, input_data):
+        data = {project_name}Data(input_data)
+        self.surround.process(data)
+
+        with open(os.path.abspath(os.path.join(self.config["output_path"], "output.txt")), 'w') as f:
+            f.write(data.output_data)

@@ -1,11 +1,14 @@
 import argparse
 import os
 import sys
+import inspect
 import logging
 import subprocess
+import tornado.ioloop
 
 from .remote import cli as remote_cli
 from .linter import Linter
+from .runner.web import api
 
 PROJECTS = {
     "new" : {
@@ -31,6 +34,9 @@ PROJECTS = {
             ("README.md", "README.md.txt", False),
             ("{project_name}/stages.py", "stages.py.txt", True),
             ("{project_name}/__main__.py", "main.py.txt", True),
+            ("{project_name}/__init__.py", "init.py.txt", True),
+            ("{project_name}/wrapper.py", "wrapper.py.txt", True),
+            ("upload.html", "upload.html.txt", False),
             ("dodo.py", "dodo.py.txt", False)
         ]
     }
@@ -86,6 +92,53 @@ def is_valid_name(aparser, arg):
     else:
         return arg
 
+def load_modules_from_path(path):
+    """Import all modules from the given directory
+
+    :param path: Path to the directory
+    :type path: string
+    """
+    # Check and fix the path
+    if path[-1:] != '/':
+        path += '/'
+
+    # Get a list of files in the directory, if the directory exists
+    if not os.path.exists(path):
+        raise OSError("Directory does not exist: %s" % path)
+
+    # Add path to the system path
+    sys.path.append(path)
+
+    # Another possibility
+    # Load all the files, check: https://github.com/dstil/surround/pull/68/commits/2175f1ae11ad903d6513e4f288d80d182499bf38
+
+    # For now, just load the wrapper.py
+    modname = "wrapper"
+
+    # Import the module
+    __import__(modname, globals(), locals(), ['*'])
+
+def load_class_from_name(modulename, classname):
+    """Import class from given module
+
+    :param modulename: Name of the module
+    :type modulename: string
+    :param classname: Name of the class
+    :type classname: string
+    """
+
+    # Import the module
+    __import__(modulename, globals(), locals(), ['*'])
+
+    # Get the class
+    cls = getattr(sys.modules[modulename], classname)
+
+    # Check cls
+    if not inspect.isclass(cls):
+        raise TypeError("%s is not a class" % classname)
+
+    return cls
+
 def parse_lint_args(args):
     linter = Linter()
     if args.list:
@@ -112,19 +165,47 @@ def parse_run_args(args):
     }
 
     path = args.path
+    classname = args.web
     errors, warnings = Linter().check_project(deploy, path)
     if errors:
         print("Invalid Surround project")
     for e in errors + warnings:
         print(e)
     if not errors:
-        print("Project tasks:")
         if args.task:
             task = args.task
         else:
             task = 'list'
-        run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
-        run_process.wait()
+
+        if classname:
+            obj = None
+            loaded_class = None
+            path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
+            load_modules_from_path(path_to_modules)
+            for file_ in os.listdir(path_to_modules):
+                if file_.endswith(".py"):
+                    modulename = os.path.splitext(file_)[0]
+                    if modulename == "wrapper" and hasattr(sys.modules[modulename], classname):
+                        loaded_class = load_class_from_name(modulename, classname)
+                        obj = loaded_class()
+                        break
+
+            if obj is None:
+                print("error: " + classname + " not found in the module wrapper")
+                return
+
+            app = api.make_app(obj)
+            app.listen(8888)
+            print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
+            print("Available endpoints:")
+            print("* GET  /                 # Health check")
+            print("* GET  /upload           # Upload data")
+            print("* POST /predict          # Send data to the Surround pipeline")
+            tornado.ioloop.IOLoop.current().start()
+        else:
+            print("Project tasks:")
+            run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
+            run_process.wait()
 
 def parse_tutorial_args(args):
     new_dir = os.path.join(args.path, "tutorial")
@@ -197,6 +278,7 @@ def main():
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
     run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
+    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper")
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
