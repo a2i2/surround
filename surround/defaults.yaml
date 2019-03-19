@@ -1,3 +1,7 @@
+company: a2i2
+image: dock
+version: latest
+
 surround:
     stages: false
     enable_stage_output_dump: false
