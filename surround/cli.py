@@ -4,11 +4,15 @@ import sys
 import inspect
 import logging
 import subprocess
-import tornado.ioloop
+
+try:
+    import tornado.ioloop
+    from .runner.web import api
+except ImportError:
+    pass
 
 from .remote import cli as remote_cli
 from .linter import Linter
-from .runner.web import api
 
 PROJECTS = {
     "new" : {
