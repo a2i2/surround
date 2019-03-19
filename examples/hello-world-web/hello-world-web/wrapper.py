@@ -8,6 +8,6 @@ class PipelineWrapper(Wrapper):
         self.config = surround.config
         super().__init__(surround, type_of_uploaded_object)
 
-    def run(self, uploaded_data):
-        data = BasicData(uploaded_data)
+    def run(self, input_data):
+        data = BasicData(input_data)
         self.surround.process(data)

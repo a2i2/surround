@@ -7,8 +7,8 @@ class HelloStage(Stage):
 class BasicData(SurroundData):
     text = None
 
-    def __init__(self, uploaded_data):
-        self.uploaded_data = uploaded_data
+    def __init__(self, input_data):
+        self.input_data = input_data
 
 class RotateImage(Stage):
     def operate(self, surround_data, config):

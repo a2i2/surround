@@ -9,8 +9,8 @@ class PipelineWrapper(Wrapper):
         self.config = surround.config
         super().__init__(surround, type_of_uploaded_object)
 
-    def run(self, uploaded_data):
-        data = {project_name}Data(uploaded_data)
+    def run(self, input_data):
+        data = {project_name}Data(input_data)
         self.surround.process(data)
 
         with open(os.path.abspath(os.path.join(self.config["output_path"], "output.txt")), 'w') as f:

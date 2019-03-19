@@ -130,7 +130,7 @@ class Wrapper():
             self.type_of_uploaded_object = AllowedTypes.JSON
         self.surround.init_stages()
 
-    def run(self, uploaded_data):
+    def run(self, input_data):
         if self.validate() is False:
             sys.exit()
 
@@ -147,6 +147,6 @@ class Wrapper():
             print(type_)
         return False
 
-    def process(self, uploaded_data):
-        Wrapper.run(self, uploaded_data)
-        self.run(uploaded_data)
+    def process(self, input_data):
+        Wrapper.run(self, input_data)
+        self.run(input_data)
