@@ -13,4 +13,4 @@ RUN pip3 install --trusted-host pypi.python.org -r requirements.txt
 EXPOSE 80
 
 # List all tasks when the container launches
-CMD ["surround", "run"]
+CMD ["python3", "-m", "{project_name}"]
