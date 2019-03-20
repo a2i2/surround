@@ -166,3 +166,17 @@ class ReadNumberPlate(Stage):
             if text_annotations is not None:
                 description = text_annotations[0]['description']
                 print(description)
+
+class RemoveTempFiles(Stage):
+    def operate(self, surround_data, config):
+        # Remove temp.jpg
+        self.remove_file("data/temp.jpg")
+        for file_ in os.listdir("data/ExtractCar"):
+            if file_ != ".gitignore":
+                self.remove_file(os.path.join("data/ExtractCar", file_))
+
+    def remove_file(self, path):
+        try:
+            os.remove(path)
+        except OSError:
+            pass
