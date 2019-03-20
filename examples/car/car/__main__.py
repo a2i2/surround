@@ -5,7 +5,9 @@ logging.basicConfig(level=logging.INFO)
 
 def main():
     wrapper = PipelineWrapper()
-    wrapper.run("data/1.jpg")
+    with open("data/1.jpg", "rb")  as outfile:
+        data = outfile.read()
+    wrapper.run(data)
 
 if __name__ == "__main__":
     main()
