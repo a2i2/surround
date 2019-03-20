@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 from surround import Stage, SurroundData
 
+KEY = "Your API Key"
+
 class CarData(SurroundData):
     output_data = None
 
@@ -33,8 +35,6 @@ class DetectCar(Stage):
             return text_file.read()
 
     def send_curl_request(self, surround_data):
-        key = "Your API Key"
-
         headers = {
             'Content-Type': 'application/json',
             'charset': 'utf-8'
@@ -47,7 +47,7 @@ class DetectCar(Stage):
         data = {'requests' : [{'image': {'content': content}, 'features' : features}]}
 
         vision_base_url = "https://vision.googleapis.com/v1/images:annotate"
-        ocr_url = vision_base_url + "?key=" + key
+        ocr_url = vision_base_url + "?key=" + KEY
 
         response = requests.post(
             ocr_url, headers=headers, data=json.dumps(data))
@@ -111,3 +111,33 @@ class ExtractCar(Stage):
         finalImage = croppedImage[minY:maxY, minX:maxX]
 
         cv2.imwrite('data/temp.jpg', finalImage)
+
+class ReadNumberPlate(Stage):
+    def operate(self, surround_data, config):
+        self.send_curl_request(surround_data)
+
+    def read_text_file(self, path):
+        with open(path, "r") as text_file:
+            return text_file.read()
+
+    def send_curl_request(self, surround_data):
+        headers = {
+            'Content-Type': 'application/json',
+            'charset': 'utf-8'
+        }
+
+        features = [{'type': 'DOCUMENT_TEXT_DETECTION'}]
+
+        content = str(surround_data.input_data)
+
+        data = {'requests' : [{'image': {'content': content}, 'features' : features}]}
+
+        vision_base_url = "https://vision.googleapis.com/v1/images:annotate"
+        ocr_url = vision_base_url + "?key=" + KEY
+
+        response = requests.post(
+            ocr_url, headers=headers, data=json.dumps(data))
+
+        surround_data.output_data = response.json()
+        description = surround_data.output_data['responses'][0]['textAnnotations'][0]['description']
+        print(description)
