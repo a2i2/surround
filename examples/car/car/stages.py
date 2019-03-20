@@ -118,7 +118,7 @@ class ExtractCar(Stage):
 
                 finalImage = croppedImage[minY:maxY, minX:maxX]
 
-                cv2.imwrite('data/cars/' + str(idx) + '.jpg', finalImage)
+                cv2.imwrite('data/ExtractCar/' + str(idx) + '.jpg', finalImage)
 
 class ReadNumberPlate(Stage):
     def operate(self, surround_data, config):
