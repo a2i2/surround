@@ -62,6 +62,9 @@ class ExtractCar(Stage):
         # Read a image
         I = cv2.imread('data/temp.jpg')
 
+        # Get Image size
+        height, width = I.shape[:2]
+
         # Define the polygon coordinates to use or the crop
         polygon = [[[20,110],[450,108],[340,420],[125,420]]]
 
