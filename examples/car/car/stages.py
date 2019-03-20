@@ -11,7 +11,6 @@ class CarData(SurroundData):
 
 class DetectCar(Stage):
     def operate(self, surround_data, config):
-        print(surround_data.input_data)
         self.send_curl_request(surround_data)
 
     def encode_image(self, path):
@@ -31,8 +30,7 @@ class DetectCar(Stage):
             'charset': 'utf-8'
         }
 
-        # For document text detection, substitute "type": "DOCUMENT_TEXT_DETECTION"
-        features = [{'type': 'TEXT_DETECTION'}]
+        features = [{'type': 'OBJECT_LOCALIZATION'}]
 
         content = self.read_text_file(surround_data.input_data)
 
