@@ -1,3 +1,4 @@
+import os
 import json
 import subprocess
 import requests
@@ -122,19 +123,28 @@ class ExtractCar(Stage):
 
 class ReadNumberPlate(Stage):
     def operate(self, surround_data, config):
-        self.send_curl_request(surround_data)
+        for file_ in os.listdir("data/ExtractCar"):
+            print('data/ExtractCar/' + file_)
+            self.send_curl_request(surround_data, 'data/ExtractCar/' + file_)
 
     def read_text_file(self, path):
         with open(path, "r") as text_file:
             return text_file.read()
 
-    def send_curl_request(self, surround_data):
+    def encode_image(self, path):
+        encoded_image = subprocess.run(['base64', '-i', path], encoding='utf-8', stdout=subprocess.PIPE)
+        return encoded_image
+
+    def send_curl_request(self, surround_data, path):
         headers = {
             'Content-Type': 'application/json',
             'charset': 'utf-8'
         }
 
         features = [{'type': 'DOCUMENT_TEXT_DETECTION'}]
+
+        encoded_image = self.encode_image(path)
+        surround_data.input_data = encoded_image.stdout
 
         content = str(surround_data.input_data)
 
