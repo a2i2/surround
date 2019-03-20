@@ -70,52 +70,55 @@ class ExtractCar(Stage):
         if response == "error":
             print("Response is not correct, Your API Key is probably incorrect")
         else:
-            coordinates = surround_data.output_data['responses'][0]['localizedObjectAnnotations'][0]['boundingPoly']['normalizedVertices']
+            localized_object_annotations = response[0]['localizedObjectAnnotations']
 
-            point_1 = [round(coordinates[0].get('x', 0)*width), round(coordinates[0].get('y', 0)*height)]
-            point_2 = [round(coordinates[1].get('x', 0)*width), round(coordinates[1].get('y', 0)*height)]
-            point_3 = [round(coordinates[2].get('x', 0)*width), round(coordinates[2].get('y', 0)*height)]
-            point_4 = [round(coordinates[3].get('x', 0)*width), round(coordinates[3].get('y', 0)*height)]
+            for idx, localized_object_annotation in enumerate(localized_object_annotations):
+                coordinates = localized_object_annotation['boundingPoly']['normalizedVertices']
 
-            # Define the polygon coordinates to use or the crop
-            polygon = [[point_1, point_2, point_3, point_4]]
+                point_1 = [round(coordinates[0].get('x', 0)*width), round(coordinates[0].get('y', 0)*height)]
+                point_2 = [round(coordinates[1].get('x', 0)*width), round(coordinates[1].get('y', 0)*height)]
+                point_3 = [round(coordinates[2].get('x', 0)*width), round(coordinates[2].get('y', 0)*height)]
+                point_4 = [round(coordinates[3].get('x', 0)*width), round(coordinates[3].get('y', 0)*height)]
 
-            # First find the minX minY maxX and maxY of the polygon
-            minX = I.shape[1]
-            maxX = -1
-            minY = I.shape[0]
-            maxY = -1
-            for point in polygon[0]:
+                # Define the polygon coordinates to use or the crop
+                polygon = [[point_1, point_2, point_3, point_4]]
 
-                x = point[0]
-                y = point[1]
+                # First find the minX minY maxX and maxY of the polygon
+                minX = I.shape[1]
+                maxX = -1
+                minY = I.shape[0]
+                maxY = -1
+                for point in polygon[0]:
 
-                if x < minX:
-                    minX = x
-                if x > maxX:
-                    maxX = x
-                if y < minY:
-                    minY = y
-                if y > maxY:
-                    maxY = y
+                    x = point[0]
+                    y = point[1]
 
-            # Go over the points in the image if they are outside of the enclosing rectangle put zero
-            # if not check if they are inside the polygon or not
-            croppedImage = np.zeros_like(I)
-            for y in range(0,I.shape[0]):
-                for x in range(0, I.shape[1]):
+                    if x < minX:
+                        minX = x
+                    if x > maxX:
+                        maxX = x
+                    if y < minY:
+                        minY = y
+                    if y > maxY:
+                        maxY = y
 
-                    if x < minX or x > maxX or y < minY or y > maxY:
-                        continue
+                # Go over the points in the image if they are outside of the enclosing rectangle put zero
+                # if not check if they are inside the polygon or not
+                croppedImage = np.zeros_like(I)
+                for y in range(0,I.shape[0]):
+                    for x in range(0, I.shape[1]):
 
-                    if cv2.pointPolygonTest(np.asarray(polygon), (x, y), False) >= 0:
-                        croppedImage[y, x, 0] = I[y, x, 0]
-                        croppedImage[y, x, 1] = I[y, x, 1]
-                        croppedImage[y, x, 2] = I[y, x, 2]
+                        if x < minX or x > maxX or y < minY or y > maxY:
+                            continue
 
-            finalImage = croppedImage[minY:maxY, minX:maxX]
+                        if cv2.pointPolygonTest(np.asarray(polygon), (x, y), False) >= 0:
+                            croppedImage[y, x, 0] = I[y, x, 0]
+                            croppedImage[y, x, 1] = I[y, x, 1]
+                            croppedImage[y, x, 2] = I[y, x, 2]
 
-            cv2.imwrite('data/temp.jpg', finalImage)
+                finalImage = croppedImage[minY:maxY, minX:maxX]
+
+                cv2.imwrite('data/cars/' + str(idx) + '.jpg', finalImage)
 
 class ReadNumberPlate(Stage):
     def operate(self, surround_data, config):
