@@ -8,14 +8,13 @@ IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 def task_build():
     """Build the Docker image for the current project"""
     return {{
-        'actions': ['docker build --build-arg BASE_IMAGE=%s -t %s .'
-                    % (CONFIG.get_path("surround.base_image"), IMAGE)]
+        'actions': ['docker build --tag=%s .' % IMAGE]
     }}
 
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run --volume %s/:/opt/dock %s" % (CONFIG["project_root"], IMAGE)]
+        'actions': ["docker run --volume %s/:/app %s" % (CONFIG["project_root"], IMAGE)]
     }}
 
 def task_prod():
