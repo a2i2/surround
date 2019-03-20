@@ -124,8 +124,9 @@ class ExtractCar(Stage):
 class ReadNumberPlate(Stage):
     def operate(self, surround_data, config):
         for file_ in os.listdir("data/ExtractCar"):
-            print('data/ExtractCar/' + file_)
-            self.send_curl_request(surround_data, 'data/ExtractCar/' + file_)
+            if file_ != ".gitignore":
+                print('data/ExtractCar/' + file_)
+                self.send_curl_request(surround_data, 'data/ExtractCar/' + file_)
 
     def read_text_file(self, path):
         with open(path, "r") as text_file:
@@ -157,5 +158,9 @@ class ReadNumberPlate(Stage):
             ocr_url, headers=headers, data=json.dumps(data))
 
         surround_data.output_data = response.json()
-        description = surround_data.output_data['responses'][0]['textAnnotations'][0]['description']
-        print(description)
+        response = surround_data.output_data.get('responses', "error")
+        if response == "error":
+            print("Response is not correct, Your API Key is probably incorrect")
+        else:
+            description = response[0]['textAnnotations'][0]['description']
+            print(description)
