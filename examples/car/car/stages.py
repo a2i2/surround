@@ -162,5 +162,7 @@ class ReadNumberPlate(Stage):
         if response == "error":
             print("Response is not correct, Your API Key is probably incorrect")
         else:
-            description = response[0]['textAnnotations'][0]['description']
-            print(description)
+            text_annotations = response[0].get('textAnnotations')
+            if text_annotations is not None:
+                description = text_annotations[0]['description']
+                print(description)
