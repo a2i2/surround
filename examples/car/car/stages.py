@@ -67,10 +67,10 @@ class ExtractCar(Stage):
 
         coordinates = surround_data.output_data['responses'][0]['localizedObjectAnnotations'][0]['boundingPoly']['normalizedVertices']
 
-        point_1 = [round(coordinates[0]['x']*width), round(coordinates[0]['y']*height)]
-        point_2 = [round(coordinates[1]['x']*width), round(coordinates[1]['y']*height)]
-        point_3 = [round(coordinates[2]['x']*width), round(coordinates[2]['y']*height)]
-        point_4 = [round(coordinates[3]['x']*width), round(coordinates[3]['y']*height)]
+        point_1 = [round(coordinates[0].get('x', 0)*width), round(coordinates[0].get('y', 0)*height)]
+        point_2 = [round(coordinates[1].get('x', 0)*width), round(coordinates[1].get('y', 0)*height)]
+        point_3 = [round(coordinates[2].get('x', 0)*width), round(coordinates[2].get('y', 0)*height)]
+        point_4 = [round(coordinates[3].get('x', 0)*width), round(coordinates[3].get('y', 0)*height)]
 
         # Define the polygon coordinates to use or the crop
         polygon = [[point_1, point_2, point_3, point_4]]
