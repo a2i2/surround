@@ -11,10 +11,10 @@ class CarData(SurroundData):
 
 class EncodeImage(Stage):
     def operate(self, surround_data, config):
-        with open("data/2.jpg", "wb")  as outfile:
+        with open("data/temp.jpg", "wb")  as outfile:
             outfile.write(surround_data.input_data)
 
-        surround_data.input_data = "data/2.jpg"
+        surround_data.input_data = "data/temp.jpg"
         encoded_image = self.encode_image(surround_data)
         surround_data.input_data = encoded_image.stdout
 
