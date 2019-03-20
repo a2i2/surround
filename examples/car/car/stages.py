@@ -65,8 +65,15 @@ class ExtractCar(Stage):
         # Get Image size
         height, width = I.shape[:2]
 
+        coordinates = surround_data.output_data['responses'][0]['localizedObjectAnnotations'][0]['boundingPoly']['normalizedVertices']
+
+        point_1 = [round(coordinates[0]['x']*width), round(coordinates[0]['y']*height)]
+        point_2 = [round(coordinates[1]['x']*width), round(coordinates[1]['y']*height)]
+        point_3 = [round(coordinates[2]['x']*width), round(coordinates[2]['y']*height)]
+        point_4 = [round(coordinates[3]['x']*width), round(coordinates[3]['y']*height)]
+
         # Define the polygon coordinates to use or the crop
-        polygon = [[[20,110],[450,108],[340,420],[125,420]]]
+        polygon = [[point_1, point_2, point_3, point_4]]
 
         # First find the minX minY maxX and maxY of the polygon
         minX = I.shape[1]
@@ -96,12 +103,11 @@ class ExtractCar(Stage):
                 if x < minX or x > maxX or y < minY or y > maxY:
                     continue
 
-                if cv2.pointPolygonTest(np.asarray(polygon),(x,y),False) >= 0:
+                if cv2.pointPolygonTest(np.asarray(polygon), (x, y), False) >= 0:
                     croppedImage[y, x, 0] = I[y, x, 0]
                     croppedImage[y, x, 1] = I[y, x, 1]
                     croppedImage[y, x, 2] = I[y, x, 2]
 
-        # Now we can crop again just the envloping rectangle
-        finalImage = croppedImage[minY:maxY,minX:maxX]
+        finalImage = croppedImage[minY:maxY, minX:maxX]
 
-        cv2.imwrite('data/temp.jpg',finalImage)
+        cv2.imwrite('data/temp.jpg', finalImage)
