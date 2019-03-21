@@ -149,4 +149,7 @@ class Wrapper():
 
     def process(self, input_data):
         Wrapper.run(self, input_data)
-        self.run(input_data)
+        return self.run(input_data)
+
+    def get_config(self):
+        return self.surround.config

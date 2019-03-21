@@ -1,0 +1,6 @@
+output:
+  text: Hello World
+
+image: {project_name}
+company: yourcompany
+version: latest

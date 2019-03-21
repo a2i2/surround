@@ -5,6 +5,7 @@ class {project_name}Data(SurroundData):
 
     def __init__(self, input_data):
         self.input_data = input_data
+        self.errors = []
 
 class ValidateData(Stage):
     def operate(self, surround_data, config):
