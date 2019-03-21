@@ -3,7 +3,7 @@ jobs:
   deploy-doc:
     docker:
     - image: circleci/python:latest
-    working_directory: ~/gh_doc_automation
+    working_directory: ~/surround
     steps:
       - checkout
       - run: make doc-requirements
