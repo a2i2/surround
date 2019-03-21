@@ -3,7 +3,7 @@ general:
   branches:
     only:
       - master
-      - feature/website
+      # - feature/website
 jobs:
   deploy-doc:
     docker:
