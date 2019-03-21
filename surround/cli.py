@@ -30,7 +30,6 @@ PROJECTS = {
         ],
         "files": [
             ("requirements.txt", "surround==0.0.3\ntornado==6.0.1"),
-            ("{project_name}/config.yaml", "output:\n  text: Hello World"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
@@ -42,7 +41,9 @@ PROJECTS = {
             ("{project_name}/wrapper.py", "wrapper.py.txt", True),
             ("upload.html", "upload.html.txt", False),
             ("dodo.py", "dodo.py.txt", False),
-            ("Dockerfile", "Dockerfile.txt", False)
+            ("Dockerfile", "Dockerfile.txt", False),
+            ("{project_name}/config.yaml", "config.yaml.txt", False)
+
         ]
     }
 }

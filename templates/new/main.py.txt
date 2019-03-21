@@ -1,11 +1,14 @@
 import logging
 from .wrapper import PipelineWrapper
-
+import os
 logging.basicConfig(level=logging.INFO)
 
 def main():
     wrapper = PipelineWrapper()
-    wrapper.run(None)
+    config = wrapper.get_config()
+    output = wrapper.run(None)
+    with open(os.path.join(config["output_path"], "output.txt"), 'w') as f:
+        f.write(output)
 
 if __name__ == "__main__":
     main()

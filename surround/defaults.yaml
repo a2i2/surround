@@ -1,6 +1,6 @@
 company: a2i2
-image: dock
 version: latest
+image: surround
 
 surround:
     stages: false
