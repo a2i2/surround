@@ -1,4 +1,9 @@
 version: 2.1
+general:
+  branches:
+    only:
+      - master
+      - feature/website
 jobs:
   deploy-doc:
     docker:
