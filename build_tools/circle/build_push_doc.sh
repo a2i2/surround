@@ -13,12 +13,12 @@ fi
 branch=$(git symbolic-ref --short HEAD)
 
 # cd into docs, make them
-cd doc
+cd docs
 make clean html EXAMPLES_PATTERN=ex_*
 cd ..
 
 # move the docs to the top-level directory, stash for checkout
-mv doc/_build/html ./
+mv docs/_build/html ./
 
 # html/ will stay there actually...
 git stash
@@ -41,7 +41,7 @@ declare -a leftover=(".cache/"
                      ".idea/"
                      "build/"
                      "build_tools/"
-                     "doc/"
+                     "docs/"
                      "examples/"
                      "surround/"
                      "surround.egg-info/"
@@ -77,5 +77,5 @@ if [[ "$CIRCLE_BRANCH" =~ ^master$|^[0-9]+\.[0-9]+\.X$ ]]; then
     # NOW we should be able to push it
     git push origin gh-pages
 else
-    echo "Not on master, so won't push doc"
+    echo "Not on master, so won't push docs"
 fi
