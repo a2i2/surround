@@ -75,7 +75,7 @@ git remote rm origin
 git remote add origin https://"$GH_NAME":"$GH_TOKEN"@github.com/dstil/surround.git
 
 # NOW we should be able to push it
-git push origin gh-pages
+git push -f origin gh-pages
 # else
 #     echo "Not on master, so won't push docs"
 # fi
