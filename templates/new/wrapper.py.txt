@@ -12,6 +12,4 @@ class PipelineWrapper(Wrapper):
     def run(self, input_data):
         data = {project_name}Data(input_data)
         self.surround.process(data)
-
-        with open(os.path.abspath(os.path.join(self.config["output_path"], "output.txt")), 'w') as f:
-            f.write(data.output_data)
+        return data.output_data

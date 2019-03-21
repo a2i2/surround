@@ -33,12 +33,13 @@ class Predict(tornado.web.RequestHandler):
 
     def post(self):
         print("info: started post request at /predict")
+        output = None
         if self.wrapper.type_of_uploaded_object == AllowedTypes.IMAGE:
             fileinfo = self.request.files['data'][0]
-            self.wrapper.process(fileinfo['body'])
+            output = self.wrapper.process(fileinfo['body'])
         else:
-            self.wrapper.process(self.request.body)
-        self.write("Task executed successfully")
+            output = self.wrapper.process(self.request.body)
+        self.write({"otuput": output})
         print("info: finished post request at /predict")
 
 def make_app(wrapper_object):
