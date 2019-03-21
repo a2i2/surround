@@ -4,8 +4,8 @@ set -e
 
 # this is a hack, but we have to make sure we're only ever running this from
 # the top level of the package and not in the subdirectory...
-if [[ ! -f gh_doc_automation/__init__.py ]]; then
-    echo "This must be run from the gh_doc_automation project directory"
+if [[ ! -f surround/__init__.py ]]; then
+    echo "This must be run from the surround project directory"
     exit 3
 fi
 
@@ -43,8 +43,8 @@ declare -a leftover=(".cache/"
                      "build_tools/"
                      "doc/"
                      "examples/"
-                     "gh_doc_automation/"
-                     "gh_doc_automation.egg-info/"
+                     "surround/"
+                     "surround.egg-info/"
                      "_downloads/"
                      "_images/"
                      "_modules/"
