@@ -66,16 +66,16 @@ mv html/* ./
 rm -r html/
 
 # Add everything, get ready for commit. But only do it if we're on master
-if [[ "$CIRCLE_BRANCH" =~ ^master$|^[0-9]+\.[0-9]+\.X$ ]]; then
-    git add --all
-    git commit -m "[ci skip] publishing updated documentation..."
+# if [[ "$CIRCLE_BRANCH" =~ ^master$|^[0-9]+\.[0-9]+\.X$ ]]; then
+git add --all
+git commit -m "[ci skip] publishing updated documentation..."
 
-    # We have to re-add the origin with the GH_TOKEN credentials
-    git remote rm origin
-    git remote add origin https://"$GH_NAME":"$GH_TOKEN"@github.com/"$GH_NAME"/gh_automation.git
+# We have to re-add the origin with the GH_TOKEN credentials
+git remote rm origin
+git remote add origin https://"$GH_NAME":"$GH_TOKEN"@github.com/"$GH_NAME"/gh_automation.git
 
-    # NOW we should be able to push it
-    git push origin gh-pages
-else
-    echo "Not on master, so won't push docs"
+# NOW we should be able to push it
+git push origin gh-pages
+# else
+#     echo "Not on master, so won't push docs"
 fi
