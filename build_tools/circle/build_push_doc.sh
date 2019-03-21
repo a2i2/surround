@@ -82,4 +82,4 @@ git remote add origin https://"$GH_NAME":"$GH_TOKEN"@github.com/"$GH_NAME"/surro
 git push origin gh-pages
 # else
 #     echo "Not on master, so won't push docs"
-fi
+# fi
