@@ -6,7 +6,6 @@ jobs:
     working_directory: ~/surround
     steps:
       - checkout
-      - run: make doc-requirements
       - run: make install
       - run: ./build_tools/circle/build_push_doc.sh
   build:
