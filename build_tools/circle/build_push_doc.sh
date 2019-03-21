@@ -80,7 +80,7 @@ git commit -m "[ci skip] publishing updated documentation..."
 
 # We have to re-add the origin with the GH_TOKEN credentials
 git remote rm origin
-git remote add origin https://"$GH_NAME":"$GH_TOKEN"@github.com/"$GH_NAME"/gh_automation.git
+git remote add origin https://"$GH_NAME":"$GH_TOKEN"@github.com/"$GH_NAME"/surround.git
 
 # NOW we should be able to push it
 git push origin gh-pages
