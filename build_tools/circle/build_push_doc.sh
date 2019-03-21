@@ -32,13 +32,9 @@ git pull origin gh-pages
 git config --global user.email "$GH_EMAIL"
 git config --global user.name "$GH_NAME" > /dev/null 2>&1
 
-echo "email"
-echo "$GH_EMAIL"
-git config --global user.email
-
-echo "PYPI_USERNAME"
-echo "$PYPI_USERNAME"
-
+echo "name"
+echo "$GH_NAME"
+git config --global user.name
 
 # remove all files that are not in the .git dir
 find . -not -name ".git/*" -type f -maxdepth 1 -delete
