@@ -6,7 +6,8 @@ jobs:
     working_directory: ~/surround
     steps:
       - checkout
-      - run: make install
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 setup.py install
       - run: ./build_tools/circle/build_push_doc.sh
   build:
     docker:
