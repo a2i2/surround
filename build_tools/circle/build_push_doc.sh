@@ -14,7 +14,7 @@ branch=$(git symbolic-ref --short HEAD)
 
 # cd into docs, make them
 cd docs
-make clean html EXAMPLES_PATTERN=ex_*
+make html
 cd ..
 
 # move the docs to the top-level directory, stash for checkout
