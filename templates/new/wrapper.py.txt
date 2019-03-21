@@ -5,7 +5,7 @@ from stages import ValidateData, {project_name}Data
 class PipelineWrapper(Wrapper):
     def __init__(self):
         surround = Surround([ValidateData()], __name__)
-        type_of_uploaded_object = AllowedTypes.IMAGE
+        type_of_uploaded_object = AllowedTypes.JSON
         self.config = surround.config
         super().__init__(surround, type_of_uploaded_object)
 

@@ -37,7 +37,7 @@ class Predict(tornado.web.RequestHandler):
             fileinfo = self.request.files['data'][0]
             self.wrapper.process(fileinfo['body'])
         else:
-            self.wrapper.process(None)
+            self.wrapper.process(self.request.body)
         self.write("Task executed successfully")
         print("info: finished post request at /predict")
 
