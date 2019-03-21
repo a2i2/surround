@@ -39,7 +39,7 @@ class Predict(tornado.web.RequestHandler):
             output = self.wrapper.process(fileinfo['body'])
         else:
             output = self.wrapper.process(self.request.body)
-        self.write({"otuput": output})
+        self.write({"output": output})
         print("info: finished post request at /predict")
 
 def make_app(wrapper_object):
