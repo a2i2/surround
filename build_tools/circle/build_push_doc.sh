@@ -18,7 +18,7 @@ make clean html EXAMPLES_PATTERN=ex_*
 cd ..
 
 # move the docs to the top-level directory, stash for checkout
-mv docs/_build/html ./
+mv docs/build/html ./
 
 # html/ will stay there actually...
 git stash
