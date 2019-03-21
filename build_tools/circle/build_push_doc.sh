@@ -18,7 +18,7 @@ make html
 cd ..
 
 # move the docs to the top-level directory, stash for checkout
-mv docs/build/html ./
+mv docs/docs/build/html ./
 
 # html/ will stay there actually...
 git stash
