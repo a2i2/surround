@@ -120,7 +120,7 @@ class Surround(ABC):
 
 class AllowedTypes(Enum):
     JSON = ["application/json"]
-    IMAGE = "image"
+    IMAGE = ["image/jpeg", "image/png", "image/bmp", "image/gif", "image/tiff"]
 
 class Wrapper():
     def __init__(self, surround, type_of_uploaded_object=None):
