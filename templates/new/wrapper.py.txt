@@ -1,4 +1,3 @@
-import os
 import json
 from surround import Surround, Wrapper, AllowedTypes
 from stages import ValidateData, {project_name}Data
