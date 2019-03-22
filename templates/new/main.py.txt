@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 
 def main():
     wrapper = PipelineWrapper()
-    config = wrapper.get_config()
+    config = wrapper.surround.config
     output = wrapper.run(json.dumps({{"data": "hello"}}))
     with open(os.path.join(config["output_path"], "output.txt"), 'w') as file_:
         file_.write(output["output"])
