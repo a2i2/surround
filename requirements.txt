@@ -1,3 +1,4 @@
 pyaml==17.12.1
 doit==0.31.1
 Sphinx==1.8.4
+python-magic==0.4.15

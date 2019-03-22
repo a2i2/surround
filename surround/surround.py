@@ -8,6 +8,7 @@ import os
 from enum import Enum
 from datetime import datetime
 from abc import ABC
+import magic
 from .stage import Stage
 from .config import Config
 
@@ -118,12 +119,13 @@ class Surround(ABC):
         surround_data.thaw()
 
 class AllowedTypes(Enum):
-    JSON = "json"
+    JSON = ["application/json"]
     IMAGE = "image"
 
 class Wrapper():
     def __init__(self, surround, type_of_uploaded_object=None):
         self.surround = surround
+        self.actual_type_of_uploaded_object = None
         if type_of_uploaded_object:
             self.type_of_uploaded_object = type_of_uploaded_object
         else:
@@ -131,11 +133,22 @@ class Wrapper():
         self.surround.init_stages()
 
     def run(self, input_data):
+        mime = magic.Magic(mime=True)
+        self.actual_type_of_uploaded_object = mime.from_buffer(input_data)
+
         if self.validate() is False:
             sys.exit()
 
     def validate(self):
-        return self.validate_type_of_uploaded_object()
+        return self.validate_type_of_uploaded_object() and self.validate_actual_type_of_uploaded_object()
+
+    def validate_actual_type_of_uploaded_object(self):
+        for type_ in self.type_of_uploaded_object.value:
+            if self.actual_type_of_uploaded_object == type_:
+                return True
+        print("error: you selected input type as " + str(self.type_of_uploaded_object).split(".")[1])
+        print("error: input file is not " + str(self.type_of_uploaded_object).split(".")[1])
+        return False
 
     def validate_type_of_uploaded_object(self):
         for type_ in AllowedTypes:
