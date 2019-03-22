@@ -121,6 +121,7 @@ class Surround(ABC):
 class AllowedTypes(Enum):
     JSON = ["application/json"]
     IMAGE = ["image/jpeg", "image/png", "image/bmp", "image/gif", "image/tiff"]
+    VIDEO = ["video/mp4", "application/octet-stream"]
 
 class Wrapper():
     def __init__(self, surround, type_of_uploaded_object=None):
