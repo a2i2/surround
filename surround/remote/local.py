@@ -19,9 +19,9 @@ class Local(BaseRemote):
         return self.file_exists_locally(path_to_remote_file, append_to)
 
     def add(self, add_to, key):
-        project_name = self.read_from_local_config("project-info", "project-name")
+        project_name = self.get_project_name()
         if project_name is None:
-            return "error: project name not present in config"
+            return self.message
 
         path_to_local_file = Path(os.path.join(add_to, key))
         path_to_remote = self.read_from_config("remote", add_to)
