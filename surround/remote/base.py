@@ -9,6 +9,10 @@ __date__ = '2019/02/18'
 
 class BaseRemote():
 
+    def __init__(self):
+        self.message = ""
+        self.messages = []
+
     def write_config(self, what_to_write, file_, name, path=None):
         """Write config to a file
 
@@ -112,3 +116,10 @@ class BaseRemote():
         :type file_: str
         """
         return os.path.basename(file_)
+
+    def get_project_name(self):
+        project_name = self.read_from_local_config("project-info", "project-name")
+        if project_name:
+            return project_name
+        self.message = "error: project name not present in config"
+        self.messages.append(self.message)
