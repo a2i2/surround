@@ -121,8 +121,19 @@ class BaseRemote():
         project_name = self.read_from_local_config("project-info", "project-name")
         if project_name:
             return project_name
-        self.message = "error: project name not present in config"
-        self.messages.append(self.message)
+        self.add_message("error: project name not present in config")
+
+    def add_message(self, message, append_to=True):
+        """Store message and if required append that to the list
+
+        :param message: message to display
+        :type message: str
+        :param append_to: append message to messages list
+        :type append_to: bool
+        """
+        self.message = message
+        if append_to:
+            self.messages.append(self.message)
 
     @abstractmethod
     def file_exists_on_remote(self, path_to_remote_file, append_to=True):
@@ -141,7 +152,5 @@ class BaseRemote():
         :type append_to: bool
         """
         if Path(path_to_file).exists():
-            self.message = "info: " + path_to_file + " already exists"
-            if append_to:
-                self.messages.append(self.message)
+            self.add_message("info: " + path_to_file + " already exists", append_to)
             return True
