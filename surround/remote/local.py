@@ -8,6 +8,14 @@ __date__ = '2019/02/18'
 
 class Local(BaseRemote):
 
+    def file_exists_on_remote(self, path_to_remote_file):
+        """For local remote, just check whether file is present locally
+
+        :param path_to_remote_file: path to file
+        :type path_to_remote_file: str
+        """
+        return self.file_exists_locally(path_to_remote_file)
+
     def add(self, add_to, key):
         project_name = self.read_from_local_config("project-info", "project-name")
         if project_name is None:
@@ -33,13 +41,14 @@ class Local(BaseRemote):
 
             path_to_remote = self.read_from_config("remote", what_to_pull)
             file_to_pull = os.path.join(path_to_remote, project_name, key)
-            if Path(os.path.join(what_to_pull, key)).exists():
-                self.messages.append("info: " + os.path.join(what_to_pull, key) + " already exists")
-                return "info: " + os.path.join(what_to_pull, key) + " already exists"
+            path_to_pulled_file = os.path.join(what_to_pull, key)
+
+            if self.file_exists_locally(path_to_pulled_file):
+                return self.message
 
             os.makedirs(what_to_pull, exist_ok=True)
             if Path(file_to_pull).exists():
-                copyfile(file_to_pull, os.path.join(what_to_pull, key))
+                copyfile(file_to_pull, path_to_pulled_file)
                 self.messages.append("info: " + key + " pulled successfully")
                 return "info: " + key + " pulled successfully"
             self.messages.append("error: file does not exist")
@@ -62,9 +71,9 @@ class Local(BaseRemote):
 
             path_to_remote = self.read_from_config("remote", what_to_push)
             path_to_remote_file = os.path.join(path_to_remote, project_name, key)
-            if Path(path_to_remote_file).exists():
-                self.messages.append("info: " + path_to_remote_file + " already exists")
-                return "info: " + path_to_remote_file + " already exists"
+
+            if self.file_exists_on_remote(path_to_remote_file):
+                return self.message
 
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
             if path_to_remote_file and Path(os.path.join(what_to_push, key)).exists():

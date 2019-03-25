@@ -123,3 +123,22 @@ class BaseRemote():
             return project_name
         self.message = "error: project name not present in config"
         self.messages.append(self.message)
+
+    @abstractmethod
+    def file_exists_on_remote(self, path_to_remote_file):
+        """Check if file is already present on remote. This is used to prevent overwriting of files.
+
+        :param path_to_remote_file: path to file
+        :type path_to_remote_file: str
+        """
+
+    def file_exists_locally(self, path_to_file):
+        """Check if file is already present on remote. This is used to prevent overwriting of files.
+
+        :param path_to_file: path to file
+        :type path_to_file: str
+        """
+        if Path(path_to_file).exists():
+            self.message = "info: " + path_to_file + " already exists"
+            self.messages.append(self.message)
+            return True
