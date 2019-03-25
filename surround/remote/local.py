@@ -8,13 +8,15 @@ __date__ = '2019/02/18'
 
 class Local(BaseRemote):
 
-    def file_exists_on_remote(self, path_to_remote_file):
+    def file_exists_on_remote(self, path_to_remote_file, append_to=True):
         """For local remote, just check whether file is present locally
 
         :param path_to_remote_file: path to file
         :type path_to_remote_file: str
+        :param append_to: Append message to messages list. By default, it is true.
+        :type append_to: bool
         """
-        return self.file_exists_locally(path_to_remote_file)
+        return self.file_exists_locally(path_to_remote_file, append_to)
 
     def add(self, add_to, key):
         project_name = self.read_from_local_config("project-info", "project-name")
@@ -46,7 +48,7 @@ class Local(BaseRemote):
                 return self.message
 
             os.makedirs(what_to_pull, exist_ok=True)
-            if Path(file_to_pull).exists():
+            if self.file_exists_on_remote(file_to_pull, False):
                 copyfile(file_to_pull, path_to_pulled_file)
                 self.messages.append("info: " + key + " pulled successfully")
                 return "info: " + key + " pulled successfully"
@@ -74,8 +76,9 @@ class Local(BaseRemote):
             if self.file_exists_on_remote(path_to_remote_file):
                 return self.message
 
+            path_to_local_file = os.path.join(what_to_push, key)
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
-            if path_to_remote_file and Path(os.path.join(what_to_push, key)).exists():
+            if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
                 copyfile(os.path.join(what_to_push, key), path_to_remote_file)
                 self.messages.append("info: " + key + " pushed successfully")
                 return "info: " + key + " pushed successfully"

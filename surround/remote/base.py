@@ -125,20 +125,23 @@ class BaseRemote():
         self.messages.append(self.message)
 
     @abstractmethod
-    def file_exists_on_remote(self, path_to_remote_file):
+    def file_exists_on_remote(self, path_to_remote_file, append_to=True):
         """Check if file is already present on remote. This is used to prevent overwriting of files.
 
         :param path_to_remote_file: path to file
         :type path_to_remote_file: str
         """
 
-    def file_exists_locally(self, path_to_file):
+    def file_exists_locally(self, path_to_file, append_to=True):
         """Check if file is already present on remote. This is used to prevent overwriting of files.
 
         :param path_to_file: path to file
         :type path_to_file: str
+        :param append_to: Append message to messages list. By default, it is true.
+        :type append_to: bool
         """
         if Path(path_to_file).exists():
             self.message = "info: " + path_to_file + " already exists"
-            self.messages.append(self.message)
+            if append_to:
+                self.messages.append(self.message)
             return True
