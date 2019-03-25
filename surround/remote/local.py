@@ -50,10 +50,12 @@ class Local(BaseRemote):
             os.makedirs(what_to_pull, exist_ok=True)
             if self.file_exists_on_remote(file_to_pull, False):
                 copyfile(file_to_pull, path_to_pulled_file)
-                self.messages.append("info: " + key + " pulled successfully")
-                return "info: " + key + " pulled successfully"
-            self.messages.append("error: file does not exist")
-            return "error: file does not exist"
+                self.message = "info: " + key + " pulled successfully"
+                self.messages.append(self.message)
+                return self.message
+            self.message = "error: file does not exist"
+            self.messages.append(self.message)
+            return self.message
 
         files_to_pull = self.read_all_from_local_config(what_to_pull)
         self.messages = []
@@ -61,7 +63,8 @@ class Local(BaseRemote):
             for file_to_pull in files_to_pull:
                 self.pull(what_to_pull, file_to_pull)
             return self.messages
-        self.messages.append("error: No file added to " + what_to_pull)
+        self.message = "error: No file added to " + what_to_pull
+        self.messages.append(self.message)
         return self.messages
 
     def push(self, what_to_push, key=None):
@@ -80,10 +83,12 @@ class Local(BaseRemote):
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
             if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
                 copyfile(os.path.join(what_to_push, key), path_to_remote_file)
-                self.messages.append("info: " + key + " pushed successfully")
-                return "info: " + key + " pushed successfully"
-            self.messages.append("error: file does not exist")
-            return "error: file does not exist"
+                self.message = "info: " + key + " pushed successfully"
+                self.messages.append(self.message)
+                return self.message
+            self.message = "error: file does not exist"
+            self.messages.append(self.messages)
+            return self.message
 
         files_to_push = self.read_all_from_local_config(what_to_push)
         self.messages = []
@@ -91,5 +96,6 @@ class Local(BaseRemote):
             for file_to_push in files_to_push:
                 self.push(what_to_push, file_to_push)
             return self.messages
-        self.messages.append("error: No file added to " + what_to_push)
+        self.message = "error: No file added to " + what_to_push
+        self.messages.append(self.message)
         return self.messages
