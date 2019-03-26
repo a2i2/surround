@@ -143,6 +143,42 @@ class BaseRemote():
         :param file_: file to push
         :type key: str
         """
+        project_name = self.get_project_name()
+        if project_name is None:
+            return self.messages
+
+        if key:
+            path_to_remote = self.read_from_config("remote", what_to_push)
+            path_to_remote_file = os.path.join(path_to_remote, project_name, key)
+
+            if self.file_exists_on_remote(path_to_remote_file):
+                return self.message
+
+            path_to_local_file = os.path.join(what_to_push, key)
+            os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
+            if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
+                self.push_file(what_to_push, key, path_to_local_file, path_to_remote_file)
+                self.add_message("info: " + key + " pushed successfully")
+            else:
+                self.add_message("error: file does not exist")
+            return self.message
+
+        files_to_push = self.read_all_from_local_config(what_to_push)
+        self.messages = []
+        if files_to_push:
+            for file_to_push in files_to_push:
+                self.push(what_to_push, file_to_push)
+        else:
+            self.add_message("error: No file added to " + what_to_push)
+        return self.messages
+
+    @abstractmethod
+    def push_file(self, what_to_push, key, path_to_local_file, path_to_remote_file):
+        """Get the file stored on the remote
+
+        :param path_to_pulled_file: path where do you want to store file
+        :type path_to_pulled_file: str
+        """
 
     def get_file_name(self, file_):
         """Extract filename from path
