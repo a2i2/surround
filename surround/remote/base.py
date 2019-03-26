@@ -93,12 +93,47 @@ class BaseRemote():
         :type key: str
         """
 
-    @abstractmethod
     def pull(self, what_to_pull, key=None):
         """Pull data from remote
 
         :param file_: file to pull
         :type key: str
+        """
+        project_name = self.get_project_name()
+        if project_name is None:
+            return self.messages
+
+        if key:
+            path_to_remote = self.read_from_config("remote", what_to_pull)
+            file_to_pull = os.path.join(path_to_remote, project_name, key)
+            path_to_pulled_file = os.path.join(what_to_pull, key)
+
+            if self.file_exists_locally(path_to_pulled_file):
+                return self.message
+
+            os.makedirs(what_to_pull, exist_ok=True)
+            if self.file_exists_on_remote(file_to_pull, False):
+                self.pull_file(what_to_pull, key, file_to_pull, path_to_pulled_file)
+                self.add_message("info: " + key + " pulled successfully")
+            else:
+                self.add_message("error: file does not exist")
+            return self.message
+
+        files_to_pull = self.read_all_from_local_config(what_to_pull)
+        self.messages = []
+        if files_to_pull:
+            for file_to_pull in files_to_pull:
+                self.pull(what_to_pull, file_to_pull)
+        else:
+            self.add_message("error: No file added to " + what_to_pull)
+        return self.messages
+
+    @abstractmethod
+    def pull_file(self, what_to_pull, key, file_to_pull, path_to_pulled_file):
+        """Get the file stored on the remote
+
+        :param path_to_pulled_file: path where do you want to store file
+        :type path_to_pulled_file: str
         """
 
     @abstractmethod
