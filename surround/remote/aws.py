@@ -14,7 +14,6 @@ class AWS(BaseRemote):
         s3 = self.session.resource('s3')
         return s3.Bucket(bucket_name)
 
-    def pull_file(self, what_to_pull, key, file_to_pull, path_to_pulled_file):
+    def pull_file(self, what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         bucket = self.get_bucket(what_to_pull)
-        project_name = self.get_project_name()
-        bucket.download_file(project_name + '/' + key, what_to_pull + '/' + key)
+        bucket.download_file(relative_path_to_remote_file, path_to_local_file)

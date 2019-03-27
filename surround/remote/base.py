@@ -94,9 +94,11 @@ class BaseRemote():
         """
 
     def pull(self, what_to_pull, key=None):
-        """Pull data from remote
+        """Pull from remote
 
-        :param file_: file to pull
+        :param what_to_pull: what to pull from remote. By convention it is remote name. If remote name is data, it will pull data.
+        :type what_to_pull: str
+        :param key: file to pull
         :type key: str
         """
         project_name = self.get_project_name()
@@ -105,15 +107,16 @@ class BaseRemote():
 
         if key:
             path_to_remote = self.read_from_config("remote", what_to_pull)
-            file_to_pull = os.path.join(path_to_remote, project_name, key)
-            path_to_pulled_file = os.path.join(what_to_pull, key)
+            relative_path_to_remote_file = os.path.join(project_name, key)
+            path_to_remote_file = os.path.join(path_to_remote, project_name, key)
+            path_to_local_file = os.path.join(what_to_pull, key)
 
-            if self.file_exists_locally(path_to_pulled_file):
+            if self.file_exists_locally(path_to_local_file):
                 return self.message
 
             os.makedirs(what_to_pull, exist_ok=True)
-            if self.file_exists_on_remote(file_to_pull, False):
-                self.pull_file(what_to_pull, key, file_to_pull, path_to_pulled_file)
+            if self.file_exists_on_remote(path_to_remote_file, False):
+                self.pull_file(what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file)
                 self.add_message("info: " + key + " pulled successfully")
             else:
                 self.add_message("error: file does not exist")
@@ -129,18 +132,26 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def pull_file(self, what_to_pull, key, file_to_pull, path_to_pulled_file):
+    def pull_file(self, what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         """Get the file stored on the remote
 
-        :param path_to_pulled_file: path where do you want to store file
-        :type path_to_pulled_file: str
+        :param what_to_pull: what to pull from remote
+        :type what_to_pull: str
+        :param path_to_remote: path to the remote.
+        :type path_to_remote: str
+        :param relative_path_to_remote_file: path to file on remote relative to the remote path
+        :type relative_path_to_remote_file: str
+        :param path_to_local_file: path to the local file
+        :type path_to_local_file: str
         """
 
     @abstractmethod
     def push(self, what_to_push, key=None):
-        """Push data to remote
+        """Push to remote
 
-        :param file_: file to push
+        :param what_to_push: what to push to remote. By convention it is remote name. If remote name is data, it will push data.
+        :type what_to_push: str
+        :param key: file to push
         :type key: str
         """
         project_name = self.get_project_name()
@@ -150,6 +161,7 @@ class BaseRemote():
         if key:
             path_to_remote = self.read_from_config("remote", what_to_push)
             path_to_remote_file = os.path.join(path_to_remote, project_name, key)
+            relative_path_to_remote_file = os.path.join(project_name, key)
 
             if self.file_exists_on_remote(path_to_remote_file):
                 return self.message
@@ -157,7 +169,7 @@ class BaseRemote():
             path_to_local_file = os.path.join(what_to_push, key)
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
             if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
-                self.push_file(what_to_push, key, path_to_local_file, path_to_remote_file)
+                self.push_file(what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file)
                 self.add_message("info: " + key + " pushed successfully")
             else:
                 self.add_message("error: file does not exist")
@@ -173,11 +185,17 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def push_file(self, what_to_push, key, path_to_local_file, path_to_remote_file):
+    def push_file(self, what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         """Get the file stored on the remote
 
-        :param path_to_pulled_file: path where do you want to store file
-        :type path_to_pulled_file: str
+        :param what_to_push: what to push to remote
+        :type what_to_push: str
+        :param path_to_remote: path to the remote.
+        :type path_to_remote: str
+        :param relative_path_to_remote_file: path to file on remote relative to the remote path
+        :type relative_path_to_remote_file: str
+        :param path_to_local_file: path to the local file
+        :type path_to_local_file: str
         """
 
     def get_file_name(self, file_):
