@@ -3,12 +3,14 @@ from pathlib import Path
 
 from . import base
 from . import local
+from . import aws
 
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/26'
 
 BASE_REMOTE = base.BaseRemote()
 LOCAL = local.Local()
+AWS = aws.AWS()
 
 def is_surround_project():
     """Whether inside surround project root directory
@@ -131,13 +133,14 @@ def parse_add_args(parsed_args):
 def parse_pull_args(parsed_args):
     if is_surround_project():
         remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
+        current_remote = get_corresponding_remote(remote)
         if remote:
             key = parsed_args.key
             if key:
-                message = LOCAL.pull(parsed_args.remote, key)
+                message = current_remote.pull(parsed_args.remote, key)
                 print(message)
             else:
-                messages = LOCAL.pull(parsed_args.remote, key)
+                messages = current_remote.pull(parsed_args.remote, key)
                 for message in messages:
                     print(message)
         else:
@@ -149,13 +152,14 @@ def parse_pull_args(parsed_args):
 def parse_push_args(parsed_args):
     if is_surround_project():
         remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
+        current_remote = get_corresponding_remote(remote)
         if remote:
             key = parsed_args.key
             if key:
-                message = LOCAL.push(parsed_args.remote, key)
+                message = current_remote.push(parsed_args.remote, key)
                 print(message)
             else:
-                messages = LOCAL.push(parsed_args.remote, key)
+                messages = current_remote.push(parsed_args.remote, key)
                 for message in messages:
                     print(message)
         else:
@@ -179,3 +183,8 @@ def parse_list_args(parsed_args):
             print(remote_file)
     else:
         print("error: no remote named " + parsed_args.remote)
+
+def get_corresponding_remote(remote):
+    if remote.startswith("s3://"):
+        return AWS
+    return LOCAL
