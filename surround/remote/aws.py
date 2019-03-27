@@ -17,3 +17,7 @@ class AWS(BaseRemote):
     def pull_file(self, what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         bucket = self.get_bucket(what_to_pull)
         bucket.download_file(relative_path_to_remote_file, path_to_local_file)
+
+    def push_file(self, what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+        bucket = self.get_bucket(what_to_push)
+        bucket.upload_file(path_to_local_file, relative_path_to_remote_file)
