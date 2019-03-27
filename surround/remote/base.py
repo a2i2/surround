@@ -145,7 +145,6 @@ class BaseRemote():
         :type path_to_local_file: str
         """
 
-    @abstractmethod
     def push(self, what_to_push, key=None):
         """Push to remote
 
