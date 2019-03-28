@@ -1,22 +1,41 @@
-import os
+import logging
 import boto3
+from botocore.exceptions import ClientError
 from .base import BaseRemote
 
 class AWS(BaseRemote):
-    ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
-    SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
     def __init__(self):
         super().__init__()
-        self.s3 = boto3.client('s3', aws_access_key_id=AWS.ACCESS_KEY, aws_secret_access_key=AWS.SECRET_KEY)
+        self.s3 = boto3.client('s3')
+
+    def bucket_exists(self, bucket_name):
+        """Determine whether bucket_name exists and the user has permission to access it
+
+        :param bucket_name: Name of the bucket
+        :type bucket_name: string
+        :return: True if the referenced bucket_name exists, otherwise False
+        """
+        try:
+            self.s3.head_bucket(Bucket=bucket_name)
+        except ClientError as e:
+            logging.debug(e)
+            return False
+        return True
 
     def get_bucket(self, path_to_remote):
         return path_to_remote.split("//")[1]
 
-    def pull_file(self, what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         bucket = self.get_bucket(path_to_remote)
-        self.s3.download_file(bucket, relative_path_to_remote_file, path_to_local_file)
+        if self.bucket_exists(bucket):
+            self.s3.download_file(bucket, relative_path_to_remote_file, path_to_local_file)
+            return "info: " + key + " pulled successfully"
+        return "Bucket does not exist"
 
-    def push_file(self, what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def push_file(self, what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         bucket = self.get_bucket(path_to_remote)
-        self.s3.upload_file(path_to_local_file, bucket, relative_path_to_remote_file)
+        if self.bucket_exists(bucket):
+            self.s3.upload_file(path_to_local_file, bucket, relative_path_to_remote_file)
+            return "info: " + key + " pushed successfully"
+        return "Bucket does not exist"

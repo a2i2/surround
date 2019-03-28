@@ -37,10 +37,12 @@ class Local(BaseRemote):
             self.add_message("error: no remote named " + add_to, False)
         return self.message
 
-    def pull_file(self, what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         path_to_remote_file = os.path.join(path_to_remote, relative_path_to_remote_file)
         copyfile(path_to_remote_file, path_to_local_file)
+        return "info: " + key + " pulled successfully"
 
-    def push_file(self, what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def push_file(self, what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         path_to_remote_file = os.path.join(path_to_remote, relative_path_to_remote_file)
         copyfile(path_to_local_file, path_to_remote_file)
+        return "info: " + key + " pushed successfully"

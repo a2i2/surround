@@ -116,8 +116,8 @@ class BaseRemote():
 
             os.makedirs(what_to_pull, exist_ok=True)
             if self.file_exists_on_remote(path_to_remote_file, False):
-                self.pull_file(what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file)
-                self.add_message("info: " + key + " pulled successfully")
+                response = self.pull_file(what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
+                self.add_message(response)
             else:
                 self.add_message("error: file does not exist")
             return self.message
@@ -132,7 +132,7 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def pull_file(self, what_to_pull, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         """Get the file stored on the remote
 
         :param what_to_pull: what to pull from remote
@@ -168,8 +168,8 @@ class BaseRemote():
             path_to_local_file = os.path.join(what_to_push, key)
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
             if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
-                self.push_file(what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file)
-                self.add_message("info: " + key + " pushed successfully")
+                response = self.push_file(what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
+                self.add_message(response)
             else:
                 self.add_message("error: file does not exist")
             return self.message
@@ -184,7 +184,7 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def push_file(self, what_to_push, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def push_file(self, what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         """Get the file stored on the remote
 
         :param what_to_push: what to push to remote
