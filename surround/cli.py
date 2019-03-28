@@ -4,6 +4,7 @@ import sys
 import inspect
 import logging
 import subprocess
+import pkg_resources
 
 try:
     import tornado.ioloop
@@ -29,7 +30,7 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround==0.0.3\ntornado==6.0.1"),
+            ("requirements.txt", "surround=={version}\ntornado==6.0.1"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
@@ -56,7 +57,7 @@ def process_directories(directories, project_dir, project_name):
 def process_files(files, project_dir, project_name, project_description):
     for afile, content in files:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
-        actual_content = content.format(project_name=project_name, project_description=project_description)
+        actual_content = content.format(project_name=project_name, project_description=project_description, version=pkg_resources.get_distribution("surround").version)
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
