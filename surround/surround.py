@@ -122,7 +122,6 @@ class AllowedTypes(Enum):
     JSON = ["application/json"]
     IMAGE = ["image/jpeg", "image/png", "image/bmp", "image/gif", "image/tiff"]
     AUDIO = ["audio/mpeg", "audio/wav"]
-    VIDEO = ["video/mp4", "application/octet-stream"]
 
 class Wrapper():
     def __init__(self, surround, type_of_uploaded_object=None):
