@@ -214,6 +214,32 @@ class BaseRemote():
         :type path_to_local_file: str
         """
 
+    def list_(self, remote_to_list):
+        """General method for listing files on the remote
+
+        :param remote_to_list: remote to list
+        :type remote_to_list: str
+        """
+        project_name = self.get_project_name()
+        if project_name is None:
+            return self.message
+
+        path_to_remote = self.read_from_config("remote", remote_to_list)
+        if path_to_remote:
+            return self.list_files(path_to_remote, project_name)
+        return "error: no remote named " + remote_to_list
+
+    @abstractmethod
+    def list_files(self, path_to_remote, project_name):
+        """List the files in the remote
+
+        :param path_to_remote: path to the remote
+        :type path_to_remote: str
+        :param project_name: name of the project
+        :type project_name: str
+        """
+        raise NotImplementedError
+
     def get_file_name(self, file_):
         """Extract filename from path
 

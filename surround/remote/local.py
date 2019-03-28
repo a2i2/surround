@@ -20,3 +20,9 @@ class Local(BaseRemote):
         path_to_remote_file = os.path.join(path_to_remote, relative_path_to_remote_file)
         copyfile(path_to_local_file, path_to_remote_file)
         return "info: " + key + " pushed successfully"
+
+    def list_files(self, path_to_remote, project_name):
+        os.makedirs(os.path.join(path_to_remote, project_name), exist_ok=True)
+        path_to_remote_files = os.path.join(path_to_remote, project_name)
+        remote_files = os.listdir(path_to_remote_files)
+        return remote_files

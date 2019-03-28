@@ -45,11 +45,21 @@ class AWS(BaseRemote):
             except ClientError as e:
                 if e.response['Error']['Code'] == "404":
                     return "error: " + key + " does not exist"
-        return "Bucket does not exist"
+        return "error: bucket does not exist"
 
     def push_file(self, what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         bucket = self.get_bucket(path_to_remote)
         if self.bucket_exists(bucket):
             self.s3.upload_file(path_to_local_file, bucket, relative_path_to_remote_file)
             return "info: " + key + " pushed successfully"
-        return "Bucket does not exist"
+        return "error: bucket does not exist"
+
+    def list_files(self, path_to_remote, project_name):
+        bucket = self.get_bucket(path_to_remote)
+        if self.bucket_exists(bucket):
+            response = self.s3.list_objects_v2(Bucket=bucket)
+            files = []
+            for file_ in response['Contents']:
+                files.append(file_['Key'])
+            return files
+        return "error: bucket does not exist"

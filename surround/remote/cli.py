@@ -169,20 +169,21 @@ def parse_push_args(parsed_args):
         print("error: goto project root directory")
 
 def parse_list_args(parsed_args):
-    project_name = BASE_REMOTE.read_from_local_config("project-info", "project-name")
-    if project_name is None:
-        print("error: project name not present in config")
-        return
-
-    path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-    if path_to_remote:
-        os.makedirs(os.path.join(path_to_remote, project_name), exist_ok=True)
-        path_to_remote_files = os.path.join(path_to_remote, project_name)
-        remote_files = os.listdir(path_to_remote_files)
-        for remote_file in remote_files:
-            print(remote_file)
+    if is_surround_project():
+        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
+        current_remote = get_corresponding_remote(remote)
+        if remote:
+            response = current_remote.list_(parsed_args.remote)
+            if isinstance(response, list):
+                for remote_file in response:
+                    print(remote_file)
+            else:
+                print(response)
+        else:
+            print("error: supply remote to push to")
     else:
-        print("error: no remote named " + parsed_args.remote)
+        print("error: not a surround project")
+        print("error: goto project root directory")
 
 def get_corresponding_remote(remote):
     if remote.startswith("s3://"):
