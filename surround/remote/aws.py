@@ -11,10 +11,12 @@ class AWS(BaseRemote):
 
     def file_exists_on_remote(self, path_to_remote, relative_path_to_remote_file, append_to=True):
         bucket = self.get_bucket(path_to_remote)
-        response = self.s3.list_objects_v2(Bucket=bucket)
-        for file_ in response['Contents']:
-            if relative_path_to_remote_file == file_['Key']:
-                return True
+        if self.bucket_exists(bucket):
+            response = self.s3.list_objects_v2(Bucket=bucket)
+            for file_ in response['Contents']:
+                if relative_path_to_remote_file == file_['Key']:
+                    return True
+            return False
         return False
 
     def bucket_exists(self, bucket_name):
