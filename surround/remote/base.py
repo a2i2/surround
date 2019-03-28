@@ -85,13 +85,31 @@ class BaseRemote():
             read_items = config.get(what_to_read, None)
             return read_items
 
-    @abstractmethod
     def add(self, add_to, key):
         """Add data to remote
 
-        :param file_: file to add
+        :param add_to: remote to add to
+        :type add_to: str
+        :param key: file to add
         :type key: str
         """
+        project_name = self.get_project_name()
+        if project_name is None:
+            return self.message
+
+        path_to_local_file = Path(os.path.join(add_to, key))
+        path_to_remote = self.read_from_config("remote", add_to)
+        if path_to_remote:
+            # Append filename
+            path_to_remote_file = os.path.join(path_to_remote, project_name, key)
+            if Path(path_to_local_file).is_file() or Path(path_to_remote_file).is_file():
+                self.write_config(add_to, ".surround/config.yaml", key)
+                self.add_message("info: file added successfully", False)
+            else:
+                self.add_message("error: " + key + " not found.", False)
+        else:
+            self.add_message("error: no remote named " + add_to, False)
+        return self.message
 
     def pull(self, what_to_pull, key=None):
         """Pull from remote
