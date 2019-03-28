@@ -108,14 +108,13 @@ class BaseRemote():
         if key:
             path_to_remote = self.read_from_config("remote", what_to_pull)
             relative_path_to_remote_file = os.path.join(project_name, key)
-            path_to_remote_file = os.path.join(path_to_remote, project_name, key)
             path_to_local_file = os.path.join(what_to_pull, key)
 
             if self.file_exists_locally(path_to_local_file):
                 return self.message
 
             os.makedirs(what_to_pull, exist_ok=True)
-            if self.file_exists_on_remote(path_to_remote_file, False):
+            if self.file_exists_on_remote(path_to_remote, relative_path_to_remote_file, False):
                 response = self.pull_file(what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
                 self.add_message(response)
             else:
@@ -162,7 +161,7 @@ class BaseRemote():
             path_to_remote_file = os.path.join(path_to_remote, project_name, key)
             relative_path_to_remote_file = os.path.join(project_name, key)
 
-            if self.file_exists_on_remote(path_to_remote_file):
+            if self.file_exists_on_remote(path_to_remote, relative_path_to_remote_file):
                 return self.message
 
             path_to_local_file = os.path.join(what_to_push, key)
@@ -224,11 +223,15 @@ class BaseRemote():
             self.messages.append(self.message)
 
     @abstractmethod
-    def file_exists_on_remote(self, path_to_remote_file, append_to=True):
+    def file_exists_on_remote(self, path_to_remote, relative_path_to_remote_file, append_to=True):
         """Check if file is already present on remote. This is used to prevent overwriting of files.
 
-        :param path_to_remote_file: path to file
-        :type path_to_remote_file: str
+        :param path_to_remote: path to remote
+        :type path_to_remote: str
+        :param relative_path_to_remote_file: path to file on remote relative to the remote path
+        :type relative_path_to_remote_file: str
+        :param append_to: Append message to messages list. By default, it is true.
+        :type append_to: bool
         """
 
     def file_exists_locally(self, path_to_file, append_to=True):

@@ -8,14 +8,8 @@ __date__ = '2019/02/18'
 
 class Local(BaseRemote):
 
-    def file_exists_on_remote(self, path_to_remote_file, append_to=True):
-        """For local remote, just check whether file is present locally
-
-        :param path_to_remote_file: path to file
-        :type path_to_remote_file: str
-        :param append_to: Append message to messages list. By default, it is true.
-        :type append_to: bool
-        """
+    def file_exists_on_remote(self, path_to_remote, relative_path_to_remote_file, append_to=True):
+        path_to_remote_file = os.path.join(path_to_remote, relative_path_to_remote_file)
         return self.file_exists_locally(path_to_remote_file, append_to)
 
     def add(self, add_to, key):
