@@ -98,17 +98,18 @@ class BaseRemote():
             return self.message
 
         path_to_local_file = Path(os.path.join(add_to, key))
-        path_to_remote = self.read_from_config("remote", add_to)
-        if path_to_remote:
-            # Append filename
-            path_to_remote_file = os.path.join(path_to_remote, project_name, key)
-            if Path(path_to_local_file).is_file() or Path(path_to_remote_file).is_file():
-                self.write_config(add_to, ".surround/config.yaml", key)
-                self.add_message("info: file added successfully", False)
-            else:
-                self.add_message("error: " + key + " not found.", False)
+        path_to_remote = self.get_path_to_remote(add_to)
+        if path_to_remote is None:
+            return self.message
+
+        # Append filename
+        path_to_remote_file = os.path.join(path_to_remote, project_name, key)
+        if Path(path_to_local_file).is_file() or Path(path_to_remote_file).is_file():
+            self.write_config(add_to, ".surround/config.yaml", key)
+            self.add_message("info: file added successfully", False)
         else:
-            self.add_message("error: no remote named " + add_to, False)
+            self.add_message("error: " + key + " not found.", False)
+
         return self.message
 
     def pull(self, what_to_pull, key=None):
@@ -123,8 +124,11 @@ class BaseRemote():
         if project_name is None:
             return self.messages
 
+        path_to_remote = self.get_path_to_remote(what_to_pull)
+        if path_to_remote is None:
+            return self.messages
+
         if key:
-            path_to_remote = self.read_from_config("remote", what_to_pull)
             relative_path_to_remote_file = os.path.join(project_name, key)
             path_to_local_file = os.path.join(what_to_pull, key)
 
@@ -174,8 +178,11 @@ class BaseRemote():
         if project_name is None:
             return self.messages
 
+        path_to_remote = self.get_path_to_remote(what_to_push)
+        if path_to_remote is None:
+            return self.messages
+
         if key:
-            path_to_remote = self.read_from_config("remote", what_to_push)
             path_to_remote_file = os.path.join(path_to_remote, project_name, key)
             relative_path_to_remote_file = os.path.join(project_name, key)
 
@@ -224,10 +231,11 @@ class BaseRemote():
         if project_name is None:
             return self.message
 
-        path_to_remote = self.read_from_config("remote", remote_to_list)
-        if path_to_remote:
-            return self.list_files(path_to_remote, project_name)
-        return "error: no remote named " + remote_to_list
+        path_to_remote = self.get_path_to_remote(remote_to_list)
+        if path_to_remote is None:
+            return self.message
+
+        return self.list_files(path_to_remote, project_name)
 
     @abstractmethod
     def list_files(self, path_to_remote, project_name):
@@ -253,6 +261,12 @@ class BaseRemote():
         if project_name:
             return project_name
         self.add_message("error: project name not present in config")
+
+    def get_path_to_remote(self, remote_to_read):
+        remote = self.read_from_config("remote", remote_to_read)
+        if remote:
+            return remote
+        self.add_message("error: no remote named " + remote_to_read)
 
     def add_message(self, message, append_to=True):
         """Store message and if required append that to the list

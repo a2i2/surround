@@ -132,55 +132,58 @@ def parse_add_args(parsed_args):
 
 def parse_pull_args(parsed_args):
     if is_surround_project():
-        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-        current_remote = get_corresponding_remote(remote)
-        if remote:
-            key = parsed_args.key
-            if key:
-                message = current_remote.pull(parsed_args.remote, key)
-                print(message)
-            else:
-                messages = current_remote.pull(parsed_args.remote, key)
-                for message in messages:
-                    print(message)
+        path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
+        if path_to_remote is None:
+            print(BASE_REMOTE.message)
+            return
+
+        current_remote = get_corresponding_remote(path_to_remote)
+        key = parsed_args.key
+        if key:
+            message = current_remote.pull(parsed_args.remote, key)
+            print(message)
         else:
-            print("error: supply remote to pull from")
+            messages = current_remote.pull(parsed_args.remote, key)
+            for message in messages:
+                print(message)
     else:
         print("error: not a surround project")
         print("error: goto project root directory")
 
 def parse_push_args(parsed_args):
     if is_surround_project():
-        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-        current_remote = get_corresponding_remote(remote)
-        if remote:
-            key = parsed_args.key
-            if key:
-                message = current_remote.push(parsed_args.remote, key)
-                print(message)
-            else:
-                messages = current_remote.push(parsed_args.remote, key)
-                for message in messages:
-                    print(message)
+        path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
+        if path_to_remote is None:
+            print(BASE_REMOTE.message)
+            return
+
+        current_remote = get_corresponding_remote(path_to_remote)
+        key = parsed_args.key
+        if key:
+            message = current_remote.push(parsed_args.remote, key)
+            print(message)
         else:
-            print("error: supply remote to push to")
+            messages = current_remote.push(parsed_args.remote, key)
+            for message in messages:
+                print(message)
     else:
         print("error: not a surround project")
         print("error: goto project root directory")
 
 def parse_list_args(parsed_args):
     if is_surround_project():
-        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-        current_remote = get_corresponding_remote(remote)
-        if remote:
-            response = current_remote.list_(parsed_args.remote)
-            if isinstance(response, list):
-                for remote_file in response:
-                    print(remote_file)
-            else:
-                print(response)
+        path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
+        if path_to_remote is None:
+            print(BASE_REMOTE.message)
+            return
+
+        current_remote = get_corresponding_remote(path_to_remote)
+        response = current_remote.list_(parsed_args.remote)
+        if isinstance(response, list):
+            for remote_file in response:
+                print(remote_file)
         else:
-            print("error: supply remote to push to")
+            print(response)
     else:
         print("error: not a surround project")
         print("error: goto project root directory")
