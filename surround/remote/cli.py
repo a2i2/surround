@@ -124,7 +124,7 @@ def parse_add_args(parsed_args):
     if is_surround_project():
         remote = parsed_args.remote
         file_to_add = parsed_args.key
-        message = LOCAL.add(remote, file_to_add)
+        message = BASE_REMOTE.add(remote, file_to_add)
         print(message)
     else:
         print("error: not a surround project")

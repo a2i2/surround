@@ -35,7 +35,7 @@ class BaseRemote():
         if path is None:
             if what_to_write in read_config and name not in read_config[what_to_write]:
                 read_config[what_to_write].append(name)
-            else:
+            elif what_to_write not in read_config:
                 read_config[what_to_write] = [name]
         else:
             if what_to_write in read_config:
