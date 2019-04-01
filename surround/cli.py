@@ -157,6 +157,8 @@ def parse_lint_args(args):
             print("All checks passed")
 
 def parse_run_args(args):
+    logging.getLogger().setLevel(logging.INFO)
+
     deploy = {
         "new": {
             "dirs": [
@@ -166,7 +168,8 @@ def parse_run_args(args):
             "files" : [
                 ("{project_name}/config.yaml", "output:\n  text: Hello World"),
                 ("dodo.py", "")
-            ]
+            ],
+            "templates" : []
         }
     }
 
@@ -266,7 +269,7 @@ def parse_tool_args(parsed_args, remote_parser, tool):
         parse_init_args(parsed_args)
 
 def main():
-    logging.disable(logging.CRITICAL)
+    # logging.disable(logging.CRITICAL)
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
