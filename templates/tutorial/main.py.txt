@@ -22,7 +22,7 @@ def main():
     # Surround has a single stage to run, the ValidateData stage.
     # The __name__ enables Surround to automatically load the config.yaml
     # file and to configure the following paths: `output_path`,
-    # `data_path` and `model_path`.
+    # `data_path` and `models_path`.
     surround = Surround([ValidateData()], __name__)
 
     # Config is a dictionary with some utility functions for reading
