@@ -269,7 +269,6 @@ def parse_tool_args(parsed_args, remote_parser, tool):
         parse_init_args(parsed_args)
 
 def main():
-    # logging.disable(logging.CRITICAL)
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
