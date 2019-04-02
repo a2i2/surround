@@ -11,6 +11,12 @@ def task_build():
         'actions': ['docker build --tag=%s .' % IMAGE]
     }}
 
+def task_remove():
+    """Remove the Docker image for the current project"""
+    return {{
+        'actions': ['docker rmi %s -f' % IMAGE]
+    }}
+
 def task_dev():
     """Run the main task for the project"""
     return {{
