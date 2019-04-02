@@ -20,7 +20,8 @@ class HealthCheck(tornado.web.RequestHandler):
 
 class Upload(tornado.web.RequestHandler):
     def get_template_path(self):
-        return os.getcwd()
+        path_to_upload_dir = os.path.split(__file__)[0]
+        return path_to_upload_dir
 
     def get(self):
         print("info: started get request at /upload")
