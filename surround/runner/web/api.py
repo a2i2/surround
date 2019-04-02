@@ -34,7 +34,7 @@ class Predict(tornado.web.RequestHandler):
     def post(self):
         print("info: started post request at /predict")
         output = None
-        if self.wrapper.type_of_uploaded_object == AllowedTypes.IMAGE:
+        if self.wrapper.type_of_uploaded_object == AllowedTypes.FILE:
             fileinfo = self.request.files['data'][0]
             output = self.wrapper.process(fileinfo['body'])
         else:

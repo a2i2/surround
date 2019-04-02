@@ -118,12 +118,13 @@ class Surround(ABC):
         surround_data.thaw()
 
 class AllowedTypes(Enum):
-    JSON = "json"
-    IMAGE = "image"
+    JSON = ["application/json"]
+    FILE = ["file"]
 
 class Wrapper():
     def __init__(self, surround, type_of_uploaded_object=None):
         self.surround = surround
+        self.actual_type_of_uploaded_object = None
         if type_of_uploaded_object:
             self.type_of_uploaded_object = type_of_uploaded_object
         else:
@@ -136,6 +137,15 @@ class Wrapper():
 
     def validate(self):
         return self.validate_type_of_uploaded_object()
+        # TODO: Find a way to validate_actual_type_of_uploaded_object(), probably using mime type # pylint: disable=fixme
+
+    def validate_actual_type_of_uploaded_object(self):
+        for type_ in self.type_of_uploaded_object.value:
+            if self.actual_type_of_uploaded_object == type_:
+                return True
+        print("error: you selected input type as " + str(self.type_of_uploaded_object).split(".")[1])
+        print("error: input file is not " + str(self.type_of_uploaded_object).split(".")[1])
+        return False
 
     def validate_type_of_uploaded_object(self):
         for type_ in AllowedTypes:
