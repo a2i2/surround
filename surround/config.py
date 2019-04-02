@@ -17,7 +17,7 @@ class Config(Mapping):
             self._storage["project_root"] = project_root
             self._storage["output_path"] = os.path.join(project_root, "output")
             self._storage["data_path"] = os.path.join(project_root, "data")
-            self._storage["model_path"] = os.path.join(project_root, "models")
+            self._storage["models_path"] = os.path.join(project_root, "models")
 
             # Load project config
             config_path = os.path.join(project_root, os.path.basename(project_root), 'config.yaml')
