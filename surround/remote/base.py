@@ -24,7 +24,7 @@ class BaseRemote():
 
         if os.path.exists(file_):
             with open(file_, "r") as f:
-                read_config = yaml.load(f) or {}
+                read_config = yaml.safe_load(f) or {}
         else:
             read_config = {}
 
