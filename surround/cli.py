@@ -161,7 +161,7 @@ def parse_lint_args(args):
         if not errors and not warnings:
             print("All checks passed")
 
-def parse_run_args(args):
+def parse_run_args(args): # pylint: disable=too-many-branches
     logging.getLogger().setLevel(logging.INFO)
 
     deploy = {
@@ -178,9 +178,7 @@ def parse_run_args(args):
         }
     }
 
-    path = args.path
-    web = args.web
-    errors, warnings = Linter().check_project(deploy, path)
+    errors, warnings = Linter().check_project(deploy, args.path)
     if errors:
         print("Invalid Surround project")
     for e in errors + warnings:
@@ -191,7 +189,7 @@ def parse_run_args(args):
         else:
             task = 'list'
 
-        if web:
+        if args.web:
             obj = None
             loaded_class = None
             path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
@@ -222,8 +220,7 @@ def parse_run_args(args):
                 print("error: cannot load " + class_name + " from " + module_name)
                 return
 
-            app = api.make_app(obj)
-            app.listen(8888)
+            api.make_app(obj).listen(8888)
             print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
             print("Available endpoints:")
             print("* GET  /                 # Health check")
@@ -233,7 +230,7 @@ def parse_run_args(args):
             tornado.ioloop.IOLoop.current().start()
         else:
             print("Project tasks:")
-            run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
+            run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=args.path)
             run_process.wait()
 
 def parse_tutorial_args(args):
