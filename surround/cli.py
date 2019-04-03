@@ -12,6 +12,7 @@ try:
 except ImportError:
     pass
 
+from .surround import AllowedTypes
 from .remote import cli as remote_cli
 from .linter import Linter
 
@@ -208,7 +209,8 @@ def parse_run_args(args):
             print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
             print("Available endpoints:")
             print("* GET  /                 # Health check")
-            print("* GET  /upload           # Upload data")
+            if obj.type_of_uploaded_object == AllowedTypes.FILE:
+                print("* GET  /upload           # Upload data")
             print("* POST /predict          # Send data to the Surround pipeline")
             tornado.ioloop.IOLoop.current().start()
         else:

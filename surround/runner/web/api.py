@@ -39,9 +39,11 @@ class Predict(tornado.web.RequestHandler):
 
 def make_app(wrapper_object):
     predict_init_args = dict(wrapper=wrapper_object)
+    available_endpoints = []
+    available_endpoints.append((r"/", HealthCheck))
 
-    return tornado.web.Application([
-        (r"/", HealthCheck),
-        (r"/upload", Upload),
-        (r"/predict", Predict, predict_init_args),
-    ])
+    if wrapper_object.type_of_uploaded_object == AllowedTypes.FILE:
+        available_endpoints.append((r"/upload", Upload))
+
+    available_endpoints.append((r"/predict", Predict, predict_init_args))
+    return tornado.web.Application(available_endpoints)
