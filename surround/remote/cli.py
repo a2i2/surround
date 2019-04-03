@@ -122,7 +122,7 @@ def parse_add_args(parsed_args):
     if is_surround_project():
         remote = parsed_args.remote
         file_to_add = parsed_args.key
-        message = LOCAL.add(remote, file_to_add)
+        message = BASE_REMOTE.add(remote, file_to_add)
         print(message)
     else:
         print("error: not a surround project")
@@ -130,52 +130,61 @@ def parse_add_args(parsed_args):
 
 def parse_pull_args(parsed_args):
     if is_surround_project():
-        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-        if remote:
-            key = parsed_args.key
-            if key:
-                message = LOCAL.pull(parsed_args.remote, key)
-                print(message)
-            else:
-                messages = LOCAL.pull(parsed_args.remote, key)
-                for message in messages:
-                    print(message)
+        path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
+        if path_to_remote is None:
+            print(BASE_REMOTE.message)
+            return
+
+        current_remote = get_corresponding_remote(path_to_remote)
+        key = parsed_args.key
+        if key:
+            message = current_remote.pull(parsed_args.remote, key)
+            print(message)
         else:
-            print("error: supply remote to pull from")
+            messages = current_remote.pull(parsed_args.remote, key)
+            for message in messages:
+                print(message)
     else:
         print("error: not a surround project")
         print("error: goto project root directory")
 
 def parse_push_args(parsed_args):
     if is_surround_project():
-        remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-        if remote:
-            key = parsed_args.key
-            if key:
-                message = LOCAL.push(parsed_args.remote, key)
-                print(message)
-            else:
-                messages = LOCAL.push(parsed_args.remote, key)
-                for message in messages:
-                    print(message)
+        path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
+        if path_to_remote is None:
+            print(BASE_REMOTE.message)
+            return
+
+        current_remote = get_corresponding_remote(path_to_remote)
+        key = parsed_args.key
+        if key:
+            message = current_remote.push(parsed_args.remote, key)
+            print(message)
         else:
-            print("error: supply remote to push to")
+            messages = current_remote.push(parsed_args.remote, key)
+            for message in messages:
+                print(message)
     else:
         print("error: not a surround project")
         print("error: goto project root directory")
 
 def parse_list_args(parsed_args):
-    project_name = BASE_REMOTE.read_from_local_config("project-info", "project-name")
-    if project_name is None:
-        print("error: project name not present in config")
-        return
+    if is_surround_project():
+        path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
+        if path_to_remote is None:
+            print(BASE_REMOTE.message)
+            return
 
-    path_to_remote = BASE_REMOTE.read_from_config("remote", parsed_args.remote)
-    if path_to_remote:
-        os.makedirs(os.path.join(path_to_remote, project_name), exist_ok=True)
-        path_to_remote_files = os.path.join(path_to_remote, project_name)
-        remote_files = os.listdir(path_to_remote_files)
-        for remote_file in remote_files:
-            print(remote_file)
+        current_remote = get_corresponding_remote(path_to_remote)
+        response = current_remote.list_(parsed_args.remote)
+        if isinstance(response, list):
+            for remote_file in response:
+                print(remote_file)
+        else:
+            print(response)
     else:
-        print("error: no remote named " + parsed_args.remote)
+        print("error: not a surround project")
+        print("error: goto project root directory")
+
+def get_corresponding_remote(remote):
+    return LOCAL
