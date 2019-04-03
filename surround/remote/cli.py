@@ -3,14 +3,12 @@ from pathlib import Path
 
 from . import base
 from . import local
-from . import aws
 
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/26'
 
 BASE_REMOTE = base.BaseRemote()
 LOCAL = local.Local()
-AWS = aws.AWS()
 
 def is_surround_project():
     """Whether inside surround project root directory
@@ -189,6 +187,4 @@ def parse_list_args(parsed_args):
         print("error: goto project root directory")
 
 def get_corresponding_remote(remote):
-    if remote.startswith("s3://"):
-        return AWS
     return LOCAL
