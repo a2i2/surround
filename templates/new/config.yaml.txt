@@ -4,3 +4,10 @@ output:
 image: {project_name}
 company: yourcompany
 version: latest
+
+# Details of class inheriting from Wrapper
+wrapper-info:
+  # Present in module
+  module: wrapper
+  # Name of the class
+  class: PipelineWrapper

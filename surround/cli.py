@@ -4,7 +4,9 @@ import sys
 import inspect
 import logging
 import subprocess
+from pathlib import Path
 import pkg_resources
+import yaml
 
 try:
     import tornado.ioloop
@@ -99,11 +101,13 @@ def is_valid_name(aparser, arg):
     else:
         return arg
 
-def load_modules_from_path(path):
+def load_modules_from_path(path, module_name):
     """Import all modules from the given directory
 
     :param path: Path to the directory
     :type path: string
+    :param module_name: module to load
+    :type module_name: string
     """
     # Check and fix the path
     if path[-1:] != '/':
@@ -120,7 +124,7 @@ def load_modules_from_path(path):
     # Load all the files, check: https://github.com/dstil/surround/pull/68/commits/2175f1ae11ad903d6513e4f288d80d182499bf38
 
     # For now, just load the wrapper.py
-    modname = "wrapper"
+    modname = module_name
 
     # Import the module
     __import__(modname, globals(), locals(), ['*'])
@@ -175,7 +179,7 @@ def parse_run_args(args):
     }
 
     path = args.path
-    classname = args.web
+    web = args.web
     errors, warnings = Linter().check_project(deploy, path)
     if errors:
         print("Invalid Surround project")
@@ -187,21 +191,35 @@ def parse_run_args(args):
         else:
             task = 'list'
 
-        if classname:
+        if web:
             obj = None
             loaded_class = None
             path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
-            load_modules_from_path(path_to_modules)
-            for file_ in os.listdir(path_to_modules):
-                if file_.endswith(".py"):
-                    modulename = os.path.splitext(file_)[0]
-                    if modulename == "wrapper" and hasattr(sys.modules[modulename], classname):
-                        loaded_class = load_class_from_name(modulename, classname)
-                        obj = loaded_class()
-                        break
+            path_to_config = os.path.join(path_to_modules, "config.yaml")
+
+            if Path(path_to_config).exists():
+                with open(path_to_config, "r") as f:
+                    config = yaml.safe_load(f)
+                    module_name = config["wrapper-info"]["module"]
+                    class_name = config["wrapper-info"]["class"]
+            else:
+                print("error: config does not exist")
+                return
+
+            if Path(os.path.join(path_to_modules, module_name + ".py")).exists():
+                load_modules_from_path(path_to_modules, module_name)
+                if hasattr(sys.modules[module_name], class_name):
+                    loaded_class = load_class_from_name(module_name, class_name)
+                    obj = loaded_class()
+                else:
+                    print("error: " + module_name + " does not have " + class_name)
+                    return
+            else:
+                print("error: " + module_name + " does not exist")
+                return
 
             if obj is None:
-                print("error: " + classname + " not found in the module wrapper")
+                print("error: cannot load " + class_name + " from " + module_name)
                 return
 
             app = api.make_app(obj)
@@ -288,7 +306,7 @@ def main():
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
     run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
-    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper")
+    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
