@@ -151,10 +151,10 @@ class Wrapper():
         for type_ in AllowedTypes:
             if self.type_of_uploaded_object == type_:
                 return True
-        print("error: selected upload type not allowed")
-        print("Choose from: ")
+        LOGGER.info("error: selected upload type not allowed")
+        LOGGER.info("Choose from: ")
         for type_ in AllowedTypes:
-            print(type_)
+            LOGGER.info(type_)
         return False
 
     def process(self, input_data):
