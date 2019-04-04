@@ -202,33 +202,35 @@ def run_locally(args):
 def run_as_web():
     obj = None
     loaded_class = None
-    path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
-    path_to_config = os.path.join(path_to_modules, "config.yaml")
+    project_root = get_project_root(os.getcwd())
+    if project_root is not None:
+        path_to_modules = os.path.join(project_root, os.path.basename(project_root))
+        path_to_config = os.path.join(path_to_modules, "config.yaml")
 
-    if Path(path_to_config).exists():
-        with open(path_to_config, "r") as f:
-            config = yaml.safe_load(f)
-            module_name = config["wrapper-info"]["module"]
-            class_name = config["wrapper-info"]["class"]
-    else:
-        print("error: config does not exist")
-        return
-
-    if Path(os.path.join(path_to_modules, module_name + ".py")).exists():
-        load_modules_from_path(path_to_modules, module_name)
-        if hasattr(sys.modules[module_name], class_name):
-            loaded_class = load_class_from_name(module_name, class_name)
-            obj = loaded_class()
+        if Path(path_to_config).exists():
+            with open(path_to_config, "r") as f:
+                config = yaml.safe_load(f)
+                module_name = config["wrapper-info"]["module"]
+                class_name = config["wrapper-info"]["class"]
         else:
-            print("error: " + module_name + " does not have " + class_name)
+            print("error: config does not exist")
             return
-    else:
-        print("error: " + module_name + " does not exist")
-        return
 
-    if obj is None:
-        print("error: cannot load " + class_name + " from " + module_name)
-        return
+        if Path(os.path.join(path_to_modules, module_name + ".py")).exists():
+            load_modules_from_path(path_to_modules, module_name)
+            if hasattr(sys.modules[module_name], class_name):
+                loaded_class = load_class_from_name(module_name, class_name)
+                obj = loaded_class()
+            else:
+                print("error: " + module_name + " does not have " + class_name)
+                return
+        else:
+            print("error: " + module_name + " does not exist")
+            return
+
+        if obj is None:
+            print("error: cannot load " + class_name + " from " + module_name)
+            return
 
     api.make_app(obj).listen(8888)
     print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
@@ -290,6 +292,19 @@ def parse_tool_args(parsed_args, remote_parser, tool):
         remote_cli.parse_list_args(parsed_args)
     else:
         parse_init_args(parsed_args)
+
+def get_project_root(current_directory):
+    home = str(Path.home())
+
+    while True:
+        list_ = os.listdir(current_directory)
+        parent_directory = os.path.dirname(current_directory)
+        if current_directory in (home, parent_directory):
+            print("Not a surround project")
+            break
+        elif ".surround" in list_:
+            return current_directory
+        current_directory = parent_directory
 
 def main():
 
