@@ -7,6 +7,8 @@ version: latest
 
 # Details of class inheriting from Wrapper
 wrapper-info:
+  # Name of the package
+  package: {project_name}
   # Present in module
   module: wrapper
   # Name of the class

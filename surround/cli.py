@@ -210,14 +210,15 @@ def run_as_web():
         if Path(path_to_config).exists():
             with open(path_to_config, "r") as f:
                 config = yaml.safe_load(f)
+                package_name = config["wrapper-info"]["package"]
                 module_name = config["wrapper-info"]["module"]
                 class_name = config["wrapper-info"]["class"]
         else:
             print("error: config does not exist")
             return
 
-        if Path(os.path.join(path_to_modules, module_name + ".py")).exists():
-            load_modules_from_path(path_to_modules, module_name)
+        if Path(os.path.join(project_root, package_name, module_name + ".py")).exists():
+            load_modules_from_path(os.path.join(project_root, package_name), module_name)
             if hasattr(sys.modules[module_name], class_name):
                 loaded_class = load_class_from_name(module_name, class_name)
                 obj = loaded_class()
