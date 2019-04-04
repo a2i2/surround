@@ -161,7 +161,7 @@ def parse_lint_args(args):
         if not errors and not warnings:
             print("All checks passed")
 
-def parse_run_args(args): # pylint: disable=too-many-branches
+def parse_run_args(args):
     logging.getLogger().setLevel(logging.INFO)
 
     deploy = {
@@ -184,54 +184,60 @@ def parse_run_args(args): # pylint: disable=too-many-branches
     for e in errors + warnings:
         print(e)
     if not errors:
-        if args.task:
-            task = args.task
-        else:
-            task = 'list'
-
         if args.web:
-            obj = None
-            loaded_class = None
-            path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
-            path_to_config = os.path.join(path_to_modules, "config.yaml")
-
-            if Path(path_to_config).exists():
-                with open(path_to_config, "r") as f:
-                    config = yaml.safe_load(f)
-                    module_name = config["wrapper-info"]["module"]
-                    class_name = config["wrapper-info"]["class"]
-            else:
-                print("error: config does not exist")
-                return
-
-            if Path(os.path.join(path_to_modules, module_name + ".py")).exists():
-                load_modules_from_path(path_to_modules, module_name)
-                if hasattr(sys.modules[module_name], class_name):
-                    loaded_class = load_class_from_name(module_name, class_name)
-                    obj = loaded_class()
-                else:
-                    print("error: " + module_name + " does not have " + class_name)
-                    return
-            else:
-                print("error: " + module_name + " does not exist")
-                return
-
-            if obj is None:
-                print("error: cannot load " + class_name + " from " + module_name)
-                return
-
-            api.make_app(obj).listen(8888)
-            print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
-            print("Available endpoints:")
-            print("* GET  /                 # Health check")
-            if obj.type_of_uploaded_object == AllowedTypes.FILE:
-                print("* GET  /upload           # Upload data")
-            print("* POST /predict          # Send data to the Surround pipeline")
-            tornado.ioloop.IOLoop.current().start()
+            run_as_web()
         else:
-            print("Project tasks:")
-            run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=args.path)
-            run_process.wait()
+            run_locally(args)
+
+def run_locally(args):
+    if args.task:
+        task = args.task
+    else:
+        task = 'list'
+
+    print("Project tasks:")
+    run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=args.path)
+    run_process.wait()
+
+def run_as_web():
+    obj = None
+    loaded_class = None
+    path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
+    path_to_config = os.path.join(path_to_modules, "config.yaml")
+
+    if Path(path_to_config).exists():
+        with open(path_to_config, "r") as f:
+            config = yaml.safe_load(f)
+            module_name = config["wrapper-info"]["module"]
+            class_name = config["wrapper-info"]["class"]
+    else:
+        print("error: config does not exist")
+        return
+
+    if Path(os.path.join(path_to_modules, module_name + ".py")).exists():
+        load_modules_from_path(path_to_modules, module_name)
+        if hasattr(sys.modules[module_name], class_name):
+            loaded_class = load_class_from_name(module_name, class_name)
+            obj = loaded_class()
+        else:
+            print("error: " + module_name + " does not have " + class_name)
+            return
+    else:
+        print("error: " + module_name + " does not exist")
+        return
+
+    if obj is None:
+        print("error: cannot load " + class_name + " from " + module_name)
+        return
+
+    api.make_app(obj).listen(8888)
+    print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
+    print("Available endpoints:")
+    print("* GET  /                 # Health check")
+    if obj.type_of_uploaded_object == AllowedTypes.FILE:
+        print("* GET  /upload           # Upload data")
+    print("* POST /predict          # Send data to the Surround pipeline")
+    tornado.ioloop.IOLoop.current().start()
 
 def parse_tutorial_args(args):
     new_dir = os.path.join(args.path, "tutorial")
