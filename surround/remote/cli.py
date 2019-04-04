@@ -137,16 +137,20 @@ def parse_remote_args(remote_parser, parsed_args):
 
 def parse_add_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         remote = parsed_args.remote
         file_to_add = parsed_args.key
         message = BASE_REMOTE.add(remote, file_to_add)
         print(message)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def parse_pull_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
         if path_to_remote is None:
             print(BASE_REMOTE.message)
@@ -161,12 +165,14 @@ def parse_pull_args(parsed_args):
             messages = current_remote.pull(parsed_args.remote, key)
             for message in messages:
                 print(message)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def parse_push_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
         if path_to_remote is None:
             print(BASE_REMOTE.message)
@@ -181,9 +187,9 @@ def parse_push_args(parsed_args):
             messages = current_remote.push(parsed_args.remote, key)
             for message in messages:
                 print(message)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def parse_list_args(parsed_args):
     if is_surround_project():
@@ -204,7 +210,6 @@ def parse_list_args(parsed_args):
         os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def get_corresponding_remote(remote):
     return LOCAL
