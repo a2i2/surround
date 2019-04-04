@@ -213,7 +213,7 @@ def run_locally(args):
 def run_as_web():
     obj = None
     loaded_class = None
-    project_root = get_project_root(os.getcwd())
+    project_root = remote_cli.get_project_root_from_current_dir()
     if project_root is not None:
         path_to_modules = os.path.join(project_root, os.path.basename(project_root))
         path_to_config = os.path.join(path_to_modules, "config.yaml")
@@ -244,6 +244,8 @@ def run_as_web():
         if obj is None:
             print("error: cannot load " + class_name + " from " + module_name)
             return
+    else:
+        print("error: not a surround project")
 
     api.make_app(obj).listen(8888)
     print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
@@ -296,19 +298,6 @@ def parse_tool_args(parsed_args, remote_parser, tool):
         remote_cli.parse_list_args(parsed_args)
     else:
         parse_init_args(parsed_args)
-
-def get_project_root(current_directory):
-    home = str(Path.home())
-
-    while True:
-        list_ = os.listdir(current_directory)
-        parent_directory = os.path.dirname(current_directory)
-        if current_directory in (home, parent_directory):
-            print("Not a surround project")
-            break
-        elif ".surround" in list_:
-            return current_directory
-        current_directory = parent_directory
 
 def main():
 
