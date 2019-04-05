@@ -91,7 +91,10 @@ def add_remote(remote_parser, parsed_args, type_):
             write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"), type_)
         else:
             if is_surround_project():
+                actual_current_dir = os.getcwd()
+                os.chdir(get_project_root_from_current_dir())
                 write_remote_config(parsed_args, remote_parser, ".surround/config.yaml", type_)
+                os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
                 print("error: goto project root directory")
@@ -129,11 +132,13 @@ def parse_remote_args(remote_parser, parsed_args):
             print_remote_info(parsed_args, remotes)
         else:
             if is_surround_project():
+                actual_current_dir = os.getcwd()
+                os.chdir(get_project_root_from_current_dir())
                 remotes = BASE_REMOTE.read_all_from_local_config("remote")
                 print_remote_info(parsed_args, remotes)
+                os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
-                print("error: goto project root directory")
 
 def parse_add_args(parsed_args):
     if is_surround_project():
