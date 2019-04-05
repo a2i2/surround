@@ -175,20 +175,6 @@ def parse_lint_args(args):
 def parse_run_args(args):
     logging.getLogger().setLevel(logging.INFO)
 
-    deploy = {
-        "new": {
-            "dirs": [
-                "models",
-                "{project_name}",
-            ],
-            "files" : [
-                ("{project_name}/config.yaml", "output:\n  text: Hello World"),
-                ("dodo.py", "")
-            ],
-            "templates" : []
-        }
-    }
-
     if remote_cli.is_surround_project():
         actual_current_dir = os.getcwd()
         os.chdir(remote_cli.get_project_root_from_current_dir())
