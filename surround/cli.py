@@ -189,16 +189,16 @@ def parse_run_args(args):
         }
     }
 
-    errors, warnings = Linter().check_project(deploy, args.path)
-    if errors:
-        print("Invalid Surround project")
-    for e in errors + warnings:
-        print(e)
-    if not errors:
+    if remote_cli.is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(remote_cli.get_project_root_from_current_dir())
         if args.web:
             run_as_web()
         else:
             run_locally(args)
+        os.chdir(actual_current_dir)
+    else:
+        print("error: not a surround project")
 
 def run_locally(args):
     if args.task:
@@ -207,7 +207,7 @@ def run_locally(args):
         task = 'list'
 
     print("Project tasks:")
-    run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=args.path)
+    run_process = subprocess.Popen(['python3', '-m', 'doit', task])
     run_process.wait()
 
 def run_as_web():
@@ -311,7 +311,6 @@ def main():
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
-    run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
     run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")

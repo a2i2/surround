@@ -97,7 +97,6 @@ def add_remote(remote_parser, parsed_args, type_):
                 os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
-                print("error: goto project root directory")
 
 def print_remote_info(parsed_args, remotes):
     verbose = parsed_args.verbose
