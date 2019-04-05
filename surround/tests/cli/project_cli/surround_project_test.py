@@ -55,6 +55,27 @@ class InitTest(unittest.TestCase):
         process = subprocess.run(['surround', 'add', 'test_remote', 'a.txt'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         self.assertEqual(process.stdout, "info: file added successfully\n")
 
+    def test_pull_from_subdir(self):
+        process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE)
+        self.assertEqual(process.stdout, "error: not a surround project\n")
+
+        process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        self.assertEqual(process.stdout, "error: no remote named test_remote\n")
+
+        process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        self.assertEqual(process.stdout, "error: no remote named test_remote\n")
+
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote', '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+
+        process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        self.assertEqual(process.stdout, "error: file does not exist\n")
+
+        process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        self.assertEqual(process.stdout, "error: file does not exist\n")
+
+        process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.txt'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        self.assertEqual(process.stdout, "info: test_remote/a.txt already exists\n")
+
     def tearDown(self):
         # Remove residual directories and files
         subprocess.run(['rm', '-r', './temp'], encoding='utf-8', stdout=subprocess.PIPE)
