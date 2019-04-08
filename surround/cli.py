@@ -210,9 +210,10 @@ def run_as_web():
         if Path(path_to_config).exists():
             with open(path_to_config, "r") as f:
                 config = yaml.safe_load(f)
-                package_name = config["wrapper-info"]["package"]
-                module_name = config["wrapper-info"]["module"]
-                class_name = config["wrapper-info"]["class"]
+                wrapper_info = config['wrapper-info'].split('.')
+                package_name = '/'.join(wrapper_info[:-2])
+                module_name = wrapper_info[-2:][0]
+                class_name = wrapper_info[-2:][1]
         else:
             print("error: config does not exist")
             return
