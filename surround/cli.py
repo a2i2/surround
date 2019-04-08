@@ -228,16 +228,6 @@ def parse_run_args(args):
             run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
             run_process.wait()
 
-def parse_tutorial_args(args):
-    new_dir = os.path.join(args.path, "tutorial")
-    if process(new_dir, PROJECTS["new"], "tutorial", None, "tutorial"):
-        print("The tutorial project has been created.\n")
-        print("Start by reading the README.md file at:")
-        print(os.path.abspath(os.path.join(args.path, "tutorial", "README.md")))
-    else:
-        print("Directory %s already exists" % new_dir)
-
-
 def parse_init_args(args):
     if allowed_to_access_dir(args.path):
         if args.project_name:
@@ -264,9 +254,7 @@ def parse_init_args(args):
         print("error: permission denied")
 
 def parse_tool_args(parsed_args, remote_parser, tool):
-    if tool == "tutorial":
-        parse_tutorial_args(parsed_args)
-    elif tool == "lint":
+    if tool == "lint":
         parse_lint_args(parsed_args)
     elif tool == "run":
         parse_run_args(parsed_args)
@@ -287,11 +275,6 @@ def main():
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
-
-
-    tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
-    tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
-    tutorial_parser.add_argument('path', help="Path for creating the tutorial project", nargs='?', default="./")
 
     init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
     init_parser.add_argument('path', help="Path for creating a Surround project", nargs='?', default="./")
