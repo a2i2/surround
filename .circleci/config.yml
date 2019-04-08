@@ -32,13 +32,6 @@ jobs:
 
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
 
-            mkdir ./temp
-            surround init ./temp -p project -d "A test project"
-
-            cd ../project
-            python3 -m project
-            [ -f ./output/output.txt ]
-
   release:
     docker:
       - image: circleci/python:latest
