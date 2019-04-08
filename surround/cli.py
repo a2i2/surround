@@ -33,7 +33,7 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround=={version}\ntornado==6.0.1"),
+            ("requirements.txt", "surround=={version}"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
