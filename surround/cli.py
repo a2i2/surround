@@ -93,6 +93,16 @@ def is_valid_dir(aparser, arg):
     else:
         return arg
 
+def allowed_to_access_dir(path):
+    try:
+        os.makedirs(path, exist_ok=True)
+    except OSError:
+        print("error: can't write to " + path)
+
+    if os.access(path, os.R_OK | os.W_OK | os.F_OK | os.X_OK):
+        return True
+    return False
+
 def is_valid_name(aparser, arg):
     if not arg.isalpha() or not arg.islower():
         aparser.error("Name %s must be lowercase letters" % arg)
@@ -229,26 +239,29 @@ def parse_tutorial_args(args):
 
 
 def parse_init_args(args):
-    if args.project_name:
-        project_name = args.project_name
-    else:
-        while True:
-            project_name = input("Name of project: ")
-            if not project_name.isalpha() or not project_name.islower():
-                print("Project name requires lowercase letters only")
-            else:
-                break
+    if allowed_to_access_dir(args.path):
+        if args.project_name:
+            project_name = args.project_name
+        else:
+            while True:
+                project_name = input("Name of project: ")
+                if not project_name.isalpha() or not project_name.islower():
+                    print("error: project name requires lowercase letters only")
+                else:
+                    break
 
-    if args.description:
-        project_description = args.description
-    else:
-        project_description = input("What is the purpose of this project?: ")
+        if args.description:
+            project_description = args.description
+        else:
+            project_description = input("What is the purpose of this project?: ")
 
-    new_dir = os.path.join(args.path, project_name)
-    if process(new_dir, PROJECTS["new"], project_name, project_description, "new"):
-        print("Project created at %s" % os.path.join(os.path.abspath(args.path), project_name))
+        new_dir = os.path.join(args.path, project_name)
+        if process(new_dir, PROJECTS["new"], project_name, project_description, "new"):
+            print("info: project created at %s" % os.path.join(os.path.abspath(args.path), project_name))
+        else:
+            print("error: directory %s already exists" % new_dir)
     else:
-        print("Directory %s already exists" % new_dir)
+        print("error: permission denied")
 
 def parse_tool_args(parsed_args, remote_parser, tool):
     if tool == "tutorial":
@@ -278,10 +291,10 @@ def main():
 
     tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
     tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
-    tutorial_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating the tutorial project", nargs='?', default="./")
+    tutorial_parser.add_argument('path', help="Path for creating the tutorial project", nargs='?', default="./")
 
     init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
-    init_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for creating a Surround project", nargs='?', default="./")
+    init_parser.add_argument('path', help="Path for creating a Surround project", nargs='?', default="./")
     init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
     init_parser.add_argument('-d', '--description', help="A description for the project")
 

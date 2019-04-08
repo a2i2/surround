@@ -12,7 +12,7 @@ class RemoteTest(unittest.TestCase):
         self.assertEqual(process.stdout, "error: not a surround project\nerror: goto project root directory\n")
 
         process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp'], encoding='utf-8', stdout=subprocess.PIPE)
-        self.assertEqual(process.stdout, "Project created at " + os.getcwd() + "/temp\n")
+        self.assertEqual(process.stdout, "info: project created at " + os.getcwd() + "/temp\n")
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
@@ -22,7 +22,7 @@ class RemoteTest(unittest.TestCase):
 
     def test_remote_add(self):
         process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp'], encoding='utf-8', stdout=subprocess.PIPE)
-        self.assertEqual(process.stdout, "Project created at " + os.getcwd() + "/temp\n")
+        self.assertEqual(process.stdout, "info: project created at " + os.getcwd() + "/temp\n")
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
