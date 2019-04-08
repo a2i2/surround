@@ -94,7 +94,12 @@ def is_valid_dir(aparser, arg):
         return arg
 
 def allowed_to_access_dir(path):
-    if os.access(path, os.W_OK | os.X_OK):
+    try:
+        os.makedirs(path, exist_ok=True)
+    except OSError:
+        print("error: can't write to " + path)
+
+    if os.access(path, os.R_OK | os.W_OK | os.F_OK | os.X_OK):
         return True
     return False
 
