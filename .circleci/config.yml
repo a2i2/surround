@@ -17,19 +17,24 @@ jobs:
       - run:
           name: Run test for Python << parameters.version >>
           command: |
+            # Install surround
             sudo python setup.py install
+
+            # Run tests
             sudo python setup.py test
 
+            # Install requirements
             sudo pip3 install pylint==2.3.0
             sudo pip3 install Flask==1.0.2
             sudo pip3 install gunicorn==19.9.0
             sudo pip3 install tornado==6.0.1
 
+            # Run pylint tests
             pylint setup.py
-
             find surround/ -iname "*.py" | xargs pylint
             find examples/ -iname "*.py" | xargs pylint
 
+            # Run examples
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
 
   release:
