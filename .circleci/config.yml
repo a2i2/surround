@@ -33,12 +33,7 @@ jobs:
             ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
 
             mkdir ./temp
-            surround tutorial ./temp
             surround init ./temp -p project -d "A test project"
-
-            cd ./temp/tutorial
-            python3 -m tutorial
-            [ -f ./output/output.txt ]
 
             cd ../project
             python3 -m project
