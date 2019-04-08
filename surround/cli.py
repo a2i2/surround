@@ -299,7 +299,7 @@ def main():
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push", "list"]
+    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
