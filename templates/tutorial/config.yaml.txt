@@ -1,4 +1,0 @@
-output:
-  text: Hello World
-
-image: {project_name}

@@ -254,16 +254,6 @@ def run_as_web():
     print("* POST /predict          # Send data to the Surround pipeline")
     tornado.ioloop.IOLoop.current().start()
 
-def parse_tutorial_args(args):
-    new_dir = os.path.join(args.path, "tutorial")
-    if process(new_dir, PROJECTS["new"], "tutorial", None, "tutorial"):
-        print("The tutorial project has been created.\n")
-        print("Start by reading the README.md file at:")
-        print(os.path.abspath(os.path.join(args.path, "tutorial", "README.md")))
-    else:
-        print("Directory %s already exists" % new_dir)
-
-
 def parse_init_args(args):
     if allowed_to_access_dir(args.path):
         if args.project_name:
@@ -290,9 +280,7 @@ def parse_init_args(args):
         print("error: permission denied")
 
 def parse_tool_args(parsed_args, remote_parser, tool):
-    if tool == "tutorial":
-        parse_tutorial_args(parsed_args)
-    elif tool == "lint":
+    if tool == "lint":
         parse_lint_args(parsed_args)
     elif tool == "run":
         parse_run_args(parsed_args)
@@ -327,11 +315,6 @@ def main():
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
 
-
-    tutorial_parser = sub_parser.add_parser('tutorial', help="Create the tutorial project")
-    tutorial_parser.add_argument('tutorial', help="Create the Surround tutorial project", action='store_true')
-    tutorial_parser.add_argument('path', help="Path for creating the tutorial project", nargs='?', default="./")
-
     init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
     init_parser.add_argument('path', help="Path for creating a Surround project", nargs='?', default="./")
     init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
@@ -355,7 +338,7 @@ def main():
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "tutorial", "lint", "run", "remote", "add", "pull", "push", "list"]
+    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
