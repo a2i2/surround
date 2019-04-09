@@ -11,11 +11,28 @@ BASE_REMOTE = base.BaseRemote()
 LOCAL = local.Local()
 
 def is_surround_project():
-    """Whether inside surround project root directory
+    """Whether inside surround project
     Check for the .surround folder
     """
-    file_ = Path(".surround/config.yaml")
-    return file_.exists()
+    dir_ = get_project_root_from_current_dir()
+    if dir_ is None:
+        return False
+    return True
+
+def get_project_root_from_current_dir():
+    return get_project_root(os.getcwd())
+
+def get_project_root(current_directory):
+    home = str(Path.home())
+
+    while True:
+        list_ = os.listdir(current_directory)
+        parent_directory = os.path.dirname(current_directory)
+        if current_directory in (home, parent_directory):
+            break
+        elif ".surround" in list_:
+            return current_directory
+        current_directory = parent_directory
 
 def add_remote_parser(sub_parser):
     remote_parser = sub_parser.add_parser('remote', help="Initialise a new remote")
@@ -74,10 +91,12 @@ def add_remote(remote_parser, parsed_args, type_):
             write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"), type_)
         else:
             if is_surround_project():
+                actual_current_dir = os.getcwd()
+                os.chdir(get_project_root_from_current_dir())
                 write_remote_config(parsed_args, remote_parser, ".surround/config.yaml", type_)
+                os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
-                print("error: goto project root directory")
 
 def print_remote_info(parsed_args, remotes):
     verbose = parsed_args.verbose
@@ -112,24 +131,30 @@ def parse_remote_args(remote_parser, parsed_args):
             print_remote_info(parsed_args, remotes)
         else:
             if is_surround_project():
+                actual_current_dir = os.getcwd()
+                os.chdir(get_project_root_from_current_dir())
                 remotes = BASE_REMOTE.read_all_from_local_config("remote")
                 print_remote_info(parsed_args, remotes)
+                os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
-                print("error: goto project root directory")
 
 def parse_add_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         remote = parsed_args.remote
         file_to_add = parsed_args.key
         message = BASE_REMOTE.add(remote, file_to_add)
         print(message)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def parse_pull_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
         if path_to_remote is None:
             print(BASE_REMOTE.message)
@@ -144,12 +169,14 @@ def parse_pull_args(parsed_args):
             messages = current_remote.pull(parsed_args.remote, key)
             for message in messages:
                 print(message)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def parse_push_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
         if path_to_remote is None:
             print(BASE_REMOTE.message)
@@ -164,12 +191,14 @@ def parse_push_args(parsed_args):
             messages = current_remote.push(parsed_args.remote, key)
             for message in messages:
                 print(message)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def parse_list_args(parsed_args):
     if is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(get_project_root_from_current_dir())
         path_to_remote = BASE_REMOTE.get_path_to_remote(parsed_args.remote)
         if path_to_remote is None:
             print(BASE_REMOTE.message)
@@ -182,9 +211,9 @@ def parse_list_args(parsed_args):
                 print(remote_file)
         else:
             print(response)
+        os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
-        print("error: goto project root directory")
 
 def get_corresponding_remote(remote):
     return LOCAL

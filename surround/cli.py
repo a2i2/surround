@@ -175,30 +175,16 @@ def parse_lint_args(args):
 def parse_run_args(args):
     logging.getLogger().setLevel(logging.INFO)
 
-    deploy = {
-        "new": {
-            "dirs": [
-                "models",
-                "{project_name}",
-            ],
-            "files" : [
-                ("{project_name}/config.yaml", "output:\n  text: Hello World"),
-                ("dodo.py", "")
-            ],
-            "templates" : []
-        }
-    }
-
-    errors, warnings = Linter().check_project(deploy, args.path)
-    if errors:
-        print("Invalid Surround project")
-    for e in errors + warnings:
-        print(e)
-    if not errors:
+    if remote_cli.is_surround_project():
+        actual_current_dir = os.getcwd()
+        os.chdir(remote_cli.get_project_root_from_current_dir())
         if args.web:
             run_as_web()
         else:
             run_locally(args)
+        os.chdir(actual_current_dir)
+    else:
+        print("error: not a surround project")
 
 def run_locally(args):
     if args.task:
@@ -207,13 +193,13 @@ def run_locally(args):
         task = 'list'
 
     print("Project tasks:")
-    run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=args.path)
+    run_process = subprocess.Popen(['python3', '-m', 'doit', task])
     run_process.wait()
 
 def run_as_web():
     obj = None
     loaded_class = None
-    project_root = get_project_root(os.getcwd())
+    project_root = remote_cli.get_project_root_from_current_dir()
     if project_root is not None:
         path_to_modules = os.path.join(project_root, os.path.basename(project_root))
         path_to_config = os.path.join(path_to_modules, "config.yaml")
@@ -244,6 +230,8 @@ def run_as_web():
         if obj is None:
             print("error: cannot load " + class_name + " from " + module_name)
             return
+    else:
+        print("error: not a surround project")
 
     api.make_app(obj).listen(8888)
     print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
@@ -297,19 +285,6 @@ def parse_tool_args(parsed_args, remote_parser, tool):
     else:
         parse_init_args(parsed_args)
 
-def get_project_root(current_directory):
-    home = str(Path.home())
-
-    while True:
-        list_ = os.listdir(current_directory)
-        parent_directory = os.path.dirname(current_directory)
-        if current_directory in (home, parent_directory):
-            print("Not a surround project")
-            break
-        elif ".surround" in list_:
-            return current_directory
-        current_directory = parent_directory
-
 def main():
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
@@ -322,7 +297,6 @@ def main():
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
-    run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
     run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")

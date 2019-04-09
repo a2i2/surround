@@ -1,4 +1,5 @@
 import os
+import shutil
 import unittest
 import subprocess
 
@@ -19,4 +20,4 @@ class InitTest(unittest.TestCase):
 
     def tearDown(self):
         # Remove residual files
-        subprocess.run(['rm', '-r', './temp'], encoding='utf-8', stdout=subprocess.PIPE)
+        shutil.rmtree('temp')
