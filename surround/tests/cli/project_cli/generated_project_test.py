@@ -1,3 +1,6 @@
+import os
+import shutil
+from pathlib import Path
 import unittest
 import subprocess
 
@@ -6,9 +9,9 @@ class InitTest(unittest.TestCase):
     def setUp(self):
         subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp'], encoding='utf-8', stdout=subprocess.PIPE)
 
-        subprocess.run(['mkdir', 'remote'], encoding='utf-8', stdout=subprocess.PIPE)
-        subprocess.run(['mkdir', 'test_remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
-        subprocess.run(['touch', 'a.txt'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/test_remote')
+        os.makedirs('remote')
+        os.makedirs('temp/test_remote')
+        Path('temp/test_remote/a.txt').touch()
 
     def test_run_from_subdir(self):
         process = subprocess.run(['surround', 'run'], encoding='utf-8', stdout=subprocess.PIPE)
@@ -127,5 +130,5 @@ class InitTest(unittest.TestCase):
 
     def tearDown(self):
         # Remove residual directories and files
-        subprocess.run(['rm', '-r', './temp'], encoding='utf-8', stdout=subprocess.PIPE)
-        subprocess.run(['rm', '-r', './remote'], encoding='utf-8', stdout=subprocess.PIPE)
+        shutil.rmtree('temp')
+        shutil.rmtree('remote')
