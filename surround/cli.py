@@ -4,7 +4,9 @@ import sys
 import inspect
 import logging
 import subprocess
+from pathlib import Path
 import pkg_resources
+import yaml
 
 try:
     import tornado.ioloop
@@ -109,11 +111,13 @@ def is_valid_name(aparser, arg):
     else:
         return arg
 
-def load_modules_from_path(path):
+def load_modules_from_path(path, module_name):
     """Import all modules from the given directory
 
     :param path: Path to the directory
     :type path: string
+    :param module_name: module to load
+    :type module_name: string
     """
     # Check and fix the path
     if path[-1:] != '/':
@@ -130,7 +134,7 @@ def load_modules_from_path(path):
     # Load all the files, check: https://github.com/dstil/surround/pull/68/commits/2175f1ae11ad903d6513e4f288d80d182499bf38
 
     # For now, just load the wrapper.py
-    modname = "wrapper"
+    modname = module_name
 
     # Import the module
     __import__(modname, globals(), locals(), ['*'])
@@ -184,49 +188,70 @@ def parse_run_args(args):
         }
     }
 
-    path = args.path
-    classname = args.web
-    errors, warnings = Linter().check_project(deploy, path)
+    errors, warnings = Linter().check_project(deploy, args.path)
     if errors:
         print("Invalid Surround project")
     for e in errors + warnings:
         print(e)
     if not errors:
-        if args.task:
-            task = args.task
+        if args.web:
+            run_as_web()
         else:
-            task = 'list'
+            run_locally(args)
 
-        if classname:
-            obj = None
-            loaded_class = None
-            path_to_modules = os.path.join(os.getcwd(), os.path.basename(os.getcwd()))
-            load_modules_from_path(path_to_modules)
-            for file_ in os.listdir(path_to_modules):
-                if file_.endswith(".py"):
-                    modulename = os.path.splitext(file_)[0]
-                    if modulename == "wrapper" and hasattr(sys.modules[modulename], classname):
-                        loaded_class = load_class_from_name(modulename, classname)
-                        obj = loaded_class()
-                        break
+def run_locally(args):
+    if args.task:
+        task = args.task
+    else:
+        task = 'list'
 
-            if obj is None:
-                print("error: " + classname + " not found in the module wrapper")
+    print("Project tasks:")
+    run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=args.path)
+    run_process.wait()
+
+def run_as_web():
+    obj = None
+    loaded_class = None
+    project_root = get_project_root(os.getcwd())
+    if project_root is not None:
+        path_to_modules = os.path.join(project_root, os.path.basename(project_root))
+        path_to_config = os.path.join(path_to_modules, "config.yaml")
+
+        if Path(path_to_config).exists():
+            with open(path_to_config, "r") as f:
+                config = yaml.safe_load(f)
+                wrapper_info = config['wrapper-info'].split('.')
+                package_name = '/'.join(wrapper_info[:-2])
+                module_name = wrapper_info[-2:][0]
+                class_name = wrapper_info[-2:][1]
+        else:
+            print("error: config does not exist")
+            return
+
+        if Path(os.path.join(project_root, package_name, module_name + ".py")).exists():
+            load_modules_from_path(os.path.join(project_root, package_name), module_name)
+            if hasattr(sys.modules[module_name], class_name):
+                loaded_class = load_class_from_name(module_name, class_name)
+                obj = loaded_class()
+            else:
+                print("error: " + module_name + " does not have " + class_name)
                 return
-
-            app = api.make_app(obj)
-            app.listen(8888)
-            print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
-            print("Available endpoints:")
-            print("* GET  /                 # Health check")
-            if obj.type_of_uploaded_object == AllowedTypes.FILE:
-                print("* GET  /upload           # Upload data")
-            print("* POST /predict          # Send data to the Surround pipeline")
-            tornado.ioloop.IOLoop.current().start()
         else:
-            print("Project tasks:")
-            run_process = subprocess.Popen(['python3', '-m', 'doit', task], cwd=path)
-            run_process.wait()
+            print("error: " + module_name + " does not exist")
+            return
+
+        if obj is None:
+            print("error: cannot load " + class_name + " from " + module_name)
+            return
+
+    api.make_app(obj).listen(8888)
+    print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
+    print("Available endpoints:")
+    print("* GET  /                 # Health check")
+    if obj.type_of_uploaded_object == AllowedTypes.FILE:
+        print("* GET  /upload           # Upload data")
+    print("* POST /predict          # Send data to the Surround pipeline")
+    tornado.ioloop.IOLoop.current().start()
 
 def parse_tutorial_args(args):
     new_dir = os.path.join(args.path, "tutorial")
@@ -283,6 +308,19 @@ def parse_tool_args(parsed_args, remote_parser, tool):
     else:
         parse_init_args(parsed_args)
 
+def get_project_root(current_directory):
+    home = str(Path.home())
+
+    while True:
+        list_ = os.listdir(current_directory)
+        parent_directory = os.path.dirname(current_directory)
+        if current_directory in (home, parent_directory):
+            print("Not a surround project")
+            break
+        elif ".surround" in list_:
+            return current_directory
+        current_directory = parent_directory
+
 def main():
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
@@ -301,7 +339,7 @@ def main():
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
     run_parser.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path to a Surround project", nargs='?', default="./")
-    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper")
+    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
