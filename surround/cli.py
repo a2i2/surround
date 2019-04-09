@@ -33,7 +33,7 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround=={version}\ntornado==6.0.1"),
+            ("requirements.txt", "surround=={version}"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
@@ -233,14 +233,18 @@ def run_as_web():
     else:
         print("error: not a surround project")
 
-    api.make_app(obj).listen(8888)
-    print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
-    print("Available endpoints:")
-    print("* GET  /                 # Health check")
-    if obj.type_of_uploaded_object == AllowedTypes.FILE:
-        print("* GET  /upload           # Upload data")
-    print("* POST /predict          # Send data to the Surround pipeline")
-    tornado.ioloop.IOLoop.current().start()
+    try:
+        api.make_app(obj).listen(8888)
+        print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
+        print("Available endpoints:")
+        print("* GET  /                 # Health check")
+        if obj.type_of_uploaded_object == AllowedTypes.FILE:
+            print("* GET  /upload           # Upload data")
+        print("* POST /predict          # Send data to the Surround pipeline")
+        tornado.ioloop.IOLoop.current().start()
+    except NameError:
+        print("error: tornado not installed")
+        print("run: pip3 install tornado==6.0.1")
 
 def parse_init_args(args):
     if allowed_to_access_dir(args.path):
