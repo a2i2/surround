@@ -122,18 +122,26 @@ class AllowedTypes(Enum):
     FILE = ["file"]
 
 class Wrapper():
-    def __init__(self, surround, type_of_uploaded_object=None):
-        self.surround = surround
+    def __init__(self, type_of_uploaded_object=None):
+        self.surround = None
+        self.stages = None
+        self.data = None
+
         self.actual_type_of_uploaded_object = None
         if type_of_uploaded_object:
             self.type_of_uploaded_object = type_of_uploaded_object
         else:
             self.type_of_uploaded_object = AllowedTypes.JSON
+
+    def setup_surround(self, surround, type_of_uploaded_object=None):
+        self.surround = surround
         self.surround.init_stages()
 
-    def run(self, input_data):
-        if self.validate() is False:
-            sys.exit()
+    def predict(self, input_data):
+        raise NotImplementedError
+
+    def train(self, input_data):
+        raise NotImplementedError
 
     def validate(self):
         return self.validate_type_of_uploaded_object()
@@ -157,9 +165,27 @@ class Wrapper():
             LOGGER.info(type_)
         return False
 
-    def process(self, input_data):
-        Wrapper.run(self, input_data)
-        return self.run(input_data)
+    def run_wrapper(self, input_data, mode):
+        if self.validate() is False:
+            sys.exit()
+
+        return {
+            'predict': self.predict(input_data),
+            'train': self.train(input_data)
+        }[mode]
+
+    def process(self, input_data, mode=None):
+        if mode is None:
+            self.predict(input_data)
+        else:
+            self.run_wrapper(input_data, mode)
+
+        self.surround.process(self.data)
+
+    def run_surround(self, input_data, mode=None):
+        self.setup_surround(Surround(self.stages, __name__))
+        self.process(input_data)
+        return self.data
 
     def get_config(self):
         return self.surround.config

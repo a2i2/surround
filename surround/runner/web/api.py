@@ -29,13 +29,13 @@ class Predict(tornado.web.RequestHandler):
         self.wrapper = wrapper
 
     def post(self):
-        output = None
         if self.wrapper.type_of_uploaded_object == AllowedTypes.FILE:
             fileinfo = self.request.files['data'][0]
-            output = self.wrapper.process(fileinfo['body'])
+            self.wrapper.run_surround(fileinfo['body'])
         else:
-            output = self.wrapper.process(self.request.body)
-        self.write({"output": output})
+            self.wrapper.run_surround(self.request.body)
+
+        self.write({"output": "Task executed successfully"})
 
 def make_app(wrapper_object):
     predict_init_args = dict(wrapper=wrapper_object)
