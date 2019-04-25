@@ -21,7 +21,11 @@ class Config(Mapping):
             self._storage["models_path"] = os.path.join(project_root, "models")
 
             # Load project config
-            config_path = os.path.join(package_path, 'config.yaml')
+            if package_path:
+                config_path = os.path.join(package_path, 'config.yaml')
+            else:
+                config_path = os.path.join(project_root, os.path.basename(project_root), 'config.yaml')
+
             if os.path.exists(config_path):
                 self.read_config_files([config_path])
 
