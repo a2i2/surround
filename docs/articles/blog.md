@@ -4,7 +4,7 @@
 
 **TLDR;** Surround is a framework developed by A<sup>2</sup>I<sup>2</sup> to take machine learning projects from concept through to production. Surround is designed to play nice with existing machine learning frameworks (Tensorflow, MXNet, PyTorch etc.) and cloud services (Google Cloud AI, SageMaker, Rekognition etc.) We designed Surround for software engineers and research engineers*, and is suitable for a range of deployment scenarios (offline, internal infrastructure, or in the cloud).
 
-A<sup>2</sup>I<sup>2</sup> is Australia's largest AI institute recently formed at Deakin University. Our team specialises in building early stage prototypes that are transferred to industry for evaluation and ongoing support. Due to the variety and number of projects we work on (more details [here](http://a2i2.ai)) we needed a flexible and consistent way to organise our machine learning projects. Surround was developed to help improve **reliability**, **maintainability**, **reproducibility** and **consistency** in our projects.
+AI is an emergent opportunity for businesses. However, it introduces new challenges for us to overcome, such as support for the journey from prototype to production. A<sup>2</sup>I<sup>2</sup> is Australia's largest AI institute recently formed at Deakin University. Our team specialises in building early stage prototypes that are transferred to industry for evaluation and ongoing support. Due to the variety and number of projects we work on (more details [here](http://a2i2.ai)) we needed a flexible and consistent way to organise our machine learning projects. Surround was developed to help improve **evaluation and field testing**, **reliability**, **maintainability**, **reproducibility**, and **consistency** in our projects.
 
 Surround is now available to the community for feedback and is actively being developed [http://github.com/dstil/surround](http://github.com/dstil/surround).
 
@@ -12,11 +12,11 @@ Surround is now available to the community for feedback and is actively being de
 
 **Huge effort is required to deploy an early prototype into a production environment**
 
-Typically, a project is first given to a research engineer to develop the initial solution (prepare the data, select an appropriate algorithm, train a model, evaluate the approach etc.) A software engineer is then tasked with preparing the scripts for integration and deployment into a client's environment. We found that many concerns of a production system such as how will configuration for different environments (development, staging and production) be handled, what is the format and location of the log files, will a queue or web interface be used etc. all impact how the initial solution is implemented. None of these concerns are paramount in the research engineers mind who typical come from a scientific background rather than an engineering background. Resolving these challenges ensuring the needs of the whole team (research engineers and software engineers) are satisfied is time consuming and must be repeated for each client project.
+Typically, a project is first given to a research engineer to develop the initial solution (prepare the data, select an appropriate algorithm, train a model, evaluate the approach etc.) A software engineer is then tasked with preparing the scripts for integration and deployment into a client's environment. We found concerns such as the handling of configuration for development, staging and production environments, the format and location of log files, whether a queue or web interface will be used, and so on, all influence the implementation of the initial solution. These concerns are not paramount to research engineers who do not typically come from an engineering background, but a scientific background. It is time consuming to repeatedly reconcile these differences in design and implement for each project.
 
 **Maintaining a production-grade machine learning system is hard**
 
-Over time we realised that clients were finding it difficult to maintain and support such complex pieces of technology. And no wonder as do do the tech giants like [Google](https://ai.google/research/pubs/pub46555). We also noticed that while each solution is unique there are many aspects which are the same but that there are no opensource convention based frameworks for developing machine learning projects. Unlike say web development which abounds in frameworks such as Ruby on Rails, Spring Boot, Laravel, Django etc. We hope to build a community around Surround that is focused on building best practices into a single framework to improve the quality of the systems we build and increase developer productivity.
+Over time we realised that clients were finding it difficult to maintain and support such complex pieces of technology. We also noticed that while each solution is unique there are many aspects which are the same but that there are no opensource convention based frameworks for developing machine learning projects. Unlike say web development which abounds in frameworks such as Ruby on Rails, Spring Boot, Laravel, Django etc. We hope to build a community around Surround that is focused on building best practices into a single framework to improve the quality of the systems we build and increase developer productivity.
 
 **Lack of consistency between machine learning projects**
 
@@ -27,6 +27,10 @@ At A<sup>2</sup>I<sup>2</sup> the focus is on delivering a *solution* that can b
 We built Surround to help us with the challenges outlined above. The Surround framework consists of four core elements a philosophy, a set of conventions, a command line tool and a Python library.
 
 ### A Philosophy
+
+**Exploration to Production**
+
+From the moment data lands on our desk we need to be thinking about the final use case for the solutions we are developing. We built Surround to help us move from data exploration to a containerised proof-of-concept web application ready to deploy in the shortest time possible. To do this we needed to resolve the competing requirements of researchers and engineers. For example, researchers want to dive into the data leaving code quality for later where as engineers want well structured code from the start. We solved this problem by focusing the team on a "production first" mindset and through a convention (data exploration scripts had their own folder). At times small compromises needed to be made to ensure that everyone can use Surround for their use cases.
 
 **A Place For Everything**
 
@@ -40,15 +44,11 @@ There are many good existing frameworks, libraries and APIs that research engine
 
 Many of the design guidelines and tools are heavily inspired by other frameworks such as Spring Boot for configuration management, Tensorflow serving for endpoint definition and the git command line tool for Surround's CLI. We made this a core philosophy to ensure both software engineers and research engineers can quickly get started with Surround. At times this was a challenge as Surround is a framework designed explicitly for two different types of people a traditional software engineer and a science focused research engineer.
 
-**Exploration to Production**
-
-From the moment data lands on our desk we need to be thinking about the final use case for the solutions we are developing. We built Surround to help us move from data exploration to a containerised proof-of-concept web application ready to deploy in the shortest time possible. To do this we needed to resolve the competing requirements of researchers and engineers. For example, researchers want to dive into the data leaving code quality for later where as engineers want well structured code from the start. We solved this problem by focusing the team on a "production first" mindset and through a convention (data exploration scripts had their own folder). At times small compromises needed to be made to ensure that everyone can use Surround for their use cases.
-
 ### A set of conventions
 
 **Project layout**
 
-All the ML projects have the following characteristics in common, requirement on data, monitor progress output, load models, and manage configuration. Surround introduces conventions for all four concepts to ensure that research engineers do not have to concern themselves with how these features will work. As our ML projects are written in Python we leverage Python package conventions for consistency. These conventions are adhered to through a project generator and project linter that checks for the core characteristics.
+All the ML projects have the following conventions in common, requirement on data, monitor progress output, load models, and manage configuration. Surround introduces conventions for all four concepts to ensure that research engineers do not have to concern themselves with how these features will work. As our ML projects are written in Python we leverage Python package conventions for consistency. These conventions are adhered to through a project generator and project linter that checks for the core conventions.
 
 Surround implements the following directory structure:
 
@@ -105,7 +105,7 @@ We developed, run as a wrapper around doit so that every project can use `surrou
 
 ### A Python library
 
-Finally, the last component of Surround is the Python library. We developed the Python library to provide a flexible way of running a ML pipeline in a variety of situations whether that be from a queue, a http endpoint or from a file system. We found that during development the research engineer often needed to run results from a file, something that is not always needed in a production environment. Surround's Python library was designed to leverage the conventions outlined above to provide maximum productivity boost to research engineers i.e. provided the conventions are followed. Surround also provides wrappers around libraries such as the Tornado web server to provide advanced functionality. These 3rd party dependencies are not installed by default and need to be added to the project before Surround will make the wrappers available.
+Finally, the last component of Surround is the Python library. We developed the Python library to provide a flexible way of running a ML pipeline in a variety of situations whether that be from a queue, a http endpoint or from a file system. We found that during development the research engineer often needed to run results from a file, something that is not always needed in a production environment. Surround's Python library was designed to leverage the conventions outlined above to provide maximum productivity boost to research engineers provided the conventions are followed. Surround also provides wrappers around libraries such as the Tornado web server to provide advanced functionality. These 3rd party dependencies are not installed by default and need to be added to the project before Surround will make the wrappers available.
 
 ## Existing Case Studies
 
