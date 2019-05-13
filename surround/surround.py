@@ -16,17 +16,41 @@ LOGGER = logging.getLogger(__name__)
 class Frozen():
     """
     A class that can toggle the ability of adding new attributes.
+
+    Public methods:
+    - freeze()
+    - thaw()
     """
+
     __isfrozen = False
+
     def __setattr__(self, key, value):
+        """
+        Called when an attribute is created/modified, throws an exception when frozen and adding a new attribute.
+        Otherwise sets the attribute at the provided key to the provided value.
+
+        :param key: the name of the attribute
+        :type key: string
+        :param value: the new value of the attribute
+        :type value: any
+        """
+
         if self.__isfrozen and not hasattr(self, key):
             raise TypeError("%r is a frozen object" % self)
         object.__setattr__(self, key, value)
 
     def freeze(self):
+        """
+        Freeze this class, throw exceptions from now on when a new attribute is added.
+        """
+
         self.__isfrozen = True
 
     def thaw(self):
+        """
+        Thaw the class, no longer throw exceptions on new attributes.
+        """
+
         self.__isfrozen = False
 
 class SurroundData(Frozen):
@@ -35,14 +59,38 @@ class SurroundData(Frozen):
     Note that different stages inside Surround are responsible for
     setting the attributes.
     """
+
     stage_metadata = []
     execution_time = None
     errors = []
     warnings = []
 
 class Surround(ABC):
+    """
+    Represents an entire Surround pipeline, containing all the stages and configuration.
+
+    Responsibilties:
+    - Store and initialize all the stages
+    - Store the Config instance used by all the stages
+    - Transform data by executing each stage in the correct order
+    - Dump the output of each stage (if requested in the Config)
+
+    Public methods:
+    - set_config(config: Config)
+    - init_stages()
+    - process(surround_data: SurroundData)
+    """
 
     def __init__(self, surround_stages=None, module=None):
+        """
+        Constructs an instance of a Surround pipeline.
+
+        :param surround_stages: the surround stages to be executed in this pipeline (default: None)
+        :type surround_stages: a list of <class 'surround.stage.Stage'> instances (order matters)
+        :param module: name of the module that is creating this instance (used to get root directory)
+        :type module: string
+        """
+
         self.surround_stages = surround_stages
 
         if module:
@@ -63,6 +111,14 @@ class Surround(ABC):
             self.set_config(Config())
 
     def set_config(self, config):
+        """
+        Sets the config instance used in all stages during execution of the pipeline.
+        Ensures order of stages set in the Config instance is followed (if set).
+
+        :param config: instance containing configuration data
+        :type config: <class 'surround.config.Config'>
+        """
+
         if not config or not isinstance(config, Config):
             raise TypeError("config should be of class Config")
         self.config = config
@@ -78,6 +134,15 @@ class Surround(ABC):
                 self.surround_stages.append(klass())
 
     def _execute_stage(self, stage, stage_data):
+        """
+        Executes the provided stage with data, dumping output (if requested) and logging execution time.
+
+        :param stage: the stage you would like to execute
+        :type stage: <class 'surround.stage.Stage'>
+        :param stage_data: the data that is being transformed by the stage
+        :type stage_data: <class 'surround.surround.SurroundData'>
+        """
+
         stage_start = datetime.now()
         stage.operate(stage_data, self.config)
 
@@ -90,10 +155,22 @@ class Surround(ABC):
         LOGGER.info("Stage %s took %s secs", type(stage).__name__, stage_execution_time)
 
     def init_stages(self):
+        """
+        Initializes all stages in the pipeline.
+        """
+
         for stage in self.surround_stages:
             stage.init_stage(self.config)
 
     def process(self, surround_data):
+        """
+        Run the entire pipeline with the provided data and log the execution time.
+        NOTE: The surround_data object will be frozen while this process completes.
+
+        :param surround_data: the data we are feeding through the pipeline
+        :type surround_data: <class 'surround.surround.SurroundData'>
+        """
+
         assert isinstance(surround_data, SurroundData), \
             "Input must be a SurroundData object or inherit from SurroundData"
 
@@ -122,7 +199,29 @@ class AllowedTypes(Enum):
     FILE = ["file"]
 
 class Wrapper():
+    """
+    Parent class for wrappers which handle the execution of a pipeline.
+    This class is used to execute the pipeline both locally and over the web.
+
+    Public methods:
+    - run(input_data: SurroundData)
+    - validate()
+    - validate_actual_type_of_uploaded_object()
+    - validate_type_of_uploaded_object()
+    - process(input_data: SurroundData)
+    - get_config()
+    """
+
     def __init__(self, surround, type_of_uploaded_object=None):
+        """
+        Constructor of the Wrapper which initializes the stages of the provided pipeline.
+
+        :param surround: the surround pipeline the wrapper will manage
+        :type surround: <class 'surround.surround.Surround'>
+        :param type_of_uploaded_object: type of data the pipeline will accept
+        :type type_of_uploaded_object: <enum 'surround.surround.AllowedTypes'>
+        """
+
         self.surround = surround
         self.actual_type_of_uploaded_object = None
         if type_of_uploaded_object:
@@ -132,14 +231,38 @@ class Wrapper():
         self.surround.init_stages()
 
     def run(self, input_data):
+        """
+        Runs the surround pipeline with the given input data.
+        This method should be extended to convert the input data and execute the pipeline.
+
+        :param input_data: the input data to be put through the pipeline
+        :type input_data: any
+        :return: the transformed data after execution of the pipeline
+        :rtype: any
+        """
+
         if self.validate() is False:
             sys.exit()
 
     def validate(self):
+        """
+        Validates the configuration of the pipeline and the type of the input data. 
+
+        :return: True on success, False on failure
+        :rtype: Boolean
+        """
+
         return self.validate_type_of_uploaded_object()
         # TODO: Find a way to validate_actual_type_of_uploaded_object(), probably using mime type # pylint: disable=fixme
 
     def validate_actual_type_of_uploaded_object(self):
+        """
+        Validate the actual type of the input with the selected type of input.
+
+        :return: True if the types match, False otherwise
+        :rtype: Boolean
+        """
+
         for type_ in self.type_of_uploaded_object.value:
             if self.actual_type_of_uploaded_object == type_:
                 return True
@@ -148,6 +271,13 @@ class Wrapper():
         return False
 
     def validate_type_of_uploaded_object(self):
+        """
+        Validate selected input type against allowed types.
+
+        :return: True if selected type allowed, False otherwise
+        :rtype: Boolean
+        """
+
         for type_ in AllowedTypes:
             if self.type_of_uploaded_object == type_:
                 return True
@@ -158,8 +288,25 @@ class Wrapper():
         return False
 
     def process(self, input_data):
+        """
+        Runs the surround pipeline with the given input data, ensuring the pipeline is validated first.
+        This is called when running the pipeline via web endpoints.
+
+        :param input_data: input data that will be fed through the pipeline
+        :type input_data: any
+        :return: the result of the run method (typically output data)
+        :rtype: any
+        """
+
         Wrapper.run(self, input_data)
         return self.run(input_data)
 
     def get_config(self):
+        """
+        Returns the configuration data of the surround pipeline.
+
+        :return: the data used to configure the pipeline
+        :rtype: <class 'surround.config.Config'>
+        """
+
         return self.surround.config

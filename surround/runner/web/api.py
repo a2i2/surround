@@ -9,7 +9,16 @@ from surround import AllowedTypes
 START_TIME = datetime.datetime.now()
 
 class HealthCheck(tornado.web.RequestHandler):
+    """
+    Class which handles the health check HTTP GET web endpoint ("/").
+    """
+
     def get(self):
+        """
+        Called when endpoint is requested via GET method.
+        Responds with a JSON document containing the app name, version and server uptime.
+        """
+
         self.write(dict(
             app="Surround Server",
             version=pkg_resources.get_distribution("surround").version,
@@ -17,18 +26,51 @@ class HealthCheck(tornado.web.RequestHandler):
         ))
 
 class Upload(tornado.web.RequestHandler):
+    """
+    Class which handles the upload HTTP GET web endpoint ("/upload").
+    """
+
     def get_template_path(self):
+        """
+        Returns the path to the folder containing the upload.html file.
+
+        :return: path to the folder
+        :rtype: string
+        """
+
         path_to_upload_dir = os.path.split(__file__)[0]
         return path_to_upload_dir
 
     def get(self):
+        """
+        Called when endpoint is requested via GET method.
+        Renders the upload.html file in the user's browser.
+        """
+
         self.render("upload.html")
 
 class Predict(tornado.web.RequestHandler):
+    """
+    Class which handles the predict HTTP POST web endpoint ("/predict").
+    """
+
     def initialize(self, wrapper):
+        """
+        Called when the endpoint is initialized, keeps a
+        reference to the pipeline wrapper.
+
+        :param wrapper: the wrapper for the surround pipeline
+        :type wrapper: <class 'surround.surround.Wrapper'>
+        """
+
         self.wrapper = wrapper
 
     def post(self):
+        """
+        Called when data has been posted to the web endpoint.
+        Processes the uploaded data using the pipeline and responds with the output.
+        """
+
         output = None
         if self.wrapper.type_of_uploaded_object == AllowedTypes.FILE:
             fileinfo = self.request.files['data'][0]
@@ -38,6 +80,15 @@ class Predict(tornado.web.RequestHandler):
         self.write({"output": output})
 
 def make_app(wrapper_object):
+    """
+    Creates a web-server with the endpoints above that can process data using the surround pipeline provided.
+
+    :param wrapper_object: the wrapper for the surround pipeline
+    :type wrapper_object: <class 'surround.surround.Wrapper'>
+    :return: the web-server application object
+    :rtype: <class 'tornado.web.Application'>
+    """
+
     predict_init_args = dict(wrapper=wrapper_object)
     available_endpoints = []
     available_endpoints.append((r"/", HealthCheck))
