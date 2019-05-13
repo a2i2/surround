@@ -9,8 +9,30 @@ import yaml
 ENV_VAR_PREFIX = "SURROUND_"
 
 class Config(Mapping):
+    """
+    An iterable dictionary class that loads and stores all the configuration settings from
+    both default and project YAML files and environment variables.
 
-    def __init__(self, project_root=None, package_path=None):
+    Responsibilities:
+    - Parse the config.yaml file and store the data as key-value pairs.
+    - Allow environment vars override data loaded from file/dict (must be prefixed with ENV_VAR_PREFX).
+    - Provide READ-ONLY access to the stored config values via [key] and iteration.
+
+    Public methods (see methods for more information):
+    - read_config_files(yaml_files)
+    - read_from_dict(config_dict)
+    - get_path(path)
+    """
+
+    def __init__(self, project_root=None):
+        """
+        Constructor of the Config class, loads the default and project YAML files into storage,
+        and sets the framework paths into storage (if project root provided).
+
+        :param project_root: path to the root directory of the surround project (default: None)
+        :type project_root: string
+        """
+
         self._storage = self.__load_defaults()
 
         # Set framework paths
@@ -41,6 +63,15 @@ class Config(Mapping):
                 self.read_config_files([config_path])
 
     def read_config_files(self, yaml_files):
+        """
+        Parses the YAML files provided and stores their key-value pairs in config.
+
+        :param yaml_files: multiple paths to the YAML files to load
+        :type yaml_files: list of strings
+        :return: True on success, throws on failure
+        :rtype: Boolean or IOError exception
+        """
+
         configs = []
         try:
             for path in yaml_files:
@@ -55,6 +86,15 @@ class Config(Mapping):
         return True
 
     def read_from_dict(self, config_dict):
+        """
+        Retrieve all key-value pairs from the dict provided and store in config.
+
+        :param config_dict: configuration settings to be added to storage
+        :type config_dict: dictionary
+        :return: true on success, throws exception on failure
+        :rtype: bool or TypeError
+        """
+
         if not isinstance(config_dict, dict):
             return TypeError("config_dict should be a dict")
 
@@ -63,6 +103,18 @@ class Config(Mapping):
         return True
 
     def get_path(self, path):
+        """
+        Returns value that can be found at the key path provided (useful for nested values).
+
+        Example:
+        config.get_path('surround.stages') is equivalent to config['surround']['stages']
+
+        :param path: path to the value in storage
+        :type path: string
+        :return: the value found at the path or none if not found
+        :rtype: any
+        """
+
         if not isinstance(path, str):
             raise TypeError("path should be a string")
         if not "." in path:
@@ -70,6 +122,13 @@ class Config(Mapping):
         return self.__iterate_over_dict(self._storage, path.split("."))
 
     def __load_defaults(self):
+        """
+        Returns the config key-value pairs loaded from defaults.yaml.
+
+        :return: the key-value pairs loaded from the file
+        :rtype: dictionary
+        """
+
         try:
             with resource_stream(__name__, "defaults.yaml") as f:
                 config = yaml.safe_load(f)
@@ -79,13 +138,27 @@ class Config(Mapping):
         return config
 
     def __merge_configs(self, configs):
-        """ Merges a list of dictionaries into the dictionary of this class. Note that lists are
-        overriden completely not extended.
         """
+        Merges a list of dictionaries into the dictionary of this class. Note that lists are
+        overriden completely not extended.
+
+        :param configs: a collection of dictionaries to merge into storage
+        :type configs: a list of dictionaries
+        """
+
         if not isinstance(configs, list):
             raise TypeError("configs should be a list")
 
         def extend_dict(target, src):
+            """
+            Merges the key-value pairs in src into the given target dictionary.
+
+            :param target: the target dictionary being extended
+            :type target: dictionary
+            :param src: the dictionary where key-value pairs are being extracted
+            :type src: dictionary
+            """
+
             if isinstance(src, dict):
                 for k, v in src.items():
                     if k in target:
@@ -100,6 +173,15 @@ class Config(Mapping):
             extend_dict(self._storage, config)
 
     def __insert_environment_variables(self):
+        """
+        Inserts environment variables prefixed with ENV_VAR_PREFIX into storage. Overriding any
+        clashing key-value pairs in storage already.
+
+        Example:
+        SURROUND_TEST_KEY='test_value'
+        This will be loaded into storage as a string value and can be found at path 'test.key' (or config['test']['key'])
+        """
+
         for var in os.environ:
             if not var.startswith(ENV_VAR_PREFIX) or len(var) == len(ENV_VAR_PREFIX):
                 continue
@@ -107,6 +189,19 @@ class Config(Mapping):
             self.__override_or_add_var(self._storage, surround_variables, os.getenv(var))
 
     def __override_or_add_var(self, config, key_list, value):
+        """
+        Recursively inserts or overrides the value in the storage specified at the specified path.
+
+        :param config: the storage container we're adding the value to
+        :type config: dictionary
+        :param key_list: collection of keys that specifies the key path (e.g. ["test", "key"] == 'test.key')
+        :type key_list: list of strings
+        :param value: the value being set to the specified path
+        :type value: any
+        :return: the storage container we've been adding to
+        :rtype: dictionary
+        """
+
         if len(key_list) > 1:
             key = key_list[0]
             if not key in config:
@@ -122,6 +217,20 @@ class Config(Mapping):
         return config
 
     def __iterate_over_dict(self, dictionary, key_list):
+        """
+        Return the value of the last key in the key list provided by traversing the dict tree.
+
+        Example:
+        self.__iterate_over_dict({ "a": { "b": "c" } }, ["a", "b"]) would return "c".
+
+        :param dictionary: the dictionary we are finding the value in
+        :type dictionary: dictionary
+        :param key_list: collection of key names (correspond to the path to the value in the dictionary)
+        :type key_list: list of strings
+        :return: the value found or none if not found
+        :rtype: any
+        """
+
         key = key_list[0] if not key_list == [] else ""
         if key in dictionary:
             if len(key_list) > 1:
@@ -130,10 +239,33 @@ class Config(Mapping):
         return None
 
     def __getitem__(self, key):
+        """
+        Provides access to stored data via the [] operator.
+
+        :param key: the key provided in the [] operator
+        :type key: string
+        :return: the value found at the specified key
+        :rtype: any
+        """
+
         return self._storage[key]
 
     def __iter__(self):
+        """
+        Allows for iteration through the config dictionary.
+
+        :return: the iterator for the internal dictionary
+        :rtype: iterator
+        """
+
         return iter(self._storage)
 
     def __len__(self):
+        """
+        Returns the length of the config dictionary.
+
+        :return: the number of key-value pairs in the dictionary
+        :rtype: integer
+        """
+
         return len(self._storage)
