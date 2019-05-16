@@ -16,10 +16,8 @@ LOGGER = logging.getLogger(__name__)
 class Frozen():
     """
     A class that can toggle the ability of adding new attributes.
-
-    Public methods:
-    - freeze()
-    - thaw()
+    When the class is considered frozen, adding new attributes will
+    trigger a :exc:`TypeError` exception.
     """
 
     __isfrozen = False
@@ -55,9 +53,43 @@ class Frozen():
 
 class SurroundData(Frozen):
     """
-    Stores the data to be passed between each stage in Surround.
-    Note that different stages inside Surround are responsible for
-    setting the attributes.
+    Stores the data to be passed between each stage in a pipeline.
+    Each stage is responsible for setting the attributes to this class.
+
+    **Attributes:**
+
+    - `stage_metadata` (:class:`list`) - information that can be used to identify the stage
+    - `execution_time` (:class:`str`) - how long it took to execute the entire pipeline
+    - `errors` (:class:`list`) - list of error messages (stops the pipeline when appended to)
+    - `warnings` (:class:`list`) - list of warning messages (displayed in console)
+
+    Example::
+
+        class PipelineData(SurroundData):
+            # Extra attributes must be defined before the pipeline is ran!
+            input_data = None
+            output_data = None
+
+            def __init__(self, input_data)
+                self.input_data = input_data
+
+        class ValidationStage(Stage):
+            def operate(self, data, config):
+                if not isinstance(data.input_data, str):
+                    data.errors.append('not correct input format!')
+                elif len(data.input_data) == 0:
+                    data.warning.append('input is empty')
+
+        pipeline = Surround([ValidationStage(), PredictStage()])
+        data = PipelineData("received data")
+        pipeline.process(data)
+
+        print(data.output_data)
+
+    .. note::
+        This class is frozen when the pipeline is being ran.
+        This means that an exception will be thrown if a new attribute
+        is added during pipeline execution.
     """
 
     stage_metadata = []
@@ -70,15 +102,26 @@ class Surround(ABC):
     Represents an entire Surround pipeline, containing all the stages and configuration.
 
     Responsibilties:
+
     - Store and initialize all the stages
     - Store the Config instance used by all the stages
-    - Transform data by executing each stage in the correct order
+    - Perform operations on input data by executing each stage on the data
     - Dump the output of each stage (if requested in the Config)
 
-    Public methods:
-    - set_config(config: Config)
-    - init_stages()
-    - process(surround_data: SurroundData)
+    Example::
+
+        pipeline = Surround([ValidateStage(),
+                             FaceDetectionStage(),
+                             ExtractFaceStage()])
+
+        config = Config()
+        config.read_config_files(["config.yaml"])
+        pipeline.set_config(config)
+
+        data = PipelineData(image)
+        pipeline.process(data)
+
+        save_image(data.output_image)
     """
 
     def __init__(self, surround_stages=None, module=None):
@@ -86,9 +129,9 @@ class Surround(ABC):
         Constructs an instance of a Surround pipeline.
 
         :param surround_stages: the surround stages to be executed in this pipeline (default: None)
-        :type surround_stages: a list of <class 'surround.stage.Stage'> instances (order matters)
+        :type surround_stages: a list of :class:`Stage`
         :param module: name of the module that is creating this instance (used to get root directory)
-        :type module: string
+        :type module: str
         """
 
         self.surround_stages = surround_stages
@@ -116,7 +159,7 @@ class Surround(ABC):
         Ensures order of stages set in the Config instance is followed (if set).
 
         :param config: instance containing configuration data
-        :type config: <class 'surround.config.Config'>
+        :type config: :class:`Config`
         """
 
         if not config or not isinstance(config, Config):
@@ -138,9 +181,9 @@ class Surround(ABC):
         Executes the provided stage with data, dumping output (if requested) and logging execution time.
 
         :param stage: the stage you would like to execute
-        :type stage: <class 'surround.stage.Stage'>
+        :type stage: :class:`Stage`
         :param stage_data: the data that is being transformed by the stage
-        :type stage_data: <class 'surround.surround.SurroundData'>
+        :type stage_data: :class:`SurroundData`
         """
 
         stage_start = datetime.now()
@@ -156,7 +199,7 @@ class Surround(ABC):
 
     def init_stages(self):
         """
-        Initializes all stages in the pipeline.
+        Initializes all stages in the pipeline by calling their :meth:`Stage.init_stage` method.
         """
 
         for stage in self.surround_stages:
@@ -165,10 +208,13 @@ class Surround(ABC):
     def process(self, surround_data):
         """
         Run the entire pipeline with the provided data and log the execution time.
-        NOTE: The surround_data object will be frozen while this process completes.
+
+        .. note::
+            The `surround_data` object will be frozen while this process completes.
+            Meaning no *new* attributes can be added to the object (or an exception will be thrown).
 
         :param surround_data: the data we are feeding through the pipeline
-        :type surround_data: <class 'surround.surround.SurroundData'>
+        :type surround_data: a child or instance of :class:`SurroundData`
         """
 
         assert isinstance(surround_data, SurroundData), \
@@ -195,21 +241,31 @@ class Surround(ABC):
         surround_data.thaw()
 
 class AllowedTypes(Enum):
+    """
+    Enumeration for types allowed as input to a pipeline.
+
+    - :attr:`AllowedTypes.JSON` - Accept JSON data only
+    - :attr:`AllowedTypes.FILE` - Accept files only
+    """
+
     JSON = ["application/json"]
     FILE = ["file"]
 
 class Wrapper():
     """
     Parent class for wrappers which handle the execution of a pipeline.
-    This class is used to execute the pipeline both locally and over the web.
+    Extensions of this class are used to execute the pipeline both locally and over the web
+    via the Surround CLI.
 
-    Public methods:
-    - run(input_data: SurroundData)
-    - validate()
-    - validate_actual_type_of_uploaded_object()
-    - validate_type_of_uploaded_object()
-    - process(input_data: SurroundData)
-    - get_config()
+    Your extended class **must** be added to the projects `config.yaml` file as `wrapper-info`
+    so that the Surround CLI can find and use your wrapper when running in web-server mode.
+
+    For example (in `config.yaml`)::
+
+        wrapper-info: testproject.wrapper.PipelineWrapper
+
+    Your extension must implement the :meth:`Wrapper.run` method which should setup the
+    input data and run the :meth:`Surround.process` method of the pipeline.
     """
 
     def __init__(self, surround, type_of_uploaded_object=None):
@@ -217,9 +273,9 @@ class Wrapper():
         Constructor of the Wrapper which initializes the stages of the provided pipeline.
 
         :param surround: the surround pipeline the wrapper will manage
-        :type surround: <class 'surround.surround.Surround'>
+        :type surround: :class:`Surround`
         :param type_of_uploaded_object: type of data the pipeline will accept
-        :type type_of_uploaded_object: <enum 'surround.surround.AllowedTypes'>
+        :type type_of_uploaded_object: :class:`AllowedTypes`
         """
 
         self.surround = surround
@@ -235,6 +291,17 @@ class Wrapper():
         Runs the surround pipeline with the given input data.
         This method should be extended to convert the input data and execute the pipeline.
 
+        .. note:: Called by the :meth:`Wrapper.process` method.
+
+        For example::
+
+            def run(self, input_data):
+                data = SurroundData(json.loads(input_data))
+                output = self.surround.process(data)
+
+                return output
+
+
         :param input_data: the input data to be put through the pipeline
         :type input_data: any
         :return: the transformed data after execution of the pipeline
@@ -246,10 +313,10 @@ class Wrapper():
 
     def validate(self):
         """
-        Validates the configuration of the pipeline and the type of the input data. 
+        Validates the configuration of the pipeline and the type of the input data.
 
         :return: True on success, False on failure
-        :rtype: Boolean
+        :rtype: bool
         """
 
         return self.validate_type_of_uploaded_object()
@@ -260,7 +327,7 @@ class Wrapper():
         Validate the actual type of the input with the selected type of input.
 
         :return: True if the types match, False otherwise
-        :rtype: Boolean
+        :rtype: bool
         """
 
         for type_ in self.type_of_uploaded_object.value:
@@ -275,7 +342,7 @@ class Wrapper():
         Validate selected input type against allowed types.
 
         :return: True if selected type allowed, False otherwise
-        :rtype: Boolean
+        :rtype: bool
         """
 
         for type_ in AllowedTypes:
@@ -306,7 +373,7 @@ class Wrapper():
         Returns the configuration data of the surround pipeline.
 
         :return: the data used to configure the pipeline
-        :rtype: <class 'surround.config.Config'>
+        :rtype: :class:`Config`
         """
 
         return self.surround.config
