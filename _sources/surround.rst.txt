@@ -1,5 +1,6 @@
-API Documentation
+API
 *****************
+Here you can find documentation on all classes and their methods in Surround.
 
 .. automodule:: surround
 
@@ -27,8 +28,8 @@ SurroundData
 ============
    
 .. autoclass:: SurroundData        
-   :members:         
- 
+   :members:          
+  
 Stage
 =====
  
@@ -40,9 +41,9 @@ AllowedTypes
 
 .. autoclass:: AllowedTypes 
     :members:
-
+ 
 Wrapper      
-=======
+======= 
 
 .. autoclass:: Wrapper  
     :members:
