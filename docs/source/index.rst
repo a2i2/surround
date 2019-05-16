@@ -3,11 +3,25 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to surround's documentation!
+.. image:: temp_logo.png
+    :alt: Flask: web development, one drop at a time
+    :align: center
+
+Welcome to Surround
 ====================================
+
+Welcome to Surround's documentation. For a quick rundown on getting started with Surround see :ref:`getting-started`.
+For more information on the aim and philosophy of Surround see :ref:`about`.
+
+.. toctree:: 
+    :maxdepth: 2
+    :caption: Users's Guide
+
+    about.rst
+    getting-started.rst
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: API Reference
 
    surround.rst

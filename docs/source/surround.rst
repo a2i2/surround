@@ -1,5 +1,6 @@
-API Documentation
+API
 *****************
+Here you can find documentation on all classes and their methods in Surround.
 
 .. automodule:: surround
 
@@ -9,20 +10,42 @@ Surround
 .. autoclass:: Surround
    :members:
 
-SurroundData
-============
+   .. automethod:: __init__   
 
-.. autoclass:: SurroundData
+Config     
+======
+ 
+.. autoclass:: Config       
    :members:
+ 
+   .. automethod:: __init__  
 
+   .. automethod:: __getitem__  
+
+   .. automethod:: __iter__          
+  
+SurroundData  
+============
+   
+.. autoclass:: SurroundData        
+   :members:          
+  
 Stage
 =====
-
+ 
 .. autoclass:: Stage
-   :members:
+   :members:         
+ 
+AllowedTypes    
+============
 
-Config
-======
+.. autoclass:: AllowedTypes 
+    :members:
+ 
+Wrapper      
+======= 
 
-.. autoclass:: Config
-   :members:
+.. autoclass:: Wrapper  
+    :members:
+
+    .. automethod:: __init__

@@ -8,10 +8,8 @@ LOGGER = logging.getLogger(__name__)
 class Frozen():
     """
     A class that can toggle the ability of adding new attributes.
-
-    Public methods:
-    - freeze()
-    - thaw()
+    When the class is considered frozen, adding new attributes will
+    trigger a :exc:`TypeError` exception.
     """
 
     __isfrozen = False
@@ -48,9 +46,43 @@ class Frozen():
 
 class SurroundData(Frozen):
     """
-    Stores the data to be passed between each stage in Surround.
-    Note that different stages inside Surround are responsible for
-    setting the attributes.
+    Stores the data to be passed between each stage in a pipeline.
+    Each stage is responsible for setting the attributes to this class.
+
+    **Attributes:**
+
+    - `stage_metadata` (:class:`list`) - information that can be used to identify the stage
+    - `execution_time` (:class:`str`) - how long it took to execute the entire pipeline
+    - `errors` (:class:`list`) - list of error messages (stops the pipeline when appended to)
+    - `warnings` (:class:`list`) - list of warning messages (displayed in console)
+
+    Example::
+
+        class PipelineData(SurroundData):
+            # Extra attributes must be defined before the pipeline is ran!
+            input_data = None
+            output_data = None
+
+            def __init__(self, input_data)
+                self.input_data = input_data
+
+        class ValidationStage(Stage):
+            def operate(self, data, config):
+                if not isinstance(data.input_data, str):
+                    data.errors.append('not correct input format!')
+                elif len(data.input_data) == 0:
+                    data.warning.append('input is empty')
+
+        pipeline = Surround([ValidationStage(), PredictStage()])
+        data = PipelineData("received data")
+        pipeline.process(data)
+
+        print(data.output_data)
+
+    .. note::
+        This class is frozen when the pipeline is being ran.
+        This means that an exception will be thrown if a new attribute
+        is added during pipeline execution.
     """
 
     stage_metadata = []

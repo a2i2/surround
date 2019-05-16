@@ -11,26 +11,49 @@ ENV_VAR_PREFIX = "SURROUND_"
 class Config(Mapping):
     """
     An iterable dictionary class that loads and stores all the configuration settings from
-    both default and project YAML files and environment variables.
+    both default and project YAML files and environment variables. Primarily used in stages
+    to retrieve configuration data set for development/production.
 
     Responsibilities:
-    - Parse the config.yaml file and store the data as key-value pairs.
-    - Allow environment vars override data loaded from file/dict (must be prefixed with ENV_VAR_PREFX).
-    - Provide READ-ONLY access to the stored config values via [key] and iteration.
 
-    Public methods (see methods for more information):
-    - read_config_files(yaml_files)
-    - read_from_dict(config_dict)
-    - get_path(path)
+    - Parse the config.yaml file and store the data as key-value pairs.
+    - Allow environment variables override data loaded from file/dict (must be prefixed with `SURROUND_`).
+    - Provide READ-ONLY access to the stored config values via [] operator and iteration.
+
+    Example usage::
+
+        config = Config()
+        config.read_from_dict({ "debug": True })
+
+        if config["debug"]:
+            # Do debug stuff
+
+    You could then override the above configuration using the systems environment variables,
+    just prefix the var with `SURROUND_` like so::
+
+        SURROUND_DEBUG=False
+
+    It also supports overriding nested configuration data, for example with the following config::
+
+        predict:
+            debug: True
+
+    We can override the above with the following environment variable::
+
+        SURRROUND_PREDICT_DEBUG=False
     """
 
     def __init__(self, project_root=None):
         """
-        Constructor of the Config class, loads the default and project YAML files into storage,
-        and sets the framework paths into storage (if project root provided).
+        Constructor of the Config class, loads the default YAML file into storage.
+        If the :attr:`project_root` is provided then the project's `config.yaml`
+        file is also loaded into configuration.
+
+        The default config file (`defaults.yaml`) can be found in the same directory as the `config.py` script.
+        The project config file (`config.yaml`) can be found in the root of the project folder.
 
         :param project_root: path to the root directory of the surround project (default: None)
-        :type project_root: string
+        :type project_root: str
         """
 
         self._storage = self.__load_defaults()
@@ -67,9 +90,9 @@ class Config(Mapping):
         Parses the YAML files provided and stores their key-value pairs in config.
 
         :param yaml_files: multiple paths to the YAML files to load
-        :type yaml_files: list of strings
-        :return: True on success, throws on failure
-        :rtype: Boolean or IOError exception
+        :type yaml_files: list
+        :return: true on success, throws :exc:`IOError` on failure
+        :rtype: bool
         """
 
         configs = []
@@ -90,9 +113,9 @@ class Config(Mapping):
         Retrieve all key-value pairs from the dict provided and store in config.
 
         :param config_dict: configuration settings to be added to storage
-        :type config_dict: dictionary
-        :return: true on success, throws exception on failure
-        :rtype: bool or TypeError
+        :type config_dict: dict
+        :return: true on success, throws exception on failure (:exc:`TypeError`)
+        :rtype: bool
         """
 
         if not isinstance(config_dict, dict):
@@ -106,11 +129,13 @@ class Config(Mapping):
         """
         Returns value that can be found at the key path provided (useful for nested values).
 
-        Example:
-        config.get_path('surround.stages') is equivalent to config['surround']['stages']
+        For example::
+
+            config.get_path('surround.stages') == config['surround']['stages']
+            --> True
 
         :param path: path to the value in storage
-        :type path: string
+        :type path: str
         :return: the value found at the path or none if not found
         :rtype: any
         """
@@ -126,7 +151,7 @@ class Config(Mapping):
         Returns the config key-value pairs loaded from defaults.yaml.
 
         :return: the key-value pairs loaded from the file
-        :rtype: dictionary
+        :rtype: dict
         """
 
         try:
@@ -143,7 +168,7 @@ class Config(Mapping):
         overriden completely not extended.
 
         :param configs: a collection of dictionaries to merge into storage
-        :type configs: a list of dictionaries
+        :type configs: a list of dict
         """
 
         if not isinstance(configs, list):
@@ -154,9 +179,9 @@ class Config(Mapping):
             Merges the key-value pairs in src into the given target dictionary.
 
             :param target: the target dictionary being extended
-            :type target: dictionary
+            :type target: dict
             :param src: the dictionary where key-value pairs are being extracted
-            :type src: dictionary
+            :type src: dict
             """
 
             if isinstance(src, dict):
@@ -179,7 +204,7 @@ class Config(Mapping):
 
         Example:
         SURROUND_TEST_KEY='test_value'
-        This will be loaded into storage as a string value and can be found at path 'test.key' (or config['test']['key'])
+        This will be loaded into storage as a string value and can be found at path 'test.key' (or `config['test']['key']`)
         """
 
         for var in os.environ:
@@ -193,13 +218,13 @@ class Config(Mapping):
         Recursively inserts or overrides the value in the storage specified at the specified path.
 
         :param config: the storage container we're adding the value to
-        :type config: dictionary
+        :type config: dict
         :param key_list: collection of keys that specifies the key path (e.g. ["test", "key"] == 'test.key')
-        :type key_list: list of strings
+        :type key_list: list of str
         :param value: the value being set to the specified path
         :type value: any
         :return: the storage container we've been adding to
-        :rtype: dictionary
+        :rtype: dict
         """
 
         if len(key_list) > 1:
@@ -220,13 +245,14 @@ class Config(Mapping):
         """
         Return the value of the last key in the key list provided by traversing the dict tree.
 
-        Example:
-        self.__iterate_over_dict({ "a": { "b": "c" } }, ["a", "b"]) would return "c".
+        Example::
+            self.__iterate_over_dict({ "a": { "b": "c" } }, ["a", "b"])
+            --> "c"
 
         :param dictionary: the dictionary we are finding the value in
-        :type dictionary: dictionary
+        :type dictionary: dict
         :param key_list: collection of key names (correspond to the path to the value in the dictionary)
-        :type key_list: list of strings
+        :type key_list: list of str
         :return: the value found or none if not found
         :rtype: any
         """
@@ -243,7 +269,7 @@ class Config(Mapping):
         Provides access to stored data via the [] operator.
 
         :param key: the key provided in the [] operator
-        :type key: string
+        :type key: str
         :return: the value found at the specified key
         :rtype: any
         """
@@ -254,8 +280,17 @@ class Config(Mapping):
         """
         Allows for iteration through the config dictionary.
 
+        Example::
+
+            config = Config()
+            config.read_config_files(['config.yaml'])
+
+            # Iterate over the key-value pairs in the config data
+            for key, value in config:
+                print("Key: " + key + " Value: " + value)
+
         :return: the iterator for the internal dictionary
-        :rtype: iterator
+        :rtype: dict_keyiterator
         """
 
         return iter(self._storage)
@@ -265,7 +300,7 @@ class Config(Mapping):
         Returns the length of the config dictionary.
 
         :return: the number of key-value pairs in the dictionary
-        :rtype: integer
+        :rtype: int
         """
 
         return len(self._storage)
