@@ -1,36 +1,158 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>surround.surround &#8212; surround 0.0.2 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>surround.surround &mdash; Surround 0.0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Surround 0.0.7 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
           
 
-          <div class="body" role="main">
+          
+            <a href="../../index.html" class="icon icon-home"> Surround
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../surround.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Surround</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>surround.surround</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for surround.surround</h1><div class="highlight"><pre>
 <span></span><span class="c1"># surround.py</span>
@@ -51,33 +173,125 @@
 <span class="k">class</span> <span class="nc">Frozen</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class that can toggle the ability of adding new attributes.</span>
+
+<span class="sd">    Public methods:</span>
+<span class="sd">    - freeze()</span>
+<span class="sd">    - thaw()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">__isfrozen</span> <span class="o">=</span> <span class="kc">False</span>
+
     <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called when an attribute is created/modified, throws an exception when frozen and adding a new attribute.</span>
+<span class="sd">        Otherwise sets the attribute at the provided key to the provided value.</span>
+
+<span class="sd">        :param key: the name of the attribute</span>
+<span class="sd">        :type key: string</span>
+<span class="sd">        :param value: the new value of the attribute</span>
+<span class="sd">        :type value: any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isfrozen</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> is a frozen object&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Freeze this class, throw exceptions from now on when a new attribute is added.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__isfrozen</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">thaw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thaw the class, no longer throw exceptions on new attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__isfrozen</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="SurroundData"><a class="viewcode-back" href="../../surround.html#surround.SurroundData">[docs]</a><span class="k">class</span> <span class="nc">SurroundData</span><span class="p">(</span><span class="n">Frozen</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Stores the data to be passed between each stage in Surround.</span>
-<span class="sd">    Note that different stages inside Surround are responsible for</span>
-<span class="sd">    setting the attributes.</span>
+<span class="sd">    Stores the data to be passed between each stage in a pipeline.</span>
+<span class="sd">    Each stage is responsible for setting the attributes to this class.</span>
+
+<span class="sd">    **NOTE:** This class is frozen when the pipeline is being ran. This means that</span>
+<span class="sd">    an exception will be thrown if a new attribute is added during pipeline</span>
+<span class="sd">    execution.</span>
+
+<span class="sd">    **Attributes:**</span>
+
+<span class="sd">    - `stage_metadata` (:class:`list`) - information that can be used to identify the stage</span>
+<span class="sd">    - `execution_time` (:class:`str`) - how long it took to execute the entire pipeline</span>
+<span class="sd">    - `errors` (:class:`list`) - list of error messages (stops the pipeline when appended to)</span>
+<span class="sd">    - `warnings` (:class:`list`) - list of warning messages (displayed in console)</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        class PipelineData(SurroundData):</span>
+<span class="sd">            # Extra attributes must be defined before the pipeline is ran!</span>
+<span class="sd">            input_data = None</span>
+<span class="sd">            output_data = None</span>
+
+<span class="sd">            def __init__(self, input_data)</span>
+<span class="sd">                self.input_data = input_data</span>
+
+<span class="sd">        class ValidationStage(Stage):</span>
+<span class="sd">            def operate(self, data, config):</span>
+<span class="sd">                if not isinstance(data.input_data, str):</span>
+<span class="sd">                    data.errors.append(&#39;not correct input format!&#39;)</span>
+<span class="sd">                elif len(data.input_data) == 0:</span>
+<span class="sd">                    data.warning.append(&#39;input is empty&#39;)</span>
+
+<span class="sd">        pipeline = Surround([ValidationStage(), PredictStage()])</span>
+<span class="sd">        data = PipelineData(&quot;received data&quot;)</span>
+<span class="sd">        pipeline.process(data)</span>
+
+<span class="sd">        print(data.output_data)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">stage_metadata</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">execution_time</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Surround"><a class="viewcode-back" href="../../surround.html#surround.Surround">[docs]</a><span class="k">class</span> <span class="nc">Surround</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents an entire Surround pipeline, containing all the stages and configuration.</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_stages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">    Responsibilties:</span>
+
+<span class="sd">    - Store and initialize all the stages</span>
+<span class="sd">    - Store the Config instance used by all the stages</span>
+<span class="sd">    - Transform data by executing each stage in the correct order</span>
+<span class="sd">    - Dump the output of each stage (if requested in the Config)</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        pipeline = Surround([ValidateStage(),</span>
+<span class="sd">                             FaceDetectionStage(),</span>
+<span class="sd">                             ExtractFaceStage()])</span>
+
+<span class="sd">        config = Config()</span>
+<span class="sd">        config.read_config_files([&quot;config.yaml&quot;])</span>
+<span class="sd">        pipeline.set_config(config)</span>
+
+<span class="sd">        data = PipelineData(image)</span>
+<span class="sd">        pipeline.process(data)</span>
+
+<span class="sd">        save_image(data.output_image)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Surround.__init__"><a class="viewcode-back" href="../../surround.html#surround.Surround.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_stages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs an instance of a Surround pipeline.</span>
+
+<span class="sd">        :param surround_stages: the surround stages to be executed in this pipeline (default: None)</span>
+<span class="sd">        :type surround_stages: a list of :class:`Stage`</span>
+<span class="sd">        :param module: name of the module that is creating this instance (used to get root directory)</span>
+<span class="sd">        :type module: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">surround_stages</span> <span class="o">=</span> <span class="n">surround_stages</span>
 
         <span class="k">if</span> <span class="n">module</span><span class="p">:</span>
@@ -95,9 +309,17 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">]):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Config</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Config</span><span class="p">())</span></div>
 
-    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="Surround.set_config"><a class="viewcode-back" href="../../surround.html#surround.Surround.set_config">[docs]</a>    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the config instance used in all stages during execution of the pipeline.</span>
+<span class="sd">        Ensures order of stages set in the Config instance is followed (if set).</span>
+
+<span class="sd">        :param config: instance containing configuration data</span>
+<span class="sd">        :type config: :class:`Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">Config</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;config should be of class Config&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
@@ -110,9 +332,18 @@
                 <span class="n">parts</span> <span class="o">=</span> <span class="n">stage</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
                 <span class="n">module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
                 <span class="n">klass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">surround_stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">klass</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">surround_stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">klass</span><span class="p">())</span></div>
 
     <span class="k">def</span> <span class="nf">_execute_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">stage_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the provided stage with data, dumping output (if requested) and logging execution time.</span>
+
+<span class="sd">        :param stage: the stage you would like to execute</span>
+<span class="sd">        :type stage: :class:`Stage`</span>
+<span class="sd">        :param stage_data: the data that is being transformed by the stage</span>
+<span class="sd">        :type stage_data: :class:`SurroundData`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">stage_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="n">stage</span><span class="o">.</span><span class="n">operate</span><span class="p">(</span><span class="n">stage_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
@@ -124,11 +355,25 @@
         <span class="n">stage_data</span><span class="o">.</span><span class="n">stage_metadata</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="nb">type</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">stage_execution_time</span><span class="p">)})</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stage </span><span class="si">%s</span><span class="s2"> took </span><span class="si">%s</span><span class="s2"> secs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">stage_execution_time</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">init_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround_stages</span><span class="p">:</span>
-            <span class="n">stage</span><span class="o">.</span><span class="n">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+<div class="viewcode-block" id="Surround.init_stages"><a class="viewcode-back" href="../../surround.html#surround.Surround.init_stages">[docs]</a>    <span class="k">def</span> <span class="nf">init_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes all stages in the pipeline by calling their :meth:`Stage.init_stage` method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround_stages</span><span class="p">:</span>
+            <span class="n">stage</span><span class="o">.</span><span class="n">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Surround.process"><a class="viewcode-back" href="../../surround.html#surround.Surround.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the entire pipeline with the provided data and log the execution time.</span>
+
+<span class="sd">        **NOTE:** The `surround_data` object will be frozen while this process completes.</span>
+<span class="sd">        Meaning no *new* attributes can be added to the object (or an exception will be thrown).</span>
+
+<span class="sd">        :param surround_data: the data we are feeding through the pipeline</span>
+<span class="sd">        :type surround_data: a child or instance of :class:`SurroundData`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="n">SurroundData</span><span class="p">),</span> \
             <span class="s2">&quot;Input must be a SurroundData object or inherit from SurroundData&quot;</span>
 
@@ -150,108 +395,215 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed processing Surround&quot;</span><span class="p">)</span>
 
-        <span class="n">surround_data</span><span class="o">.</span><span class="n">thaw</span><span class="p">()</span></div>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">thaw</span><span class="p">()</span></div></div>
 
-<span class="k">class</span> <span class="nc">AllowedTypes</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">JSON</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span>
-    <span class="n">IMAGE</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
+<div class="viewcode-block" id="AllowedTypes"><a class="viewcode-back" href="../../surround.html#surround.AllowedTypes">[docs]</a><span class="k">class</span> <span class="nc">AllowedTypes</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enumeration for types allowed as input to a pipeline.</span>
 
-<span class="k">class</span> <span class="nc">Wrapper</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround</span><span class="p">,</span> <span class="n">type_of_uploaded_object</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">    - :attr:`AllowedTypes.JSON` - Accept JSON data only</span>
+<span class="sd">    - :attr:`AllowedTypes.FILE` - Accept files only</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">JSON</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;application/json&quot;</span><span class="p">]</span>
+    <span class="n">FILE</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Wrapper"><a class="viewcode-back" href="../../surround.html#surround.Wrapper">[docs]</a><span class="k">class</span> <span class="nc">Wrapper</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parent class for wrappers which handle the execution of a pipeline.</span>
+<span class="sd">    Extensions of this class are used to execute the pipeline both locally and over the web</span>
+<span class="sd">    via the Surround CLI.</span>
+
+<span class="sd">    Your extended class **must** be added to the projects `config.yaml` file as `wrapper-info`</span>
+<span class="sd">    so that the Surround CLI can find and use your wrapper when running in web-server mode.</span>
+
+<span class="sd">    For example (in `config.yaml`)::</span>
+
+<span class="sd">        wrapper-info: testproject.wrapper.PipelineWrapper</span>
+
+<span class="sd">    Your extension must implement the :meth:`Wrapper.run` method which should setup the</span>
+<span class="sd">    input data and run the :meth:`Surround.process` method of the pipeline.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Wrapper.__init__"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround</span><span class="p">,</span> <span class="n">type_of_uploaded_object</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor of the Wrapper which initializes the stages of the provided pipeline.</span>
+
+<span class="sd">        :param surround: the surround pipeline the wrapper will manage</span>
+<span class="sd">        :type surround: :class:`Surround`</span>
+<span class="sd">        :param type_of_uploaded_object: type of data the pipeline will accept</span>
+<span class="sd">        :type type_of_uploaded_object: :class:`AllowedTypes`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">surround</span> <span class="o">=</span> <span class="n">surround</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actual_type_of_uploaded_object</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">type_of_uploaded_object</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span> <span class="o">=</span> <span class="n">type_of_uploaded_object</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span> <span class="o">=</span> <span class="n">AllowedTypes</span><span class="o">.</span><span class="n">JSON</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">init_stages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">init_stages</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+<div class="viewcode-block" id="Wrapper.run"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the surround pipeline with the given input data.</span>
+<span class="sd">        This method should be extended to convert the input data and execute the pipeline.</span>
+
+<span class="sd">        **NOTE:** Called by the :meth:`Wrapper.process` method.</span>
+
+<span class="sd">        For example::</span>
+
+<span class="sd">            def run(self, input_data):</span>
+<span class="sd">                data = SurroundData(json.loads(input_data))</span>
+<span class="sd">                output = self.surround.process(data)</span>
+
+<span class="sd">                return output</span>
+
+
+<span class="sd">        :param input_data: the input data to be put through the pipeline</span>
+<span class="sd">        :type input_data: any</span>
+<span class="sd">        :return: the transformed data after execution of the pipeline</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_type_of_uploaded_object</span><span class="p">()</span>
+<div class="viewcode-block" id="Wrapper.validate"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates the configuration of the pipeline and the type of the input data.</span>
 
-    <span class="k">def</span> <span class="nf">validate_type_of_uploaded_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">        :return: True on success, False on failure</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_type_of_uploaded_object</span><span class="p">()</span></div>
+        <span class="c1"># TODO: Find a way to validate_actual_type_of_uploaded_object(), probably using mime type # pylint: disable=fixme</span>
+
+<div class="viewcode-block" id="Wrapper.validate_actual_type_of_uploaded_object"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.validate_actual_type_of_uploaded_object">[docs]</a>    <span class="k">def</span> <span class="nf">validate_actual_type_of_uploaded_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the actual type of the input with the selected type of input.</span>
+
+<span class="sd">        :return: True if the types match, False otherwise</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">type_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_type_of_uploaded_object</span> <span class="o">==</span> <span class="n">type_</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;error: you selected input type as &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;error: input file is not &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Wrapper.validate_type_of_uploaded_object"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.validate_type_of_uploaded_object">[docs]</a>    <span class="k">def</span> <span class="nf">validate_type_of_uploaded_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate selected input type against allowed types.</span>
+
+<span class="sd">        :return: True if selected type allowed, False otherwise</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">for</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">AllowedTypes</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span> <span class="o">==</span> <span class="n">type_</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;error: selected upload type not allowed&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Choose from: &quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;error: selected upload type not allowed&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Choose from: &quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">AllowedTypes</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+<div class="viewcode-block" id="Wrapper.process"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the surround pipeline with the given input data, ensuring the pipeline is validated first.</span>
+<span class="sd">        This is called when running the pipeline via web endpoints.</span>
+
+<span class="sd">        :param input_data: input data that will be fed through the pipeline</span>
+<span class="sd">        :type input_data: any</span>
+<span class="sd">        :return: the result of the run method (typically output data)</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">Wrapper</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Wrapper.get_config"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the configuration data of the surround pipeline.</span>
+
+<span class="sd">        :return: the data used to configure the pipeline</span>
+<span class="sd">        :rtype: :class:`Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">config</span></div></div>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">surround</a></h1>
+          <footer>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Scott Barnett.
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../surround.html">API Documentation</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Scott Barnett.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.7',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="../../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
 </html>

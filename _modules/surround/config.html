@@ -1,36 +1,158 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>surround.config &#8212; surround 0.0.2 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>surround.config &mdash; Surround 0.0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Surround 0.0.7 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
           
 
-          <div class="body" role="main">
+          
+            <a href="../../index.html" class="icon icon-home"> Surround
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../surround.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Surround</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>surround.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for surround.config</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">ast</span>
@@ -43,8 +165,53 @@
 <span class="n">ENV_VAR_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;SURROUND_&quot;</span>
 
 <div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../surround.html#surround.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An iterable dictionary class that loads and stores all the configuration settings from</span>
+<span class="sd">    both default and project YAML files and environment variables. Primarily used in stages</span>
+<span class="sd">    to retrieve configuration data set for development/production.</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">    Responsibilities:</span>
+
+<span class="sd">    - Parse the config.yaml file and store the data as key-value pairs.</span>
+<span class="sd">    - Allow environment variables override data loaded from file/dict (must be prefixed with `SURROUND_`).</span>
+<span class="sd">    - Provide READ-ONLY access to the stored config values via [] operator and iteration.</span>
+
+<span class="sd">    Example usage::</span>
+
+<span class="sd">        config = Config()</span>
+<span class="sd">        config.read_from_dict({ &quot;debug&quot;: True })</span>
+
+<span class="sd">        if config[&quot;debug&quot;]:</span>
+<span class="sd">            # Do debug stuff</span>
+
+<span class="sd">    You could then override the above configuration using the systems environment variables,</span>
+<span class="sd">    just prefix the var with `SURROUND_` like so::</span>
+
+<span class="sd">        SURROUND_DEBUG=False</span>
+
+<span class="sd">    It also supports overriding nested configuration data, for example with the following config::</span>
+
+<span class="sd">        predict:</span>
+<span class="sd">            debug: True</span>
+
+<span class="sd">    We can override the above with the following environment variable::</span>
+
+<span class="sd">        SURRROUND_PREDICT_DEBUG=False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Config.__init__"><a class="viewcode-back" href="../../surround.html#surround.Config.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor of the Config class, loads the default YAML file into storage.</span>
+<span class="sd">        If the :attr:`project_root` is provided then the project&#39;s `config.yaml`</span>
+<span class="sd">        file is also loaded into configuration.</span>
+
+<span class="sd">        The default config file (`defaults.yaml`) can be found in the same directory as the `config.py` script.</span>
+<span class="sd">        The project config file (`config.yaml`) can be found in the root of the project folder.</span>
+
+<span class="sd">        :param project_root: path to the root directory of the surround project (default: None)</span>
+<span class="sd">        :type project_root: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__load_defaults</span><span class="p">()</span>
 
         <span class="c1"># Set framework paths</span>
@@ -52,14 +219,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="s2">&quot;project_root&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">project_root</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="s2">&quot;model_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;models&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="s2">&quot;models_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;models&quot;</span><span class="p">)</span>
 
             <span class="c1"># Load project config</span>
             <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">project_root</span><span class="p">),</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_config_files</span><span class="p">([</span><span class="n">config_path</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_config_files</span><span class="p">([</span><span class="n">config_path</span><span class="p">])</span></div>
 
-    <span class="k">def</span> <span class="nf">read_config_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yaml_files</span><span class="p">):</span>
+<div class="viewcode-block" id="Config.read_config_files"><a class="viewcode-back" href="../../surround.html#surround.Config.read_config_files">[docs]</a>    <span class="k">def</span> <span class="nf">read_config_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yaml_files</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the YAML files provided and stores their key-value pairs in config.</span>
+
+<span class="sd">        :param yaml_files: multiple paths to the YAML files to load</span>
+<span class="sd">        :type yaml_files: list</span>
+<span class="sd">        :return: true on success, throws :exc:`IOError` on failure</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">yaml_files</span><span class="p">:</span>
@@ -71,24 +247,54 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__merge_configs</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__insert_environment_variables</span><span class="p">()</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="k">def</span> <span class="nf">read_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Config.read_from_dict"><a class="viewcode-back" href="../../surround.html#surround.Config.read_from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">read_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve all key-value pairs from the dict provided and store in config.</span>
+
+<span class="sd">        :param config_dict: configuration settings to be added to storage</span>
+<span class="sd">        :type config_dict: dict</span>
+<span class="sd">        :return: true on success, throws exception on failure (:exc:`TypeError`)</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">return</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;config_dict should be a dict&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__merge_configs</span><span class="p">([</span><span class="n">config_dict</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__insert_environment_variables</span><span class="p">()</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="Config.get_path"><a class="viewcode-back" href="../../surround.html#surround.Config.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns value that can be found at the key path provided (useful for nested values).</span>
+
+<span class="sd">        For example::</span>
+
+<span class="sd">            config.get_path(&#39;surround.stages&#39;) == config[&#39;surround&#39;][&#39;stages&#39;]</span>
+<span class="sd">            --&gt; True</span>
+
+<span class="sd">        :param path: path to the value in storage</span>
+<span class="sd">        :type path: str</span>
+<span class="sd">        :return: the value found at the path or none if not found</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;path should be a string&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">path</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__iterate_over_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__iterate_over_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__load_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the config key-value pairs loaded from defaults.yaml.</span>
+
+<span class="sd">        :return: the key-value pairs loaded from the file</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">resource_stream</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;defaults.yaml&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -98,13 +304,27 @@
         <span class="k">return</span> <span class="n">config</span>
 
     <span class="k">def</span> <span class="nf">__merge_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Merges a list of dictionaries into the dictionary of this class. Note that lists are</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merges a list of dictionaries into the dictionary of this class. Note that lists are</span>
 <span class="sd">        overriden completely not extended.</span>
+
+<span class="sd">        :param configs: a collection of dictionaries to merge into storage</span>
+<span class="sd">        :type configs: a list of dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;configs should be a list&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">extend_dict</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">src</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Merges the key-value pairs in src into the given target dictionary.</span>
+
+<span class="sd">            :param target: the target dictionary being extended</span>
+<span class="sd">            :type target: dict</span>
+<span class="sd">            :param src: the dictionary where key-value pairs are being extracted</span>
+<span class="sd">            :type src: dict</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">target</span><span class="p">:</span>
@@ -119,6 +339,15 @@
             <span class="n">extend_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__insert_environment_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inserts environment variables prefixed with ENV_VAR_PREFIX into storage. Overriding any</span>
+<span class="sd">        clashing key-value pairs in storage already.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        SURROUND_TEST_KEY=&#39;test_value&#39;</span>
+<span class="sd">        This will be loaded into storage as a string value and can be found at path &#39;test.key&#39; (or `config[&#39;test&#39;][&#39;key&#39;]`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">ENV_VAR_PREFIX</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ENV_VAR_PREFIX</span><span class="p">):</span>
                 <span class="k">continue</span>
@@ -126,6 +355,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__override_or_add_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">,</span> <span class="n">surround_variables</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__override_or_add_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">key_list</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively inserts or overrides the value in the storage specified at the specified path.</span>
+
+<span class="sd">        :param config: the storage container we&#39;re adding the value to</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        :param key_list: collection of keys that specifies the key path (e.g. [&quot;test&quot;, &quot;key&quot;] == &#39;test.key&#39;)</span>
+<span class="sd">        :type key_list: list of str</span>
+<span class="sd">        :param value: the value being set to the specified path</span>
+<span class="sd">        :type value: any</span>
+<span class="sd">        :return: the storage container we&#39;ve been adding to</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="n">key_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
@@ -141,6 +383,21 @@
         <span class="k">return</span> <span class="n">config</span>
 
     <span class="k">def</span> <span class="nf">__iterate_over_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">key_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the value of the last key in the key list provided by traversing the dict tree.</span>
+
+<span class="sd">        Example::</span>
+<span class="sd">            self.__iterate_over_dict({ &quot;a&quot;: { &quot;b&quot;: &quot;c&quot; } }, [&quot;a&quot;, &quot;b&quot;])</span>
+<span class="sd">            --&gt; &quot;c&quot;</span>
+
+<span class="sd">        :param dictionary: the dictionary we are finding the value in</span>
+<span class="sd">        :type dictionary: dict</span>
+<span class="sd">        :param key_list: collection of key names (correspond to the path to the value in the dictionary)</span>
+<span class="sd">        :type key_list: list of str</span>
+<span class="sd">        :return: the value found or none if not found</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">key</span> <span class="o">=</span> <span class="n">key_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">key_list</span> <span class="o">==</span> <span class="p">[]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -148,81 +405,116 @@
             <span class="k">return</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<div class="viewcode-block" id="Config.__getitem__"><a class="viewcode-back" href="../../surround.html#surround.Config.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides access to stored data via the [] operator.</span>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span>
+<span class="sd">        :param key: the key provided in the [] operator</span>
+<span class="sd">        :type key: str</span>
+<span class="sd">        :return: the value found at the specified key</span>
+<span class="sd">        :rtype: any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Config.__iter__"><a class="viewcode-back" href="../../surround.html#surround.Config.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows for iteration through the config dictionary.</span>
+
+<span class="sd">        Example::</span>
+
+<span class="sd">            config = Config()</span>
+<span class="sd">            config.read_config_files([&#39;config.yaml&#39;])</span>
+
+<span class="sd">            # Iterate over the key-value pairs in the config data</span>
+<span class="sd">            for key, value in config:</span>
+<span class="sd">                print(&quot;Key: &quot; + key + &quot; Value: &quot; + value)</span>
+
+<span class="sd">        :return: the iterator for the internal dictionary</span>
+<span class="sd">        :rtype: dict_keyiterator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the length of the config dictionary.</span>
+
+<span class="sd">        :return: the number of key-value pairs in the dictionary</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span></div>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">surround</a></h1>
+          <footer>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Scott Barnett.
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../surround.html">API Documentation</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Scott Barnett.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.7',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="../../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
 </html>

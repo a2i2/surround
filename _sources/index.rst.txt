@@ -10,4 +10,5 @@ Welcome to surround's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   getting-started.rst
    surround.rst

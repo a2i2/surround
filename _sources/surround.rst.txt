@@ -9,20 +9,42 @@ Surround
 .. autoclass:: Surround
    :members:
 
-SurroundData
-============
+   .. automethod:: __init__   
 
-.. autoclass:: SurroundData
+Config     
+======
+ 
+.. autoclass:: Config       
    :members:
+ 
+   .. automethod:: __init__  
 
+   .. automethod:: __getitem__  
+
+   .. automethod:: __iter__          
+  
+SurroundData  
+============
+   
+.. autoclass:: SurroundData        
+   :members:         
+ 
 Stage
 =====
-
+ 
 .. autoclass:: Stage
-   :members:
+   :members:         
+ 
+AllowedTypes    
+============
 
-Config
-======
+.. autoclass:: AllowedTypes 
+    :members:
 
-.. autoclass:: Config
-   :members:
+Wrapper      
+=======
+
+.. autoclass:: Wrapper  
+    :members:
+
+    .. automethod:: __init__
