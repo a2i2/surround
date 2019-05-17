@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>surround.linter &mdash; Surround 0.0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/temp_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Users's Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../surround.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Surround</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>surround.linter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for surround.linter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">from</span> <span class="nn">.stage</span> <span class="k">import</span> <span class="n">Stage</span>
+<span class="kn">from</span> <span class="nn">.surround</span> <span class="k">import</span> <span class="n">SurroundData</span><span class="p">,</span> <span class="n">Surround</span>
+
+
+<div class="viewcode-block" id="LinterStage"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage">[docs]</a><span class="k">class</span> <span class="nc">LinterStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for a check in the Surround :class:`Linter`.</span>
+
+<span class="sd">    Provides functions for creating warnings and errors that are</span>
+<span class="sd">    found during the linting process.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        class CheckExists(LinterStage):</span>
+<span class="sd">            def operate(self, data, config):</span>
+<span class="sd">                if not os.path.isdir(data.project_root):</span>
+<span class="sd">                    self.add_error(data, &quot;Project doesn&#39;t exist!&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LinterStage.__init__"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for a linter stage.</span>
+
+<span class="sd">        :param key: identifier of the linter stage</span>
+<span class="sd">        :type key: str</span>
+<span class="sd">        :param description: short description of the linter stage</span>
+<span class="sd">        :type description: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span></div>
+
+<div class="viewcode-block" id="LinterStage.add_error"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage.add_error">[docs]</a>    <span class="k">def</span> <span class="nf">add_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an error which will be displayed and stop the :class:`Linter`.</span>
+
+<span class="sd">        :param data: the data being passed between stages</span>
+<span class="sd">        :type data: :class:`ProjectData`</span>
+<span class="sd">        :param string: description of the error</span>
+<span class="sd">        :type string: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ERROR: </span><span class="si">%s</span><span class="s2">_CHECK: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">string</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LinterStage.add_warning"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage.add_warning">[docs]</a>    <span class="k">def</span> <span class="nf">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a warning that will be displayed but the :class:`Linter` will continue.</span>
+
+<span class="sd">        :param data: the data being passed between stages</span>
+<span class="sd">        :type data: :class:`ProjectData`</span>
+<span class="sd">        :param string: description of the warning</span>
+<span class="sd">        :type string: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WARNING: </span><span class="si">%s</span><span class="s2">_CHECK: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">string</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LinterStage.operate"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage.operate">[docs]</a>    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executed by the :class:`Linter`, performs the linting specific to this stage.</span>
+<span class="sd">        **Must** be implemented in extended versions of this class.</span>
+
+<span class="sd">        :param surround_data: the data being passed between stages</span>
+<span class="sd">        :type surround_data: :class:`ProjectData`</span>
+<span class="sd">        :param config: the configuration data for the linter</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="CheckData"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckData">[docs]</a><span class="k">class</span> <span class="nc">CheckData</span><span class="p">(</span><span class="n">LinterStage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :class:`Linter` stage that checks the data folder in the surround project for files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the CheckData linter stage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">LinterStage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;DATA&quot;</span><span class="p">,</span> <span class="s2">&quot;Check data files&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CheckData.operate"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckData.operate">[docs]</a>    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executed by the :class:`Linter`, checks if there is any files in the project&#39;s data folder.</span>
+<span class="sd">        If there is none then a warning will be issued.</span>
+
+<span class="sd">        :param surround_data: the data being passed between stages</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        :param config: the linter&#39;s configuration data</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">surround_data</span><span class="o">.</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="s2">&quot;No data available, data directory is empty&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CheckFiles"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckFiles">[docs]</a><span class="k">class</span> <span class="nc">CheckFiles</span><span class="p">(</span><span class="n">LinterStage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :class:`Linter` stage that checks the surround project files exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the CheckFiles linter stage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">LinterStage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;FILES&quot;</span><span class="p">,</span> <span class="s2">&quot;Check for Surround project files&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CheckFiles.operate"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckFiles.operate">[docs]</a>    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executed by the :class:`Linter`, checks if the files in the project structure exist.</span>
+<span class="sd">        Will create errors if required surround project files are missing in the root directory.</span>
+
+<span class="sd">        :param surround_data: the data being passed between stages</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        :param config: the linter&#39;s configuation data</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">project_structure</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">][</span><span class="s2">&quot;files&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">project_structure</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">][</span><span class="s2">&quot;templates&quot;</span><span class="p">]:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">surround_data</span><span class="o">.</span><span class="n">project_root</span><span class="p">,</span>
+                <span class="n">file_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_name</span><span class="o">=</span><span class="n">surround_data</span><span class="o">.</span><span class="n">project_name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="s2">&quot;Path </span><span class="si">%s</span><span class="s2"> does not exist&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CheckDirectories"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckDirectories">[docs]</a><span class="k">class</span> <span class="nc">CheckDirectories</span><span class="p">(</span><span class="n">LinterStage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :class:`Linter` stage that checks the surround project directories exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the CheckDirectories linter stage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">LinterStage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;DIRECTORIES&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Check for validating Surround&#39;s directory structure&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CheckDirectories.operate"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckDirectories.operate">[docs]</a>    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executed by the :class:`Linter`, checks whether the project directories exist.</span>
+<span class="sd">        If the expected directories don&#39;t exist then errors will be created.</span>
+
+<span class="sd">        :param surround_data: the data being passed between stages</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        :param config: the linter&#39;s configuration data</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">project_structure</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">][</span><span class="s2">&quot;dirs&quot;</span><span class="p">]:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">surround_data</span><span class="o">.</span><span class="n">project_root</span><span class="p">,</span>
+                                <span class="n">d</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_name</span><span class="o">=</span><span class="n">surround_data</span><span class="o">.</span><span class="n">project_name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="s2">&quot;Directory </span><span class="si">%s</span><span class="s2"> does not exist&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ProjectData"><a class="viewcode-back" href="../../surround.html#surround.linter.ProjectData">[docs]</a><span class="k">class</span> <span class="nc">ProjectData</span><span class="p">(</span><span class="n">SurroundData</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class containing the data passed between each :class:`LinterStage`.</span>
+
+<span class="sd">    **Attributes:**</span>
+
+<span class="sd">    - :attr:`project_structure` - expected file structure of the surround project (:class:`dict`)</span>
+<span class="sd">    - :attr:`project_root` - path to the root of the surround project (:class:`str`)</span>
+<span class="sd">    - :attr:`project_name` - name of the surround project (:class:`str`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_structure</span><span class="p">,</span> <span class="n">project_root</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the ProjectData class.</span>
+
+<span class="sd">        :param project_structure: the expected file structure of the project</span>
+<span class="sd">        :type project_structure: dict</span>
+<span class="sd">        :param project_root: path to the root of the project</span>
+<span class="sd">        :type project_root: str</span>
+<span class="sd">        :param project_name: name of the project</span>
+<span class="sd">        :type project_name: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_structure</span> <span class="o">=</span> <span class="n">project_structure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">=</span> <span class="n">project_root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name</span></div>
+
+
+<div class="viewcode-block" id="Linter"><a class="viewcode-back" href="../../surround.html#surround.linter.Linter">[docs]</a><span class="k">class</span> <span class="nc">Linter</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents the Surround linter which performs multiple checks on the surround project</span>
+<span class="sd">    and displays warnings/errors found during the linting process.</span>
+
+<span class="sd">    This class is used by the Surround CLI to perform the linting of a project via the</span>
+<span class="sd">    `lint` sub-command.</span>
+
+<span class="sd">    To add a new check to the linter, append it to the stages list being passed to</span>
+<span class="sd">    the :class:`surround.Surround` constructor, which is then being set to the attribute :attr:`linter_checks`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">linter_checks</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">CheckDirectories</span><span class="p">(),</span> <span class="n">CheckFiles</span><span class="p">(),</span> <span class="n">CheckData</span><span class="p">()])</span>
+
+<div class="viewcode-block" id="Linter.dump_checks"><a class="viewcode-back" href="../../surround.html#surround.linter.Linter.dump_checks">[docs]</a>    <span class="k">def</span> <span class="nf">dump_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dumps a list of the checks in this linter.</span>
+<span class="sd">        The list is compiled using the :attr:`LinterStage.key` and :attr:`LinterStage.description`</span>
+<span class="sd">        attributes of each check.</span>
+
+<span class="sd">        :return: formatted list of the checkers in the linter</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Checkers in Surround&#39;s linter</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;=============================&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">linter_checks</span><span class="o">.</span><span class="n">surround_stages</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stage</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">stage</span><span class="o">.</span><span class="n">description</span><span class="p">))</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="Linter.check_project"><a class="viewcode-back" href="../../surround.html#surround.linter.Linter.check_project">[docs]</a>    <span class="k">def</span> <span class="nf">check_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">project_root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the linter against the project specified, returning any warnings/errors.</span>
+
+<span class="sd">        :param project: expected file structure of the project</span>
+<span class="sd">        :type project: dict</span>
+<span class="sd">        :param project_root: path to the root of the project (default: current directory)</span>
+<span class="sd">        :type project_root: str</span>
+<span class="sd">        :return: errors and warnings found (if any)</span>
+<span class="sd">        :rtype: (list of error strings, list of warning strings)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">project_root</span><span class="p">)</span>
+        <span class="n">project_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">ProjectData</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linter_checks</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">warnings</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Scott Barnett
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

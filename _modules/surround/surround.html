@@ -171,10 +171,8 @@
 <span class="k">class</span> <span class="nc">Frozen</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class that can toggle the ability of adding new attributes.</span>
-
-<span class="sd">    Public methods:</span>
-<span class="sd">    - freeze()</span>
-<span class="sd">    - thaw()</span>
+<span class="sd">    When the class is considered frozen, adding new attributes will</span>
+<span class="sd">    trigger a :exc:`TypeError` exception.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__isfrozen</span> <span class="o">=</span> <span class="kc">False</span>
@@ -235,7 +233,7 @@
 <span class="sd">                if not isinstance(data.input_data, str):</span>
 <span class="sd">                    data.errors.append(&#39;not correct input format!&#39;)</span>
 <span class="sd">                elif len(data.input_data) == 0:</span>
-<span class="sd">                    data.warning.append(&#39;input is empty&#39;)</span>
+<span class="sd">                    data.warnings.append(&#39;input is empty&#39;)</span>
 
 <span class="sd">        pipeline = Surround([ValidationStage(), PredictStage()])</span>
 <span class="sd">        data = PipelineData(&quot;received data&quot;)</span>
@@ -286,7 +284,7 @@
 <span class="sd">        Constructs an instance of a Surround pipeline.</span>
 
 <span class="sd">        :param surround_stages: the surround stages to be executed in this pipeline (default: None)</span>
-<span class="sd">        :type surround_stages: a list of :class:`Stage`</span>
+<span class="sd">        :type surround_stages: a list of :class:`surround.stage.Stage`</span>
 <span class="sd">        :param module: name of the module that is creating this instance (used to get root directory)</span>
 <span class="sd">        :type module: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -316,7 +314,7 @@
 <span class="sd">        Ensures order of stages set in the Config instance is followed (if set).</span>
 
 <span class="sd">        :param config: instance containing configuration data</span>
-<span class="sd">        :type config: :class:`Config`</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">Config</span><span class="p">):</span>
@@ -338,7 +336,7 @@
 <span class="sd">        Executes the provided stage with data, dumping output (if requested) and logging execution time.</span>
 
 <span class="sd">        :param stage: the stage you would like to execute</span>
-<span class="sd">        :type stage: :class:`Stage`</span>
+<span class="sd">        :type stage: :class:`surround.stage.Stage`</span>
 <span class="sd">        :param stage_data: the data that is being transformed by the stage</span>
 <span class="sd">        :type stage_data: :class:`SurroundData`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -356,7 +354,7 @@
 
 <div class="viewcode-block" id="Surround.init_stages"><a class="viewcode-back" href="../../surround.html#surround.Surround.init_stages">[docs]</a>    <span class="k">def</span> <span class="nf">init_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes all stages in the pipeline by calling their :meth:`Stage.init_stage` method.</span>
+<span class="sd">        Initializes all stages in the pipeline by calling their :meth:`surround.stage.Stage.init_stage` method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround_stages</span><span class="p">:</span>
@@ -399,7 +397,7 @@
 
 <div class="viewcode-block" id="AllowedTypes"><a class="viewcode-back" href="../../surround.html#surround.AllowedTypes">[docs]</a><span class="k">class</span> <span class="nc">AllowedTypes</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enumeration for types allowed as input to a pipeline.</span>
+<span class="sd">    Enumeration for types allowed as input to a pipeline via the :class:`Wrapper`.</span>
 
 <span class="sd">    - :attr:`AllowedTypes.JSON` - Accept JSON data only</span>
 <span class="sd">    - :attr:`AllowedTypes.FILE` - Accept files only</span>
@@ -530,7 +528,7 @@
 <span class="sd">        Returns the configuration data of the surround pipeline.</span>
 
 <span class="sd">        :return: the data used to configure the pipeline</span>
-<span class="sd">        :rtype: :class:`Config`</span>
+<span class="sd">        :rtype: :class:`surround.config.Config`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">config</span></div></div>
