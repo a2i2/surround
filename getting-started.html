@@ -88,10 +88,15 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-via-pip">Install via Pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-via-source">Install via Source</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#project-setup">Project Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-your-first-pipeline">Creating your first pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#running-your-first-pipeline">Running your first pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-your-first-pipeline-in-a-container">Running your first pipeline in a container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#serving-your-first-pipeline-via-web-endpoint">Serving your first pipeline via Web Endpoint</a></li>
 </ul>
 </li>
@@ -167,18 +172,225 @@
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Python 3+ (Tested on 3.6.5)</p></li>
+<li><p>Docker</p></li>
+<li><p>Supports MacOS, Linux, and Windows</p></li>
+</ul>
+</div>
+<div class="section" id="install-via-pip">
+<h3>Install via Pip<a class="headerlink" href="#install-via-pip" title="Permalink to this headline">¶</a></h3>
+<p>Run the following command to install the latest version of Surround:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip3 install surround
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If this doesn’t work make sure you have pip installed. See <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">here</a> on how to install it.</p>
+</div>
+<p>Now the Surround library and command-line tool should be installed! To make sure run the following command to test:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround
+</pre></div>
+</div>
+<p>If it works then you are ready for the <a class="reference internal" href="#project-setup"><span class="std std-ref">Project Setup</span></a> stage.</p>
+</div>
+<div class="section" id="install-via-source">
+<h3>Install via Source<a class="headerlink" href="#install-via-source" title="Permalink to this headline">¶</a></h3>
+<p>If for some reason the above isn’t working for you, or you plan to extend Surround, then you can install via the source.
+So first clone the repository like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/a2i2/surround.git
+$ cd surround
+</pre></div>
+</div>
+<p>Then install the package using the <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py install
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This step requires the module <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> to be installed. See <a class="reference external" href="https://pypi.org/project/setuptools/">here</a> on how to install it.</p>
+</div>
+<p>Then test the installation by running the tests and trying the surround CLI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py test
+
+$ surround
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="project-setup">
-<h2>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
+<span id="id3"></span><h2>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
+<p>Before we can create our first pipeline, we need to generate an empty Surround project.
+Use the following command to generate a new project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround init -p testproject -d &quot;Our first pipeline&quot;
+</pre></div>
+</div>
+<p>This will create a new folder called <code class="docutils literal notranslate"><span class="pre">testproject</span></code> with the following file structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>testproject
+├── Dockerfile
+├── README.md
+├── data
+├── testproject
+│   ├── __main__.py
+│   ├── config.yaml
+│   ├── wrapper.py
+│   └── stages.py
+├── docs
+├── dodo.py
+├── models
+├── notebooks
+├── output
+├── requirements.txt
+├── scripts
+├── spikes
+└── tests
+</pre></div>
+</div>
+<p>The generated project comes with an example pipeline that can be ran straight away using the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd testproject
+$ python3 -m testproject
+</pre></div>
+</div>
+<p>Which should output the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Stage</span> <span class="n">ValidateData</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000007</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Surround</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000802</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:{</span><span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;TODO: Validate input data assumptions here&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Now you are ready for <a class="reference internal" href="#create-first-pipeline"><span class="std std-ref">Creating your first pipeline</span></a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Not sure what a pipeline is? Checkout our <a class="reference internal" href="about.html#about"><span class="std std-ref">About</span></a> section first!</p>
+</div>
 </div>
 <div class="section" id="creating-your-first-pipeline">
-<h2>Creating your first pipeline<a class="headerlink" href="#creating-your-first-pipeline" title="Permalink to this headline">¶</a></h2>
+<span id="create-first-pipeline"></span><h2>Creating your first pipeline<a class="headerlink" href="#creating-your-first-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>For our first Surround pipeline, we are going to do some very basic data transformation and convert the input string
+from lower case to upper case. This pipeline is going to consist of two stages, <code class="docutils literal notranslate"><span class="pre">ValidateData</span></code> and <code class="docutils literal notranslate"><span class="pre">MakeUpperCase</span></code>.</p>
+<p>Open the script <code class="docutils literal notranslate"><span class="pre">stages.py</span></code> and you should see the following code already generated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">surround</span> <span class="k">import</span> <span class="n">Stage</span><span class="p">,</span> <span class="n">SurroundData</span>
+
+<span class="k">class</span> <span class="nc">TestprojectData</span><span class="p">(</span><span class="n">SurroundData</span><span class="p">):</span>
+    <span class="n">output_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">class</span> <span class="nc">ValidateData</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="s2">&quot;TODO: Validate input data assumptions here&quot;</span>
+</pre></div>
 </div>
-<div class="section" id="running-your-first-pipeline">
-<h2>Running your first pipeline<a class="headerlink" href="#running-your-first-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>As you can see we are already given the <code class="docutils literal notranslate"><span class="pre">ValidateData</span></code> stage, we just need to edit the <code class="docutils literal notranslate"><span class="pre">operate</span></code> method to
+check if the input data is the correct data type (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># Create an error sine the data is wrong, this will stop the pipeline</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Input is not a string!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we need to create the <code class="docutils literal notranslate"><span class="pre">MakeUpperCase</span></code> stage which will perform the data transformation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MakeUpperCase</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="c1"># Convert the input into upper case</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now we just need to add this new stage into the actual pipeline, so first open the <code class="docutils literal notranslate"><span class="pre">wrapper.py</span></code> script, you should see the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">surround</span> <span class="k">import</span> <span class="n">Surround</span><span class="p">,</span> <span class="n">Wrapper</span><span class="p">,</span> <span class="n">AllowedTypes</span>
+<span class="kn">from</span> <span class="nn">stages</span> <span class="k">import</span> <span class="n">ValidateData</span><span class="p">,</span> <span class="n">TestprojectData</span>
+
+<span class="k">class</span> <span class="nc">PipelineWrapper</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">surround</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">ValidateData</span><span class="p">()],</span> <span class="vm">__name__</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">surround</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">input_data</span><span class="p">)[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">TestprojectData</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Edit this script to first import the new stage like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stages</span> <span class="k">import</span> <span class="n">ValidateData</span><span class="p">,</span> <span class="n">MakeUpperCase</span><span class="p">,</span> <span class="n">TestprojectData</span>
+</pre></div>
+</div>
+<p>Then append an instance of the stage in the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> being passed to the <code class="docutils literal notranslate"><span class="pre">Surround</span></code> constructor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">surround</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">ValidateData</span><span class="p">(),</span> <span class="n">MakeUpperCase</span><span class="p">()],</span> <span class="vm">__name__</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">surround</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s it for the pipeline! To test the pipeline with default input (<code class="docutils literal notranslate"><span class="pre">&quot;hello&quot;</span></code> string) just run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m testproject
+</pre></div>
+</div>
+<p>The output should be the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Stage</span> <span class="n">ValidateData</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000004</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Stage</span> <span class="n">MakeUpperCase</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000029</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Surround</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.001610</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:{</span><span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;HELLO&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To modify what happens when <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">testproject</span></code> is executed, edit the <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code> script.</p>
+</div>
+</div>
+<div class="section" id="running-your-first-pipeline-in-a-container">
+<h2>Running your first pipeline in a container<a class="headerlink" href="#running-your-first-pipeline-in-a-container" title="Permalink to this headline">¶</a></h2>
+<p>First you must build an image for your container. To do this just run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run build
+</pre></div>
+</div>
+<p>Then to run the container in dev mode just use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run dev
+</pre></div>
+</div>
+<p>This will run the container linking the folder <code class="docutils literal notranslate"><span class="pre">testproject/testproject</span></code> with the working directory in the
+container. So during development when you make small changes, there is no need to build the image again.</p>
+<p>Then when you are ready for production testing you use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run prod
+</pre></div>
+</div>
+<p>Which will first build the image and then run the container without any linking to the host machine.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Both methods of running will use the equivalent command to <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">testproject</span></code> inside the container.</p>
+</div>
 </div>
 <div class="section" id="serving-your-first-pipeline-via-web-endpoint">
 <h2>Serving your first pipeline via Web Endpoint<a class="headerlink" href="#serving-your-first-pipeline-via-web-endpoint" title="Permalink to this headline">¶</a></h2>
+<p>Using Surround we can also host a web-server which can receive data, pass it through our pipeline
+and return the result. All via HTTP endpoints, making your pipeline accessible by any application!</p>
+<p>Before we can run the web-server, we need to install a dependency called <code class="docutils literal notranslate"><span class="pre">tornado</span></code>, do this like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip3 install tornado==6.0.1
+</pre></div>
+</div>
+<p>To start the web-server run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run --web
+</pre></div>
+</div>
+<p>Which should output the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">testproject</span> <span class="ow">is</span> <span class="n">running</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8888</span>
+<span class="n">Available</span> <span class="n">endpoints</span><span class="p">:</span>
+<span class="o">*</span> <span class="n">GET</span>  <span class="o">/</span>                 <span class="c1"># Health check</span>
+<span class="o">*</span> <span class="n">POST</span> <span class="o">/</span><span class="n">predict</span>          <span class="c1"># Send data to the Surround pipeline</span>
+</pre></div>
+</div>
+<p>Now you can send data to your pipeline via HTTP POST to the <code class="docutils literal notranslate"><span class="pre">/predict</span></code> endpoint like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ curl -d &quot;{ \&quot;data\&quot;: \&quot;mAkE aLL upper CASE\&quot; }&quot; http://localhost:8888/predict
+</pre></div>
+</div>
+<p>Which should output the following if succssful:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;MAKE ALL UPPER CASE&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
 </div>
 </div>
 
