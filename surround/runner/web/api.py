@@ -35,7 +35,7 @@ class Upload(tornado.web.RequestHandler):
         Returns the path to the folder containing the upload.html file.
 
         :return: path to the folder
-        :rtype: string
+        :rtype: str
         """
 
         path_to_upload_dir = os.path.split(__file__)[0]
@@ -45,6 +45,8 @@ class Upload(tornado.web.RequestHandler):
         """
         Called when endpoint is requested via GET method.
         Renders the upload.html file in the user's browser.
+
+        The form in `upload.html` POST's to the :class:`Predict` endpoint.
         """
 
         self.render("upload.html")
@@ -60,7 +62,7 @@ class Predict(tornado.web.RequestHandler):
         reference to the pipeline wrapper.
 
         :param wrapper: the wrapper for the surround pipeline
-        :type wrapper: <class 'surround.surround.Wrapper'>
+        :type wrapper: :class:`surround.Wrapper`
         """
 
         self.wrapper = wrapper
@@ -81,12 +83,18 @@ class Predict(tornado.web.RequestHandler):
 
 def make_app(wrapper_object):
     """
-    Creates a web-server with the endpoints above that can process data using the surround pipeline provided.
+    Creates a web-server with the following endpoints:
+
+    - `/` - HTTP GET - responds with the Surround version and current uptime (see :class:`HealthCheck`)
+    - `/upload` - HTTP GET - used to upload a file and run the pipeline on the file (see :class:`Upload`)
+    - `/predict` - HTTP POST - runs the pipeline on the data in the body of the request (see :class:`Predict`)
+
+    .. note:: This function is called by the Surround CLI.
 
     :param wrapper_object: the wrapper for the surround pipeline
-    :type wrapper_object: <class 'surround.surround.Wrapper'>
+    :type wrapper_object: :class:`surround.Wrapper`
     :return: the web-server application object
-    :rtype: <class 'tornado.web.Application'>
+    :rtype: :class:`tornado.web.Application`
     """
 
     predict_init_args = dict(wrapper=wrapper_object)

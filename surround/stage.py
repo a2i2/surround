@@ -7,7 +7,7 @@ class Stage(ABC):
 
     Stages main responsiblity are to transform input data in some way, this may be a
     data wrangling operation or a prediciton operation. This operation must happen in the
-    :meth:`Stage.operate` method.
+    :meth:`surround.stage.Stage.operate` method.
 
     Example::
 
@@ -27,12 +27,12 @@ class Stage(ABC):
         """
         Dump the output of the stage after the operate method has transformed the input data.
 
-        .. note:: This is called by :meth:`Surround.process` (when dumping output is requested)
+        .. note:: This is called by :meth:`surround.Surround.process` (when dumping output is requested)
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`SurroundData`
+        :type surround_data: Instance or child of :class:`surround.SurroundData`
         :param config: Config of the pipeline
-        :type config: :class:`Config`
+        :type config: :class:`surround.config.Config`
         """
 
     @abstractmethod
@@ -42,12 +42,12 @@ class Stage(ABC):
         implemented in extensions of this class. Where it should perform some
         transformation/checking of the :attr:`surround_data`.
 
-        .. note:: This is called by the :meth:`Surround.process` method before/after other stages.
+        .. note:: This is called by the :meth:`surround.Surround.process` method before/after other stages.
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`SurroundData`
+        :type surround_data: Instance or child of :class:`surround.SurroundData`
         :param config: Contains the settings for each stage
-        :type config: :class:`Config`
+        :type config: :class:`surround.config.Config`
         """
 
     def init_stage(self, config):
@@ -56,10 +56,10 @@ class Stage(ABC):
         is called ONLY once before the stage is executed.
 
         For example you may load a Tensorflow model which you will use
-        for prediction in the :meth:`Stage.operate` method.
+        for prediction in the :meth:`surround.stage.Stage.operate` method.
 
-        .. note:: This is called by the :meth:`Surround.init_stages` method.
+        .. note:: This is called by the :meth:`surround.Surround.init_stages` method.
 
         :param config: Contains the settings for each stage
-        :type config: :class:`Config`
+        :type config: :class:`surround.config.Config`
         """

@@ -78,7 +78,7 @@ class SurroundData(Frozen):
                 if not isinstance(data.input_data, str):
                     data.errors.append('not correct input format!')
                 elif len(data.input_data) == 0:
-                    data.warning.append('input is empty')
+                    data.warnings.append('input is empty')
 
         pipeline = Surround([ValidationStage(), PredictStage()])
         data = PipelineData("received data")
@@ -129,7 +129,7 @@ class Surround(ABC):
         Constructs an instance of a Surround pipeline.
 
         :param surround_stages: the surround stages to be executed in this pipeline (default: None)
-        :type surround_stages: a list of :class:`Stage`
+        :type surround_stages: a list of :class:`surround.stage.Stage`
         :param module: name of the module that is creating this instance (used to get root directory)
         :type module: str
         """
@@ -159,7 +159,7 @@ class Surround(ABC):
         Ensures order of stages set in the Config instance is followed (if set).
 
         :param config: instance containing configuration data
-        :type config: :class:`Config`
+        :type config: :class:`surround.config.Config`
         """
 
         if not config or not isinstance(config, Config):
@@ -181,7 +181,7 @@ class Surround(ABC):
         Executes the provided stage with data, dumping output (if requested) and logging execution time.
 
         :param stage: the stage you would like to execute
-        :type stage: :class:`Stage`
+        :type stage: :class:`surround.stage.Stage`
         :param stage_data: the data that is being transformed by the stage
         :type stage_data: :class:`SurroundData`
         """
@@ -199,7 +199,7 @@ class Surround(ABC):
 
     def init_stages(self):
         """
-        Initializes all stages in the pipeline by calling their :meth:`Stage.init_stage` method.
+        Initializes all stages in the pipeline by calling their :meth:`surround.stage.Stage.init_stage` method.
         """
 
         for stage in self.surround_stages:
@@ -242,7 +242,7 @@ class Surround(ABC):
 
 class AllowedTypes(Enum):
     """
-    Enumeration for types allowed as input to a pipeline.
+    Enumeration for types allowed as input to a pipeline via the :class:`Wrapper`.
 
     - :attr:`AllowedTypes.JSON` - Accept JSON data only
     - :attr:`AllowedTypes.FILE` - Accept files only
@@ -373,7 +373,7 @@ class Wrapper():
         Returns the configuration data of the surround pipeline.
 
         :return: the data used to configure the pipeline
-        :rtype: :class:`Config`
+        :rtype: :class:`surround.config.Config`
         """
 
         return self.surround.config
