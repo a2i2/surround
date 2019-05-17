@@ -71,7 +71,7 @@ class SurroundData(Frozen):
                 if not isinstance(data.input_data, str):
                     data.errors.append('not correct input format!')
                 elif len(data.input_data) == 0:
-                    data.warning.append('input is empty')
+                    data.warnings.append('input is empty')
 
         pipeline = Surround([ValidationStage(), PredictStage()])
         data = PipelineData("received data")
