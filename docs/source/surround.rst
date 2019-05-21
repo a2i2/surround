@@ -12,24 +12,16 @@ Surround
     .. autoclass:: Surround
         :members:
 
-        .. automethod:: __init__   
-
     .. automodule:: surround.config
 
     Config     
     ^^^^^^
     
     .. autoclass:: surround.config.Config       
-        :members:   
-    
-        .. automethod:: __init__  
+        :members:          
 
-        .. automethod:: __getitem__  
-
-        .. automethod:: __iter__          
-
-        .. automodule:: surround
-
+        .. automodule:: surround  
+ 
     SurroundData  
     ^^^^^^^^^^^^
     
@@ -48,8 +40,6 @@ Wrapper
 =======
 .. autoclass:: surround.Wrapper  
     :members:
-
-    .. automethod:: __init__
 
 AllowedTypes    
 ^^^^^^^^^^^^
@@ -72,8 +62,6 @@ Linter
     .. autoclass:: LinterStage
         :show-inheritance:
         :members:
-
-        .. automethod:: __init__
 
     ProjectData
     ^^^^^^^^^^^
