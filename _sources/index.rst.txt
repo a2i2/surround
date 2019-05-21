@@ -1,5 +1,5 @@
 .. image:: temp_logo.png
-    :alt: Flask: web development, one drop at a time
+    :alt: Surround
     :align: center
 
 Welcome to Surround

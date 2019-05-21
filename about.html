@@ -87,8 +87,27 @@
               <p class="caption"><span class="caption-text">Users's Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">About</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-surround-exactly">What is Surround exactly?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#who-is-surround-for">Who is Surround for?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-surround-exactly">What is Surround exactly?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#a-philosophy">A Philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-set-of-conventions">A set of conventions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-command-line-tool">A command line tool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-python-library">A Python library</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-surround-work-at-its-core">How does Surround work at its core?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#assembler">Assembler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stages">Stages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loaders">Loaders</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#validators">Validators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estimators">Estimators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizers">Visualizers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data">Data</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
@@ -164,9 +183,237 @@
 <span id="id1"></span><h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="what-is-surround-exactly">
 <h2>What is Surround exactly?<a class="headerlink" href="#what-is-surround-exactly" title="Permalink to this headline">¶</a></h2>
+<p>Surround is an open-source framework developed by the Applied Artificial Intelligence Institute (<cite>A</cite><sup>2</sup><cite>I</cite><sup>2</sup>) to take machine
+learning solutions through from exploration all the way to production. For this reason, it is developed with both
+research engineers and software developers in mind. Designed to play nice with existing machine learning frameworks
+(Tensorflow, MXNet, PyTorch, etc) and cloud services (Google Cloud AI, SageMaker, Rekognition etc), engineers have the freedom
+to use whatever necessary to solve their problem.</p>
+<div class="section" id="a-philosophy">
+<h3>A Philosophy<a class="headerlink" href="#a-philosophy" title="Permalink to this headline">¶</a></h3>
+<p>Surround isn’t just a framework, its also a philosophy. From the moment data lands on our desk we need to be thinking about the
+final use case for the solutions we are developing. To reduce the amount of time between data exploration and a containerised
+proof-of-concept web application ready to be deployed, Surround was built to resolve some competing requirements of both researchers
+and engineers. Where in general researchers want to dive into the data and leave code quality to later, and engineers prefer
+well structured code from the start. We attempt to solve this problem with Surround by introducing a “production first” mindset and
+providing conventions for researchers (a separate folder for data exploration scripts).</p>
+<p>Long ago, web frameworks realised there are a set of concerns that almost all web applications must deal with, such as connecting
+to databases, managing configuration, rendering static and dynamic content, and handling security concerns. Machine Learning projets
+have similar concerns but also have their own set of special concerns such as:</p>
+<ul class="simple">
+<li><p>Experimentation is a first class citizen</p></li>
+<li><p>Data and models need to be versioned and managed</p></li>
+<li><p>Model performance needs to be visualized</p></li>
+<li><p>Training infrastructure is required</p></li>
+<li><p>Etc..</p></li>
+</ul>
+<p>Surround strives to provide a <strong>single place</strong> for every concern that arises when building a ML project. Ideally there will be a single
+solution to any concerns that occur to either the research engineer or the software developer. But to be the <strong>single place</strong> for ML projects
+we are going to have to support as many existing frameworks, libraries and APIs as we can. This can be seen reflected in the design of Surround
+where the Core framework could be used to build:</p>
+<ul class="simple">
+<li><p>A solution based on cloud APIs</p></li>
+<li><p>A custom Docker image for SageMaker</p></li>
+<li><p>Form part of a batch process running on an internal Kubernetes cluster</p></li>
+</ul>
+<p>By <strong>playing nice with others</strong> we hope the core Surround framework can continue to be used as the ML ecosystem evolves.</p>
 </div>
-<div class="section" id="who-is-surround-for">
-<h2>Who is Surround for?<a class="headerlink" href="#who-is-surround-for" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="a-set-of-conventions">
+<h3>A set of conventions<a class="headerlink" href="#a-set-of-conventions" title="Permalink to this headline">¶</a></h3>
+<p>Surround attempts to enforce a set of conventions to help researchers keep their solutions structured for software developers and
+implements solutions for common ML project concepts such as managing configuration so that they don’t have to.</p>
+<p>These conventions are adhered to through the use of a project generator and project linter that will check for the core conventions.
+For example during project generation, the following structure is used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>package name
+├── Dockerfile
+├── README.md
+├── data
+├── package name
+│   ├── __main__.py
+│   ├── config.yaml
+│   ├── visualiser.py
+│   ├── loader.py
+│   └── stage
+│       ├── validator.py
+│       ├── wrangler.py
+│       ├── decider.py
+│       └── estimator.py
+├── docs
+├── dodo.py
+├── models
+├── notebooks
+├── output
+├── requirements.txt
+├── scripts
+├── spikes
+└── tests
+    └── integration.py
+</pre></div>
+</div>
+<p>Every Surround project has the following characteristics:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> for bundling up the project as a web application.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dodo.py</span></code> file containing useful tasks such as train, batch predict and test for a project.</p></li>
+<li><p>Tests for catching training serving skew.</p></li>
+<li><p>A single entry point for running the application, <code class="docutils literal notranslate"><span class="pre">main.py</span></code>.</p></li>
+<li><p>A place for data exploration with Jupyter notebooks and miscellaneous scripts.</p></li>
+<li><p>A single place, for output files, data, and model storage.</p></li>
+</ul>
+</div>
+<div class="section" id="a-command-line-tool">
+<h3>A command line tool<a class="headerlink" href="#a-command-line-tool" title="Permalink to this headline">¶</a></h3>
+<p>Surround also comes with a command line tool (CLI) which can perform a variety of tasks such as project generation and running
+the project in Docker. The tools included are shown below:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">init</span></code> - Used to generate a new Surround project.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lint</span></code> - Used to run the Surround Linter which checks if Surround conventions are being used correctly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run</span></code> - Used to run a task defined in <code class="docutils literal notranslate"><span class="pre">dodo.py</span></code> or starting the web-server.</p></li>
+</ul>
+<p>Where the <code class="docutils literal notranslate"><span class="pre">run</span></code> command is essentially a wrapper around the <code class="docutils literal notranslate"><span class="pre">doit</span></code> library and the Surround Linter will perform multiple checks
+on the current project to see if it is following standard conventions. The intention of the Surround Linter will to become more
+of an assistant when building ML projects. These tools are automatically added to your environment path so they can be used anywhere
+in your preferred terminal application.</p>
+</div>
+<div class="section" id="a-python-library">
+<h3>A Python library<a class="headerlink" href="#a-python-library" title="Permalink to this headline">¶</a></h3>
+<p>The last component of Surround is the Python library. We developed the Python library to provide a flexible way of running a ML
+pipeline in a variety of situations whether that be from a queue, a http endpoint or from a file system. We found that during
+development the research engineer often needed to run results from a file, something that is not always needed in a production
+environment. Surround’s Python library was designed to leverage the conventions outlined above to provide maximum productivity
+boost to research engineers provided the conventions are followed. Surround also provides wrappers around libraries such as
+the Tornado web server to provide advanced functionality. These 3rd party dependencies are not installed by default and need
+to be added to the project before Surround will make the wrappers available.</p>
+</div>
+</div>
+<div class="section" id="how-does-surround-work-at-its-core">
+<h2>How does Surround work at its core?<a class="headerlink" href="#how-does-surround-work-at-its-core" title="Permalink to this headline">¶</a></h2>
+<p>At its core, there are four main concepts that you need to understand while using Surround, these are:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a></p></li>
+<li><p><a class="reference internal" href="#stages"><span class="std std-ref">Stages</span></a></p></li>
+<li><p><a class="reference internal" href="#configuration"><span class="std std-ref">Configuration</span></a></p></li>
+<li><p><a class="reference internal" href="#data"><span class="std std-ref">Data</span></a></p></li>
+</ul>
+<p>The most <strong>important</strong> being the <strong>first two</strong> since they make up the actual pipeline that is responsible for taking in data and spitting
+out a prediction based on that input.</p>
+<div class="section" id="assembler">
+<span id="id2"></span><h3>Assembler<a class="headerlink" href="#assembler" title="Permalink to this headline">¶</a></h3>
+<img alt="Surround flow diagram" class="align-center" src="_images/pipeline_flow_diagram.png" />
+<p>The Assembler (formerly Surround) is responsible for constructing and executing a pipeline on data. How the pipeline is constructed depends on which
+execution mode (task) is required. The above diagram describes a simple Surround pipeline showing four different modes of
+execution. These modes are:</p>
+<ul class="simple">
+<li><p><strong>Predict</strong> - Used for production, runs the estimator in predict mode, takes some data and just returns the output data.</p></li>
+<li><p><strong>Batch-predict</strong> - Used for evaluation, uses a Loader to run a lot of data through the pipeline, visualizes performance.</p></li>
+<li><p><strong>Train</strong> - Used to train an estimator, loads data using a Loader, configures the estimator to be in <code class="docutils literal notranslate"><span class="pre">train</span></code> mode, visualizes output.</p></li>
+<li><p><strong>Test</strong> - Used to test the pipeline in all aspects (prediction and training).</p></li>
+</ul>
+<p>Each coloured line in the figure above is a different sequence of execution, each rectangle are <a class="reference internal" href="#stages"><span class="std std-ref">Stages</span></a> which are executed one at a time by the Assembler during processing. There
+are multiple different types of stages, these include: <a class="reference internal" href="#loaders"><span class="std std-ref">Loaders</span></a>, <a class="reference internal" href="#validators"><span class="std std-ref">Validators</span></a>, <a class="reference internal" href="#filters"><span class="std std-ref">Filters</span></a>, <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>, and <a class="reference internal" href="#visualizers"><span class="std std-ref">Visualizers</span></a>.</p>
+</div>
+<div class="section" id="stages">
+<span id="id3"></span><h3>Stages<a class="headerlink" href="#stages" title="Permalink to this headline">¶</a></h3>
+<p>A stage, at its base, can do three things:</p>
+<ul class="simple">
+<li><p><strong>Initialize</strong> anything needed to complete its function. This may include a loading a Tensorflow graph or loading configuration data.</p></li>
+<li><p><strong>Perform</strong> its intended operation. Whether that be feeding data through a model or checking if the data is correct.</p></li>
+<li><p><strong>Dump</strong> output from the operation to the console (if requested, used for debugging).</p></li>
+</ul>
+<p>Between each stage, during processing, there are two objects passed between them:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#data"><span class="std std-ref">Data</span></a> object which contains the input data, has a field for errors (which stops the execution when added to) and holds the output of each stage (if any).</p></li>
+<li><p><a class="reference internal" href="#configuration"><span class="std std-ref">Configuration</span></a> object which contains all the settings loaded in from YAML files plus paths to folders in the project such as <code class="docutils literal notranslate"><span class="pre">data/</span></code> and <code class="docutils literal notranslate"><span class="pre">output/</span></code>.</p></li>
+</ul>
+<div class="section" id="loaders">
+<span id="id4"></span><h4>Loaders<a class="headerlink" href="#loaders" title="Permalink to this headline">¶</a></h4>
+<p>Loaders are stages that are responsible for batch loading large amounts of data and feeding them through the pipeline. Typically
+used for both training and evaluation of performance. For example for a Facial Recognition pipeline you may have a large dataset
+of images that needs to be fed through the pipeline for training. The loading of all those images would take place in a Loader.</p>
+</div>
+<div class="section" id="validators">
+<span id="id5"></span><h4>Validators<a class="headerlink" href="#validators" title="Permalink to this headline">¶</a></h4>
+<p>Validators are stages that are responsible for checking if the input data that is about to be fed through the pipeline is valid.
+Meaning is the data the correct format, checking whether there is any detectable reason why the data would cause issues while
+being processed. This stage is positioned first in the execution of the pipeline (or after <a class="reference internal" href="#loaders"><span class="std std-ref">Loaders</span></a>), they are not intended to create any output,
+only errors or warnings.</p>
+</div>
+<div class="section" id="filters">
+<span id="id6"></span><h4>Filters<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h4>
+<p>Filters are stages that are responsible for getting data ready for the next stage of execution. These are typically placed before
+or after <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>. There are generally two types of filters: <a class="reference internal" href="#wranglers"><span class="std std-ref">Wranglers</span></a> and <a class="reference internal" href="#deciders"><span class="std std-ref">Deciders</span></a>.</p>
+<div class="section" id="wranglers">
+<span id="id7"></span><h5>Wranglers<a class="headerlink" href="#wranglers" title="Permalink to this headline">¶</a></h5>
+<p>Wranglers perform data wrangling operations on the data. Meaning getting the data from one format into another that is useful
+for the next stage (typically an Estimator). For example the input data might be a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> formatted in JSON but the estimator
+next in the pipeline might only accept a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> so a Wrangler would be used to parse the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> into a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
+</div>
+<div class="section" id="deciders">
+<span id="id8"></span><h5>Deciders<a class="headerlink" href="#deciders" title="Permalink to this headline">¶</a></h5>
+<p>Deciders, placed after <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>, are stages which make descisions based on the output of them. For example in a Voice Activity
+Detection pipeline, we may have an estimator that outputs confidence values on whether the input audio data was speech or not, you would
+then place a Decider after which may perform thresholding on the confidence values.</p>
+</div>
+</div>
+<div class="section" id="estimators">
+<span id="id9"></span><h4>Estimators<a class="headerlink" href="#estimators" title="Permalink to this headline">¶</a></h4>
+<p>Estimators are stages where the actual prediction or training of an ML model takes place. Depending on the pipeline configuration
+the estimator will either use the input data to make a prediction or use the input data as training data. This stage should have
+some form of output. Typically placed between two <a class="reference internal" href="#filters"><span class="std std-ref">Filters</span></a> during execution. For example you may be using Tensorflow to run your model, so
+an estimator would be created, which would load the model and create a Tensorflow session during initialization and the session
+would be ran with the input data during execution of the stage.</p>
+<p>In more complex pipelines, these stages may be composed of an entirely separate Surround pipeline (another Assembler instance). Surround is designed this way
+to allow pipelines as complex as required.</p>
+</div>
+<div class="section" id="visualizers">
+<span id="id10"></span><h4>Visualizers<a class="headerlink" href="#visualizers" title="Permalink to this headline">¶</a></h4>
+<p>Visualizers are stages where they do what their name entails, visualize the data. Typically used during training and evaluation
+of the model, these stages are used to generate reports on how the model is performing. <strong>TODO: GET GOOD EXAMPLE</strong></p>
+</div>
+</div>
+<div class="section" id="configuration">
+<span id="id11"></span><h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>Every instance of <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a> has a configuration object constructed from the project’s configuration file. This
+configuration object is passed between each stage of the pipeline during initialization and execution. The configuration
+file uses the <a class="reference external" href="https://yaml.org/">YAML</a> data-serialization language.</p>
+<p>Example configuration file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pathToModels</span><span class="p">:</span> <span class="o">../</span><span class="n">models</span>
+<span class="n">model</span><span class="p">:</span> <span class="n">hog</span>                                                       <span class="c1"># &#39;hog&#39; or &#39;cnn&#39;</span>
+<span class="n">minFaceWidth</span><span class="p">:</span> <span class="mi">100</span>                                                <span class="c1"># Threshold for the width of a face bounding box in pixels</span>
+<span class="n">minFaceHeight</span><span class="p">:</span> <span class="mi">125</span>                                               <span class="c1"># Threshold for the height of a face bounding box in pixels</span>
+<span class="n">useAllFaces</span><span class="p">:</span> <span class="n">true</span>                                                <span class="c1"># If false, only extract encodings for the largest face</span>
+<span class="n">imageTooDark</span><span class="p">:</span> <span class="mi">23</span>                                                 <span class="c1"># Threshold for determining if an image is too dark, lower values = darker image</span>
+<span class="n">blurryThreshold</span><span class="p">:</span> <span class="mi">4</span>                                               <span class="c1"># Smaller values indicate a &quot;more&quot; blurry image</span>
+<span class="n">gpuDynamicMemoryAllocation</span><span class="p">:</span> <span class="n">true</span>                                 <span class="c1"># If true, Tensorflow will allocate GPU memory on an as-needs basis. perProcessGpuMemoryFraction will have no effect.</span>
+<span class="n">perProcessGpuMemoryFraction</span><span class="p">:</span> <span class="mf">0.5</span>                                 <span class="c1"># Fraction of GPU memory Tensorflow should acquire. Has no effect if gpuDynamicMemoryAllocation is true.</span>
+<span class="n">rotateImageModelFile</span><span class="p">:</span> <span class="n">image</span><span class="o">-</span><span class="n">rotator</span><span class="o">/</span><span class="n">image</span><span class="o">-</span><span class="n">rotator</span><span class="o">-</span><span class="mi">2018</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mf">05.</span><span class="n">pb</span>  <span class="c1"># Model used to detect the orientation of the image</span>
+<span class="n">rotateImageModelLabels</span><span class="p">:</span> <span class="n">image</span><span class="o">-</span><span class="n">rotator</span><span class="o">/</span><span class="n">labels</span><span class="o">.</span><span class="n">txt</span>                 <span class="c1"># Model used to detect the orientation of the image</span>
+<span class="n">rotateImageInputLayer</span><span class="p">:</span> <span class="n">conv2d_1_input</span>                            <span class="c1"># Tensorflow input layer</span>
+<span class="n">rotateImageOutputLayer</span><span class="p">:</span> <span class="n">activation_5</span><span class="o">/</span><span class="n">Softmax</span>                     <span class="c1"># Tensorflow output layer</span>
+<span class="n">rotateImageInputHeight</span><span class="p">:</span> <span class="mi">100</span>                                      <span class="c1"># Input image height to the image stage neural network</span>
+<span class="n">rotateImageInputWidth</span><span class="p">:</span> <span class="mi">100</span>                                       <span class="c1"># Input image width to the image stage neural network</span>
+<span class="n">rotateImageThreshold</span><span class="p">:</span> <span class="mf">0.5</span>                                        <span class="c1"># Rotate image if the orientation is above this threshold</span>
+<span class="n">rotateImageSkip</span><span class="p">:</span> <span class="n">false</span>                                           <span class="c1"># Option to skip image rotation step</span>
+<span class="n">imageSizeMax</span><span class="p">:</span> <span class="mi">700</span>                                                <span class="c1"># Maximum allowable image size (width or height). Images larger than this will be downsized.</span>
+<span class="n">postgres</span><span class="p">:</span>                                                        <span class="c1"># Postgres database options</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">postgres</span>                                               <span class="c1">#   Postgres username</span>
+    <span class="n">password</span><span class="p">:</span> <span class="n">postgres</span>                                           <span class="c1">#   Postgres password</span>
+    <span class="n">host</span><span class="p">:</span> <span class="n">localhost</span>                                              <span class="c1">#   Postgres server host</span>
+    <span class="n">port</span><span class="p">:</span> <span class="mi">5432</span>                                                   <span class="c1">#   Postgres server port</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">face_recognition</span>                                         <span class="c1">#   Which database to connect to</span>
+<span class="n">webcamStream</span><span class="p">:</span>                                                    <span class="c1"># Webcam stream options</span>
+    <span class="n">drawBox</span><span class="p">:</span> <span class="n">true</span>                                                <span class="c1">#   Whether to draw a box around detected faces</span>
+    <span class="n">minConfidence</span><span class="p">:</span> <span class="mf">0.5</span>                                           <span class="c1">#   Discard detections below this confidence level</span>
+    <span class="n">highConfidence</span><span class="p">:</span> <span class="mf">0.9</span>                                          <span class="c1">#   Confidence values at or above this level are deemed to be &#39;highly confident&#39;</span>
+<span class="n">celery</span><span class="p">:</span>
+    <span class="n">broker</span><span class="p">:</span> <span class="n">pyamqp</span><span class="p">:</span><span class="o">//</span><span class="n">guest</span><span class="nd">@localhost</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="n">redis</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="data">
+<span id="id12"></span><h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
+<p>Every time an <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a> is ran, it requires an object that will be used to store the input data and eventually store
+the output. Passed between stages during execution, it can also be used to store any intermediate data between stages.</p>
+</div>
 </div>
 </div>
 
