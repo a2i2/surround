@@ -270,7 +270,7 @@ class Wrapper():
 
     def __init__(self, surround, type_of_uploaded_object=None):
         """
-        Constructor of the Wrapper which initializes the stages of the provided pipeline.
+        Constructor of the Wrapper initializes the stages of the provided pipeline.
 
         :param surround: the surround pipeline the wrapper will manage
         :type surround: :class:`Surround`

@@ -16,16 +16,20 @@ class Config(Mapping):
     Responsibilities:
 
     - Parse the config.yaml file and store the data as key-value pairs.
-    - Allow environment variables override data loaded from file/dict (must be prefixed with `SURROUND_`).
-    - Provide READ-ONLY access to the stored config values via [] operator and iteration.
+    - Allow environment variables override data loaded from file/dict (must be prefixed with ``SURROUND_``).
+    - Provide READ-ONLY access to the stored config values via ``[]`` operator and iteration.
 
     Example usage::
 
         config = Config()
         config.read_from_dict({ "debug": True })
+        config.read_config_files(["config.yaml"])
 
         if config["debug"]:
             # Do debug stuff
+
+        for key, value in config:
+            # Iterate over all data
 
     You could then override the above configuration using the systems environment variables,
     just prefix the var with `SURROUND_` like so::
