@@ -171,16 +171,20 @@
 <span class="sd">    Responsibilities:</span>
 
 <span class="sd">    - Parse the config.yaml file and store the data as key-value pairs.</span>
-<span class="sd">    - Allow environment variables override data loaded from file/dict (must be prefixed with `SURROUND_`).</span>
-<span class="sd">    - Provide READ-ONLY access to the stored config values via [] operator and iteration.</span>
+<span class="sd">    - Allow environment variables override data loaded from file/dict (must be prefixed with ``SURROUND_``).</span>
+<span class="sd">    - Provide READ-ONLY access to the stored config values via ``[]`` operator and iteration.</span>
 
 <span class="sd">    Example usage::</span>
 
 <span class="sd">        config = Config()</span>
 <span class="sd">        config.read_from_dict({ &quot;debug&quot;: True })</span>
+<span class="sd">        config.read_config_files([&quot;config.yaml&quot;])</span>
 
 <span class="sd">        if config[&quot;debug&quot;]:</span>
 <span class="sd">            # Do debug stuff</span>
+
+<span class="sd">        for key, value in config:</span>
+<span class="sd">            # Iterate over all data</span>
 
 <span class="sd">    You could then override the above configuration using the systems environment variables,</span>
 <span class="sd">    just prefix the var with `SURROUND_` like so::</span>
@@ -197,7 +201,7 @@
 <span class="sd">        SURRROUND_PREDICT_DEBUG=False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Config.__init__"><a class="viewcode-back" href="../../surround.html#surround.config.Config.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor of the Config class, loads the default YAML file into storage.</span>
 <span class="sd">        If the :attr:`project_root` is provided then the project&#39;s `config.yaml`</span>
@@ -222,7 +226,7 @@
             <span class="c1"># Load project config</span>
             <span class="n">config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">project_root</span><span class="p">),</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_config_files</span><span class="p">([</span><span class="n">config_path</span><span class="p">])</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_config_files</span><span class="p">([</span><span class="n">config_path</span><span class="p">])</span>
 
 <div class="viewcode-block" id="Config.read_config_files"><a class="viewcode-back" href="../../surround.html#surround.config.Config.read_config_files">[docs]</a>    <span class="k">def</span> <span class="nf">read_config_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yaml_files</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -403,7 +407,7 @@
             <span class="k">return</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Config.__getitem__"><a class="viewcode-back" href="../../surround.html#surround.config.Config.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provides access to stored data via the [] operator.</span>
 
@@ -413,9 +417,9 @@
 <span class="sd">        :rtype: any</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Config.__iter__"><a class="viewcode-back" href="../../surround.html#surround.config.Config.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allows for iteration through the config dictionary.</span>
 
@@ -432,7 +436,7 @@
 <span class="sd">        :rtype: dict_keyiterator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

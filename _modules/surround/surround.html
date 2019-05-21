@@ -279,7 +279,7 @@
 <span class="sd">        save_image(data.output_image)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Surround.__init__"><a class="viewcode-back" href="../../surround.html#surround.Surround.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_stages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_stages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs an instance of a Surround pipeline.</span>
 
@@ -306,7 +306,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">]):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Config</span><span class="p">())</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Config</span><span class="p">())</span>
 
 <div class="viewcode-block" id="Surround.set_config"><a class="viewcode-back" href="../../surround.html#surround.Surround.set_config">[docs]</a>    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -423,9 +423,9 @@
 <span class="sd">    input data and run the :meth:`Surround.process` method of the pipeline.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Wrapper.__init__"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround</span><span class="p">,</span> <span class="n">type_of_uploaded_object</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround</span><span class="p">,</span> <span class="n">type_of_uploaded_object</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructor of the Wrapper which initializes the stages of the provided pipeline.</span>
+<span class="sd">        Constructor of the Wrapper initializes the stages of the provided pipeline.</span>
 
 <span class="sd">        :param surround: the surround pipeline the wrapper will manage</span>
 <span class="sd">        :type surround: :class:`Surround`</span>
@@ -439,7 +439,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span> <span class="o">=</span> <span class="n">type_of_uploaded_object</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_of_uploaded_object</span> <span class="o">=</span> <span class="n">AllowedTypes</span><span class="o">.</span><span class="n">JSON</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">init_stages</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">init_stages</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Wrapper.run"><a class="viewcode-back" href="../../surround.html#surround.Wrapper.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
