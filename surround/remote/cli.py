@@ -75,7 +75,7 @@ def add_remote_parser(sub_parser):
 def create_add_parser(sub_parser):
     """
     Adds a sub-parser for the "add" sub-command to the parser provided.
-    
+
     :param sub_parser: the parser to add to
     :type sub_parser: <class 'argparse.ArgumentParser'>
     """
