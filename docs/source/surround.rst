@@ -48,6 +48,8 @@ AllowedTypes
     :show-inheritance:
     :members:
 
+.. _linter:
+
 Linter
 ======
 
