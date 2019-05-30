@@ -54,7 +54,7 @@ class Surround(ABC):
             else:
                 raise ValueError("Invalid Python module %s" % module)
 
-            self.set_config(Config(root_path))
+            self.set_config(Config(root_path, package_path))
 
 
             if not os.path.exists(self.config["output_path"]):
