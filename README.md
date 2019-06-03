@@ -54,18 +54,19 @@ A short explanation is provided in the hello-world example's [README](examples/h
 from surround import Stage, SurroundData, Surround
 import logging
 
+class BasicData(SurroundData):
+    text = None
+
 class HelloStage(Stage):
     def operate(self, data, config):
         data.text = "hello"
 
-class BasicData(SurroundData):
-    text = None
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    data_state = BasicData()
     surround = Surround([HelloStage()])
-    output = surround.process(BasicData())
-    print(output.text)
+    output = surround.process(data_state)
+    print(data_state.text)
 ```
 
 ## Command Line
