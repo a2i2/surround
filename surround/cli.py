@@ -193,7 +193,7 @@ def run_locally(args):
         task = 'list'
 
     print("Project tasks:")
-    run_process = subprocess.Popen(['python3', '-m', 'doit', task])
+    run_process = subprocess.Popen([sys.executable, '-m', 'doit', task])
     run_process.wait()
 
 def run_as_web():
