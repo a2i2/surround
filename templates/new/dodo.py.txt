@@ -5,6 +5,15 @@ CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
+split_path = os.path.splitdrive(CONFIG["project_root"])
+
+# If the system has a drive letter, change the project_root to /c/rest/of/path
+if (split_path[0] != ''):
+    drive_letter = split_path[0][0].lower()
+    path = split_path[1].replace('\\', '/')
+
+    CONFIG.read_from_dict({{"project_root": '/' + drive_letter + path}})
+
 def task_build():
     """Build the Docker image for the current project"""
     return {{
@@ -20,7 +29,7 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run --volume %s/:/app %s" % (CONFIG["project_root"], IMAGE)]
+        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["project_root"], IMAGE)]
     }}
 
 def task_prod():
