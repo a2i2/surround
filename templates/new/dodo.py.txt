@@ -1,7 +1,8 @@
 import os
 from surround import Config
+from pathlib import Path
 
-CONFIG = Config(os.path.dirname(__file__))
+CONFIG = Config(str(Path(os.path.dirname(__file__)).resolve()))
 DOIT_CONFIG = {{'verbosity':2}}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
