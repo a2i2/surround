@@ -1,6 +1,6 @@
 import argparse
 import os
-from surround import Config, Surround
+from surround import Config, Assembler
 
 def is_valid_dir(parser, arg):
     if not os.path.isdir(arg):
@@ -15,10 +15,10 @@ def is_valid_file(parser, arg):
         return arg
 
 class FileSystemRunner():
-    def __init__(self, surround, **kwargs):
-        assert isinstance(surround, Surround), \
-            "surround must be a class or subclass of Surround"
-        self.surround = surround
+    def __init__(self, assembler, **kwargs):
+        assert isinstance(assembler, Assembler), \
+            "assembler must be a class or subclass of Assembler"
+        self.assembler = assembler
 
         assert all(isinstance(value, str) for value in kwargs.values()), \
             "Keys should be a string description of that input parameter"
@@ -37,4 +37,4 @@ class FileSystemRunner():
         if hasattr(args, 'config_file'):
             config = Config()
             config.read_config_files([args.config_file])
-            self.surround.set_config(config)
+            self.assembler.set_config(config)

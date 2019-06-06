@@ -6,7 +6,7 @@ In this example, values are loaded to a data object in each stage and printed to
 for the corresponding stage, the file contents are saved in the data variable.
 - In each stage's `operate()` method, the contents of the stage's data are printed to screen.
 
-Note that although a `BasicData` object is initialised, it is not modified throughout this example. Instead, internal data 
+Note that although a `BasicData` object is initialised, it is not modified throughout this example. Instead, internal data
 objects are used in each stage.
 ## Run
 From surround's root folder, run:

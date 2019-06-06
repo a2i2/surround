@@ -1,16 +1,22 @@
 import logging
-from surround import Stage, SurroundData, Surround
+from surround import SurroundData, Estimator, Assembler
 
-class HelloStage(Stage):
-    def operate(self, surround_data, config):
-        surround_data.text = "hello"
+
+class HelloWorld(Estimator):
+    def estimate(self, surround_data, config):
+        surround_data.text = "Hello world"
+
+    def fit(self, surround_data, config):
+        print("No training implemented")
+
 
 class BasicData(SurroundData):
     text = None
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    surround = Surround([HelloStage()])
     data = BasicData()
-    surround.process(data)
-    print(data.text)
+    assembler = Assembler("Hello world example", data, HelloWorld())
+    assembler.run()
+    print("Text is '%s'" % data.text)

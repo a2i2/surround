@@ -1,37 +1,55 @@
 import logging
 import os
-from surround import Stage, SurroundData, Surround
-from file_system_runner import FileSystemRunner
+from surround import Filter, Estimator, SurroundData, Assembler, Config
 
-class WriteHello(Stage):
+hello_file_path = "/stages/WriteHello/Output.txt"
+world_file_path = "/stages/WriteWorld/Output.txt"
+
+class WriteHello(Filter):
+    def __init__(self, dir_path):
+        self.dir_path = dir_path
+
     def dump_output(self, surround_data, config):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        text_file = open(dir_path + "/stages/WriteHello/Output.txt", "w")
+        text_file = open(self.dir_path + hello_file_path, "w")
         text_file.write(surround_data.text)
         text_file.close()
 
     def operate(self, surround_data, config):
         surround_data.text = "Hello"
 
-class WriteWorld(Stage):
+
+class WriteWorld(Estimator):
+    def __init__(self, dir_path):
+        self.dir_path = dir_path
+
     def dump_output(self, surround_data, config):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        text_file = open(dir_path + "/stages/WriteWorld/Output.txt", "w")
+        text_file = open(self.dir_path + world_file_path, "w")
         text_file.write(surround_data.text)
         text_file.close()
 
-    def operate(self, surround_data, config):
+    def estimate(self, surround_data, config):
         surround_data.text = "World"
+
+    def fit(self, surround_data, config):
+        print("Not training implementation")
+
 
 class BasicData(SurroundData):
     text = None
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    surround = Surround([WriteHello(), WriteWorld()])
-    adapter = FileSystemRunner(surround,
-                               description="A sample project to show dump intermediate ouput",
-                               config_file="Path to configuration file")
-    adapter.start()
-    surround.process(BasicData())
+    path = os.path.dirname(os.path.realpath(__file__))
+
+    app_config = Config()
+    app_config.read_config_files([path + "/config.yaml"])
+    data = BasicData()
+    assembler = Assembler("Dump output example", data)
+    assembler.set_config(app_config)
+    assembler.set_estimator(WriteWorld(path), [WriteHello(path)])
+    assembler.run()
+
+    print("Hello output.txt contains '%s'" % open(path + hello_file_path, "r").read())
+    print("World output.txt contains '%s'" % open(path + world_file_path, "r").read())

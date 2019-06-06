@@ -1,3 +1,3 @@
 # Run project
-`cd examples/hello_world_web`
+`cd examples/hello-world-web`
 `surround run dev`
