@@ -42,7 +42,6 @@ PROJECTS = {
             ("{project_name}/stages.py", "stages.py.txt", True),
             ("{project_name}/__main__.py", "main.py.txt", True),
             ("{project_name}/__init__.py", "init.py.txt", True),
-            ("{project_name}/wrapper.py", "wrapper.py.txt", True),
             ("dodo.py", "dodo.py.txt", False),
             ("Dockerfile", "Dockerfile.txt", False),
             ("{project_name}/config.yaml", "config.yaml.txt", False),
