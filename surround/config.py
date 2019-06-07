@@ -58,6 +58,8 @@ class Config(Mapping):
 
         :param project_root: path to the root directory of the surround project (default: None)
         :type project_root: str
+        :param package_path: path to the root directory of the package that contains the surround project (default: None)
+        :type package_path: str
         """
 
         self._storage = self.__load_defaults()
