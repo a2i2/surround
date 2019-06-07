@@ -2,6 +2,7 @@ import logging
 from surround import Assembler
 from .stages import RunnersData, HelloWorld
 from .runners import SingleRunner, BatchRunner
+# pylint: disable=unused-import
 from .web_runner import WebRunner
 
 logging.basicConfig(level=logging.INFO)
