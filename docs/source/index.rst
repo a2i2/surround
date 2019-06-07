@@ -15,6 +15,7 @@ method or class? See :ref:`surround-api`.
 
     about.rst
     getting-started.rst
+    cli-guide.rst
 
 .. toctree::
    :maxdepth: 3

@@ -47,7 +47,7 @@ class Config(Mapping):
         SURRROUND_PREDICT_DEBUG=False
     """
 
-    def __init__(self, project_root=None):
+    def __init__(self, project_root=None, package_path=None):
         """
         Constructor of the Config class, loads the default YAML file into storage.
         If the :attr:`project_root` is provided then the project's `config.yaml`
