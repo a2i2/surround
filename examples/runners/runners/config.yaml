@@ -1,0 +1,9 @@
+output:
+  text: Hello World
+
+image: runners
+company: yourcompany
+version: latest
+
+# Details of class inheriting from Wrapper
+wrapper-info: runners.wrapper.PipelineWrapper
