@@ -46,7 +46,6 @@ PROJECTS = {
             ("Dockerfile", "Dockerfile.txt", False),
             ("{project_name}/config.yaml", "config.yaml.txt", False),
             (".gitignore", ".gitignore.txt", False)
-
         ]
     }
 }
