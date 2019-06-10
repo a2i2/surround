@@ -55,26 +55,26 @@ class Assembler(ABC):
 
     def __run_pipeline(self, is_training):
         if self.pre_filters:
-            self.execute_filters(self.pre_filters, self.surround_data)
+            self.__execute_filters(self.pre_filters, self.surround_data)
 
         if is_training:
-            self.execute_fit(self.surround_data)
+            self.__execute_fit(self.surround_data)
         else:
-            self.execute_main(self.surround_data)
+            self.__execute_main(self.surround_data)
 
         if self.post_filters:
-            self.execute_filters(self.post_filters, self.surround_data)
+            self.__execute_filters(self.post_filters, self.surround_data)
 
         if (is_training or self.batch_mode) and self.visualiser:
             self.visualiser.visualise(self.surround_data, self.config)
 
-    def execute_filters(self, filters, surround_data):
+    def __execute_filters(self, filters, surround_data):
         surround_data.freeze()
         start_time = datetime.now()
 
         try:
             for stage in filters:
-                self.execute_filter(stage, surround_data)
+                self.__execute_filter(stage, surround_data)
                 if surround_data.errors:
                     LOGGER.error("Error during processing")
                     LOGGER.error(surround_data.errors)
@@ -87,7 +87,7 @@ class Assembler(ABC):
 
         surround_data.thaw()
 
-    def execute_filter(self, stage, stage_data):
+    def __execute_filter(self, stage, stage_data):
         stage_start = datetime.now()
         stage.operate(stage_data, self.config)
 
@@ -99,7 +99,7 @@ class Assembler(ABC):
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
         LOGGER.info("Filter %s took %s secs", type(stage).__name__, stage_execution_time)
 
-    def execute_main(self, surround_data):
+    def __execute_main(self, surround_data):
         main_start = datetime.now()
         self.estimator.estimate(surround_data, self.config)
 
@@ -112,7 +112,7 @@ class Assembler(ABC):
         LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
 
 
-    def execute_fit(self, surround_data):
+    def __execute_fit(self, surround_data):
         fit_start = datetime.now()
         self.estimator.fit(surround_data, self.config)
 

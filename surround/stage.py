@@ -55,7 +55,6 @@ class Estimator(Stage):
         :type config: <class 'surround.config.Config'>
         """
 
-    @abstractmethod
     def fit(self, surround_data, config):
         """Train a model.
 
