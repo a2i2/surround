@@ -10,7 +10,7 @@ from datetime import datetime
 
 from .config import Config
 from .visualiser import Visualiser
-from .stage import Filter, Estimator
+from .stage import Filter, Estimator, Validator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -18,6 +18,15 @@ class Assembler(ABC):
 
     # pylint: disable=too-many-instance-attributes
     def __init__(self, assembler_name="", validator=None, estimator=None, config=None):
+        if not validator:
+            raise ValueError("'Validator' is required to run an assembler")
+        if not isinstance(validator, Validator):
+            raise TypeError("'validator' should be of class Validator")
+        if estimator and not isinstance(estimator, Estimator):
+            raise TypeError("'estimator' should be of class Estimator")
+        if config and not isinstance(config, Config):
+            raise TypeError("'config' should be of class Config")
+
         self.assembler_name = assembler_name
         self.config = config
         self.estimator = estimator
