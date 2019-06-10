@@ -7,7 +7,7 @@ import subprocess
 class InitTest(unittest.TestCase):
 
     def setUp(self):
-        subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp'], encoding='utf-8', stdout=subprocess.PIPE)
+        subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE)
 
         os.makedirs('remote')
         os.makedirs('temp/test_remote')
