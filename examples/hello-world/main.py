@@ -1,5 +1,5 @@
 import logging
-from surround import SurroundData, Estimator, Assembler
+from surround import SurroundData, Validator, Estimator, Assembler
 
 
 class HelloWorld(Estimator):
@@ -10,6 +10,12 @@ class HelloWorld(Estimator):
         print("No training implemented")
 
 
+class ValidateData(Validator):
+    def validate(self, surround_data, config):
+        if surround_data.text:
+            raise ValueError("'text' is not None")
+
+
 class BasicData(SurroundData):
     text = None
 
@@ -17,6 +23,6 @@ class BasicData(SurroundData):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = BasicData()
-    assembler = Assembler("Hello world example", data, HelloWorld())
-    assembler.run()
+    assembler = Assembler("Hello world example", ValidateData(), HelloWorld())
+    assembler.run(data)
     print("Text is '%s'" % data.text)

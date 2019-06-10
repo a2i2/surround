@@ -1,12 +1,11 @@
 import logging
 import os
 
-from surround import Estimator, SurroundData, Assembler, Config
+from surround import Estimator, SurroundData, Assembler, Config, Validator
 
 prefix = ""
 
 class HelloWorld(Estimator):
-
     def __init__(self):
         self.file_ = None
 
@@ -25,6 +24,12 @@ class BasicData(SurroundData):
     text = None
 
 
+class ValidateData(Validator):
+    def validate(self, surround_data, config):
+        if surround_data.text:
+            raise ValueError("'text' is not None")
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
@@ -36,8 +41,8 @@ if __name__ == "__main__":
     app_config.read_config_files([prefix + "config.yaml"])
 
     data = BasicData()
-    assembler = Assembler("Init state example", data, HelloWorld(), app_config)
-    assembler.init_assembler()
+    assembler = Assembler("Init state example", ValidateData(), HelloWorld(), app_config)
+    assembler.init_assembler(data)
     assembler.run()
 
     print("Text is '%s'" % data.text)

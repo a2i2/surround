@@ -9,32 +9,27 @@ from abc import ABC
 from datetime import datetime
 
 from .config import Config
-from .loader import Loader
-from .surround import SurroundData
 from .visualiser import Visualiser
-from .stage import Validator, Filter, Estimator
+from .stage import Filter, Estimator
 
 LOGGER = logging.getLogger(__name__)
 
 class Assembler(ABC):
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, assembler_name="", surround_data=None, estimator=None, config=None):
+    def __init__(self, assembler_name="", validator=None, estimator=None, config=None):
         self.assembler_name = assembler_name
         self.config = config
-        self.surround_data = surround_data
         self.estimator = estimator
-        self.loader = None
-        self.validator = None
+        self.validator = validator
         self.pre_filters = None
         self.post_filters = None
         self.visualiser = None
 
-    def init_assembler(self):
+    def init_assembler(self, surround_data=None):
+        if surround_data:
+            self.surround_data = surround_data
         try:
-            if self.validator:
-                self.validator.init_stage(self.config)
-
             if self.pre_filters:
                 for pre_filter in self.pre_filters:
                     pre_filter.init_stage(self.config)
@@ -47,15 +42,13 @@ class Assembler(ABC):
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
-    def run(self):
+    def run(self, surround_data=None):
         LOGGER.info("Starting '%s'", self.assembler_name)
+        if surround_data:
+            self.surround_data = surround_data
         try:
-            if self.loader:     # Initiate loader (if exists)
-                self.loader.load(self.surround_data, self.config)
-                self.validator.validate(self.surround_data, self.config)
-                self.loader.execute(self.surround_data, self.config, self.__run_pipeline)
-            else:
-                self.__run_pipeline()
+            self.validator.validate(self.surround_data, self.config)
+            self.__run_pipeline()
         except Exception:
             LOGGER.exception("Failed running Assembler")
 
@@ -129,33 +122,10 @@ class Assembler(ABC):
         else:
             self.set_config(Config())
 
-    def set_data(self, surround_data):
-        # Surround Data is required
-        if surround_data is None:
-            raise ValueError("Surround Data is not provided")
-        if not isinstance(surround_data, SurroundData):
-            raise TypeError("surround_data should be of class SurroundData")
-        self.surround_data = surround_data
-
     def set_config(self, config):
         if not config or not isinstance(config, Config):
             raise TypeError("config should be of class Config")
         self.config = config
-
-    def set_loader(self, loader, validator):
-        # Loader is required
-        if loader is None:
-            raise ValueError("loader is not provided")
-        if loader and not isinstance(loader, Loader):
-            raise TypeError("loader should be of class Loader")
-        self.loader = loader
-
-        # Validator is required
-        if validator is None:
-            raise ValueError("validator is not provided")
-        if not isinstance(validator, Validator):
-            raise TypeError("validator should be of class Validator")
-        self.validator = validator
 
     def set_estimator(self, estimator=None, pre_filters=None, post_filters=None):
         # Estimator is required

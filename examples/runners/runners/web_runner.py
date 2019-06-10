@@ -5,11 +5,13 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from surround import Runner
+from .stages import RunnersData
 
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
     def prepare_runner(self):
+        self.assembler.init_assembler(RunnersData())
         self.application = Application(self.assembler)
 
     def prepare_data(self):
@@ -44,6 +46,5 @@ class MessageHandler(tornado.web.RequestHandler):
         self.assembler.surround_data.input_data = data["message"]
 
         # Execute assembler
-        self.assembler.init_assembler()
         self.assembler.run()
         logging.info("Message: %s", self.assembler.surround_data.output_data)

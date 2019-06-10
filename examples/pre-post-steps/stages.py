@@ -1,4 +1,4 @@
-from surround import Filter, Estimator, SurroundData
+from surround import Filter, Estimator, SurroundData, Validator
 
 
 class AddHello(Filter):
@@ -21,3 +21,9 @@ class AddSurround(Filter):
 
 class BasicData(SurroundData):
     text = None
+
+
+class ValidateData(Validator):
+    def validate(self, surround_data, config):
+        if surround_data.text:
+            raise ValueError("'text' is not None")

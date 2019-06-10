@@ -1,6 +1,6 @@
 import unittest
 import os
-from surround import Assembler, Estimator, SurroundData, Config
+from surround import Assembler, Estimator, SurroundData, Config, Validator
 
 
 test_text = "hello"
@@ -23,20 +23,35 @@ class BasicData(SurroundData):
     stage2 = None
 
 
+class ValidateData(Validator):
+    def validate(self, surround_data, config):
+        if surround_data.text:
+            raise ValueError("'text' is not None")
+
+        if surround_data.config_value:
+            raise ValueError("'config_value' is not None")
+
+        if surround_data.stage1:
+            raise ValueError("'stage1' is not None")
+
+        if surround_data.stage2:
+            raise ValueError("'stage2' is not None")
+
+
 class TestSurround(unittest.TestCase):
 
     def test_happy_path(self):
         data = BasicData()
-        assembler = Assembler("Happy path", data, HelloStage(), Config())
+        assembler = Assembler("Happy path", ValidateData(), HelloStage(), Config())
         assembler.init_assembler()
-        assembler.run()
+        assembler.run(data)
         self.assertEqual(data.text, test_text)
 
     def test_rejecting_attributes(self):
         data = BasicData()
-        assembler = Assembler("Reject attribute", data, HelloStage(), Config())
+        assembler = Assembler("Reject attribute", ValidateData(), HelloStage(), Config())
         assembler.init_assembler()
-        assembler.run()
+        assembler.run(data)
         self.assertRaises(AttributeError, getattr, data, "no_text")
 
     def test_surround_config(self):
@@ -44,6 +59,6 @@ class TestSurround(unittest.TestCase):
         config = Config()
         config.read_config_files([os.path.join(path, "config.yaml")])
         data = BasicData()
-        assembler = Assembler("Surround config", data, HelloStage(), config)
-        assembler.run()
+        assembler = Assembler("Surround config", ValidateData(), HelloStage(), config)
+        assembler.run(data)
         self.assertEqual(data.config_value, "Scott")

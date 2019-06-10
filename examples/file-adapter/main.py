@@ -2,25 +2,34 @@ import logging
 import os
 import csv
 
-from surround import Estimator, SurroundData, Assembler, Validator, Loader, Config
+from surround import Estimator, SurroundData, Assembler, Validator, Config, Runner
 
 prefix = ""
 
-class CSVLoader(Loader):
-    def load(self, surround_data, config):
-        input_path = prefix + config.get_path("Surround.Loader.input")
-        with open(input_path) as csv_file:
+class MainRunner(Runner):
+    def prepare_runner(self):
+        self.input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
+        self.data = BasicData()
+
+    def prepare_data(self):
+        with open(self.input_path) as csv_file:
             content = csv.DictReader(csv_file, delimiter=',', quotechar='"')
             # pylint: disable=unused-variable
             for i, row in enumerate(content):
-                surround_data.inputs.append(row)
+                self.data.inputs.append(row)
 
-    def execute(self, surround_data, config, run_pipeline):
-        for row in surround_data.inputs:
-            surround_data.active_row = row
-            run_pipeline()
+    def run(self):
+        self.prepare_runner()
+        self.assembler.init_assembler(self.data)
+        self.prepare_data()
 
-        self.save_result(surround_data, config)
+        for row in self.data.inputs:
+            self.data.active_row = row
+
+            # Start assembler to process processed data
+            self.assembler.run()
+
+        self.save_result(self.data, self.assembler.config)
 
     def save_result(self, surround_data, config):
         output_path = prefix + config.get_path("Surround.Loader.output")
@@ -69,6 +78,5 @@ if __name__ == "__main__":
 
     app_config = Config()
     app_config.read_config_files([prefix + "config.yaml"])
-    assembler = Assembler("Loader example", BasicData(), ProcessCSV(), app_config)
-    assembler.set_loader(CSVLoader(), CSVValidator())
-    assembler.run()
+    assembler = Assembler("Loader example", CSVValidator(), ProcessCSV(), app_config)
+    MainRunner(assembler).run()
