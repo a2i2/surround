@@ -5,17 +5,8 @@ import sys
 import inspect
 import logging
 import subprocess
-from pathlib import Path
 import pkg_resources
-import yaml
 
-try:
-    import tornado.ioloop
-    from .runner.web import api
-except ImportError:
-    pass
-
-from .surround import AllowedTypes
 from .remote import cli as remote_cli
 from .linter import Linter
 
@@ -67,6 +58,7 @@ def process_files(files, project_dir, project_name, project_description):
         with open(file_path, 'w') as f:
             f.write(actual_content)
 
+# pylint: disable=too-many-locals
 def process_templates(templates, folder, project_dir, project_name, project_description, require_web):
     for afile, template, capitalize in templates:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
@@ -201,6 +193,7 @@ def run_locally(args):
     run_process = subprocess.Popen([sys.executable, '-m', 'doit', task])
     run_process.wait()
 
+# pylint: disable=too-many-branches
 def parse_init_args(args):
     if allowed_to_access_dir(args.path):
         if args.project_name:
