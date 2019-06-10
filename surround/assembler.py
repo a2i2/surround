@@ -42,24 +42,30 @@ class Assembler(ABC):
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
-    def run(self, surround_data=None):
+    def run(self, surround_data=None, is_training=False):
         LOGGER.info("Starting '%s'", self.assembler_name)
         if surround_data:
             self.surround_data = surround_data
         try:
             self.validator.validate(self.surround_data, self.config)
-            self.__run_pipeline()
+            self.__run_pipeline(is_training)
         except Exception:
             LOGGER.exception("Failed running Assembler")
 
-    def __run_pipeline(self):
+    def __run_pipeline(self, is_training):
         if self.pre_filters:
             self.execute_filters(self.pre_filters, self.surround_data)
 
-        self.execute_main(self.surround_data)
+        if is_training:
+            self.execute_fit(self.surround_data)
+        else:
+            self.execute_main(self.surround_data)
 
         if self.post_filters:
             self.execute_filters(self.post_filters, self.surround_data)
+
+        if is_training and self.visualiser:
+            self.visualiser.visualise(self.surround_data, self.config)
 
     def execute_filters(self, filters, surround_data):
         surround_data.freeze()
@@ -103,6 +109,19 @@ class Assembler(ABC):
         main_execution_time = datetime.now() - main_start
         surround_data.stage_metadata.append({type(self.estimator).__name__: str(main_execution_time)})
         LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
+
+
+    def execute_fit(self, surround_data):
+        fit_start = datetime.now()
+        self.estimator.fit(surround_data, self.config)
+
+        if self.config and self.config["surround"]["enable_stage_output_dump"]:
+            self.estimator.dump_output(surround_data, self.config)
+
+        # Calculate and log filter duration
+        fit_execution_time = datetime.now() - fit_start
+        surround_data.stage_metadata.append({type(self.estimator).__name__: str(fit_execution_time)})
+        LOGGER.info("Fitting %s took %s secs", type(self.estimator).__name__, fit_execution_time)
 
     def load_config(self, module):
         if module:
@@ -149,6 +168,6 @@ class Assembler(ABC):
 
     def set_visualiser(self, visualiser):
         # visualiser must be a type of Visualiser
-        if visualiser and not isinstance(visualiser, Visualiser):
+        if not visualiser and not isinstance(visualiser, Visualiser):
             raise TypeError("visualiser should be of class Visualiser")
         self.visualiser = visualiser
