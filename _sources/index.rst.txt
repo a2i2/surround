@@ -1,6 +1,7 @@
-.. image:: temp_logo.png
+.. image:: temp_logo_hq.png
     :alt: Surround
     :align: center
+    :scale: 45%
 
 Welcome to Surround
 ====================================

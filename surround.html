@@ -1,186 +1,36 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>API &mdash; Surround 0.0.7 documentation</title>
-  
 
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>API &#8212; Surround 0.0.7 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Command-line Interface" href="cli-guide.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
+    <link rel="prev" title="Command-line Interface" href="cli-guide.html" />
    
-  <div class="wy-grid-for-nav">
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="index.html">
-          
-
-          
-            
-            <img src="_static/temp_logo.png" class="logo" alt="Logo"/>
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Users's Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli-guide.html">Command-line Interface</a></li>
-</ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-surround">Surround</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#config">Config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#surrounddata">SurroundData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stage">Stage</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#wrapper">Wrapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#allowedtypes">AllowedTypes</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#linter">Linter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#linterstage">LinterStage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#projectdata">ProjectData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkdata">CheckData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkfiles">CheckFiles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkdirectories">CheckDirectories</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-surround.runner.web.api">Web API</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#healthcheck">HealthCheck</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#upload">Upload</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#predict">Predict</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Surround</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>API</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/surround.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
             
   <div class="section" id="api">
 <span id="surround-api"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
@@ -262,7 +112,7 @@ Ensures order of stages set in the Config instance is followed (if set).</p>
 <h3>Config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="surround.config.Config">
-<em class="property">class </em><code class="descclassname">surround.config.</code><code class="descname">Config</code><span class="sig-paren">(</span><em>project_root=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.config.Config" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">surround.config.</code><code class="descname">Config</code><span class="sig-paren">(</span><em>project_root=None</em>, <em>package_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.config.Config" title="Permalink to this definition">¶</a></dt>
 <dd><p>An iterable dictionary class that loads and stores all the configuration settings from
 both default and project YAML files and environment variables. Primarily used in stages
 to retrieve configuration data set for development/production.</p>
@@ -305,7 +155,10 @@ file is also loaded into configuration.</p>
 The project config file (<cite>config.yaml</cite>) can be found in the root of the project folder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>project_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the root directory of the surround project (default: None)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the root directory of the surround project (default: None)</p></li>
+<li><p><strong>package_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the root directory of the package that contains the surround project (default: None)</p></li>
+</ul>
 </dd>
 </dl>
 <span class="target" id="module-surround"></span><dl class="method">
@@ -975,50 +828,108 @@ Processes the uploaded data using the pipeline and responds with the output.</p>
 </div>
 
 
-           </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="cli-guide.html" class="btn btn-neutral float-left" title="Command-line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/../_images/temp_logo_hq.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Users's Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli-guide.html">Command-line Interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-surround">Surround</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config">Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#surrounddata">SurroundData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stage">Stage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#wrapper">Wrapper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#allowedtypes">AllowedTypes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#linter">Linter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linterstage">LinterStage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#projectdata">ProjectData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#checkdata">CheckData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#checkfiles">CheckFiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#checkdirectories">CheckDirectories</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-surround.runner.web.api">Web API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#healthcheck">HealthCheck</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#upload">Upload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#predict">Predict</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="cli-guide.html" title="previous chapter">Command-line Interface</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
     </div>
-  
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
 
-  <hr/>
 
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Scott Barnett
 
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-</footer>
+
+
+
 
         </div>
       </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Scott Barnett.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/surround.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
 
-    </section>
-
-  </div>
-  
-
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
     
-   
 
-</body>
+    
+  </body>
 </html>
