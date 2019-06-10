@@ -12,7 +12,7 @@ class BatchRunner(Runner):
     def prepare_data(self):
         self.data.input_data = self.raw_data.rstrip() + " "
 
-    def run(self):
+    def run(self, is_training=False):
         self.prepare_runner()
         self.assembler.init_assembler()
         with open(self.path, 'r') as f:

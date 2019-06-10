@@ -18,6 +18,6 @@ class Runner(ABC):
         """
 
     @abstractmethod
-    def run(self):
+    def run(self, is_training=False):
         """Execute assembler to process.
         """

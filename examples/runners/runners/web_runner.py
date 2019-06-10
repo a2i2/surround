@@ -17,7 +17,7 @@ class WebRunner(Runner):
     def prepare_data(self):
         print("No data prep")
 
-    def run(self):
+    def run(self, is_training=False):
         self.prepare_runner()
         self.application.listen(8080)
         logging.info("Server started at http://localhost:8080")

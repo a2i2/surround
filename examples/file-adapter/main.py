@@ -18,7 +18,7 @@ class MainRunner(Runner):
             for i, row in enumerate(content):
                 self.data.inputs.append(row)
 
-    def run(self):
+    def run(self, is_training=False):
         self.prepare_runner()
         self.assembler.init_assembler(self.data)
         self.prepare_data()

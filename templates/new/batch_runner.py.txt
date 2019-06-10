@@ -13,10 +13,10 @@ class BatchRunner(Runner):
         # Parse raw data into pipeline ready format here
         self.data.input_data = self.raw_data
 
-    def run(self):
+    def run(self, is_training=False):
         # Execute here
         self.prepare_runner()
         self.prepare_data()
-        self.assembler.run()
+        self.assembler.run(None, is_training)
 
         print("Batch Runner: %s" % self.data.output_data)

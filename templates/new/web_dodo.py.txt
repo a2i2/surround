@@ -30,14 +30,20 @@ def task_prod():
         'task_dep': ["build"]
     }}
 
+def task_train():
+    """Run batch mode locally"""
+    return {{
+        'actions': ["python3 -m {project_name} -m train"]
+    }}
+
 def task_batch():
     """Run batch mode locally"""
     return {{
-        'actions': ["python3 {project_name}/batch_main.py"]
+        'actions': ["python3 -m {project_name} -m batch"]
     }}
 
 def task_web():
     """Run web mode locally"""
     return {{
-        'actions': ["python3 {project_name}/web_main.py"]
+        'actions': ["python3 -m {project_name} -m web"]
     }}
