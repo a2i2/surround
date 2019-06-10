@@ -1,16 +1,22 @@
-import os
 from surround import Runner
+from stages import {project_name}Data
 
-class SingleRunner(Runner):
+
+class BatchRunner(Runner):
     def prepare_runner(self):
-        self.message = "TODO: Do estimate calculation here"
+        # Load data from files or directory here
+        self.raw_data = "TODO: Load raw data here"
+        self.data = {project_name}Data()
+        self.assembler.init_assembler(self.data)
 
     def prepare_data(self):
-        self.assembler.surround_data.input_data = self.message
+        # Parse raw data into pipeline ready format here
+        self.data.input_data = self.raw_data
 
     def run(self):
+        # Execute here
         self.prepare_runner()
         self.prepare_data()
-        # Start assembler to process processed data
-        self.assembler.init_assembler()
         self.assembler.run()
+
+        print("Batch Runner: %s" % self.data.output_data)

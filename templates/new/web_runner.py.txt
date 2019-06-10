@@ -5,11 +5,13 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from surround import Runner
+from stages import {project_name}Data
 
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
     def prepare_runner(self):
+        self.assembler.init_assembler({project_name}Data())
         self.application = Application(self.assembler)
 
     def prepare_data(self):

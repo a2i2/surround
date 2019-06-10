@@ -32,7 +32,7 @@ class ListTest(unittest.TestCase):
         self.assertEqual(process.stdout, 'temp_remote: ' + os.getcwd() + '/temp\n')
 
         process = subprocess.run(['surround', 'list', 'temp_remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
-        self.assertListEqual(sorted(str(process.stdout).splitlines()), sorted('config.yaml\nstages.py\n__main__.py\n__init__.py\nrunners.py'.splitlines()))
+        self.assertListEqual(sorted(str(process.stdout).splitlines()), sorted('config.yaml\nstages.py\n__main__.py\n__init__.py\nrunners.py\nbatch_main.py\nweb_main.py\nweb_runner.py'.splitlines()))
 
     def tearDown(self):
         # Remove residual files

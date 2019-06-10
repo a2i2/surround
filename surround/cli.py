@@ -30,15 +30,19 @@ PROJECTS = {
         ],
         "templates" : [
             # File name, template name, capitalize project name
-            ("README.md", "README.md.txt", False),
-            ("{project_name}/stages.py", "stages.py.txt", True),
-            ("{project_name}/runners.py", "runners.py.txt", True),
-            ("{project_name}/__main__.py", "main.py.txt", True),
-            ("{project_name}/__init__.py", "init.py.txt", True),
-            ("dodo.py", "dodo.py.txt", False),
-            ("Dockerfile", "Dockerfile.txt", False),
-            ("{project_name}/config.yaml", "config.yaml.txt", False),
-            (".gitignore", ".gitignore.txt", False)
+            ("README.md", "README.md.txt", False, False),
+            ("{project_name}/stages.py", "stages.py.txt", True, False),
+            ("{project_name}/runners.py", "runners.py.txt", True, False),
+            ("{project_name}/web_runner.py", "web_runner.py.txt", True, True),
+            ("{project_name}/batch_main.py", "batch_main.py.txt", True, True),
+            ("{project_name}/web_main.py", "web_main.py.txt", True, True),
+            ("{project_name}/__main__.py", "main.py.txt", True, False),
+            ("{project_name}/__init__.py", "init.py.txt", True, False),
+            ("dodo.py", "dodo.py.txt", False, False),
+            ("dodo.py", "web_dodo.py.txt", False, True),
+            ("Dockerfile", "Dockerfile.txt", False, False),
+            ("{project_name}/config.yaml", "config.yaml.txt", False, False),
+            (".gitignore", ".gitignore.txt", False, False)
         ]
     }
 }
@@ -60,21 +64,26 @@ def process_files(files, project_dir, project_name, project_description):
 
 # pylint: disable=too-many-locals
 def process_templates(templates, folder, project_dir, project_name, project_description, require_web):
-    for afile, template, capitalize in templates:
+    for afile, template, capitalize, web_component in templates:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
         path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-        # Replace certain files when web service is required
+        runner_file = "runners"
+        runner_class = "BatchRunner"
         if require_web:
-            if template == "runners.py.txt":
-                template = "web_runner.py.txt"
-            if template == "main.py.txt":
-                template = "web_main.py.txt"
+            runner_file = "web_runner"
+            runner_class = "WebRunner"
+        else:
+            if web_component:
+                continue
 
         with open(os.path.join(path, "templates", folder, template)) as f:
             contents = f.read()
             name = project_name.capitalize() if capitalize else project_name
-            actual_contents = contents.format(project_name=name, project_description=project_description)
+            if template == "main.py.txt":
+                actual_contents = contents.format(runner_file=runner_file, runner_class=runner_class)
+            else:
+                actual_contents = contents.format(project_name=name, project_description=project_description)
             file_path = os.path.join(project_dir, actual_file)
         with open(file_path, 'w') as f:
             f.write(actual_contents)

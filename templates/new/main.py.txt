@@ -1,19 +1,12 @@
-import os
-import json
-import logging
 from surround import Assembler
-from .stages import {project_name}Data, Main
-from .runners import SingleRunner
+from stages import Main, ValidateData
+from {runner_file} import {runner_class}
 
-logging.basicConfig(level=logging.INFO)
 
 def main():
-    data = {project_name}Data()
-    assembler = Assembler("Default project", data, Main())
+    assembler = Assembler("Default project", ValidateData(), Main())
+    {runner_class}(assembler).run()
 
-    SingleRunner(assembler).run()
-
-    logging.info(data.output_data)
 
 if __name__ == "__main__":
     main()

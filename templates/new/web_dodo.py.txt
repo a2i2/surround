@@ -20,7 +20,7 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["project_root"], IMAGE)]
+        'actions': ["docker run --volume %s/:/app %s" % (CONFIG["project_root"], IMAGE)]
     }}
 
 def task_prod():
@@ -33,5 +33,11 @@ def task_prod():
 def task_batch():
     """Run batch mode locally"""
     return {{
-        'actions': ["python3 -m {project_name}"]
+        'actions': ["python3 {project_name}/batch_main.py"]
+    }}
+
+def task_web():
+    """Run web mode locally"""
+    return {{
+        'actions': ["python3 {project_name}/web_main.py"]
     }}

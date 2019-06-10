@@ -1,11 +1,11 @@
 from surround import Assembler
 from stages import Main, ValidateData
-from web_runner import WebRunner
+from runners import BatchRunner
 
 
 def main():
     assembler = Assembler("Default project", ValidateData(), Main())
-    WebRunner(assembler).run()
+    BatchRunner(assembler).run()
 
 
 if __name__ == "__main__":
