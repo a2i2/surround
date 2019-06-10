@@ -1,0 +1,16 @@
+import os
+from surround import Runner
+
+class SingleRunner(Runner):
+    def prepare_runner(self):
+        self.message = "TODO: Do estimate calculation here"
+
+    def prepare_data(self):
+        self.assembler.surround_data.input_data = self.message
+
+    def run(self):
+        self.prepare_runner()
+        self.prepare_data()
+        # Start assembler to process processed data
+        self.assembler.init_assembler()
+        self.assembler.run()

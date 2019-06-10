@@ -3,7 +3,7 @@ import json
 import logging
 from surround import Assembler
 from .stages import {project_name}Data, Main
-from .runners import SingleRunner
+from .runners import WebRunner
 
 logging.basicConfig(level=logging.INFO)
 
@@ -11,7 +11,7 @@ def main():
     data = {project_name}Data()
     assembler = Assembler("Default project", data, Main())
 
-    SingleRunner(assembler).run()
+    WebRunner(assembler).run()
 
     logging.info(data.output_data)
 
