@@ -7,6 +7,7 @@ class BatchRunner(Runner):
         # Load data from files or directory here
         self.raw_data = "TODO: Load raw data here"
         self.data = {project_name}Data()
+        self.assembler.run_on_batch_mode()
         self.assembler.init_assembler(self.data)
 
     def prepare_data(self):

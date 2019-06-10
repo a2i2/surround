@@ -25,6 +25,7 @@ class Assembler(ABC):
         self.pre_filters = None
         self.post_filters = None
         self.visualiser = None
+        self.batch_mode = False
 
     def init_assembler(self, surround_data=None):
         if surround_data:
@@ -64,7 +65,7 @@ class Assembler(ABC):
         if self.post_filters:
             self.execute_filters(self.post_filters, self.surround_data)
 
-        if is_training and self.visualiser:
+        if (is_training or self.batch_mode) and self.visualiser:
             self.visualiser.visualise(self.surround_data, self.config)
 
     def execute_filters(self, filters, surround_data):
@@ -171,3 +172,6 @@ class Assembler(ABC):
         if not visualiser and not isinstance(visualiser, Visualiser):
             raise TypeError("visualiser should be of class Visualiser")
         self.visualiser = visualiser
+
+    def run_on_batch_mode(self):
+        self.batch_mode = True
