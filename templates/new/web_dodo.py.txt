@@ -31,7 +31,7 @@ def task_prod():
     }}
 
 def task_train():
-    """Run batch mode inside the container"""
+    """Run training mode inside the container"""
     return {{
         'actions': ["docker run %s python3 -m {project_name} --mode train" % IMAGE]
     }}
