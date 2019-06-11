@@ -10,15 +10,9 @@ from .stages import RunnersData
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
-    def prepare_runner(self):
-        self.assembler.init_assembler(RunnersData())
-        self.application = Application(self.assembler)
-
-    def prepare_data(self):
-        print("No data prep")
-
     def run(self, is_training=False):
-        self.prepare_runner()
+        self.assembler.init_assembler()
+        self.application = Application(self.assembler)
         self.application.listen(8080)
         logging.info("Server started at http://localhost:8080")
         tornado.ioloop.IOLoop.instance().start()
@@ -35,16 +29,17 @@ class Application(tornado.web.Application):
 class MessageHandler(tornado.web.RequestHandler):
     def initialize(self, assembler):
         self.assembler = assembler
+        self.data = RunnersData()
 
     def post(self):
-        data = json.loads(self.request.body)
+        req_data = json.loads(self.request.body)
 
         # Clean output_data on every request
-        self.assembler.surround_data.output_data = ""
+        self.data.output_data = ""
 
         # Prepare input_date for the assembler
-        self.assembler.surround_data.input_data = data["message"]
+        self.data.input_data = req_data["message"]
 
         # Execute assembler
-        self.assembler.run()
-        logging.info("Message: %s", self.assembler.surround_data.output_data)
+        self.assembler.run(self.data)
+        logging.info("Message: %s", self.data.output_data)

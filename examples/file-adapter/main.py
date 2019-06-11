@@ -7,29 +7,19 @@ from surround import Estimator, SurroundData, Assembler, Validator, Config, Runn
 prefix = ""
 
 class MainRunner(Runner):
-    def prepare_runner(self):
-        self.input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
-        self.data = BasicData()
+    def run(self, is_training=False):
+        self.assembler.init_assembler()
+        data = BasicData()
+        input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
 
-    def prepare_data(self):
-        with open(self.input_path) as csv_file:
+        with open(input_path) as csv_file:
             content = csv.DictReader(csv_file, delimiter=',', quotechar='"')
             # pylint: disable=unused-variable
             for i, row in enumerate(content):
-                self.data.inputs.append(row)
+                data.active_row = row
+                self.assembler.run(data)
 
-    def run(self, is_training=False):
-        self.prepare_runner()
-        self.assembler.init_assembler(self.data)
-        self.prepare_data()
-
-        for row in self.data.inputs:
-            self.data.active_row = row
-
-            # Start assembler to process processed data
-            self.assembler.run()
-
-        self.save_result(self.data, self.assembler.config)
+        self.save_result(data, self.assembler.config)
 
     def save_result(self, surround_data, config):
         output_path = prefix + config.get_path("Surround.Loader.output")
@@ -44,8 +34,8 @@ class MainRunner(Runner):
 
 class CSVValidator(Validator):
     def validate(self, surround_data, config):
-        if not surround_data.inputs:
-            raise ValueError("Input is empty")
+        if not surround_data.active_row:
+            raise ValueError("'active_row' is empty")
 
 
 class ProcessCSV(Estimator):
@@ -62,7 +52,6 @@ class ProcessCSV(Estimator):
 
 
 class BasicData(SurroundData):
-    inputs = []
     outputs = []
     row = None
     word_count = None

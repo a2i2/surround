@@ -10,15 +10,10 @@ from stages import {project_name}Data
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
-    def prepare_runner(self):
-        self.assembler.init_assembler({project_name}Data())
-        self.application = Application(self.assembler)
-
-    def prepare_data(self):
-        print("No data prep")
-
     def run(self, is_training=False):
-        self.prepare_runner()
+        # Setup web service
+        self.assembler.init_assembler()
+        self.application = Application(self.assembler)
         self.application.listen(8080)
         logging.info("Server started at http://localhost:8080")
         tornado.ioloop.IOLoop.instance().start()
@@ -36,20 +31,20 @@ class Application(tornado.web.Application):
 class EstimateHandler(tornado.web.RequestHandler):
     def initialize(self, assembler):
         self.assembler = assembler
+        self.data = {project_name}Data()
 
     def post(self):
-        data = json.loads(self.request.body)
+        req_data = json.loads(self.request.body)
 
         # Clean output_data on every request
-        self.assembler.surround_data.output_data = ""
+        self.data.output_data = ""
 
         # Prepare input_date for the assembler
-        self.assembler.surround_data.input_data = data["message"]
+        self.data.input_data = req_data["message"]
 
         # Execute assembler
-        self.assembler.init_assembler()
-        self.assembler.run()
-        logging.info("Message: %s", self.assembler.surround_data.output_data)
+        self.assembler.run(self.data)
+        logging.info("Message: %s", self.data.output_data)
 
 
 class InfoHandler(tornado.web.RequestHandler):

@@ -3,21 +3,18 @@ from stages import {project_name}Data
 
 
 class BatchRunner(Runner):
-    def prepare_runner(self):
-        # Load data from files or directory here
-        self.raw_data = "TODO: Load raw data here"
-        self.data = {project_name}Data()
-        self.assembler.run_on_batch_mode()
-        self.assembler.init_assembler(self.data)
-
-    def prepare_data(self):
-        # Parse raw data into pipeline ready format here
-        self.data.input_data = self.raw_data
-
     def run(self, is_training=False):
-        # Execute here
-        self.prepare_runner()
-        self.prepare_data()
-        self.assembler.run(None, is_training)
+        self.assembler.run_on_batch_mode()
+        self.assembler.init_assembler()
+        data = {project_name}Data()
 
-        print("Batch Runner: %s" % self.data.output_data)
+        # Load data to be processed
+        raw_data = "TODO: Load raw data here"
+
+        # Setup input data
+        data.input_data = raw_data
+
+        # Run assembler
+        self.assembler.run(data, is_training)
+
+        print("Batch Runner: %s" % data.output_data)

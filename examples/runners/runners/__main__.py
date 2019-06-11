@@ -1,6 +1,6 @@
 from surround import Assembler
 from .stages import ValidateData, HelloWorld
-from .runners import BatchRunner
+from .batch_runner import BatchRunner
 # pylint: disable=unused-import
 from .web_runner import WebRunner
 

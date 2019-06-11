@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     data = BasicData()
     assembler = Assembler("Init state example", ValidateData(), HelloWorld(), app_config)
-    assembler.init_assembler(data)
-    assembler.run()
+    assembler.init_assembler()
+    assembler.run(data)
 
     print("Text is '%s'" % data.text)

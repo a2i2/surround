@@ -36,9 +36,7 @@ class Assembler(ABC):
         self.visualiser = None
         self.batch_mode = False
 
-    def init_assembler(self, surround_data=None):
-        if surround_data:
-            self.surround_data = surround_data
+    def init_assembler(self):
         try:
             if self.pre_filters:
                 for pre_filter in self.pre_filters:
@@ -54,8 +52,9 @@ class Assembler(ABC):
 
     def run(self, surround_data=None, is_training=False):
         LOGGER.info("Starting '%s'", self.assembler_name)
-        if surround_data:
-            self.surround_data = surround_data
+        if not surround_data:
+            raise ValueError("surround_data is required to run an assembler")
+        self.surround_data = surround_data
         try:
             self.validator.validate(self.surround_data, self.config)
             self.__run_pipeline(is_training)
