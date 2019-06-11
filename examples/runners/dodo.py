@@ -2,42 +2,30 @@ import os
 from surround import Config
 
 CONFIG = Config(os.path.dirname(__file__))
-DOIT_CONFIG = {{'verbosity':2}}
+DOIT_CONFIG = {'verbosity':2}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
 def task_build():
     """Build the Docker image for the current project"""
-    return {{
+    return {
         'actions': ['docker build --tag=%s .' % IMAGE]
-    }}
+    }
 
 def task_remove():
     """Remove the Docker image for the current project"""
-    return {{
+    return {
         'actions': ['docker rmi %s -f' % IMAGE]
-    }}
+    }
 
 def task_dev():
     """Run the main task for the project"""
-    return {{
-        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["project_root"], IMAGE)]
-    }}
+    return {
+        'actions': ["docker run --volume %s/:/app %s" % (CONFIG["project_root"], IMAGE)]
+    }
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
-    return {{
+    return {
         'actions': ["docker run %s" % IMAGE],
         'task_dep': ["build"]
-    }}
-
-def task_train():
-    """Run batch mode inside the container"""
-    return {{
-        'actions': ["docker run %s python3 -m {project_name} --mode train" % IMAGE]
-    }}
-
-def task_batch():
-    """Run batch mode inside the container"""
-    return {{
-        'actions': ["docker run %s python3 -m {project_name} --mode batch" % IMAGE]
-    }}
+    }

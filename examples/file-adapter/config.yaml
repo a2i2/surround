@@ -1,2 +1,6 @@
+Surround:
+    Loader:
+        input: "data/input.csv"
+        output: "data/output.txt"
 ProcessCSV:
     include_company: True

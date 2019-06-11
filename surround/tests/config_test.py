@@ -55,15 +55,14 @@ class TestConfig(unittest.TestCase):
         config.read_config_files([self.f1.name, self.f2.name])
         output = {
             'company': 'a2i2',
-            'image': 'surround',
             'version': 'latest',
-            'surround' : {
-                "stages" : False,
-                "enable_stage_output_dump": False
+            'image': 'surround',
+            'surround': {
+                'enable_stage_output_dump': False
             },
             'main': {
-                'count': 15,
-                'surround': 'au.com.first_stage.FirstStage'
+                'surround': 'au.com.first_stage.FirstStage',
+                'count': 15
             },
             'objects': [{
                 'node': 43,

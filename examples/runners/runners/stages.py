@@ -1,9 +1,9 @@
-from surround import Estimator, SurroundData, Validator
+from surround import Validator, Estimator, SurroundData
 
 
-class {project_name}Data(SurroundData):
+class RunnersData(SurroundData):
     input_data = None
-    output_data = None
+    output_data = ""
 
 
 class ValidateData(Validator):
@@ -11,9 +11,10 @@ class ValidateData(Validator):
         if not surround_data.input_data:
             raise ValueError("'input_data' is None")
 
-class Main(Estimator):
+
+class HelloWorld(Estimator):
     def estimate(self, surround_data, config):
-        surround_data.output_data = surround_data.input_data
+        surround_data.output_data += surround_data.input_data
 
     def fit(self, surround_data, config):
-        print("TODO: Train your model here")
+        print("TODO: Building models")

@@ -1,3 +1,2 @@
 include surround/*.yaml
-include surround/runner/web/upload.html
 graft templates

@@ -41,3 +41,9 @@ def task_batch():
     return {{
         'actions': ["docker run %s python3 -m {project_name} --mode batch" % IMAGE]
     }}
+
+def task_web():
+    """Run web mode inside the container"""
+    return {{
+        'actions': ["docker run -p 8080:8080  %s python3 -m {project_name} --mode web" % IMAGE]
+    }}

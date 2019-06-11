@@ -1,10 +1,11 @@
 import os
 import io
-from .stage import Stage
-from .surround import SurroundData, Surround
+from .stage import Filter, Estimator
+from .surround import SurroundData
+from .assembler import Assembler
 
 
-class LinterStage(Stage):
+class LinterStage(Filter):
     def __init__(self, key, description):
         self.key = key
         self.description = description
@@ -57,6 +58,18 @@ class CheckDirectories(LinterStage):
                 self.add_error(surround_data, "Directory %s does not exist" % path)
 
 
+class Main(Estimator):
+    def __init__(self, filters):
+        self.filters = filters
+
+    def estimate(self, surround_data, config):
+        for filters in self.filters:
+            filters.operate(surround_data, config)
+
+    def fit(self, surround_data, config):
+        print("No training implemented")
+
+
 class ProjectData(SurroundData):
     def __init__(self, project_structure, project_root, project_name):
         self.project_structure = project_structure
@@ -66,13 +79,13 @@ class ProjectData(SurroundData):
 
 class Linter():
 
-    linter_checks = Surround([CheckDirectories(), CheckFiles(), CheckData()])
+    filters = [CheckDirectories(), CheckFiles(), CheckData()]
 
     def dump_checks(self):
         with io.StringIO() as s:
             s.write("Checkers in Surround's linter\n")
             s.write("=============================")
-            for stage in self.linter_checks.surround_stages:
+            for stage in self.filters:
                 s.write("\n%s - %s" % (stage.key, stage.description))
             output = s.getvalue()
         return output
@@ -82,5 +95,7 @@ class Linter():
         root = os.path.abspath(project_root)
         project_name = os.path.basename(root)
         data = ProjectData(project, root, project_name)
-        self.linter_checks.process(data)
+        assembler = Assembler("Linting", data, Main(self.filters))
+        assembler.init_assembler()
+        assembler.run()
         return data.errors, data.warnings

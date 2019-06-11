@@ -1,38 +1,48 @@
 import logging
-from surround import Stage, SurroundData, Surround, Config
+import os
 
-class HelloSurround(Stage):
+from surround import Estimator, SurroundData, Assembler, Config, Validator
 
+prefix = ""
+
+class HelloWorld(Estimator):
     def __init__(self):
-        self.data = None
+        self.file_ = None
 
     def init_stage(self, config):
-        file_ = open(config.get_path("surround.path_to_HelloSurround"), "r")
-        self.data = file_.read()
+        filename = config.get_path("surround.path_to_HelloWorld")
+        self.file_ = open(prefix + filename, "r")
 
-    def operate(self, surround_data, config):
-        print(self.data)
+    def estimate(self, surround_data, config):
+        surround_data.text = self.file_.read()
 
-class HelloWorld(Stage):
+    def fit(self, surround_data, config):
+        print("No training implemented")
 
-    def __init__(self):
-        self.data = None
-
-    def init_stage(self, config):
-        file_ = open(config.get_path("surround.path_to_HelloWorld"), "r")
-        self.data = file_.read()
-
-    def operate(self, surround_data, config):
-        print(self.data)
 
 class BasicData(SurroundData):
     text = None
 
+
+class ValidateData(Validator):
+    def validate(self, surround_data, config):
+        if surround_data.text:
+            raise ValueError("'text' is not None")
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    surround = Surround([HelloSurround(), HelloWorld()])
-    surround_config = Config()
-    surround_config.read_config_files(["examples/init-stage-with-data/config.yaml"])
-    surround.set_config(surround_config)
-    surround.init_stages()
-    surround.process(BasicData())
+
+    dir_extension = os.path.dirname(__file__)
+    if dir_extension not in os.getcwd():
+        prefix = dir_extension + "/"
+
+    app_config = Config()
+    app_config.read_config_files([prefix + "config.yaml"])
+
+    data = BasicData()
+    assembler = Assembler("Init state example", ValidateData(), HelloWorld(), app_config)
+    assembler.init_assembler()
+    assembler.run(data)
+
+    print("Text is '%s'" % data.text)

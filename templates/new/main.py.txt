@@ -1,17 +1,12 @@
-import os
-import json
-import logging
-from .wrapper import PipelineWrapper
+from surround import Assembler
+from stages import Main, ValidateData
+from {runner_file} import {runner_class}
 
-logging.basicConfig(level=logging.INFO)
 
 def main():
-    wrapper = PipelineWrapper()
-    config = wrapper.get_config()
-    output = wrapper.run(json.dumps({{"data": "hello"}}))
-    with open(os.path.join(config["output_path"], "output.txt"), 'w') as file_:
-        file_.write(output["output"])
-    logging.info(output)
+    assembler = Assembler("Default project", ValidateData(), Main())
+    {runner_class}(assembler).run()
+
 
 if __name__ == "__main__":
     main()

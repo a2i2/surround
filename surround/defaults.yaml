@@ -3,5 +3,4 @@ version: latest
 image: surround
 
 surround:
-    stages: false
     enable_stage_output_dump: false

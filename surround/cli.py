@@ -1,20 +1,12 @@
 import argparse
+import re
 import os
 import sys
 import inspect
 import logging
 import subprocess
-from pathlib import Path
 import pkg_resources
-import yaml
 
-try:
-    import tornado.ioloop
-    from .runner.web import api
-except ImportError:
-    pass
-
-from .surround import AllowedTypes
 from .remote import cli as remote_cli
 from .linter import Linter
 
@@ -38,16 +30,18 @@ PROJECTS = {
         ],
         "templates" : [
             # File name, template name, capitalize project name
-            ("README.md", "README.md.txt", False),
-            ("{project_name}/stages.py", "stages.py.txt", True),
-            ("{project_name}/__main__.py", "main.py.txt", True),
-            ("{project_name}/__init__.py", "init.py.txt", True),
-            ("{project_name}/wrapper.py", "wrapper.py.txt", True),
-            ("dodo.py", "dodo.py.txt", False),
-            ("Dockerfile", "Dockerfile.txt", False),
-            ("{project_name}/config.yaml", "config.yaml.txt", False),
-            (".gitignore", ".gitignore.txt", False)
-
+            ("README.md", "README.md.txt", False, False),
+            ("{project_name}/stages.py", "stages.py.txt", True, False),
+            ("{project_name}/batch_runner.py", "batch_runner.py.txt", True, False),
+            ("{project_name}/web_runner.py", "web_runner.py.txt", True, True),
+            ("{project_name}/__main__.py", "batch_main.py.txt", True, False),
+            ("{project_name}/__main__.py", "web_main.py.txt", True, True),
+            ("{project_name}/__init__.py", "init.py.txt", True, False),
+            ("dodo.py", "dodo.py.txt", False, False),
+            ("dodo.py", "web_dodo.py.txt", False, True),
+            ("Dockerfile", "Dockerfile.txt", False, False),
+            ("{project_name}/config.yaml", "config.yaml.txt", False, False),
+            (".gitignore", ".gitignore.txt", False, False)
         ]
     }
 }
@@ -57,20 +51,28 @@ def process_directories(directories, project_dir, project_name):
         actual_directory = directory.format(project_name=project_name)
         os.makedirs(os.path.join(project_dir, actual_directory))
 
-def process_files(files, project_dir, project_name, project_description):
+def process_files(files, project_dir, project_name, project_description, require_web):
     for afile, content in files:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
         actual_content = content.format(project_name=project_name, project_description=project_description, version=pkg_resources.get_distribution("surround").version)
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
+        if require_web and afile == "requirements.txt":
+            actual_content += "\ntornado==6.0.2"
+
         with open(file_path, 'w') as f:
             f.write(actual_content)
 
-def process_templates(templates, folder, project_dir, project_name, project_description):
-    for afile, template, capitalize in templates:
+# pylint: disable=too-many-locals
+def process_templates(templates, folder, project_dir, project_name, project_description, require_web):
+    for afile, template, capitalize, web_component in templates:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
         path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+        if not require_web and web_component:
+            continue
+
         with open(os.path.join(path, "templates", folder, template)) as f:
             contents = f.read()
             name = project_name.capitalize() if capitalize else project_name
@@ -79,13 +81,13 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
         with open(file_path, 'w') as f:
             f.write(actual_contents)
 
-def process(project_dir, project, project_name, project_description, folder):
+def process(project_dir, project, project_name, project_description, require_web, folder):
     if os.path.exists(project_dir):
         return False
     os.makedirs(project_dir)
     process_directories(project["dirs"], project_dir, project_name)
-    process_files(project["files"], project_dir, project_name, project_description)
-    process_templates(project["templates"], folder, project_dir, project_name, project_description)
+    process_files(project["files"], project_dir, project_name, project_description, require_web)
+    process_templates(project["templates"], folder, project_dir, project_name, project_description, require_web)
     return True
 
 def is_valid_dir(aparser, arg):
@@ -178,10 +180,7 @@ def parse_run_args(args):
     if remote_cli.is_surround_project():
         actual_current_dir = os.getcwd()
         os.chdir(remote_cli.get_project_root_from_current_dir())
-        if args.web:
-            run_as_web()
-        else:
-            run_locally(args)
+        run_locally(args)
         os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
@@ -196,56 +195,7 @@ def run_locally(args):
     run_process = subprocess.Popen([sys.executable, '-m', 'doit', task])
     run_process.wait()
 
-def run_as_web():
-    obj = None
-    loaded_class = None
-    project_root = remote_cli.get_project_root_from_current_dir()
-    if project_root is not None:
-        path_to_modules = os.path.join(project_root, os.path.basename(project_root))
-        path_to_config = os.path.join(path_to_modules, "config.yaml")
-
-        if Path(path_to_config).exists():
-            with open(path_to_config, "r") as f:
-                config = yaml.safe_load(f)
-                wrapper_info = config['wrapper-info'].split('.')
-                package_name = '/'.join(wrapper_info[:-2])
-                module_name = wrapper_info[-2:][0]
-                class_name = wrapper_info[-2:][1]
-        else:
-            print("error: config does not exist")
-            return
-
-        if Path(os.path.join(project_root, package_name, module_name + ".py")).exists():
-            load_modules_from_path(os.path.join(project_root, package_name), module_name)
-            if hasattr(sys.modules[module_name], class_name):
-                loaded_class = load_class_from_name(module_name, class_name)
-                obj = loaded_class()
-            else:
-                print("error: " + module_name + " does not have " + class_name)
-                return
-        else:
-            print("error: " + module_name + " does not exist")
-            return
-
-        if obj is None:
-            print("error: cannot load " + class_name + " from " + module_name)
-            return
-    else:
-        print("error: not a surround project")
-
-    try:
-        api.make_app(obj).listen(8888)
-        print(os.path.basename(os.getcwd()) + " is running on http://localhost:8888")
-        print("Available endpoints:")
-        print("* GET  /                 # Health check")
-        if obj.type_of_uploaded_object == AllowedTypes.FILE:
-            print("* GET  /upload           # Upload data")
-        print("* POST /predict          # Send data to the Surround pipeline")
-        tornado.ioloop.IOLoop.current().start()
-    except NameError:
-        print("error: tornado not installed")
-        print("run: pip3 install tornado==6.0.1")
-
+# pylint: disable=too-many-branches
 def parse_init_args(args):
     if allowed_to_access_dir(args.path):
         if args.project_name:
@@ -253,8 +203,8 @@ def parse_init_args(args):
         else:
             while True:
                 project_name = input("Name of project: ")
-                if not project_name.isalpha() or not project_name.islower():
-                    print("error: project name requires lowercase letters only")
+                if not re.match("^[A-Za-z_-]*$", project_name) or not project_name.islower():
+                    print("error: project name requires lowercase letters and hyphens only")
                 else:
                     break
 
@@ -263,8 +213,20 @@ def parse_init_args(args):
         else:
             project_description = input("What is the purpose of this project?: ")
 
+        if args.require_web:
+            require_web = args.require_web
+        else:
+            while True:
+                require_web_string = input("Does it require a web runner? (y/n) ")
+                if require_web_string.lower() == "y":
+                    require_web = True
+                    break
+                if require_web_string.lower() == "n":
+                    require_web = False
+                    break
+
         new_dir = os.path.join(args.path, project_name)
-        if process(new_dir, PROJECTS["new"], project_name, project_description, "new"):
+        if process(new_dir, PROJECTS["new"], project_name, project_description, require_web, "new"):
             print("info: project created at %s" % os.path.join(os.path.abspath(args.path), project_name))
         else:
             print("error: directory %s already exists" % new_dir)
@@ -298,10 +260,10 @@ def main():
     init_parser.add_argument('path', help="Path for creating a Surround project", nargs='?', default="./")
     init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
     init_parser.add_argument('-d', '--description', help="A description for the project")
+    init_parser.add_argument('-w', '--require-web', help="Is web service required for the project")
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
-    run_parser.add_argument('-w', '--web', help="Name of the class inherited from Wrapper", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
