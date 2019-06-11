@@ -1,5 +1,6 @@
 import ast
 import os
+from pathlib import Path
 from collections.abc import Mapping
 from pkg_resources import resource_stream
 
@@ -14,6 +15,16 @@ class Config(Mapping):
 
         # Set framework paths
         if project_root:
+            # Resolve absolute path
+            project_root = str(Path(project_root).resolve())
+
+            # If the system has a drive letter, change the project_root to /c/rest/of/path
+            split_path = os.path.splitdrive(project_root)
+            if split_path[0] != '':
+                drive_letter = split_path[0][0].lower()
+                path = split_path[1].replace('\\', '/')
+                project_root = '/' + drive_letter + path
+
             self._storage["project_root"] = project_root
             self._storage["package_path"] = package_path
             self._storage["output_path"] = os.path.join(project_root, "output")

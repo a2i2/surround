@@ -20,7 +20,7 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run --volume %s/:/app %s" % (CONFIG["project_root"], IMAGE)]
+        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["project_root"], IMAGE)]
     }}
 
 def task_prod():
