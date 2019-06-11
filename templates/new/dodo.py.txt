@@ -31,13 +31,13 @@ def task_prod():
     }}
 
 def task_train():
-    """Run batch mode locally"""
+    """Run batch mode inside the container"""
     return {{
-        'actions': ["python3 -m {project_name} --mode train"]
+        'actions': ["docker run %s python3 -m {project_name} --mode train" % IMAGE]
     }}
 
 def task_batch():
-    """Run batch mode locally"""
+    """Run batch mode inside the container"""
     return {{
-        'actions': ["python3 -m {project_name} --mode batch"]
+        'actions': ["docker run %s python3 -m {project_name} --mode batch" % IMAGE]
     }}
