@@ -36,7 +36,8 @@ class Assembler(ABC):
         self.visualiser = None
         self.batch_mode = False
 
-    def init_assembler(self):
+    def init_assembler(self, batch_mode=False):
+        self.batch_mode = batch_mode
         try:
             if self.pre_filters:
                 for pre_filter in self.pre_filters:
@@ -180,6 +181,3 @@ class Assembler(ABC):
         if not visualiser and not isinstance(visualiser, Visualiser):
             raise TypeError("visualiser should be of class Visualiser")
         self.visualiser = visualiser
-
-    def run_on_batch_mode(self):
-        self.batch_mode = True

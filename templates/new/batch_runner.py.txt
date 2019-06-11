@@ -1,11 +1,12 @@
+import logging
 from surround import Runner
 from stages import {project_name}Data
 
+logging.basicConfig(level=logging.INFO)
 
 class BatchRunner(Runner):
     def run(self, is_training=False):
-        self.assembler.run_on_batch_mode()
-        self.assembler.init_assembler()
+        self.assembler.init_assembler(True)
         data = {project_name}Data()
 
         # Load data to be processed
@@ -17,4 +18,4 @@ class BatchRunner(Runner):
         # Run assembler
         self.assembler.run(data, is_training)
 
-        print("Batch Runner: %s" % data.output_data)
+        logging.info("Batch Runner: %s", data.output_data)

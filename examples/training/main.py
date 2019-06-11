@@ -34,7 +34,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = BasicData()
     assembler = Assembler("Training example", ValidateData(), HelloWorld())
-    assembler.run_on_batch_mode()
+    assembler.init_assembler(True)
     assembler.set_visualiser(Formatter())
 
     # Run assembler before training
