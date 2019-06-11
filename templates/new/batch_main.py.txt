@@ -6,7 +6,7 @@ from batch_runner import BatchRunner
 
 def main():
     parser = argparse.ArgumentParser(prog='{project_name}', description="Surround mode(s) available to run this module")
-    parser.add_argument('-m', '--mode', help="Mode to run (train, batch)", default="batch")
+    parser.add_argument('--mode', help="Mode to run (train, batch)", default="batch")
     execute_assembler(parser.parse_args().mode)
 
 

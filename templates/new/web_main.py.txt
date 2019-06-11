@@ -7,7 +7,7 @@ from web_runner import WebRunner
 
 def main():
     parser = argparse.ArgumentParser(prog='{project_name}', description="Surround mode(s) available to run this module")
-    parser.add_argument('-m', '--mode', help="Mode to run (train, batch)", default="web")
+    parser.add_argument('--mode', help="Mode to run (train, batch)", default="web")
     execute_assembler(parser.parse_args().mode)
 
 

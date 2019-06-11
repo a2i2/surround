@@ -33,11 +33,11 @@ def task_prod():
 def task_train():
     """Run batch mode locally"""
     return {{
-        'actions': ["python3 -m {project_name} -m train"]
+        'actions': ["python3 -m {project_name} --mode train"]
     }}
 
 def task_batch():
     """Run batch mode locally"""
     return {{
-        'actions': ["python3 -m {project_name} -m batch"]
+        'actions': ["python3 -m {project_name} --mode batch"]
     }}
