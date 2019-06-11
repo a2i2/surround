@@ -51,12 +51,15 @@ def process_directories(directories, project_dir, project_name):
         actual_directory = directory.format(project_name=project_name)
         os.makedirs(os.path.join(project_dir, actual_directory))
 
-def process_files(files, project_dir, project_name, project_description):
+def process_files(files, project_dir, project_name, project_description, require_web):
     for afile, content in files:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
         actual_content = content.format(project_name=project_name, project_description=project_description, version=pkg_resources.get_distribution("surround").version)
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        if require_web and afile == "requirements.txt":
+            actual_content += "\ntornado==6.0.2"
 
         with open(file_path, 'w') as f:
             f.write(actual_content)
@@ -83,7 +86,7 @@ def process(project_dir, project, project_name, project_description, require_web
         return False
     os.makedirs(project_dir)
     process_directories(project["dirs"], project_dir, project_name)
-    process_files(project["files"], project_dir, project_name, project_description)
+    process_files(project["files"], project_dir, project_name, project_description, require_web)
     process_templates(project["templates"], folder, project_dir, project_name, project_description, require_web)
     return True
 
