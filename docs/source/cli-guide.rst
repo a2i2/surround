@@ -8,7 +8,7 @@ surround
 
 .. argparse::
     :module: surround.cli
-    :func: run_parser
+    :func: execute_cli
     :prog: surround
     :nosubcommands:
 
@@ -19,7 +19,7 @@ Initialize a new Surround project.
 
 .. argparse::
     :module: surround.cli
-    :func: run_parser
+    :func: execute_cli
     :prog: surround
     :path: init
 
@@ -37,7 +37,7 @@ The default tasks that come with every project are:
 
 .. argparse::
     :module: surround.cli
-    :func: run_parser
+    :func: execute_cli
     :prog: surround
     :path: run
 
@@ -50,6 +50,6 @@ For more information on what this does, see :ref:`linter`.
 
 .. argparse::
     :module: surround.cli
-    :func: run_parser
+    :func: execute_cli
     :prog: surround
     :path: lint

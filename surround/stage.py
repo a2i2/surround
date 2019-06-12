@@ -75,7 +75,7 @@ class Estimator(Stage):
         :param config: Contains the settings for each stage
         :type config: <class 'surround.config.Config'>
         """
-        
+
     def fit(self, surround_data, config):
         """Train a model.
 

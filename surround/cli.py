@@ -394,7 +394,7 @@ def parse_tool_args(parsed_args, remote_parser, tool):
     else:
         parse_init_args(parsed_args)
 
-def run_parser():
+def execute_cli():
     """
     Uses the argparse module to parse sys.argv for sub-commands and any arguments (if required).
 
@@ -456,7 +456,7 @@ def main():
     Runs the parser and executes the appropriate operation according to the aguments given.
     """
 
-    run_parser()
+    execute_cli()
 
 if __name__ == "__main__":
     main()
