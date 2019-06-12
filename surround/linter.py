@@ -212,7 +212,7 @@ class Linter():
     To add a new check to the linter, append it to the stages list being passed to
     the :class:`surround.Surround` constructor, which is then being set to the attribute :attr:`linter_checks`.
     """
-    
+
     filters = [CheckDirectories(), CheckFiles(), CheckData()]
 
     def dump_checks(self):
