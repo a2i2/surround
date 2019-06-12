@@ -394,10 +394,8 @@ def parse_tool_args(parsed_args, remote_parser, tool):
     else:
         parse_init_args(parsed_args)
 
-def main():
+def run_parser():
     """
-    Entry-point for the Surround Command Line Interface (CLI).
-
     Uses the argparse module to parse sys.argv for sub-commands and any arguments (if required).
 
     Sub-commands:
@@ -451,6 +449,14 @@ def main():
         print("\nKeyboardInterrupt")
 
     return parser
+
+def main():
+    """
+    Entry-point for the Surround Command Line Interface (CLI).
+    Runs the parser and executes the appropriate operation according to the aguments given.
+    """
+
+    run_parser()
 
 if __name__ == "__main__":
     main()
