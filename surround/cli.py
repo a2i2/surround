@@ -29,7 +29,7 @@ PROJECTS = {
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
-            # File name, template name, capitalize project name
+            # File name, template name, capitalize project name, is web component
             ("README.md", "README.md.txt", False, False),
             ("{project_name}/stages.py", "stages.py.txt", True, False),
             ("{project_name}/batch_runner.py", "batch_runner.py.txt", True, False),
@@ -103,6 +103,8 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
     :type project_name: string
     :param project_description: description of the project
     :type project_description: string
+    :param require_web: whether the project requires web components
+    :type require_web: bool
     """
 
     for afile, template, capitalize, web_component in templates:
@@ -132,10 +134,12 @@ def process(project_dir, project, project_name, project_description, require_web
     :type project_name: string
     :param project_description: description of the new project
     :type project_description: string
+    :param require_web: whether the project requires web components
+    :type require_web: bool
     :param folder: name of the folder in the templates folder to use
     :type folder: string
     :return: Whether the process completed successfully
-    :rtype: boolean
+    :rtype: bool
     """
 
     if os.path.exists(project_dir):
@@ -306,6 +310,8 @@ def run_locally(args):
     - build - builds a docker image for the pipeline
     - dev - runs the surround pipeline in a docker container
     - prod - builds and runs the surround pipeline in a docker container (for production)
+    - batch - runs the surround pipeline using the batch runner
+    - web - runs the surround pipeline using the web runner (if they have it)
     - remove - deletes the docker image for this pipeline
 
     :param args: the arguments parsed from the user
@@ -397,6 +403,7 @@ def parse_tool_args(parsed_args, remote_parser, tool):
 def execute_cli():
     """
     Uses the argparse module to parse sys.argv for sub-commands and any arguments (if required).
+    Executes the appropriate command according to the arguments.
 
     Sub-commands:
     - init - creates a new surround project

@@ -75,10 +75,6 @@ class CheckData(LinterStage):
     """
 
     def __init__(self):
-        """
-        Constructor for the CheckData linter stage.
-        """
-
         LinterStage.__init__(self, "DATA", "Check data files")
 
     def operate(self, surround_data, config):
@@ -103,10 +99,6 @@ class CheckFiles(LinterStage):
     """
 
     def __init__(self):
-        """
-        Constructor for the CheckFiles linter stage.
-        """
-
         LinterStage.__init__(self, "FILES", "Check for Surround project files")
 
     def operate(self, surround_data, config):
@@ -135,10 +127,6 @@ class CheckDirectories(LinterStage):
     """
 
     def __init__(self):
-        """
-        Constructor for the CheckDirectories linter stage.
-        """
-
         LinterStage.__init__(
             self, "DIRECTORIES",
             "Check for validating Surround's directory structure")
@@ -162,14 +150,31 @@ class CheckDirectories(LinterStage):
 
 
 class Main(Estimator):
+    """
+    Class responsible for executing all of the :class:`LinterStage`'s in the Surround Linter.
+    """
+
     def __init__(self, filters):
+        """
+        :param filters: list of stages in the linter
+        :type filters: list of :class:`LinterStage`
+        """
+
         self.filters = filters
 
     def estimate(self, surround_data, config):
+        """
+        Execute each stage in the linter.
+        """
+
         for filters in self.filters:
             filters.operate(surround_data, config)
 
     def fit(self, surround_data, config):
+        """
+        Should never be called.
+        """
+
         print("No training implemented")
 
 
@@ -209,8 +214,7 @@ class Linter():
     This class is used by the Surround CLI to perform the linting of a project via the
     `lint` sub-command.
 
-    To add a new check to the linter, append it to the stages list being passed to
-    the :class:`surround.Surround` constructor, which is then being set to the attribute :attr:`linter_checks`.
+    To add a new check to the linter, append an instance of it to the ``filters`` list.
     """
 
     filters = [CheckDirectories(), CheckFiles(), CheckData()]

@@ -66,16 +66,21 @@ class SurroundData(Frozen):
             def __init__(self, input_data)
                 self.input_data = input_data
 
-        class ValidationStage(Stage):
+        class ValidationStage(Validator):
             def operate(self, data, config):
                 if not isinstance(data.input_data, str):
                     data.errors.append('not correct input format!')
                 elif len(data.input_data) == 0:
                     data.warnings.append('input is empty')
 
-        pipeline = Surround([ValidationStage(), PredictStage()])
+        class Predict(Estimator):
+            # Do prediction here
+
+        pipeline = Assembler("Example", ValidationStage(), Predict())
+        pipeline.init_assembler()
+
         data = PipelineData("received data")
-        pipeline.process(data)
+        pipeline.run(data)
 
         print(data.output_data)
 
