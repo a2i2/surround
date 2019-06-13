@@ -17,16 +17,18 @@ class Config(Mapping):
         if project_root:
             # Resolve absolute path
             project_root = str(Path(project_root).resolve())
+            volume_path = project_root
 
-            # If the system has a drive letter, change the project_root to /c/rest/of/path
+            # If the system has a drive letter, set volume_path to /c/rest/of/path
             split_path = os.path.splitdrive(project_root)
             if split_path[0] != '':
                 drive_letter = split_path[0][0].lower()
                 path = split_path[1].replace('\\', '/')
-                project_root = '/' + drive_letter + path
+                volume_path = '/' + drive_letter + path
 
             self._storage["project_root"] = project_root
             self._storage["package_path"] = package_path
+            self._storage["volume_path"] = volume_path
             self._storage["output_path"] = os.path.join(project_root, "output")
             self._storage["data_path"] = os.path.join(project_root, "data")
             self._storage["models_path"] = os.path.join(project_root, "models")
