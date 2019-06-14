@@ -34,6 +34,9 @@ The default tasks that come with every project are:
 - ``build`` - Build a Docker image for your Surround project.
 - ``dev`` - Run the Docker image with the current source code (via drive mount).
 - ``prod`` - Build and run the Docker image (no drive mounting).
+- ``batch`` - Run the Docker image (no drive mounting) in batch mode.
+- ``train`` - Run the Docker image (no drive mounting) in train mode.
+- ``remove`` - Remove the Docker image built for this project (if any).
 
 .. argparse::
     :module: surround.cli
