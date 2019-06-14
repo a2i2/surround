@@ -44,7 +44,6 @@ Then install the package using the ``setup.py`` script::
 Then test the installation by running the tests and trying the surround CLI::
 
     $ python3 setup.py test
-
     $ surround
 
 .. _project-setup:
@@ -57,26 +56,33 @@ Use the following command to generate a new project::
 
     $ surround init -p testproject -d "Our first pipeline"
 
+When it asks the following, respond with ``n`` (we'll cover this in later sections)::
+    
+    Does it require a web runner? (y/n) n
+
 This will create a new folder called ``testproject`` with the following file structure::
 
     testproject
-    ├── Dockerfile
-    ├── README.md
-    ├── data
-    ├── testproject
+    ├── testproject/
     │   ├── __main__.py
+    │   ├── __init__.py    
     │   ├── config.yaml
-    │   ├── wrapper.py
+    │   ├── batch_runner.py
     │   └── stages.py
-    ├── docs
+    ├── data/
+    ├── docs/
+    ├── models/
+    ├── notebooks/
+    ├── output/
+    ├── scripts/
+    ├── spikes/
+    ├── tests/
+    ├── __main__.py
+    ├── __init__.py    
     ├── dodo.py
-    ├── models
-    ├── notebooks
-    ├── output
+    ├── Dockerfile
     ├── requirements.txt
-    ├── scripts
-    ├── spikes
-    └── tests
+    └── README.md
 
 The generated project comes with an example pipeline that can be ran straight away using the command::
 
@@ -85,9 +91,9 @@ The generated project comes with an example pipeline that can be ran straight aw
 
 Which should output the following::
 
-    INFO:surround.surround:Stage ValidateData took 0:00:00.000007 secs
-    INFO:surround.surround:Surround took 0:00:00.000802 secs
-    INFO:root:{'output': 'TODO: Validate input data assumptions here'}
+    INFO:surround.assembler:Starting 'Default project'
+    INFO:surround.assembler:Estimator Main took 0:00:00 secs
+    INFO:root:Batch Runner: TODO: Load raw data here
 
 Now you are ready for :ref:`create-first-pipeline`. 
 
@@ -103,73 +109,91 @@ from lower case to upper case. This pipeline is going to consist of two stages, 
 
 Open the script ``stages.py`` and you should see the following code already generated::
 
-    from surround import Stage, SurroundData
+    from surround import Estimator, SurroundData, Validator
 
     class TestprojectData(SurroundData):
+        input_data = None
         output_data = None
 
-        def __init__(self, input_data):
-            self.input_data = input_data
-            self.errors = []
+    class ValidateData(Validator):
+        def validate(self, surround_data, config):
+            if not surround_data.input_data:
+                raise ValueError("'input_data' is None")
 
-    class ValidateData(Stage):
-        def operate(self, surround_data, config):
-            surround_data.output_data = "TODO: Validate input data assumptions here"
+    class Main(Estimator):
+        def estimate(self, surround_data, config):
+            surround_data.output_data = surround_data.input_data
+
+        def fit(self, surround_data, config):
+            print("TODO: Train your model here")
 
 As you can see we are already given the ``ValidateData`` stage, we just need to edit the ``operate`` method to
 check if the input data is the correct data type (:class:`str`)::
 
-    def operate(self, surround_data, config):
+    def validate(self, surround_data, config):
         if not isinstance(surround_data.input_data, str):
             # Create an error sine the data is wrong, this will stop the pipeline
             surround_data.errors.append('Input is not a string!')
 
-Now we need to create the ``MakeUpperCase`` stage which will perform the data transformation::
+Now we need to rename ``Main`` to ``MakeUpperCase`` and perform the data transformation in ``estimate``::
 
-    class MakeUpperCase(Stage):
-        def operate(self, surround_data, config):
+    class MakeUpperCase(Estimator):
+        def estimate(self, surround_data, config):
             # Convert the input into upper case
             surround_data.output_data = surround_data.input_data.upper()
+        
+        def fit(self, surround_data, config):
+            # Leave the fit method the same 
+            # We aren't doing any training in this guide
+            print("TODO: Train your model here")
 
-Now we just need to add this new stage into the actual pipeline, so first open the ``wrapper.py`` script, you should see the following::
+Since we renamed the estimator, we need to reflect that change when we create the ``Assembler``.
+So in ``__main__.py`` where the estimator is imported make sure it looks like so::
 
-    import json
-    from surround import Surround, Wrapper, AllowedTypes
-    from stages import ValidateData, TestprojectData
+    from stages import MakeUpperCase, ValidateData
 
-    class PipelineWrapper(Wrapper):
-        def __init__(self):
-            surround = Surround([ValidateData()], __name__)
-            super().__init__(surround)
+And where the assembler is created, make sure it looks like so::
 
-        def run(self, input_data):
-            text = json.loads(input_data)["data"]
-            data = TestprojectData(text)
-            self.surround.process(data)
-            return {"output": data.output_data}
+    assembler = Assembler("Default project", ValidateData(), MakeUpperCase())
 
-Edit this script to first import the new stage like so::
-
-    from stages import ValidateData, MakeUpperCase, TestprojectData
-
-Then append an instance of the stage in the :class:`list` being passed to the ``Surround`` constructor::
-
-    def __init__(self):
-        surround = Surround([ValidateData(), MakeUpperCase()], __name__)
-        super().__init__(surround)
-
-That's it for the pipeline! To test the pipeline with default input (``"hello"`` string) just run the following command::
+That's it for the pipeline! 
+To test the pipeline with default input (``"TODO Load raw data here"`` string) just run the following command::
 
     $ python3 -m testproject
 
 The output should be the following::
 
-    INFO:surround.surround:Stage ValidateData took 0:00:00.000004 secs
-    INFO:surround.surround:Stage MakeUpperCase took 0:00:00.000029 secs
-    INFO:surround.surround:Surround took 0:00:00.001610 secs
-    INFO:root:{'output': 'HELLO'}
+    INFO:surround.assembler:Starting 'Default project'
+    INFO:surround.assembler:Estimator MakeUpperCase took 0:00:00 secs
+    INFO:root:Batch Runner: TODO: LOAD RAW DATA HERE
 
-.. note:: To modify what happens when ``python3 -m testproject`` is executed, edit the ``__main__.py`` script.
+To change what input is fed through the pipeline, modify ``batch_runner.py`` and change what is given to ``data.input_data``::
+
+    import logging
+    from surround import Runner
+    from stages import TestprojectData
+
+    logging.basicConfig(level=logging.INFO)
+
+    class BatchRunner(Runner):
+        def run(self, is_training=False):
+            self.assembler.init_assembler(True)
+            data = TestprojectData()
+
+            # Load data to be processed
+            raw_data = "This daTa wiLL end UP captializED"
+
+            # Setup input data
+            data.input_data = raw_data
+
+            # Run assembler
+            self.assembler.run(data, is_training)
+
+            logging.info("Batch Runner: %s", data.output_data)
+
+
+.. note:: To test training mode (``fit`` will be called instead in the estimator), run the following command: 
+            ``$ python3 -m testproject --mode train``
 
 Running your first pipeline in a container
 ******************************************
@@ -183,41 +207,100 @@ Then to run the container in dev mode just use the following command::
     $ surround run dev
 
 This will run the container linking the folder ``testproject/testproject`` with the working directory in the
-container. So during development when you make small changes, there is no need to build the image again.
+container. So during development when you make small changes, there is no need to build the image, just run
+this command again.
 
-Then when you are ready for production testing you use the following command::
+Then when you are ready for production you can use the following command::
 
     $ surround run prod
 
 Which will first build the image and then run the container without any linking to the host machine.
+The image created in the build can also then be committed to a Docker Hub repository and shared.
 
-.. note:: Both methods of running will use the equivalent command to ``python3 -m testproject`` inside the container.
+.. note:: Both ``dev`` and ``prod`` will use the command ``$ python3 -m testproject`` inside the container.
+        Meaning they will use the default mode set in ``__main__.py`` (which is ``batch`` in default projects) 
+        when running the pipeline.
+
+The following commands will force which mode to use::
+
+    $ surround run batch
+    $ surround run train
 
 Serving your first pipeline via Web Endpoint
 ********************************************
 
-Using Surround we can also host a web-server which can receive data, pass it through our pipeline
-and return the result. All via HTTP endpoints, making your pipeline accessible by any application!
+When generating a project, you get asked::
+    
+    Does it require a web runner? (y/n)
+    
+If we say yes to this then Surround will generate a generic ``batch_runner.py`` but it will also
+generate a new script called ``web_runner.py``. 
 
-Before we can run the web-server, we need to install a dependency called ``tornado``, do this like so::
+This script contains a new ``Runner`` which will use `Tornado <https://www.tornadoweb.org/en/stable/>`_
+to host a web server which will allow your pipeline to be accessible via HTTP request. By default the 
+``WebRunner`` will host two endpoints:
 
-    $ pip3 install tornado==6.0.1
+- ``/info`` - access via GET request, will return ``{'version': '0.0.1'}``
+- ``/estimate`` - access via POST request, body must have a JSON document containing input data::
 
-To start the web-server run the following command::
+    {
+        "message": "this text will be processed" 
+    }
 
-    $ surround run --web
+So lets create a new pipeline that does the same data processing as the one in :ref:`create-first-pipeline` but
+we will send strings via web endpoint and get the results in the response of the request.
 
-Which should output the following::
+First generate a new project, this time saying yes to the require web prompt, and make all the changes we did in
+:ref:`create-first-pipeline` and test it is still working locally.
 
-    testproject is running on http://localhost:8888
-    Available endpoints:
-    * GET  /                 # Health check
-    * POST /predict          # Send data to the Surround pipeline
+Next we are going to build an image for our pipeline using the command::
 
-Now you can send data to your pipeline via HTTP POST to the ``/predict`` endpoint like so::
+    $ surround run build
 
-    $ curl -d "{ \"data\": \"mAkE aLL upper CASE\" }" http://localhost:8888/predict
+Then we are going to run our default server using the command::
 
-Which should output the following if succssful::
+    $ surround run web
 
-    {"output": "MAKE ALL UPPER CASE"}
+You should get output like so::
+
+    INFO:root:Server started at http://localhost:8080
+
+.. note:: If you would like to run it on the host machine instead of in a container, you must install Tornado using
+        this command: ``$ pip3 install tornado==6.0.2``
+
+Now hopefully if you load ``http://localhost:8080/info`` in your preferred browser, you should see the following::
+
+    {"version": "0.0.1"}
+
+.. note:: If you are running this on Windows and don't see the above, try using ``http://192.168.99.100:8080/info`` instead.
+
+Next we are going to test the ``/estimate`` endpoint by using the following command in another terminal::
+
+    $ curl -d "{ \"message\": \"test phrase\" }" http://localhost:8080/estimate
+
+You should see the following output in the terminal running the pipeline::
+
+    INFO:surround.assembler:Starting 'Default project'
+    INFO:surround.assembler:Estimator MakeUpperCase took 0:00:00 secs
+    INFO:root:Message: TEST PHRASE
+    INFO:tornado.access:200 POST /estimate (::1) 1.95ms
+
+So our data is successfully being processed! But what if we need the result?
+
+Head to the script ``web_runner.py`` and append the following to the ``post`` method of ``EstimateHandler``::
+
+    # Return the result of the processing
+    self.write({"output": self.data.output_data})
+
+Restart the web server, use the same ``curl`` command and you should see the following output::
+
+    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                    Dload  Upload   Total   Spent    Left  Speed
+    100    53  100    25  100    28    806    903 --:--:-- --:--:-- --:--:--  1709
+    {"output": "TEST PHRASE"}
+
+Thats it, you are now serving a Surround pipeline! Now you could potentially use this pipeline in virtually any
+application.
+
+.. note:: Since this project was generated with a web runner, the default mode is ``web``, to run the pipeline
+        using the ``BatchRunner`` instead, use the command ``$ surround run batch`` or ``$ surround run train``.
