@@ -1,4 +1,5 @@
 import os
+import sys
 from surround import Config
 
 CONFIG = Config(os.path.dirname(__file__))
@@ -42,8 +43,26 @@ def task_batch():
         'actions': ["docker run %s python3 -m {project_name} --mode batch" % IMAGE]
     }}
 
+def task_train_local():
+    """Run training mode locally"""
+    return {{
+        'actions': ["%s -m {project_name} --mode train" % sys.executable]
+    }}
+
+def task_batch_local():
+    """Run batch mode locally"""
+    return {{
+        'actions': ["%s -m {project_name} --mode batch" % sys.executable]
+    }}
+
 def task_web():
     """Run web mode inside the container"""
     return {{
         'actions': ["docker run -p 8080:8080  %s python3 -m {project_name} --mode web" % IMAGE]
+    }}
+
+def task_web_local():
+    """Run web mode locally"""
+    return {{
+        'actions': ["%s -m {project_name} --mode web" % sys.executable]
     }}
