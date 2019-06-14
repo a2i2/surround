@@ -57,15 +57,12 @@ For example during project generation, the following structure is used::
     ├── README.md
     ├── data
     ├── package name
+    │   ├── __init__.py
     │   ├── __main__.py
+    │   ├── web_runner.py
+    │   ├── batch_runner.py
     │   ├── config.yaml
-    │   ├── visualiser.py
-    │   ├── loader.py
-    │   └── stage
-    │       ├── validator.py
-    │       ├── wrangler.py
-    │       ├── decider.py
-    │       └── estimator.py
+    │   └── stages.py
     ├── docs
     ├── dodo.py
     ├── models
@@ -75,14 +72,13 @@ For example during project generation, the following structure is used::
     ├── scripts
     ├── spikes
     └── tests
-        └── integration.py
 
 Every Surround project has the following characteristics:
 
 - ``Dockerfile`` for bundling up the project as a web application.
 - ``dodo.py`` file containing useful tasks such as train, batch predict and test for a project.
 - Tests for catching training serving skew.
-- A single entry point for running the application, ``main.py``.
+- A single entry point for running the application, ``__main__.py``.
 - A place for data exploration with Jupyter notebooks and miscellaneous scripts.
 - A single place, for output files, data, and model storage.
 
@@ -94,7 +90,7 @@ the project in Docker. The tools included are shown below:
 
 - ``init`` - Used to generate a new Surround project.
 - ``lint`` - Used to run the Surround Linter which checks if Surround conventions are being used correctly.
-- ``run`` - Used to run a task defined in ``dodo.py`` or starting the web-server.
+- ``run`` - Used to run a task defined in ``dodo.py``.
 
 Where the ``run`` command is essentially a wrapper around the ``doit`` library and the Surround Linter will perform multiple checks
 on the current project to see if it is following standard conventions. The intention of the Surround Linter will to become more
@@ -131,20 +127,46 @@ Assembler
 ^^^^^^^^^
 
 .. image:: pipeline_flow_diagram.png
-    :alt: Surround flow diagram
+    :alt: Assembler flow diagram
     :align: center
 
-The Assembler (formerly Surround) is responsible for constructing and executing a pipeline on data. How the pipeline is constructed depends on which 
-execution mode (task) is required. The above diagram describes a simple Surround pipeline showing four different modes of 
-execution. These modes are:
+The Assembler is responsible for constructing and executing a pipeline on data. How the pipeline is constructed (and where/how data is loaded) depends on which 
+execution mode is being used. The above diagram describes a simple Surround pipeline showing three different modes of 
+execution. These modes are described below.
 
-- **Predict** - Used for production, runs the estimator in predict mode, takes some data and just returns the output data.
-- **Batch-predict** - Used for evaluation, uses a Loader to run a lot of data through the pipeline, visualizes performance.
-- **Train** - Used to train an estimator, loads data using a Loader, configures the estimator to be in ``train`` mode, visualizes output.
-- **Test** - Used to test the pipeline in all aspects (prediction and training).
+Training 
+########
 
-Each coloured line in the figure above is a different sequence of execution, each rectangle are :ref:`stages` which are executed one at a time by the Assembler during processing. There 
-are multiple different types of stages, these include: :ref:`loaders`, :ref:`validators`, :ref:`filters`, :ref:`estimators`, and :ref:`visualizers`.
+.. image:: train_diagram.png
+    :alt: Training flow diagram
+    :align: center
+
+Primarily built for **training**, training data is loaded from disk (usually in bulk) then fed through the pipeline
+with the estimator set to ``fit`` mode. Once training the pipeline is complete the data is then fed to a visualiser which
+will help display useful information about the training operation.
+
+Batch-predict 
+#############
+
+.. image:: batch_diagram.png
+    :alt: Batch-predict flow diagram
+    :align: center
+
+Primarily built for **evaluation**, data is loaded from disk (also usually in bulk) then fed through the pipeline with
+the estimator set to ``estimate`` mode. Once processing is complete the data is then fed to a visualiser which
+will help summarise and visualise the overall results / performance.
+
+Web / Predict
+#############
+
+.. image:: predict_diagram.png
+    :alt: Web / Predict flow diagram
+    :align: center
+
+This mode is built for **production**. When your pipeline is setup, training has been completed, evaluation of the model
+shows good performance and is ready for use, this mode is to be used to serve your pipeline. Depending on the type of project you generated
+initially, the input data may come from your local disk or from the body of a POST HTTP request and the result may be
+saved locally or returned to the client who sent the request.
 
 .. _stages:
 
@@ -162,15 +184,6 @@ Between each stage, during processing, there are two objects passed between them
 - :ref:`data` object which contains the input data, has a field for errors (which stops the execution when added to) and holds the output of each stage (if any).
 - :ref:`configuration` object which contains all the settings loaded in from YAML files plus paths to folders in the project such as ``data/`` and ``output/``.
 
-.. _loaders:
-
-Loaders
-#######
-
-Loaders are stages that are responsible for batch loading large amounts of data and feeding them through the pipeline. Typically 
-used for both training and evaluation of performance. For example for a Facial Recognition pipeline you may have a large dataset
-of images that needs to be fed through the pipeline for training. The loading of all those images would take place in a Loader.
-
 .. _validators:
 
 Validators
@@ -178,7 +191,7 @@ Validators
 
 Validators are stages that are responsible for checking if the input data that is about to be fed through the pipeline is valid.
 Meaning is the data the correct format, checking whether there is any detectable reason why the data would cause issues while
-being processed. This stage is positioned first in the execution of the pipeline (or after :ref:`loaders`), they are not intended to create any output, 
+being processed. This stage is positioned first in the execution of the pipeline, they are not intended to create any output, 
 only errors or warnings.
 
 .. _filters:
@@ -191,8 +204,8 @@ or after :ref:`estimators`. There are generally two types of filters: :ref:`wran
 
 .. _wranglers:
 
-Wranglers
----------
+Wranglers (Pre-filters)
+-----------------------
 
 Wranglers perform data wrangling operations on the data. Meaning getting the data from one format into another that is useful 
 for the next stage (typically an Estimator). For example the input data might be a :class:`str` formatted in JSON but the estimator
@@ -200,8 +213,8 @@ next in the pipeline might only accept a Python :class:`dict` so a Wrangler woul
 
 .. _deciders:
 
-Deciders
---------
+Deciders (Post-filters)
+-----------------------
 
 Deciders, placed after :ref:`estimators`, are stages which make descisions based on the output of them. For example in a Voice Activity
 Detection pipeline, we may have an estimator that outputs confidence values on whether the input audio data was speech or not, you would
@@ -221,13 +234,14 @@ would be ran with the input data during execution of the stage.
 In more complex pipelines, these stages may be composed of an entirely separate Surround pipeline (another Assembler instance). Surround is designed this way
 to allow pipelines as complex as required.
 
-.. _visualizers:
+.. _visualisers:
 
-Visualizers
+Visualisers
 ###########
 
-Visualizers are stages where they do what their name entails, visualize the data. Typically used during training and evaluation
-of the model, these stages are used to generate reports on how the model is performing. **TODO: GET GOOD EXAMPLE**
+Visualisers are stages where they do what their name entails, visualize the data. Typically used during training and evaluation
+of the model, these stages are used to generate reports on how the model is performing. For example in a Facial Detection pipeline
+during evaluation of the model, the visualiser may display an example image it processed and render boxes around the faces it detected.
 
 .. _configuration:
 
