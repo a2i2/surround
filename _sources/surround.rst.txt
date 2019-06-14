@@ -4,29 +4,29 @@ API
 *****************
 Here you can find documentation on all classes and their methods in Surround.
 
-Surround
+.. _assembler:   
+
+Assembler
 ========
+
+.. autoclass:: surround.assembler.Assembler
+    :members:
 
 .. automodule:: surround
 
-    .. autoclass:: Surround
-        :members:
-
-    .. automodule:: surround.config
-
-    Config     
+    Config
     ^^^^^^
     
     .. autoclass:: surround.config.Config       
         :members:          
-
+ 
         .. automodule:: surround  
  
-    SurroundData  
-    ^^^^^^^^^^^^
-    
+    SurroundData                              
+    ^^^^^^^^^^^^   
+                
     .. autoclass:: surround.SurroundData        
-        :members:          
+        :members:                   
 
     .. automodule:: surround.stage
 
@@ -34,18 +34,35 @@ Surround
     ^^^^^
     
     .. autoclass:: surround.stage.Stage
-        :members:         
+        :members:      
 
-Wrapper
+    Validator
+    ^^^^^^^^^
+
+    .. autoclass:: surround.stage.Validator
+        :members:
+
+    Filter
+    ^^^^^^
+
+    .. autoclass:: surround.stage.Filter
+        :members:
+
+    Estimator
+    ^^^^^^^^^
+
+    .. autoclass:: surround.stage.Estimator
+        :members:
+
+    Visualiser
+    ^^^^^^^^^^
+
+    .. autoclass:: surround.visualiser.Visualiser
+        :members: 
+
+Runner
 =======
-.. autoclass:: surround.Wrapper  
-    :members:
-
-AllowedTypes    
-^^^^^^^^^^^^
-
-.. autoclass:: surround.AllowedTypes 
-    :show-inheritance:
+.. autoclass:: surround.runners.Runner  
     :members:
 
 .. _linter:
@@ -91,29 +108,4 @@ Linter
 
     .. autoclass:: CheckDirectories
         :show-inheritance:
-        :members:                       
-
-Web API
-=======
-
-.. automodule:: surround.runner.web.api
-
-    .. autofunction:: make_app
-
-    HealthCheck
-    ^^^^^^^^^^^
-    .. autoclass:: HealthCheck
-        :members:
-        :show-inheritance:
-
-    Upload
-    ^^^^^^
-    .. autoclass:: Upload
-        :members:
-        :show-inheritance:
-
-    Predict
-    ^^^^^^^
-    .. autoclass:: Predict
-        :members:    
-        :show-inheritance:
+        :members:  

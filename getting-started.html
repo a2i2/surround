@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Getting Started &#8212; Surround 0.0.7 documentation</title>
+    <title>Getting Started &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -79,7 +79,6 @@ $ cd surround
 </div>
 <p>Then test the installation by running the tests and trying the surround CLI:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py test
-
 $ surround
 </pre></div>
 </div>
@@ -92,25 +91,32 @@ Use the following command to generate a new project:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround init -p testproject -d &quot;Our first pipeline&quot;
 </pre></div>
 </div>
+<p>When it asks the following, respond with <code class="docutils literal notranslate"><span class="pre">n</span></code> (we’ll cover this in later sections):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Does it require a web runner? (y/n) n
+</pre></div>
+</div>
 <p>This will create a new folder called <code class="docutils literal notranslate"><span class="pre">testproject</span></code> with the following file structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>testproject
-├── Dockerfile
-├── README.md
-├── data
-├── testproject
+├── testproject/
 │   ├── __main__.py
+│   ├── __init__.py
 │   ├── config.yaml
-│   ├── wrapper.py
+│   ├── batch_runner.py
 │   └── stages.py
-├── docs
+├── data/
+├── docs/
+├── models/
+├── notebooks/
+├── output/
+├── scripts/
+├── spikes/
+├── tests/
+├── __main__.py
+├── __init__.py
 ├── dodo.py
-├── models
-├── notebooks
-├── output
+├── Dockerfile
 ├── requirements.txt
-├── scripts
-├── spikes
-└── tests
+└── README.md
 </pre></div>
 </div>
 <p>The generated project comes with an example pipeline that can be ran straight away using the command:</p>
@@ -119,9 +125,9 @@ $ python3 -m testproject
 </pre></div>
 </div>
 <p>Which should output the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Stage</span> <span class="n">ValidateData</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000007</span> <span class="n">secs</span>
-<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Surround</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000802</span> <span class="n">secs</span>
-<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:{</span><span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;TODO: Validate input data assumptions here&#39;</span><span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">assembler</span><span class="p">:</span><span class="n">Starting</span> <span class="s1">&#39;Default project&#39;</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">assembler</span><span class="p">:</span><span class="n">Estimator</span> <span class="n">Main</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Batch</span> <span class="n">Runner</span><span class="p">:</span> <span class="n">TODO</span><span class="p">:</span> <span class="n">Load</span> <span class="n">raw</span> <span class="n">data</span> <span class="n">here</span>
 </pre></div>
 </div>
 <p>Now you are ready for <a class="reference internal" href="#create-first-pipeline"><span class="std std-ref">Creating your first pipeline</span></a>.</p>
@@ -135,76 +141,93 @@ $ python3 -m testproject
 <p>For our first Surround pipeline, we are going to do some very basic data transformation and convert the input string
 from lower case to upper case. This pipeline is going to consist of two stages, <code class="docutils literal notranslate"><span class="pre">ValidateData</span></code> and <code class="docutils literal notranslate"><span class="pre">MakeUpperCase</span></code>.</p>
 <p>Open the script <code class="docutils literal notranslate"><span class="pre">stages.py</span></code> and you should see the following code already generated:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">surround</span> <span class="k">import</span> <span class="n">Stage</span><span class="p">,</span> <span class="n">SurroundData</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">surround</span> <span class="k">import</span> <span class="n">Estimator</span><span class="p">,</span> <span class="n">SurroundData</span><span class="p">,</span> <span class="n">Validator</span>
 
 <span class="k">class</span> <span class="nc">TestprojectData</span><span class="p">(</span><span class="n">SurroundData</span><span class="p">):</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">output_data</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">class</span> <span class="nc">ValidateData</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;input_data&#39; is None&quot;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">ValidateData</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="s2">&quot;TODO: Validate input data assumptions here&quot;</span>
+<span class="k">class</span> <span class="nc">Main</span><span class="p">(</span><span class="n">Estimator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TODO: Train your model here&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>As you can see we are already given the <code class="docutils literal notranslate"><span class="pre">ValidateData</span></code> stage, we just need to edit the <code class="docutils literal notranslate"><span class="pre">operate</span></code> method to
 check if the input data is the correct data type (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># Create an error sine the data is wrong, this will stop the pipeline</span>
         <span class="n">surround_data</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Input is not a string!&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now we need to create the <code class="docutils literal notranslate"><span class="pre">MakeUpperCase</span></code> stage which will perform the data transformation:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MakeUpperCase</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<p>Now we need to rename <code class="docutils literal notranslate"><span class="pre">Main</span></code> to <code class="docutils literal notranslate"><span class="pre">MakeUpperCase</span></code> and perform the data transformation in <code class="docutils literal notranslate"><span class="pre">estimate</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MakeUpperCase</span><span class="p">(</span><span class="n">Estimator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="c1"># Convert the input into upper case</span>
         <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Now we just need to add this new stage into the actual pipeline, so first open the <code class="docutils literal notranslate"><span class="pre">wrapper.py</span></code> script, you should see the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">surround</span> <span class="k">import</span> <span class="n">Surround</span><span class="p">,</span> <span class="n">Wrapper</span><span class="p">,</span> <span class="n">AllowedTypes</span>
-<span class="kn">from</span> <span class="nn">stages</span> <span class="k">import</span> <span class="n">ValidateData</span><span class="p">,</span> <span class="n">TestprojectData</span>
 
-<span class="k">class</span> <span class="nc">PipelineWrapper</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">surround</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">ValidateData</span><span class="p">()],</span> <span class="vm">__name__</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">surround</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">input_data</span><span class="p">)[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">TestprojectData</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">}</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="c1"># Leave the fit method the same</span>
+        <span class="c1"># We aren&#39;t doing any training in this guide</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TODO: Train your model here&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Edit this script to first import the new stage like so:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stages</span> <span class="k">import</span> <span class="n">ValidateData</span><span class="p">,</span> <span class="n">MakeUpperCase</span><span class="p">,</span> <span class="n">TestprojectData</span>
+<p>Since we renamed the estimator, we need to reflect that change when we create the <code class="docutils literal notranslate"><span class="pre">Assembler</span></code>.
+So in <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code> where the estimator is imported make sure it looks like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stages</span> <span class="k">import</span> <span class="n">MakeUpperCase</span><span class="p">,</span> <span class="n">ValidateData</span>
 </pre></div>
 </div>
-<p>Then append an instance of the stage in the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> being passed to the <code class="docutils literal notranslate"><span class="pre">Surround</span></code> constructor:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">surround</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">ValidateData</span><span class="p">(),</span> <span class="n">MakeUpperCase</span><span class="p">()],</span> <span class="vm">__name__</span><span class="p">)</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">surround</span><span class="p">)</span>
+<p>And where the assembler is created, make sure it looks like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">assembler</span> <span class="o">=</span> <span class="n">Assembler</span><span class="p">(</span><span class="s2">&quot;Default project&quot;</span><span class="p">,</span> <span class="n">ValidateData</span><span class="p">(),</span> <span class="n">MakeUpperCase</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>That’s it for the pipeline! To test the pipeline with default input (<code class="docutils literal notranslate"><span class="pre">&quot;hello&quot;</span></code> string) just run the following command:</p>
+<p>That’s it for the pipeline!
+To test the pipeline with default input (<code class="docutils literal notranslate"><span class="pre">&quot;TODO</span> <span class="pre">Load</span> <span class="pre">raw</span> <span class="pre">data</span> <span class="pre">here&quot;</span></code> string) just run the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m testproject
 </pre></div>
 </div>
 <p>The output should be the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Stage</span> <span class="n">ValidateData</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000004</span> <span class="n">secs</span>
-<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Stage</span> <span class="n">MakeUpperCase</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.000029</span> <span class="n">secs</span>
-<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">surround</span><span class="p">:</span><span class="n">Surround</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">00.001610</span> <span class="n">secs</span>
-<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:{</span><span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;HELLO&#39;</span><span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">assembler</span><span class="p">:</span><span class="n">Starting</span> <span class="s1">&#39;Default project&#39;</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">assembler</span><span class="p">:</span><span class="n">Estimator</span> <span class="n">MakeUpperCase</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Batch</span> <span class="n">Runner</span><span class="p">:</span> <span class="n">TODO</span><span class="p">:</span> <span class="n">LOAD</span> <span class="n">RAW</span> <span class="n">DATA</span> <span class="n">HERE</span>
+</pre></div>
+</div>
+<p>To change what input is fed through the pipeline, modify <code class="docutils literal notranslate"><span class="pre">batch_runner.py</span></code> and change what is given to <code class="docutils literal notranslate"><span class="pre">data.input_data</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">surround</span> <span class="k">import</span> <span class="n">Runner</span>
+<span class="kn">from</span> <span class="nn">stages</span> <span class="k">import</span> <span class="n">TestprojectData</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BatchRunner</span><span class="p">(</span><span class="n">Runner</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">TestprojectData</span><span class="p">()</span>
+
+        <span class="c1"># Load data to be processed</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="s2">&quot;This daTa wiLL end UP captializED&quot;</span>
+
+        <span class="c1"># Setup input data</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">raw_data</span>
+
+        <span class="c1"># Run assembler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">is_training</span><span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Batch Runner: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To modify what happens when <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">testproject</span></code> is executed, edit the <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code> script.</p>
+<p>To test training mode (<code class="docutils literal notranslate"><span class="pre">fit</span></code> will be called instead in the estimator), run the following command:
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">testproject</span> <span class="pre">--mode</span> <span class="pre">train</span></code></p>
 </div>
 </div>
 <div class="section" id="running-your-first-pipeline-in-a-container">
@@ -218,43 +241,106 @@ check if the input data is the correct data type (<a class="reference external" 
 </pre></div>
 </div>
 <p>This will run the container linking the folder <code class="docutils literal notranslate"><span class="pre">testproject/testproject</span></code> with the working directory in the
-container. So during development when you make small changes, there is no need to build the image again.</p>
-<p>Then when you are ready for production testing you use the following command:</p>
+container. So during development when you make small changes, there is no need to build the image, just run
+this command again.</p>
+<p>Then when you are ready for production you can use the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run prod
 </pre></div>
 </div>
-<p>Which will first build the image and then run the container without any linking to the host machine.</p>
+<p>Which will first build the image and then run the container without any linking to the host machine.
+The image created in the build can also then be committed to a Docker Hub repository and shared.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Both methods of running will use the equivalent command to <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">testproject</span></code> inside the container.</p>
+<p>Both <code class="docutils literal notranslate"><span class="pre">dev</span></code> and <code class="docutils literal notranslate"><span class="pre">prod</span></code> will use the command <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">testproject</span></code> inside the container.
+Meaning they will use the default mode set in <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code> (which is <code class="docutils literal notranslate"><span class="pre">batch</span></code> in default projects)
+when running the pipeline.</p>
+</div>
+<p>The following commands will force which mode to use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run batch
+$ surround run train
+</pre></div>
 </div>
 </div>
 <div class="section" id="serving-your-first-pipeline-via-web-endpoint">
 <h2>Serving your first pipeline via Web Endpoint<a class="headerlink" href="#serving-your-first-pipeline-via-web-endpoint" title="Permalink to this headline">¶</a></h2>
-<p>Using Surround we can also host a web-server which can receive data, pass it through our pipeline
-and return the result. All via HTTP endpoints, making your pipeline accessible by any application!</p>
-<p>Before we can run the web-server, we need to install a dependency called <code class="docutils literal notranslate"><span class="pre">tornado</span></code>, do this like so:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip3 install tornado==6.0.1
+<p>When generating a project, you get asked:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Does it require a web runner? (y/n)
 </pre></div>
 </div>
-<p>To start the web-server run the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run --web
+<p>If we say yes to this then Surround will generate a generic <code class="docutils literal notranslate"><span class="pre">batch_runner.py</span></code> but it will also
+generate a new script called <code class="docutils literal notranslate"><span class="pre">web_runner.py</span></code>.</p>
+<p>This script contains a new <code class="docutils literal notranslate"><span class="pre">Runner</span></code> which will use <a class="reference external" href="https://www.tornadoweb.org/en/stable/">Tornado</a>
+to host a web server which will allow your pipeline to be accessible via HTTP request. By default the
+<code class="docutils literal notranslate"><span class="pre">WebRunner</span></code> will host two endpoints:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">/info</span></code> - access via GET request, will return <code class="docutils literal notranslate"><span class="pre">{'version':</span> <span class="pre">'0.0.1'}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/estimate</span></code> - access via POST request, body must have a JSON document containing input data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;this text will be processed&quot;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>Which should output the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">testproject</span> <span class="ow">is</span> <span class="n">running</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8888</span>
-<span class="n">Available</span> <span class="n">endpoints</span><span class="p">:</span>
-<span class="o">*</span> <span class="n">GET</span>  <span class="o">/</span>                 <span class="c1"># Health check</span>
-<span class="o">*</span> <span class="n">POST</span> <span class="o">/</span><span class="n">predict</span>          <span class="c1"># Send data to the Surround pipeline</span>
+</li>
+</ul>
+<p>So lets create a new pipeline that does the same data processing as the one in <a class="reference internal" href="#create-first-pipeline"><span class="std std-ref">Creating your first pipeline</span></a> but
+we will send strings via web endpoint and get the results in the response of the request.</p>
+<p>First generate a new project, this time saying yes to the require web prompt, and make all the changes we did in
+<a class="reference internal" href="#create-first-pipeline"><span class="std std-ref">Creating your first pipeline</span></a> and test it is still working locally.</p>
+<p>Next we are going to build an image for our pipeline using the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run build
 </pre></div>
 </div>
-<p>Now you can send data to your pipeline via HTTP POST to the <code class="docutils literal notranslate"><span class="pre">/predict</span></code> endpoint like so:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ curl -d &quot;{ \&quot;data\&quot;: \&quot;mAkE aLL upper CASE\&quot; }&quot; http://localhost:8888/predict
+<p>Then we are going to run our default server using the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround run web
 </pre></div>
 </div>
-<p>Which should output the following if succssful:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;MAKE ALL UPPER CASE&quot;</span><span class="p">}</span>
+<p>You should get output like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Server</span> <span class="n">started</span> <span class="n">at</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8080</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you would like to run it on the host machine instead of in a container, you must install Tornado using
+this command: <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">tornado==6.0.2</span></code></p>
+</div>
+<p>Now hopefully if you load <code class="docutils literal notranslate"><span class="pre">http://localhost:8080/info</span></code> in your preferred browser, you should see the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are running this on Windows and don’t see the above, try using <code class="docutils literal notranslate"><span class="pre">http://192.168.99.100:8080/info</span></code> instead.</p>
+</div>
+<p>Next we are going to test the <code class="docutils literal notranslate"><span class="pre">/estimate</span></code> endpoint by using the following command in another terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ curl -d &quot;{ \&quot;message\&quot;: \&quot;test phrase\&quot; }&quot; http://localhost:8080/estimate
+</pre></div>
+</div>
+<p>You should see the following output in the terminal running the pipeline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">assembler</span><span class="p">:</span><span class="n">Starting</span> <span class="s1">&#39;Default project&#39;</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">surround</span><span class="o">.</span><span class="n">assembler</span><span class="p">:</span><span class="n">Estimator</span> <span class="n">MakeUpperCase</span> <span class="n">took</span> <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="n">secs</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Message</span><span class="p">:</span> <span class="n">TEST</span> <span class="n">PHRASE</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">tornado</span><span class="o">.</span><span class="n">access</span><span class="p">:</span><span class="mi">200</span> <span class="n">POST</span> <span class="o">/</span><span class="n">estimate</span> <span class="p">(::</span><span class="mi">1</span><span class="p">)</span> <span class="mf">1.95</span><span class="n">ms</span>
+</pre></div>
+</div>
+<p>So our data is successfully being processed! But what if we need the result?</p>
+<p>Head to the script <code class="docutils literal notranslate"><span class="pre">web_runner.py</span></code> and append the following to the <code class="docutils literal notranslate"><span class="pre">post</span></code> method of <code class="docutils literal notranslate"><span class="pre">EstimateHandler</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Return the result of the processing</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Restart the web server, use the same <code class="docutils literal notranslate"><span class="pre">curl</span></code> command and you should see the following output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">Total</span>    <span class="o">%</span> <span class="n">Received</span> <span class="o">%</span> <span class="n">Xferd</span>  <span class="n">Average</span> <span class="n">Speed</span>   <span class="n">Time</span>    <span class="n">Time</span>     <span class="n">Time</span>  <span class="n">Current</span>
+                                <span class="n">Dload</span>  <span class="n">Upload</span>   <span class="n">Total</span>   <span class="n">Spent</span>    <span class="n">Left</span>  <span class="n">Speed</span>
+<span class="mi">100</span>    <span class="mi">53</span>  <span class="mi">100</span>    <span class="mi">25</span>  <span class="mi">100</span>    <span class="mi">28</span>    <span class="mi">806</span>    <span class="mi">903</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span>  <span class="mi">1709</span>
+<span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST PHRASE&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Thats it, you are now serving a Surround pipeline! Now you could potentially use this pipeline in virtually any
+application.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since this project was generated with a web runner, the default mode is <code class="docutils literal notranslate"><span class="pre">web</span></code>, to run the pipeline
+using the <code class="docutils literal notranslate"><span class="pre">BatchRunner</span></code> instead, use the command <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">surround</span> <span class="pre">run</span> <span class="pre">batch</span></code> or <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">surround</span> <span class="pre">run</span> <span class="pre">train</span></code>.</p>
 </div>
 </div>
 </div>

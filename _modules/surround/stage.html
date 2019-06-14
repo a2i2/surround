@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>surround.stage &#8212; Surround 0.0.7 documentation</title>
+    <title>surround.stage &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -37,31 +37,19 @@
 
 <div class="viewcode-block" id="Stage"><a class="viewcode-back" href="../../surround.html#surround.stage.Stage">[docs]</a><span class="k">class</span> <span class="nc">Stage</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parent class of all stages in a Surround pipeline.</span>
+<span class="sd">    Base class of all stages in a Surround pipeline.</span>
 
-<span class="sd">    Stages main responsiblity are to transform input data in some way, this may be a</span>
-<span class="sd">    data wrangling operation or a prediciton operation. This operation must happen in the</span>
-<span class="sd">    :meth:`surround.stage.Stage.operate` method.</span>
+<span class="sd">    See the following classes for more information:</span>
 
-<span class="sd">    Example::</span>
-
-<span class="sd">        class DetectFaces(Stage):</span>
-<span class="sd">            def init_stage(self, config):</span>
-<span class="sd">                self.model = load_model(config[&quot;model-name&quot;])</span>
-
-<span class="sd">            def operate(self, data, config):</span>
-<span class="sd">                data.faces = self.model.detect(data.input_image)</span>
-
-<span class="sd">            def dump_output(self, data, config):</span>
-<span class="sd">                print(&quot;Number of faces found: &quot; + len(data.faces))</span>
-
+<span class="sd">    - :class:`surround.stage.Estimator`</span>
+<span class="sd">    - :class:`surround.stage.Filter`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Stage.dump_output"><a class="viewcode-back" href="../../surround.html#surround.stage.Stage.dump_output">[docs]</a>    <span class="k">def</span> <span class="nf">dump_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Dump the output of the stage after the operate method has transformed the input data.</span>
+<span class="sd">        Dump the output of the stage after the stage has transformed the data.</span>
 
-<span class="sd">        .. note:: This is called by :meth:`surround.Surround.process` (when dumping output is requested)</span>
+<span class="sd">        .. note:: This is called by :meth:`surround.assembler.Assembler.run` (when dumping output is requested).</span>
 
 <span class="sd">        :param surround_data: Stores intermediate data from each stage in the pipeline</span>
 <span class="sd">        :type surround_data: Instance or child of :class:`surround.SurroundData`</span>
@@ -69,14 +57,126 @@
 <span class="sd">        :type config: :class:`surround.config.Config`</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="Stage.operate"><a class="viewcode-back" href="../../surround.html#surround.stage.Stage.operate">[docs]</a>    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="Stage.init_stage"><a class="viewcode-back" href="../../surround.html#surround.stage.Stage.init_stage">[docs]</a>    <span class="k">def</span> <span class="nf">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the stage, this may be loading a model or loading data.</span>
+
+<span class="sd">        .. note:: This is called by :meth:`surround.assembler.Assembler.init_assembler`.</span>
+
+<span class="sd">        :param config: Contains the settings for each stage</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="Validator"><a class="viewcode-back" href="../../surround.html#surround.stage.Validator">[docs]</a><span class="k">class</span> <span class="nc">Validator</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class of a validation stage in a Surround pipeline. Responsible for checking the data being</span>
+<span class="sd">    fed into the pipeline before passing the data onto the next stages (filtering, estimation, etc).</span>
+
+<span class="sd">    .. note:: This stage is executed in :meth:`surround.assembler.Assembler.run` before all other stages in the pipeline.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        class ValidateData(Validator):</span>
+<span class="sd">            def validate(self, surround_data, config):</span>
+<span class="sd">                if not surround_data.input_data:</span>
+<span class="sd">                    # Stop the pipeline, we have no data!</span>
+<span class="sd">                    surround_data.errors.append(&quot;&#39;input_data&#39; is None&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Validator.validate"><a class="viewcode-back" href="../../surround.html#surround.stage.Validator.validate">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate data being loaded into the pipeline. Appending to ``surround_data.errors``</span>
+<span class="sd">        or ``surround_data.warnings`` when problems are found with the input data.</span>
+
+<span class="sd">        .. note:: This should only be called by :meth:`surround.assembler.Assembler.run`.</span>
+
+<span class="sd">        :param surround_data: Stores intermediate data from each stage in the pipeline</span>
+<span class="sd">        :type surround_data: Instance or child of :class:`surround.SurroundData`</span>
+<span class="sd">        :param config: Config of the pipeline</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../../surround.html#surround.stage.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class of all filters (pre or post) in a Surround pipeine.</span>
+
+<span class="sd">    There are two types of filters:</span>
+
+<span class="sd">    - **Pre-filters** - Perform data wrangling operations on the data **before**</span>
+<span class="sd">                        being fed into an :class:`surround.stage.Estimator`.</span>
+<span class="sd">    - **Post-filters** - Perform data wrangling operations on the data **after**</span>
+<span class="sd">                        being fed into an :class:`surround.stage.Estimator`.</span>
+
+<span class="sd">    Depending on the type, this stage is executed before/after an estimator in the pipeline.</span>
+
+<span class="sd">    There can be many pre/post filters in a single :class:`surround.assembler.Assembler` instance.</span>
+
+<span class="sd">    .. note:: To set the pre/post filter(s), use :meth:`surround.assembler.Assembler.set_estimator`.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        class ConvertFromJSONString(Filter):</span>
+<span class="sd">            def operate(self, surround_data, config):</span>
+<span class="sd">                surround_data.input_data = json.loads(self.input_data)</span>
+
+<span class="sd">        class ConvertToJSONString(Filter):</span>
+<span class="sd">            def operate(self, surround_data, config):</span>
+<span class="sd">                surround_data.output_data = json.dumps(self.input_data)</span>
+
+<span class="sd">        assembler = Assembler(&quot;Example&quot;, ValidationStage())</span>
+
+<span class="sd">        # Set ConvertFromJSONString as a pre-filter, the other as a post-filter</span>
+<span class="sd">        assembler.set_estimator(PredictStage, [ConvertFromJSONString()], [ConvertToJSONString()])</span>
+
+<span class="sd">        data = PipelineData(&quot;{ \&quot;example\&quot;: \&quot;data\&quot; }&quot;)</span>
+<span class="sd">        assembler.run(data)</span>
+
+<span class="sd">        # Would print JSON represented as a string</span>
+<span class="sd">        print(data.output_data)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Filter.operate"><a class="viewcode-back" href="../../surround.html#surround.stage.Filter.operate">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Perform the intended operation of the stage. This method **must** be</span>
-<span class="sd">        implemented in extensions of this class. Where it should perform some</span>
-<span class="sd">        transformation/checking of the :attr:`surround_data`.</span>
+<span class="sd">        Modify data before/after it enters an :class:`surround.stage.Estimator`.</span>
 
-<span class="sd">        .. note:: This is called by the :meth:`surround.Surround.process` method before/after other stages.</span>
+<span class="sd">        .. note:: This should only be called by :meth:`surround.assembler.Assembler.run`.</span>
+
+<span class="sd">        :param surround_data: Stores intermediate data from each stage in the pipeline</span>
+<span class="sd">        :type surround_data: Instance or child of :class:`surround.SurroundData`</span>
+<span class="sd">        :param config: Contains the settings for each stage</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="Estimator"><a class="viewcode-back" href="../../surround.html#surround.stage.Estimator">[docs]</a><span class="k">class</span> <span class="nc">Estimator</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for an estimator in a Surround pipeline. Responsible for performing estimation</span>
+<span class="sd">    or training using the input data.</span>
+
+<span class="sd">    This stage is executed by :meth:`surround.assembler.Assembler.run` after the validator and</span>
+<span class="sd">    in-between pre and post filters.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        class Predict(Estimator):</span>
+<span class="sd">            def init_stage(self, config):</span>
+<span class="sd">                self.model = load_model(os.path.join(config[&quot;models_path&quot;], &quot;model.pb&quot;))</span>
+
+<span class="sd">            def estimate(self, surround_data, config):</span>
+<span class="sd">                surround_data.output_data = run_model(self.model)</span>
+
+<span class="sd">            def fit(self, surround_data, config):</span>
+<span class="sd">                surround_data.output_data = train_model(self.model)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Estimator.estimate"><a class="viewcode-back" href="../../surround.html#surround.stage.Estimator.estimate">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process input data and store estimated values.</span>
+
+<span class="sd">        .. note:: This method is ONLY called by :meth:`surround.assembler.Assembler.run` when</span>
+<span class="sd">                  running in predict/batch-predict mode.</span>
 
 <span class="sd">        :param surround_data: Stores intermediate data from each stage in the pipeline</span>
 <span class="sd">        :type surround_data: Instance or child of :class:`surround.SurroundData`</span>
@@ -84,16 +184,15 @@
 <span class="sd">        :type config: :class:`surround.config.Config`</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="Stage.init_stage"><a class="viewcode-back" href="../../surround.html#surround.stage.Stage.init_stage">[docs]</a>    <span class="k">def</span> <span class="nf">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="Estimator.fit"><a class="viewcode-back" href="../../surround.html#surround.stage.Estimator.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialise the stage with some data or extra operations. This method</span>
-<span class="sd">        is called ONLY once before the stage is executed.</span>
+<span class="sd">        Train a model using the input data.</span>
 
-<span class="sd">        For example you may load a Tensorflow model which you will use</span>
-<span class="sd">        for prediction in the :meth:`surround.stage.Stage.operate` method.</span>
+<span class="sd">        .. note:: This method is ONLY called by :meth:`surround.assembler.Assembler.run` when</span>
+<span class="sd">                  running in training mode.</span>
 
-<span class="sd">        .. note:: This is called by the :meth:`surround.Surround.init_stages` method.</span>
-
+<span class="sd">        :param surround_data: Stores intermediate data from each stage in the pipeline</span>
+<span class="sd">        :type surround_data: Instance or child of :class:`surround.SurroundData`</span>
 <span class="sd">        :param config: Contains the settings for each stage</span>
 <span class="sd">        :type config: :class:`surround.config.Config`</span>
 <span class="sd">        &quot;&quot;&quot;</span></div></div>

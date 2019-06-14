@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>About &#8212; Surround 0.0.7 documentation</title>
+    <title>About &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -82,15 +82,12 @@ For example during project generation, the following structure is used:</p>
 ├── README.md
 ├── data
 ├── package name
+│   ├── __init__.py
 │   ├── __main__.py
+│   ├── web_runner.py
+│   ├── batch_runner.py
 │   ├── config.yaml
-│   ├── visualiser.py
-│   ├── loader.py
-│   └── stage
-│       ├── validator.py
-│       ├── wrangler.py
-│       ├── decider.py
-│       └── estimator.py
+│   └── stages.py
 ├── docs
 ├── dodo.py
 ├── models
@@ -100,7 +97,6 @@ For example during project generation, the following structure is used:</p>
 ├── scripts
 ├── spikes
 └── tests
-    └── integration.py
 </pre></div>
 </div>
 <p>Every Surround project has the following characteristics:</p>
@@ -108,7 +104,7 @@ For example during project generation, the following structure is used:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> for bundling up the project as a web application.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dodo.py</span></code> file containing useful tasks such as train, batch predict and test for a project.</p></li>
 <li><p>Tests for catching training serving skew.</p></li>
-<li><p>A single entry point for running the application, <code class="docutils literal notranslate"><span class="pre">main.py</span></code>.</p></li>
+<li><p>A single entry point for running the application, <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code>.</p></li>
 <li><p>A place for data exploration with Jupyter notebooks and miscellaneous scripts.</p></li>
 <li><p>A single place, for output files, data, and model storage.</p></li>
 </ul>
@@ -120,7 +116,7 @@ the project in Docker. The tools included are shown below:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">init</span></code> - Used to generate a new Surround project.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">lint</span></code> - Used to run the Surround Linter which checks if Surround conventions are being used correctly.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">run</span></code> - Used to run a task defined in <code class="docutils literal notranslate"><span class="pre">dodo.py</span></code> or starting the web-server.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run</span></code> - Used to run a task defined in <code class="docutils literal notranslate"><span class="pre">dodo.py</span></code>.</p></li>
 </ul>
 <p>Where the <code class="docutils literal notranslate"><span class="pre">run</span></code> command is essentially a wrapper around the <code class="docutils literal notranslate"><span class="pre">doit</span></code> library and the Surround Linter will perform multiple checks
 on the current project to see if it is following standard conventions. The intention of the Surround Linter will to become more
@@ -151,18 +147,32 @@ to be added to the project before Surround will make the wrappers available.</p>
 out a prediction based on that input.</p>
 <div class="section" id="assembler">
 <span id="id2"></span><h3>Assembler<a class="headerlink" href="#assembler" title="Permalink to this headline">¶</a></h3>
-<img alt="Surround flow diagram" class="align-center" src="_images/pipeline_flow_diagram.png" />
-<p>The Assembler (formerly Surround) is responsible for constructing and executing a pipeline on data. How the pipeline is constructed depends on which
-execution mode (task) is required. The above diagram describes a simple Surround pipeline showing four different modes of
-execution. These modes are:</p>
-<ul class="simple">
-<li><p><strong>Predict</strong> - Used for production, runs the estimator in predict mode, takes some data and just returns the output data.</p></li>
-<li><p><strong>Batch-predict</strong> - Used for evaluation, uses a Loader to run a lot of data through the pipeline, visualizes performance.</p></li>
-<li><p><strong>Train</strong> - Used to train an estimator, loads data using a Loader, configures the estimator to be in <code class="docutils literal notranslate"><span class="pre">train</span></code> mode, visualizes output.</p></li>
-<li><p><strong>Test</strong> - Used to test the pipeline in all aspects (prediction and training).</p></li>
-</ul>
-<p>Each coloured line in the figure above is a different sequence of execution, each rectangle are <a class="reference internal" href="#stages"><span class="std std-ref">Stages</span></a> which are executed one at a time by the Assembler during processing. There
-are multiple different types of stages, these include: <a class="reference internal" href="#loaders"><span class="std std-ref">Loaders</span></a>, <a class="reference internal" href="#validators"><span class="std std-ref">Validators</span></a>, <a class="reference internal" href="#filters"><span class="std std-ref">Filters</span></a>, <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>, and <a class="reference internal" href="#visualizers"><span class="std std-ref">Visualizers</span></a>.</p>
+<img alt="Assembler flow diagram" class="align-center" src="_images/pipeline_flow_diagram.png" />
+<p>The Assembler is responsible for constructing and executing a pipeline on data. How the pipeline is constructed (and where/how data is loaded) depends on which
+execution mode is being used. The above diagram describes a simple Surround pipeline showing three different modes of
+execution. These modes are described below.</p>
+<div class="section" id="training">
+<h4>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h4>
+<img alt="Training flow diagram" class="align-center" src="_images/train_diagram.png" />
+<p>Primarily built for <strong>training</strong>, training data is loaded from disk (usually in bulk) then fed through the pipeline
+with the estimator set to <code class="docutils literal notranslate"><span class="pre">fit</span></code> mode. Once training the pipeline is complete the data is then fed to a visualiser which
+will help display useful information about the training operation.</p>
+</div>
+<div class="section" id="batch-predict">
+<h4>Batch-predict<a class="headerlink" href="#batch-predict" title="Permalink to this headline">¶</a></h4>
+<img alt="Batch-predict flow diagram" class="align-center" src="_images/batch_diagram.png" />
+<p>Primarily built for <strong>evaluation</strong>, data is loaded from disk (also usually in bulk) then fed through the pipeline with
+the estimator set to <code class="docutils literal notranslate"><span class="pre">estimate</span></code> mode. Once processing is complete the data is then fed to a visualiser which
+will help summarise and visualise the overall results / performance.</p>
+</div>
+<div class="section" id="web-predict">
+<h4>Web / Predict<a class="headerlink" href="#web-predict" title="Permalink to this headline">¶</a></h4>
+<img alt="Web / Predict flow diagram" class="align-center" src="_images/predict_diagram.png" />
+<p>This mode is built for <strong>production</strong>. When your pipeline is setup, training has been completed, evaluation of the model
+shows good performance and is ready for use, this mode is to be used to serve your pipeline. Depending on the type of project you generated
+initially, the input data may come from your local disk or from the body of a POST HTTP request and the result may be
+saved locally or returned to the client who sent the request.</p>
+</div>
 </div>
 <div class="section" id="stages">
 <span id="id3"></span><h3>Stages<a class="headerlink" href="#stages" title="Permalink to this headline">¶</a></h3>
@@ -177,38 +187,32 @@ are multiple different types of stages, these include: <a class="reference inter
 <li><p><a class="reference internal" href="#data"><span class="std std-ref">Data</span></a> object which contains the input data, has a field for errors (which stops the execution when added to) and holds the output of each stage (if any).</p></li>
 <li><p><a class="reference internal" href="#configuration"><span class="std std-ref">Configuration</span></a> object which contains all the settings loaded in from YAML files plus paths to folders in the project such as <code class="docutils literal notranslate"><span class="pre">data/</span></code> and <code class="docutils literal notranslate"><span class="pre">output/</span></code>.</p></li>
 </ul>
-<div class="section" id="loaders">
-<span id="id4"></span><h4>Loaders<a class="headerlink" href="#loaders" title="Permalink to this headline">¶</a></h4>
-<p>Loaders are stages that are responsible for batch loading large amounts of data and feeding them through the pipeline. Typically
-used for both training and evaluation of performance. For example for a Facial Recognition pipeline you may have a large dataset
-of images that needs to be fed through the pipeline for training. The loading of all those images would take place in a Loader.</p>
-</div>
 <div class="section" id="validators">
-<span id="id5"></span><h4>Validators<a class="headerlink" href="#validators" title="Permalink to this headline">¶</a></h4>
+<span id="id4"></span><h4>Validators<a class="headerlink" href="#validators" title="Permalink to this headline">¶</a></h4>
 <p>Validators are stages that are responsible for checking if the input data that is about to be fed through the pipeline is valid.
 Meaning is the data the correct format, checking whether there is any detectable reason why the data would cause issues while
-being processed. This stage is positioned first in the execution of the pipeline (or after <a class="reference internal" href="#loaders"><span class="std std-ref">Loaders</span></a>), they are not intended to create any output,
+being processed. This stage is positioned first in the execution of the pipeline, they are not intended to create any output,
 only errors or warnings.</p>
 </div>
 <div class="section" id="filters">
-<span id="id6"></span><h4>Filters<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h4>
+<span id="id5"></span><h4>Filters<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h4>
 <p>Filters are stages that are responsible for getting data ready for the next stage of execution. These are typically placed before
-or after <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>. There are generally two types of filters: <a class="reference internal" href="#wranglers"><span class="std std-ref">Wranglers</span></a> and <a class="reference internal" href="#deciders"><span class="std std-ref">Deciders</span></a>.</p>
-<div class="section" id="wranglers">
-<span id="id7"></span><h5>Wranglers<a class="headerlink" href="#wranglers" title="Permalink to this headline">¶</a></h5>
+or after <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>. There are generally two types of filters: <a class="reference internal" href="#wranglers"><span class="std std-ref">Wranglers (Pre-filters)</span></a> and <a class="reference internal" href="#deciders"><span class="std std-ref">Deciders (Post-filters)</span></a>.</p>
+<div class="section" id="wranglers-pre-filters">
+<span id="wranglers"></span><h5>Wranglers (Pre-filters)<a class="headerlink" href="#wranglers-pre-filters" title="Permalink to this headline">¶</a></h5>
 <p>Wranglers perform data wrangling operations on the data. Meaning getting the data from one format into another that is useful
 for the next stage (typically an Estimator). For example the input data might be a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> formatted in JSON but the estimator
 next in the pipeline might only accept a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> so a Wrangler would be used to parse the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> into a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
 </div>
-<div class="section" id="deciders">
-<span id="id8"></span><h5>Deciders<a class="headerlink" href="#deciders" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="deciders-post-filters">
+<span id="deciders"></span><h5>Deciders (Post-filters)<a class="headerlink" href="#deciders-post-filters" title="Permalink to this headline">¶</a></h5>
 <p>Deciders, placed after <a class="reference internal" href="#estimators"><span class="std std-ref">Estimators</span></a>, are stages which make descisions based on the output of them. For example in a Voice Activity
 Detection pipeline, we may have an estimator that outputs confidence values on whether the input audio data was speech or not, you would
 then place a Decider after which may perform thresholding on the confidence values.</p>
 </div>
 </div>
 <div class="section" id="estimators">
-<span id="id9"></span><h4>Estimators<a class="headerlink" href="#estimators" title="Permalink to this headline">¶</a></h4>
+<span id="id6"></span><h4>Estimators<a class="headerlink" href="#estimators" title="Permalink to this headline">¶</a></h4>
 <p>Estimators are stages where the actual prediction or training of an ML model takes place. Depending on the pipeline configuration
 the estimator will either use the input data to make a prediction or use the input data as training data. This stage should have
 some form of output. Typically placed between two <a class="reference internal" href="#filters"><span class="std std-ref">Filters</span></a> during execution. For example you may be using Tensorflow to run your model, so
@@ -217,14 +221,15 @@ would be ran with the input data during execution of the stage.</p>
 <p>In more complex pipelines, these stages may be composed of an entirely separate Surround pipeline (another Assembler instance). Surround is designed this way
 to allow pipelines as complex as required.</p>
 </div>
-<div class="section" id="visualizers">
-<span id="id10"></span><h4>Visualizers<a class="headerlink" href="#visualizers" title="Permalink to this headline">¶</a></h4>
-<p>Visualizers are stages where they do what their name entails, visualize the data. Typically used during training and evaluation
-of the model, these stages are used to generate reports on how the model is performing. <strong>TODO: GET GOOD EXAMPLE</strong></p>
+<div class="section" id="visualisers">
+<span id="id7"></span><h4>Visualisers<a class="headerlink" href="#visualisers" title="Permalink to this headline">¶</a></h4>
+<p>Visualisers are stages where they do what their name entails, visualize the data. Typically used during training and evaluation
+of the model, these stages are used to generate reports on how the model is performing. For example in a Facial Detection pipeline
+during evaluation of the model, the visualiser may display an example image it processed and render boxes around the faces it detected.</p>
 </div>
 </div>
 <div class="section" id="configuration">
-<span id="id11"></span><h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<span id="id8"></span><h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
 <p>Every instance of <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a> has a configuration object constructed from the project’s configuration file. This
 configuration object is passed between each stage of the pipeline during initialization and execution. The configuration
 file uses the <a class="reference external" href="https://yaml.org/">YAML</a> data-serialization language.</p>
@@ -264,7 +269,7 @@ file uses the <a class="reference external" href="https://yaml.org/">YAML</a> da
 </div>
 </div>
 <div class="section" id="data">
-<span id="id12"></span><h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
+<span id="id9"></span><h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
 <p>Every time an <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a> is ran, it requires an object that will be used to store the input data and eventually store
 the output. Passed between stages during execution, it can also be used to store any intermediate data between stages.</p>
 </div>

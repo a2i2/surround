@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>surround.linter &#8212; Surround 0.0.7 documentation</title>
+    <title>surround.linter &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -34,11 +34,12 @@
   <h1>Source code for surround.linter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">from</span> <span class="nn">.stage</span> <span class="k">import</span> <span class="n">Stage</span>
-<span class="kn">from</span> <span class="nn">.surround</span> <span class="k">import</span> <span class="n">SurroundData</span><span class="p">,</span> <span class="n">Surround</span>
+<span class="kn">from</span> <span class="nn">.stage</span> <span class="k">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">Estimator</span>
+<span class="kn">from</span> <span class="nn">.surround</span> <span class="k">import</span> <span class="n">SurroundData</span>
+<span class="kn">from</span> <span class="nn">.assembler</span> <span class="k">import</span> <span class="n">Assembler</span>
 
 
-<div class="viewcode-block" id="LinterStage"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage">[docs]</a><span class="k">class</span> <span class="nc">LinterStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+<div class="viewcode-block" id="LinterStage"><a class="viewcode-back" href="../../surround.html#surround.linter.LinterStage">[docs]</a><span class="k">class</span> <span class="nc">LinterStage</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for a check in the Surround :class:`Linter`.</span>
 
@@ -108,10 +109,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructor for the CheckData linter stage.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">LinterStage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;DATA&quot;</span><span class="p">,</span> <span class="s2">&quot;Check data files&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CheckData.operate"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckData.operate">[docs]</a>    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
@@ -136,10 +133,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructor for the CheckFiles linter stage.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">LinterStage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;FILES&quot;</span><span class="p">,</span> <span class="s2">&quot;Check for Surround project files&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CheckFiles.operate"><a class="viewcode-back" href="../../surround.html#surround.linter.CheckFiles.operate">[docs]</a>    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
@@ -168,10 +161,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructor for the CheckDirectories linter stage.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">LinterStage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;DIRECTORIES&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Check for validating Surround&#39;s directory structure&quot;</span><span class="p">)</span>
@@ -192,6 +181,35 @@
                                 <span class="n">d</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_name</span><span class="o">=</span><span class="n">surround_data</span><span class="o">.</span><span class="n">project_name</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="s2">&quot;Directory </span><span class="si">%s</span><span class="s2"> does not exist&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">Main</span><span class="p">(</span><span class="n">Estimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class responsible for executing all of the :class:`LinterStage`&#39;s in the Surround Linter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param filters: list of stages in the linter</span>
+<span class="sd">        :type filters: list of :class:`LinterStage`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">filters</span>
+
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute each stage in the linter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">filters</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">:</span>
+            <span class="n">filters</span><span class="o">.</span><span class="n">operate</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Should never be called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No training implemented&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ProjectData"><a class="viewcode-back" href="../../surround.html#surround.linter.ProjectData">[docs]</a><span class="k">class</span> <span class="nc">ProjectData</span><span class="p">(</span><span class="n">SurroundData</span><span class="p">):</span>
@@ -230,11 +248,10 @@
 <span class="sd">    This class is used by the Surround CLI to perform the linting of a project via the</span>
 <span class="sd">    `lint` sub-command.</span>
 
-<span class="sd">    To add a new check to the linter, append it to the stages list being passed to</span>
-<span class="sd">    the :class:`surround.Surround` constructor, which is then being set to the attribute :attr:`linter_checks`.</span>
+<span class="sd">    To add a new check to the linter, append an instance of it to the ``filters`` list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">linter_checks</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">CheckDirectories</span><span class="p">(),</span> <span class="n">CheckFiles</span><span class="p">(),</span> <span class="n">CheckData</span><span class="p">()])</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">[</span><span class="n">CheckDirectories</span><span class="p">(),</span> <span class="n">CheckFiles</span><span class="p">(),</span> <span class="n">CheckData</span><span class="p">()]</span>
 
 <div class="viewcode-block" id="Linter.dump_checks"><a class="viewcode-back" href="../../surround.html#surround.linter.Linter.dump_checks">[docs]</a>    <span class="k">def</span> <span class="nf">dump_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -248,7 +265,7 @@
         <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Checkers in Surround&#39;s linter</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;=============================&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">linter_checks</span><span class="o">.</span><span class="n">surround_stages</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">:</span>
                 <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stage</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">stage</span><span class="o">.</span><span class="n">description</span><span class="p">))</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">output</span></div>
@@ -269,7 +286,9 @@
         <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">project_root</span><span class="p">)</span>
         <span class="n">project_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">ProjectData</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linter_checks</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">assembler</span> <span class="o">=</span> <span class="n">Assembler</span><span class="p">(</span><span class="s2">&quot;Linting&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">Main</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">))</span>
+        <span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">()</span>
+        <span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">warnings</span></div></div>
 </pre></div>
 

@@ -1,0 +1,473 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>surround.assembler &#8212; Surround 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for surround.assembler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># assembler.py</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">.config</span> <span class="k">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">.visualiser</span> <span class="k">import</span> <span class="n">Visualiser</span>
+<span class="kn">from</span> <span class="nn">.stage</span> <span class="k">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">Estimator</span><span class="p">,</span> <span class="n">Validator</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Assembler"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler">[docs]</a><span class="k">class</span> <span class="nc">Assembler</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class responsible for assembling and executing a Surround pipeline.</span>
+
+<span class="sd">    Responsibilties:</span>
+
+<span class="sd">    - Encapsulate the configuration data, validator, filter(s), visualiser, and estimator.</span>
+<span class="sd">    - Initialize all filters and the estimator</span>
+<span class="sd">    - Load configuration from a specified module</span>
+<span class="sd">    - Run the pipeline with input data in predict/batch/train mode</span>
+
+<span class="sd">    Where running the pipeline involves passing the data to each stage in the following order:</span>
+
+<span class="sd">    Validator -&gt; Pre-filter(s) -&gt; Estimator -&gt; Post-filter(s) -&gt; Visualiser</span>
+
+<span class="sd">    For more information on this process, see the :ref:`about` page.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        config = Config()</span>
+<span class="sd">        config.read_config_files([&quot;config.yaml&quot;])</span>
+
+<span class="sd">        assembler = Assembler(&quot;Example pipeline&quot;, Validation(), None, config)</span>
+<span class="sd">        assembler.set_estimator(PredictStage(), [PreFilter()], [PostFilter()])</span>
+<span class="sd">        assembler.init_assembler(batch_mode=False)</span>
+
+<span class="sd">        data = TestData(&quot;some data&quot;)</span>
+<span class="sd">        assembler.run(data, is_training=False)</span>
+
+<span class="sd">    Batch-predict mode::</span>
+
+<span class="sd">        assembler.init_assembler(batch_mode=True)</span>
+<span class="sd">        assembler.run(data, is_training=False)</span>
+
+<span class="sd">    Training mode::</span>
+
+<span class="sd">        assembler.init_assembler(batch_mode=True)</span>
+<span class="sd">        assembler.run(data, is_training=True)</span>
+
+<span class="sd">    Predict/Estimate mode::</span>
+
+<span class="sd">        assembler.init_assembler(batch_mode=False)</span>
+<span class="sd">        assembler.run(data, is_training=False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assembler_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for an Assembler pipeline:</span>
+
+<span class="sd">        :param assembler_name: The name of the pipeline</span>
+<span class="sd">        :type assembler_name: str</span>
+<span class="sd">        :param validator: The validator to use on input data (default: None)</span>
+<span class="sd">        :type validator: :class:`surround.stage.Validator`</span>
+<span class="sd">        :param estimator: The estimator to use on input data (default: None)</span>
+<span class="sd">        :type estimator: :class:`surround.stage.Estimator`</span>
+<span class="sd">        :param config: The pipeline configuration data</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">validator</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;Validator&#39; is required to run an assembler&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">Validator</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;validator&#39; should be of class Validator&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">estimator</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">Estimator</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;estimator&#39; should be of class Estimator&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">Config</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;config&#39; should be of class Config&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assembler_name</span> <span class="o">=</span> <span class="n">assembler_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_filters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_filters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualiser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Assembler.init_assembler"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler.init_assembler">[docs]</a>    <span class="k">def</span> <span class="nf">init_assembler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the assembler and all of it&#39;s stages.</span>
+
+<span class="sd">        Calls the :meth:`surround.stage.Stage.init_stage` method of all filters and the estimator.</span>
+<span class="sd">        Also used set the variable ``batch_mode`` which is then used to determine if the visualiser</span>
+<span class="sd">        should be used after all the stages have been executed.</span>
+
+<span class="sd">        .. note:: Should be called after :meth:`surround.assembler.Assembler.set_estimator` and</span>
+<span class="sd">                :meth:`surround.assembler.Assembler.set_config`.</span>
+
+<span class="sd">        :param batch_mode: Whether batch mode should be used</span>
+<span class="sd">        :type batch_mode: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="n">batch_mode</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_filters</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pre_filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_filters</span><span class="p">:</span>
+                    <span class="n">pre_filter</span><span class="o">.</span><span class="n">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_filters</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">post_filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_filters</span><span class="p">:</span>
+                    <span class="n">post_filter</span><span class="o">.</span><span class="n">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed initiating Assembler&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Assembler.run"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the pipeline using the input data provided.</span>
+
+<span class="sd">        If ``is_training`` is set to ``True`` then when it gets to the execution of the estimator,</span>
+<span class="sd">        it will use the :meth:`surround.stage.Estimator.fit` method instead.</span>
+
+<span class="sd">        If the above or ``batch_mode`` is set to ``True`` then when all the other stages have finished,</span>
+<span class="sd">        the visualiser will be executed.</span>
+
+<span class="sd">        If ``surround.enable_stage_output_dump`` is enabled in the Config instance then each filter and</span>
+<span class="sd">        estimator&#39;s :meth:`surround.stage.Stage.dump_output` method will be called.</span>
+
+<span class="sd">        This method doesn&#39;t return anything, instead results should be stored in the ``surround_data``</span>
+<span class="sd">        object passed in the parameters.</span>
+
+<span class="sd">        :param surround_data: Data passed between each stage in the pipeline</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        :param is_training: Run the pipeline in training mode or not</span>
+<span class="sd">        :type is_training: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">assembler_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">surround_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;surround_data is required to run an assembler&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span> <span class="o">=</span> <span class="n">surround_data</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__run_pipeline</span><span class="p">(</span><span class="n">is_training</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed running Assembler&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__run_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_training</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the pre-filter(s), then the estimator (estimate/fit), then the post-filter(s)</span>
+<span class="sd">        then the visualiser (only if ``is_training`` or ``batch_mode`` has been set).</span>
+
+<span class="sd">        :param is_training: Run the pipeline in training mode or not</span>
+<span class="sd">        :type is_training: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__execute_filters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_filters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_training</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__execute_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__execute_main</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_filters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__execute_filters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_filters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">is_training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">visualiser</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visualiser</span><span class="o">.</span><span class="n">visualise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surround_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__execute_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Safely executes each filter in the list provided on the</span>
+<span class="sd">        data provided and calculates time taken to execute the filters.</span>
+
+<span class="sd">        :param filters: collection of filters to be executed</span>
+<span class="sd">        :type filters: list of :class:`surround.stage.Filter`</span>
+<span class="sd">        :param surround_data: the data being filtered</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__execute_filter</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error during processing&quot;</span><span class="p">)</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">surround_data</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="n">execution_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="n">surround_data</span><span class="o">.</span><span class="n">execution_time</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">execution_time</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Filter took </span><span class="si">%s</span><span class="s2"> secs&quot;</span><span class="p">,</span> <span class="n">execution_time</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed processing Surround Filters&quot;</span><span class="p">)</span>
+
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">thaw</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__execute_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">stage_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes a single filter on the data provided.</span>
+<span class="sd">        Taking care of execution time tracking.</span>
+
+<span class="sd">        :param stage: the filter</span>
+<span class="sd">        :type stage: :class:`surround.stage.Filter`</span>
+<span class="sd">        :param stage_data: data being filtered</span>
+<span class="sd">        :type stage_data: :class:`surround.SurroundData`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">stage_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">stage</span><span class="o">.</span><span class="n">operate</span><span class="p">(</span><span class="n">stage_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;surround&quot;</span><span class="p">][</span><span class="s2">&quot;enable_stage_output_dump&quot;</span><span class="p">]:</span>
+            <span class="n">stage</span><span class="o">.</span><span class="n">dump_output</span><span class="p">(</span><span class="n">stage_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Calculate and log filter duration</span>
+        <span class="n">stage_execution_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">stage_start</span>
+        <span class="n">stage_data</span><span class="o">.</span><span class="n">stage_metadata</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="nb">type</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">stage_execution_time</span><span class="p">)})</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Filter </span><span class="si">%s</span><span class="s2"> took </span><span class="si">%s</span><span class="s2"> secs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">stage_execution_time</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__execute_main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the :meth:`surround.stage.Estimator.estimate` method (used for</span>
+<span class="sd">        batch-predict/predict mode), taking care of time tracking and dumping</span>
+<span class="sd">        output (if requested).</span>
+
+<span class="sd">        :param surround_data: data being fed into the estimator</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">main_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;surround&quot;</span><span class="p">][</span><span class="s2">&quot;enable_stage_output_dump&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">dump_output</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Calculate and log filter duration</span>
+        <span class="n">main_execution_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">main_start</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">stage_metadata</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">main_execution_time</span><span class="p">)})</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Estimator </span><span class="si">%s</span><span class="s2"> took </span><span class="si">%s</span><span class="s2"> secs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">main_execution_time</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__execute_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the :meth:`surround.stage.Estimator.fit` method (used for training mode),</span>
+<span class="sd">        taking care of time tracking and dumping output (if requested)</span>
+
+<span class="sd">        :param surround_data: data being fed into the estimator</span>
+<span class="sd">        :type surround_data: :class:`surround.SurroundData`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fit_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;surround&quot;</span><span class="p">][</span><span class="s2">&quot;enable_stage_output_dump&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">dump_output</span><span class="p">(</span><span class="n">surround_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Calculate and log filter duration</span>
+        <span class="n">fit_execution_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">fit_start</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">stage_metadata</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">fit_execution_time</span><span class="p">)})</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fitting </span><span class="si">%s</span><span class="s2"> took </span><span class="si">%s</span><span class="s2"> secs&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">fit_execution_time</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Assembler.load_config"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a module contained in the root of the project, create an instance of</span>
+<span class="sd">        :class:`surround.config.Config` loading configuration data from the ``config.yaml``</span>
+<span class="sd">        found in the project, and use this configuration for the pipeline.</span>
+
+<span class="sd">        .. note:: Should be called before :meth:`surround.assembler.Assemble.init_assembler`</span>
+
+<span class="sd">        :param module: name of the module</span>
+<span class="sd">        :type module: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">module</span><span class="p">:</span>
+            <span class="c1"># Module already imported and has a file attribute</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mod</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s1">&#39;__file__&#39;</span><span class="p">):</span>
+                <span class="n">package_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
+                <span class="n">root_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">package_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid Python module </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">module</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Config</span><span class="p">(</span><span class="n">root_path</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">]):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;output_path&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Config</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Assembler.set_config"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler.set_config">[docs]</a>    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the configuration data to be used during pipeline execution.</span>
+
+<span class="sd">        .. note:: Should be called before :meth:`surround.assembler.Assembler.init_assembler`.</span>
+
+<span class="sd">        :param config: the configuration data</span>
+<span class="sd">        :type config: :class:`surround.config.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">Config</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;config should be of class Config&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="Assembler.set_estimator"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler.set_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">set_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pre_filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">post_filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the estimator that should be used during pipeline execution and any filters (if required).</span>
+
+<span class="sd">        .. note:: Should be called before :meth:`surround.assembler.Assembler.init_assembler`.</span>
+
+<span class="sd">        :param estimator: the estimator to be used for this pipeline</span>
+<span class="sd">        :type estimator: :class:`surround.stage.Estimator`</span>
+<span class="sd">        :param pre_filters: list of pre-filters (default: None)</span>
+<span class="sd">        :type pre_filters: :class:`list` of :class:`surround.stage.Filter`</span>
+<span class="sd">        :param post_filters: list of post-filters (default: None)</span>
+<span class="sd">        :type post_filters: :class:`list` of :class:`surround.stage.Filter`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Estimator is required</span>
+        <span class="k">if</span> <span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;estimator is not provided&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">Estimator</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;estimator should be of class Estimator&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">estimator</span>
+
+        <span class="k">if</span> <span class="n">pre_filters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pre_filter</span> <span class="ow">in</span> <span class="n">pre_filters</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_filter</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Prefilter should be of class Filter&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_filters</span> <span class="o">=</span> <span class="n">pre_filters</span>
+
+        <span class="k">if</span> <span class="n">post_filters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">post_filter</span> <span class="ow">in</span> <span class="n">post_filters</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_filter</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;post_filter should be of class Filter&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_filters</span> <span class="o">=</span> <span class="n">post_filters</span></div>
+
+<div class="viewcode-block" id="Assembler.set_visualiser"><a class="viewcode-back" href="../../surround.html#surround.assembler.Assembler.set_visualiser">[docs]</a>    <span class="k">def</span> <span class="nf">set_visualiser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visualiser</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the visualiser that will be executed after all other stages during</span>
+<span class="sd">        batch-predict/training mode.</span>
+
+<span class="sd">        .. seealso:: See :class:`surround.visualiser.Visualiser` for more information.</span>
+
+<span class="sd">        :param visualiser: the visualiser instance</span>
+<span class="sd">        :type visualiser: :class:`surround.visualiser.Visualiser`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># visualiser must be a type of Visualiser</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">visualiser</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">visualiser</span><span class="p">,</span> <span class="n">Visualiser</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;visualiser should be of class Visualiser&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualiser</span> <span class="o">=</span> <span class="n">visualiser</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../index.html">
+    <img class="logo" src="../../_static/../_images/temp_logo_hq.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Users's Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli-guide.html">Command-line Interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../surround.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Scott Barnett.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

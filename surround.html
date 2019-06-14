@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>API &#8212; Surround 0.0.7 documentation</title>
+    <title>API &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -35,80 +35,171 @@
   <div class="section" id="api">
 <span id="surround-api"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <p>Here you can find documentation on all classes and their methods in Surround.</p>
-<div class="section" id="module-surround">
-<span id="surround"></span><h2>Surround<a class="headerlink" href="#module-surround" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="assembler">
+<span id="id1"></span><h2>Assembler<a class="headerlink" href="#assembler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="surround.Surround">
-<em class="property">class </em><code class="descclassname">surround.</code><code class="descname">Surround</code><span class="sig-paren">(</span><em>surround_stages=None</em>, <em>module=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Surround"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Surround" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents an entire Surround pipeline, containing all the stages and configuration.</p>
+<dt id="surround.assembler.Assembler">
+<em class="property">class </em><code class="descclassname">surround.assembler.</code><code class="descname">Assembler</code><span class="sig-paren">(</span><em>assembler_name=''</em>, <em>validator=None</em>, <em>estimator=None</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class responsible for assembling and executing a Surround pipeline.</p>
 <p>Responsibilties:</p>
 <ul class="simple">
-<li><p>Store and initialize all the stages</p></li>
-<li><p>Store the Config instance used by all the stages</p></li>
-<li><p>Perform operations on input data by executing each stage on the data</p></li>
-<li><p>Dump the output of each stage (if requested in the Config)</p></li>
+<li><p>Encapsulate the configuration data, validator, filter(s), visualiser, and estimator.</p></li>
+<li><p>Initialize all filters and the estimator</p></li>
+<li><p>Load configuration from a specified module</p></li>
+<li><p>Run the pipeline with input data in predict/batch/train mode</p></li>
 </ul>
+<p>Where running the pipeline involves passing the data to each stage in the following order:</p>
+<p>Validator -&gt; Pre-filter(s) -&gt; Estimator -&gt; Post-filter(s) -&gt; Visualiser</p>
+<p>For more information on this process, see the <a class="reference internal" href="about.html#about"><span class="std std-ref">About</span></a> page.</p>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">ValidateStage</span><span class="p">(),</span>
-                     <span class="n">FaceDetectionStage</span><span class="p">(),</span>
-                     <span class="n">ExtractFaceStage</span><span class="p">()])</span>
-
-<span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
 <span class="n">config</span><span class="o">.</span><span class="n">read_config_files</span><span class="p">([</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">])</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">PipelineData</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">assembler</span> <span class="o">=</span> <span class="n">Assembler</span><span class="p">(</span><span class="s2">&quot;Example pipeline&quot;</span><span class="p">,</span> <span class="n">Validation</span><span class="p">(),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">set_estimator</span><span class="p">(</span><span class="n">PredictStage</span><span class="p">(),</span> <span class="p">[</span><span class="n">PreFilter</span><span class="p">()],</span> <span class="p">[</span><span class="n">PostFilter</span><span class="p">()])</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">(</span><span class="n">batch_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">save_image</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">output_image</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">TestData</span><span class="p">(</span><span class="s2">&quot;some data&quot;</span><span class="p">)</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Constructs an instance of a Surround pipeline.</p>
+<p>Batch-predict mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">(</span><span class="n">batch_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Training mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">(</span><span class="n">batch_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Predict/Estimate mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">(</span><span class="n">batch_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Constructor for an Assembler pipeline:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>surround_stages</strong> (a list of <a class="reference internal" href="#surround.stage.Stage" title="surround.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Stage</span></code></a>) – the surround stages to be executed in this pipeline (default: None)</p></li>
-<li><p><strong>module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – name of the module that is creating this instance (used to get root directory)</p></li>
+<li><p><strong>assembler_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the pipeline</p></li>
+<li><p><strong>validator</strong> (<a class="reference internal" href="#surround.stage.Validator" title="surround.stage.Validator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Validator</span></code></a>) – The validator to use on input data (default: None)</p></li>
+<li><p><strong>estimator</strong> (<a class="reference internal" href="#surround.stage.Estimator" title="surround.stage.Estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Estimator</span></code></a>) – The estimator to use on input data (default: None)</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – The pipeline configuration data</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="method">
-<dt id="surround.Surround.init_stages">
-<code class="descname">init_stages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Surround.init_stages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Surround.init_stages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes all stages in the pipeline by calling their <a class="reference internal" href="#surround.stage.Stage.init_stage" title="surround.stage.Stage.init_stage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.stage.Stage.init_stage()</span></code></a> method.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.Surround.process">
-<code class="descname">process</code><span class="sig-paren">(</span><em>surround_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Surround.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Surround.process" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the entire pipeline with the provided data and log the execution time.</p>
+<dt id="surround.assembler.Assembler.init_assembler">
+<code class="descname">init_assembler</code><span class="sig-paren">(</span><em>batch_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler.init_assembler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler.init_assembler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the assembler and all of it’s stages.</p>
+<p>Calls the <a class="reference internal" href="#surround.stage.Stage.init_stage" title="surround.stage.Stage.init_stage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.stage.Stage.init_stage()</span></code></a> method of all filters and the estimator.
+Also used set the variable <code class="docutils literal notranslate"><span class="pre">batch_mode</span></code> which is then used to determine if the visualiser
+should be used after all the stages have been executed.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <cite>surround_data</cite> object will be frozen while this process completes.
-Meaning no <em>new</em> attributes can be added to the object (or an exception will be thrown).</p>
+<p>Should be called after <a class="reference internal" href="#surround.assembler.Assembler.set_estimator" title="surround.assembler.Assembler.set_estimator"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.set_estimator()</span></code></a> and
+<a class="reference internal" href="#surround.assembler.Assembler.set_config" title="surround.assembler.Assembler.set_config"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.set_config()</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>surround_data</strong> (a child or instance of <a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SurroundData</span></code></a>) – the data we are feeding through the pipeline</p>
+<dd class="field-odd"><p><strong>batch_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether batch mode should be used</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="surround.Surround.set_config">
-<code class="descname">set_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Surround.set_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Surround.set_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the config instance used in all stages during execution of the pipeline.
-Ensures order of stages set in the Config instance is followed (if set).</p>
+<dt id="surround.assembler.Assembler.load_config">
+<code class="descname">load_config</code><span class="sig-paren">(</span><em>module</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a module contained in the root of the project, create an instance of
+<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a> loading configuration data from the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>
+found in the project, and use this configuration for the pipeline.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Should be called before <code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assemble.init_assembler()</span></code></p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – instance containing configuration data</p>
+<dd class="field-odd"><p><strong>module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – name of the module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="surround.assembler.Assembler.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>surround_data=None</em>, <em>is_training=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the pipeline using the input data provided.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">is_training</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> then when it gets to the execution of the estimator,
+it will use the <a class="reference internal" href="#surround.stage.Estimator.fit" title="surround.stage.Estimator.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.stage.Estimator.fit()</span></code></a> method instead.</p>
+<p>If the above or <code class="docutils literal notranslate"><span class="pre">batch_mode</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> then when all the other stages have finished,
+the visualiser will be executed.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">surround.enable_stage_output_dump</span></code> is enabled in the Config instance then each filter and
+estimator’s <a class="reference internal" href="#surround.stage.Stage.dump_output" title="surround.stage.Stage.dump_output"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.stage.Stage.dump_output()</span></code></a> method will be called.</p>
+<p>This method doesn’t return anything, instead results should be stored in the <code class="docutils literal notranslate"><span class="pre">surround_data</span></code>
+object passed in the parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>surround_data</strong> (<a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – Data passed between each stage in the pipeline</p></li>
+<li><p><strong>is_training</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Run the pipeline in training mode or not</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="surround.assembler.Assembler.set_config">
+<code class="descname">set_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler.set_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler.set_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the configuration data to be used during pipeline execution.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Should be called before <a class="reference internal" href="#surround.assembler.Assembler.init_assembler" title="surround.assembler.Assembler.init_assembler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.init_assembler()</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – the configuration data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="surround.assembler.Assembler.set_estimator">
+<code class="descname">set_estimator</code><span class="sig-paren">(</span><em>estimator=None</em>, <em>pre_filters=None</em>, <em>post_filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler.set_estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler.set_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the estimator that should be used during pipeline execution and any filters (if required).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Should be called before <a class="reference internal" href="#surround.assembler.Assembler.init_assembler" title="surround.assembler.Assembler.init_assembler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.init_assembler()</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<a class="reference internal" href="#surround.stage.Estimator" title="surround.stage.Estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Estimator</span></code></a>) – the estimator to be used for this pipeline</p></li>
+<li><p><strong>pre_filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="#surround.stage.Filter" title="surround.stage.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Filter</span></code></a>) – list of pre-filters (default: None)</p></li>
+<li><p><strong>post_filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="#surround.stage.Filter" title="surround.stage.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Filter</span></code></a>) – list of post-filters (default: None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="surround.assembler.Assembler.set_visualiser">
+<code class="descname">set_visualiser</code><span class="sig-paren">(</span><em>visualiser</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/assembler.html#Assembler.set_visualiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.assembler.Assembler.set_visualiser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the visualiser that will be executed after all other stages during
+batch-predict/training mode.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>See <a class="reference internal" href="#surround.visualiser.Visualiser" title="surround.visualiser.Visualiser"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.visualiser.Visualiser</span></code></a> for more information.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>visualiser</strong> (<a class="reference internal" href="#surround.visualiser.Visualiser" title="surround.visualiser.Visualiser"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.visualiser.Visualiser</span></code></a>) – the visualiser instance</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-<span class="target" id="module-surround.config"></span><div class="section" id="config">
+<span class="target" id="module-surround"></span><div class="section" id="config">
 <h3>Config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="surround.config.Config">
@@ -243,16 +334,21 @@ Each stage is responsible for setting the attributes to this class.</p>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span>
 
-<span class="k">class</span> <span class="nc">ValidationStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ValidationStage</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">data</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;not correct input format!&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">input_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;input is empty&#39;</span><span class="p">)</span>
 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Surround</span><span class="p">([</span><span class="n">ValidationStage</span><span class="p">(),</span> <span class="n">PredictStage</span><span class="p">()])</span>
+<span class="k">class</span> <span class="nc">Predict</span><span class="p">(</span><span class="n">Estimator</span><span class="p">):</span>
+    <span class="c1"># Do prediction here</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Assembler</span><span class="p">(</span><span class="s2">&quot;Example&quot;</span><span class="p">,</span> <span class="n">ValidationStage</span><span class="p">(),</span> <span class="n">Predict</span><span class="p">())</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">()</span>
+
 <span class="n">data</span> <span class="o">=</span> <span class="n">PipelineData</span><span class="p">(</span><span class="s2">&quot;received data&quot;</span><span class="p">)</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">)</span>
 </pre></div>
@@ -271,29 +367,19 @@ is added during pipeline execution.</p>
 <dl class="class">
 <dt id="surround.stage.Stage">
 <em class="property">class </em><code class="descclassname">surround.stage.</code><code class="descname">Stage</code><a class="reference internal" href="_modules/surround/stage.html#Stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Stage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parent class of all stages in a Surround pipeline.</p>
-<p>Stages main responsiblity are to transform input data in some way, this may be a
-data wrangling operation or a prediciton operation. This operation must happen in the
-<a class="reference internal" href="#surround.stage.Stage.operate" title="surround.stage.Stage.operate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.stage.Stage.operate()</span></code></a> method.</p>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DetectFaces</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;model-name&quot;</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">faces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">input_image</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">dump_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of faces found: &quot;</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">faces</span><span class="p">))</span>
-</pre></div>
-</div>
+<dd><p>Base class of all stages in a Surround pipeline.</p>
+<p>See the following classes for more information:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#surround.stage.Estimator" title="surround.stage.Estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Estimator</span></code></a></p></li>
+<li><p><a class="reference internal" href="#surround.stage.Filter" title="surround.stage.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Filter</span></code></a></p></li>
+</ul>
 <dl class="method">
 <dt id="surround.stage.Stage.dump_output">
 <code class="descname">dump_output</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Stage.dump_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Stage.dump_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dump the output of the stage after the operate method has transformed the input data.</p>
+<dd><p>Dump the output of the stage after the stage has transformed the data.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is called by <a class="reference internal" href="#surround.Surround.process" title="surround.Surround.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.Surround.process()</span></code></a> (when dumping output is requested)</p>
+<p>This is called by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a> (when dumping output is requested).</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -308,13 +394,10 @@ data wrangling operation or a prediciton operation. This operation must happen i
 <dl class="method">
 <dt id="surround.stage.Stage.init_stage">
 <code class="descname">init_stage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Stage.init_stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Stage.init_stage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialise the stage with some data or extra operations. This method
-is called ONLY once before the stage is executed.</p>
-<p>For example you may load a Tensorflow model which you will use
-for prediction in the <a class="reference internal" href="#surround.stage.Stage.operate" title="surround.stage.Stage.operate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.stage.Stage.operate()</span></code></a> method.</p>
+<dd><p>Initialise the stage, this may be loading a model or loading data.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is called by the <a class="reference internal" href="#surround.Surround.init_stages" title="surround.Surround.init_stages"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.Surround.init_stages()</span></code></a> method.</p>
+<p>This is called by <a class="reference internal" href="#surround.assembler.Assembler.init_assembler" title="surround.assembler.Assembler.init_assembler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.init_assembler()</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -323,15 +406,103 @@ for prediction in the <a class="reference internal" href="#surround.stage.Stage.
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="surround.stage.Stage.operate">
-<code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Stage.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Stage.operate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform the intended operation of the stage. This method <strong>must</strong> be
-implemented in extensions of this class. Where it should perform some
-transformation/checking of the <code class="xref py py-attr docutils literal notranslate"><span class="pre">surround_data</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="validator">
+<h3>Validator<a class="headerlink" href="#validator" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="surround.stage.Validator">
+<em class="property">class </em><code class="descclassname">surround.stage.</code><code class="descname">Validator</code><a class="reference internal" href="_modules/surround/stage.html#Validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Validator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class of a validation stage in a Surround pipeline. Responsible for checking the data being
+fed into the pipeline before passing the data onto the next stages (filtering, estimation, etc).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is called by the <a class="reference internal" href="#surround.Surround.process" title="surround.Surround.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.Surround.process()</span></code></a> method before/after other stages.</p>
+<p>This stage is executed in <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a> before all other stages in the pipeline.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ValidateData</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span><span class="p">:</span>
+            <span class="c1"># Stop the pipeline, we have no data!</span>
+            <span class="n">surround_data</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&#39;input_data&#39; is None&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="surround.stage.Validator.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Validator.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Validator.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate data being loaded into the pipeline. Appending to <code class="docutils literal notranslate"><span class="pre">surround_data.errors</span></code>
+or <code class="docutils literal notranslate"><span class="pre">surround_data.warnings</span></code> when problems are found with the input data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This should only be called by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>surround_data</strong> (Instance or child of <a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – Stores intermediate data from each stage in the pipeline</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – Config of the pipeline</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="filter">
+<h3>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="surround.stage.Filter">
+<em class="property">class </em><code class="descclassname">surround.stage.</code><code class="descname">Filter</code><a class="reference internal" href="_modules/surround/stage.html#Filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class of all filters (pre or post) in a Surround pipeine.</p>
+<p>There are two types of filters:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Pre-filters</strong> - Perform data wrangling operations on the data <strong>before</strong></dt><dd><p>being fed into an <a class="reference internal" href="#surround.stage.Estimator" title="surround.stage.Estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Estimator</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Post-filters</strong> - Perform data wrangling operations on the data <strong>after</strong></dt><dd><p>being fed into an <a class="reference internal" href="#surround.stage.Estimator" title="surround.stage.Estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Estimator</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Depending on the type, this stage is executed before/after an estimator in the pipeline.</p>
+<p>There can be many pre/post filters in a single <a class="reference internal" href="#surround.assembler.Assembler" title="surround.assembler.Assembler"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.assembler.Assembler</span></code></a> instance.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To set the pre/post filter(s), use <a class="reference internal" href="#surround.assembler.Assembler.set_estimator" title="surround.assembler.Assembler.set_estimator"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.set_estimator()</span></code></a>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ConvertFromJSONString</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ConvertToJSONString</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">)</span>
+
+<span class="n">assembler</span> <span class="o">=</span> <span class="n">Assembler</span><span class="p">(</span><span class="s2">&quot;Example&quot;</span><span class="p">,</span> <span class="n">ValidationStage</span><span class="p">())</span>
+
+<span class="c1"># Set ConvertFromJSONString as a pre-filter, the other as a post-filter</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">set_estimator</span><span class="p">(</span><span class="n">PredictStage</span><span class="p">,</span> <span class="p">[</span><span class="n">ConvertFromJSONString</span><span class="p">()],</span> <span class="p">[</span><span class="n">ConvertToJSONString</span><span class="p">()])</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">PipelineData</span><span class="p">(</span><span class="s2">&quot;{ &quot;</span><span class="n">example</span><span class="s2">&quot;: &quot;</span><span class="n">data</span><span class="s2">&quot; }&quot;</span><span class="p">)</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Would print JSON represented as a string</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="surround.stage.Filter.operate">
+<code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Filter.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Filter.operate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify data before/after it enters an <a class="reference internal" href="#surround.stage.Estimator" title="surround.stage.Estimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Estimator</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This should only be called by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -346,155 +517,181 @@ transformation/checking of the <code class="xref py py-attr docutils literal not
 </dd></dl>
 
 </div>
-</div>
-<div class="section" id="wrapper">
-<h2>Wrapper<a class="headerlink" href="#wrapper" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="estimator">
+<h3>Estimator<a class="headerlink" href="#estimator" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
-<dt id="surround.Wrapper">
-<em class="property">class </em><code class="descclassname">surround.</code><code class="descname">Wrapper</code><span class="sig-paren">(</span><em>surround</em>, <em>type_of_uploaded_object=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parent class for wrappers which handle the execution of a pipeline.
-Extensions of this class are used to execute the pipeline both locally and over the web
-via the Surround CLI.</p>
-<p>Your extended class <strong>must</strong> be added to the projects <cite>config.yaml</cite> file as <cite>wrapper-info</cite>
-so that the Surround CLI can find and use your wrapper when running in web-server mode.</p>
-<p>For example (in <cite>config.yaml</cite>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wrapper</span><span class="o">-</span><span class="n">info</span><span class="p">:</span> <span class="n">testproject</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">PipelineWrapper</span>
+<dt id="surround.stage.Estimator">
+<em class="property">class </em><code class="descclassname">surround.stage.</code><code class="descname">Estimator</code><a class="reference internal" href="_modules/surround/stage.html#Estimator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for an estimator in a Surround pipeline. Responsible for performing estimation
+or training using the input data.</p>
+<p>This stage is executed by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a> after the validator and
+in-between pre and post filters.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Predict</span><span class="p">(</span><span class="n">Estimator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">init_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;models_path&quot;</span><span class="p">],</span> <span class="s2">&quot;model.pb&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="n">run_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">surround_data</span><span class="o">.</span><span class="n">output_data</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Your extension must implement the <a class="reference internal" href="#surround.Wrapper.run" title="surround.Wrapper.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Wrapper.run()</span></code></a> method which should setup the
-input data and run the <a class="reference internal" href="#surround.Surround.process" title="surround.Surround.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Surround.process()</span></code></a> method of the pipeline.</p>
-<p>Constructor of the Wrapper initializes the stages of the provided pipeline.</p>
+<dl class="method">
+<dt id="surround.stage.Estimator.estimate">
+<code class="descname">estimate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Estimator.estimate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Estimator.estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process input data and store estimated values.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is ONLY called by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a> when
+running in predict/batch-predict mode.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>surround</strong> (<a class="reference internal" href="#surround.Surround" title="surround.Surround"><code class="xref py py-class docutils literal notranslate"><span class="pre">Surround</span></code></a>) – the surround pipeline the wrapper will manage</p></li>
-<li><p><strong>type_of_uploaded_object</strong> (<a class="reference internal" href="#surround.AllowedTypes" title="surround.AllowedTypes"><code class="xref py py-class docutils literal notranslate"><span class="pre">AllowedTypes</span></code></a>) – type of data the pipeline will accept</p></li>
+<li><p><strong>surround_data</strong> (Instance or child of <a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – Stores intermediate data from each stage in the pipeline</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – Contains the settings for each stage</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="surround.Wrapper.get_config">
-<code class="descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper.get_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the configuration data of the surround pipeline.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>the data used to configure the pipeline</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="surround.Wrapper.process">
-<code class="descname">process</code><span class="sig-paren">(</span><em>input_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper.process" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs the surround pipeline with the given input data, ensuring the pipeline is validated first.
-This is called when running the pipeline via web endpoints.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_data</strong> (<em>any</em>) – input data that will be fed through the pipeline</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the result of the run method (typically output data)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>any</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.Wrapper.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>input_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs the surround pipeline with the given input data.
-This method should be extended to convert the input data and execute the pipeline.</p>
+<dt id="surround.stage.Estimator.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/stage.html#Estimator.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.stage.Estimator.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train a model using the input data.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Called by the <a class="reference internal" href="#surround.Wrapper.process" title="surround.Wrapper.process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Wrapper.process()</span></code></a> method.</p>
-</div>
-<p>For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">SurroundData</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">input_data</span><span class="p">))</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surround</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">output</span>
-</pre></div>
+<p>This method is ONLY called by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a> when
+running in training mode.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_data</strong> (<em>any</em>) – the input data to be put through the pipeline</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the transformed data after execution of the pipeline</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>any</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.Wrapper.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validates the configuration of the pipeline and the type of the input data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True on success, False on failure</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.Wrapper.validate_actual_type_of_uploaded_object">
-<code class="descname">validate_actual_type_of_uploaded_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper.validate_actual_type_of_uploaded_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper.validate_actual_type_of_uploaded_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate the actual type of the input with the selected type of input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True if the types match, False otherwise</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.Wrapper.validate_type_of_uploaded_object">
-<code class="descname">validate_type_of_uploaded_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/surround.html#Wrapper.validate_type_of_uploaded_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.Wrapper.validate_type_of_uploaded_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate selected input type against allowed types.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True if selected type allowed, False otherwise</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<div class="section" id="allowedtypes">
-<h3>AllowedTypes<a class="headerlink" href="#allowedtypes" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.AllowedTypes">
-<em class="property">class </em><code class="descclassname">surround.</code><code class="descname">AllowedTypes</code><a class="reference internal" href="_modules/surround/surround.html#AllowedTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.AllowedTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
-<p>Enumeration for types allowed as input to a pipeline via the <a class="reference internal" href="#surround.Wrapper" title="surround.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wrapper</span></code></a>.</p>
-<ul class="simple">
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">AllowedTypes.JSON</span></code> - Accept JSON data only</p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">AllowedTypes.FILE</span></code> - Accept files only</p></li>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>surround_data</strong> (Instance or child of <a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – Stores intermediate data from each stage in the pipeline</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – Contains the settings for each stage</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
+<div class="section" id="visualiser">
+<h3>Visualiser<a class="headerlink" href="#visualiser" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="surround.visualiser.Visualiser">
+<em class="property">class </em><code class="descclassname">surround.visualiser.</code><code class="descname">Visualiser</code><a class="reference internal" href="_modules/surround/visualiser.html#Visualiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.visualiser.Visualiser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all visualisers that are executed at the end of a batch predict/training operation.</p>
+<p>Visualisers are used to prettify or format results from a batch predict or training execution
+of an <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a>. Such as generating graphs or formatting the data in a way that is meaningful.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To set a visualiser to a pipeline, use <a class="reference internal" href="#surround.assembler.Assembler.set_visualiser" title="surround.assembler.Assembler.set_visualiser"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.set_visualiser()</span></code></a>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">class</span> <span class="nc">Accuracy</span><span class="p">(</span><span class="n">Visualiser</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visualise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surround_data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">get_epochs</span><span class="p">(</span><span class="n">surround_data</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">get_accuracy_over_epochs</span><span class="p">(</span><span class="n">surround_data</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Epochs vs Accuracy&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Epochs&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Accuracy&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">assembler</span> <span class="o">=</span> <span class="n">Assembler</span><span class="p">(</span><span class="s2">&quot;Example&quot;</span><span class="p">,</span> <span class="n">Validate</span><span class="p">(),</span> <span class="n">Predict</span><span class="p">())</span>
+<span class="n">assembler</span><span class="o">.</span><span class="n">set_visualiser</span><span class="p">(</span><span class="n">Accuracy</span><span class="p">())</span>
+
+<span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">PipelineData</span><span class="p">(</span><span class="n">input_data</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="surround.visualiser.Visualiser.visualise">
+<code class="descname">visualise</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/visualiser.html#Visualiser.visualise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.visualiser.Visualiser.visualise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prettify/format the data contained in <code class="docutils literal notranslate"><span class="pre">surround_data</span></code>.</p>
+<p>Called by <a class="reference internal" href="#surround.assembler.Assembler.run" title="surround.assembler.Assembler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">surround.assembler.Assembler.run()</span></code></a> after all other stages in
+the pipline have been executed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This should only be called by the <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a>!</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>surround_data</strong> (Instance or child of <a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – Stores the results of the pipeline execution</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – Config of the pipeline</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="runner">
+<h2>Runner<a class="headerlink" href="#runner" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="surround.runners.Runner">
+<em class="property">class </em><code class="descclassname">surround.runners.</code><code class="descname">Runner</code><span class="sig-paren">(</span><em>assembler</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runners.html#Runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runners.Runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for runners which are responsible for:</p>
+<ul class="simple">
+<li><p>Initializing an <a class="reference internal" href="#surround.assembler.Assembler" title="surround.assembler.Assembler"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.assembler.Assembler</span></code></a>.</p></li>
+<li><p>Loading/preparing input data.</p></li>
+<li><p>Running the <a class="reference internal" href="#surround.assembler.Assembler" title="surround.assembler.Assembler"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.assembler.Assembler</span></code></a>.</p></li>
+</ul>
+<p>Example batch runner:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BatchRunner</span><span class="p">(</span><span class="n">Runner</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assembler</span><span class="o">.</span><span class="n">init_assembler</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assembler</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">],</span> <span class="s2">&quot;input.txt&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">RunnersData</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="c1"># Each line needs to be processed by the pipeline</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+
+                <span class="c1"># Start assembler to process processed data</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assembler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Batch Runner: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You get a Batch Runner and Web Runner (if web requested) when
+you generate a project using the CLI tool.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>assembler</strong> (<a class="reference internal" href="#surround.assembler.Assembler" title="surround.assembler.Assembler"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.assembler.Assembler</span></code></a>) – The assembler the runner will execute</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="surround.runners.Runner.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>is_training=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runners.html#Runner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runners.Runner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare data and execute the <a class="reference internal" href="#surround.assembler.Assembler" title="surround.assembler.Assembler"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.assembler.Assembler</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>is_training</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Run the pipeline in training mode or not</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="linter">
-<span id="id1"></span><h2>Linter<a class="headerlink" href="#linter" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Linter<a class="headerlink" href="#linter" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-surround.linter"></span><dl class="class">
 <dt id="surround.linter.Linter">
 <em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">Linter</code><a class="reference internal" href="_modules/surround/linter.html#Linter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.Linter" title="Permalink to this definition">¶</a></dt>
@@ -502,8 +699,7 @@ This method should be extended to convert the input data and execute the pipelin
 and displays warnings/errors found during the linting process.</p>
 <p>This class is used by the Surround CLI to perform the linting of a project via the
 <cite>lint</cite> sub-command.</p>
-<p>To add a new check to the linter, append it to the stages list being passed to
-the <a class="reference internal" href="#surround.Surround" title="surround.Surround"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.Surround</span></code></a> constructor, which is then being set to the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">linter_checks</span></code>.</p>
+<p>To add a new check to the linter, append an instance of it to the <code class="docutils literal notranslate"><span class="pre">filters</span></code> list.</p>
 <dl class="method">
 <dt id="surround.linter.Linter.check_project">
 <code class="descname">check_project</code><span class="sig-paren">(</span><em>project</em>, <em>project_root='.'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#Linter.check_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.Linter.check_project" title="Permalink to this definition">¶</a></dt>
@@ -547,7 +743,7 @@ attributes of each check.</p>
 <dl class="class">
 <dt id="surround.linter.LinterStage">
 <em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">LinterStage</code><span class="sig-paren">(</span><em>key</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#LinterStage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.LinterStage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#surround.stage.Stage" title="surround.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Stage</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#surround.stage.Filter" title="surround.stage.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Filter</span></code></a></p>
 <p>Base class for a check in the Surround <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>.</p>
 <p>Provides functions for creating warnings and errors that are
 found during the linting process.</p>
@@ -646,7 +842,6 @@ found during the linting process.</p>
 <em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">CheckData</code><a class="reference internal" href="_modules/surround/linter.html#CheckData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.linter.LinterStage</span></code></a></p>
 <p><a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> stage that checks the data folder in the surround project for files.</p>
-<p>Constructor for the CheckData linter stage.</p>
 <dl class="method">
 <dt id="surround.linter.CheckData.operate">
 <code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#CheckData.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckData.operate" title="Permalink to this definition">¶</a></dt>
@@ -672,7 +867,6 @@ If there is none then a warning will be issued.</p>
 <em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">CheckFiles</code><a class="reference internal" href="_modules/surround/linter.html#CheckFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckFiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.linter.LinterStage</span></code></a></p>
 <p><a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> stage that checks the surround project files exist.</p>
-<p>Constructor for the CheckFiles linter stage.</p>
 <dl class="method">
 <dt id="surround.linter.CheckFiles.operate">
 <code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#CheckFiles.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckFiles.operate" title="Permalink to this definition">¶</a></dt>
@@ -698,7 +892,6 @@ Will create errors if required surround project files are missing in the root di
 <em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">CheckDirectories</code><a class="reference internal" href="_modules/surround/linter.html#CheckDirectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckDirectories" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.linter.LinterStage</span></code></a></p>
 <p><a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> stage that checks the surround project directories exist.</p>
-<p>Constructor for the CheckDirectories linter stage.</p>
 <dl class="method">
 <dt id="surround.linter.CheckDirectories.operate">
 <code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#CheckDirectories.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckDirectories.operate" title="Permalink to this definition">¶</a></dt>
@@ -712,113 +905,6 @@ If the expected directories don’t exist then errors will be created.</p>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-</div>
-<div class="section" id="module-surround.runner.web.api">
-<span id="web-api"></span><h2>Web API<a class="headerlink" href="#module-surround.runner.web.api" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="surround.runner.web.api.make_app">
-<code class="descclassname">surround.runner.web.api.</code><code class="descname">make_app</code><span class="sig-paren">(</span><em>wrapper_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#make_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.make_app" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a web-server with the following endpoints:</p>
-<ul class="simple">
-<li><p><cite>/</cite> - HTTP GET - responds with the Surround version and current uptime (see <a class="reference internal" href="#surround.runner.web.api.HealthCheck" title="surround.runner.web.api.HealthCheck"><code class="xref py py-class docutils literal notranslate"><span class="pre">HealthCheck</span></code></a>)</p></li>
-<li><p><cite>/upload</cite> - HTTP GET - used to upload a file and run the pipeline on the file (see <a class="reference internal" href="#surround.runner.web.api.Upload" title="surround.runner.web.api.Upload"><code class="xref py py-class docutils literal notranslate"><span class="pre">Upload</span></code></a>)</p></li>
-<li><p><cite>/predict</cite> - HTTP POST - runs the pipeline on the data in the body of the request (see <a class="reference internal" href="#surround.runner.web.api.Predict" title="surround.runner.web.api.Predict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Predict</span></code></a>)</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This function is called by the Surround CLI.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>wrapper_object</strong> (<a class="reference internal" href="#surround.Wrapper" title="surround.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.Wrapper</span></code></a>) – the wrapper for the surround pipeline</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the web-server application object</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.Application</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<div class="section" id="healthcheck">
-<h3>HealthCheck<a class="headerlink" href="#healthcheck" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.runner.web.api.HealthCheck">
-<em class="property">class </em><code class="descclassname">surround.runner.web.api.</code><code class="descname">HealthCheck</code><span class="sig-paren">(</span><em>application: tornado.web.Application</em>, <em>request: tornado.httputil.HTTPServerRequest</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#HealthCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.HealthCheck" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
-<p>Class which handles the health check HTTP GET web endpoint (“/”).</p>
-<dl class="method">
-<dt id="surround.runner.web.api.HealthCheck.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#HealthCheck.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.HealthCheck.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when endpoint is requested via GET method.
-Responds with a JSON document containing the app name, version and server uptime.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="upload">
-<h3>Upload<a class="headerlink" href="#upload" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.runner.web.api.Upload">
-<em class="property">class </em><code class="descclassname">surround.runner.web.api.</code><code class="descname">Upload</code><span class="sig-paren">(</span><em>application: tornado.web.Application</em>, <em>request: tornado.httputil.HTTPServerRequest</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#Upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.Upload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
-<p>Class which handles the upload HTTP GET web endpoint (“/upload”).</p>
-<dl class="method">
-<dt id="surround.runner.web.api.Upload.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#Upload.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.Upload.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when endpoint is requested via GET method.
-Renders the upload.html file in the user’s browser.</p>
-<p>The form in <cite>upload.html</cite> POST’s to the <a class="reference internal" href="#surround.runner.web.api.Predict" title="surround.runner.web.api.Predict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Predict</span></code></a> endpoint.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.runner.web.api.Upload.get_template_path">
-<code class="descname">get_template_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#Upload.get_template_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.Upload.get_template_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the path to the folder containing the upload.html file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>path to the folder</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="predict">
-<h3>Predict<a class="headerlink" href="#predict" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.runner.web.api.Predict">
-<em class="property">class </em><code class="descclassname">surround.runner.web.api.</code><code class="descname">Predict</code><span class="sig-paren">(</span><em>application: tornado.web.Application</em>, <em>request: tornado.httputil.HTTPServerRequest</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#Predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.Predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
-<p>Class which handles the predict HTTP POST web endpoint (“/predict”).</p>
-<dl class="method">
-<dt id="surround.runner.web.api.Predict.initialize">
-<code class="descname">initialize</code><span class="sig-paren">(</span><em>wrapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#Predict.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.Predict.initialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when the endpoint is initialized, keeps a
-reference to the pipeline wrapper.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>wrapper</strong> (<a class="reference internal" href="#surround.Wrapper" title="surround.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.Wrapper</span></code></a>) – the wrapper for the surround pipeline</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.runner.web.api.Predict.post">
-<code class="descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/runner/web/api.html#Predict.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.runner.web.api.Predict.post" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when data has been posted to the web endpoint.
-Processes the uploaded data using the pipeline and responds with the output.</p>
 </dd></dl>
 
 </dd></dl>
@@ -858,28 +944,23 @@ Processes the uploaded data using the pipeline and responds with the output.</p>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-surround">Surround</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#assembler">Assembler</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#config">Config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#surrounddata">SurroundData</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stage">Stage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validator">Validator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filter">Filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estimator">Estimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visualiser">Visualiser</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#wrapper">Wrapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#allowedtypes">AllowedTypes</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#runner">Runner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#linter">Linter</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#linterstage">LinterStage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#projectdata">ProjectData</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#checkdata">CheckData</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#checkfiles">CheckFiles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#checkdirectories">CheckDirectories</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-surround.runner.web.api">Web API</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#healthcheck">HealthCheck</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#upload">Upload</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#predict">Predict</a></li>
 </ul>
 </li>
 </ul>

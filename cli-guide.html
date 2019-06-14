@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Command-line Interface &#8212; Surround 0.0.7 documentation</title>
+    <title>Command-line Interface &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -47,7 +47,8 @@
 <div class="section" id="init">
 <h2>init<a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h2>
 <p>Initialize a new Surround project.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">surround</span> <span class="n">init</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PROJECT_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DESCRIPTION</span><span class="p">]</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">surround</span> <span class="n">init</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PROJECT_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DESCRIPTION</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">REQUIRE_WEB</span><span class="p">]</span>
+                     <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -68,6 +69,9 @@
 <dt><kbd>-d, --description</kbd></dt>
 <dd><p>A description for the project</p>
 </dd>
+<dt><kbd>-w, --require-web</kbd></dt>
+<dd><p>Is web service required for the project</p>
+</dd>
 </dl>
 </div>
 </div>
@@ -80,8 +84,11 @@ The default tasks that come with every project are:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">build</span></code> - Build a Docker image for your Surround project.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dev</span></code> - Run the Docker image with the current source code (via drive mount).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">prod</span></code> - Build and run the Docker image (no drive mounting).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">batch</span></code> - Run the Docker image (no drive mounting) in batch mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train</span></code> - Run the Docker image (no drive mounting) in train mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remove</span></code> - Remove the Docker image built for this project (if any).</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">surround</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span><span class="p">]</span> <span class="p">[</span><span class="n">task</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">surround</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="n">task</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -89,15 +96,6 @@ The default tasks that come with every project are:</p>
 <dl class="option-list">
 <dt><kbd>task</kbd></dt>
 <dd><p>Task defined in a Surround project dodo.py file.</p>
-</dd>
-</dl>
-</div>
-<div class="section" id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
-<dl class="option-list">
-<dt><kbd>-w, --web</kbd></dt>
-<dd><p>Name of the class inherited from Wrapper</p>
-<p>Default: False</p>
 </dd>
 </dl>
 </div>
