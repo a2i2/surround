@@ -18,10 +18,10 @@ class InitTest(unittest.TestCase):
         self.assertEqual(process.stdout, "error: not a surround project\n")
 
         process = subprocess.run(['surround', 'run'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
-        self.assertEqual(process.stdout[:44], "batch    Run batch mode inside the container")
+        self.assertEqual(process.stdout[:49], "batch         Run batch mode inside the container")
 
         process = subprocess.run(['surround', 'run'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
-        self.assertEqual(process.stdout[:44], "batch    Run batch mode inside the container")
+        self.assertEqual(process.stdout[:49], "batch         Run batch mode inside the container")
 
     def test_remote_from_subdir(self):
         process = subprocess.run(['surround', 'remote'], encoding='utf-8', stdout=subprocess.PIPE)
