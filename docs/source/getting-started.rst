@@ -274,9 +274,15 @@ Now hopefully if you load ``http://localhost:8080/info`` in your preferred brows
 
 .. note:: If you are running this on Windows and don't see the above, try using ``http://192.168.99.100:8080/info`` instead.
 
-Next we are going to test the ``/estimate`` endpoint by using the following command in another terminal::
+Next we are going to test the ``/estimate`` endpoint by using the following command in another terminal:
+
+On Linux/MacOS::
 
     $ curl -d "{ \"message\": \"test phrase\" }" http://localhost:8080/estimate
+
+On Windows (in Powershell)::
+
+    $ Invoke-WebRequest http://192.168.99.100:8080/estimate -Method POST -Body "{ ""message"": ""test phrase"" }"
 
 You should see the following output in the terminal running the pipeline::
 
@@ -292,12 +298,34 @@ Head to the script ``web_runner.py`` and append the following to the ``post`` me
     # Return the result of the processing
     self.write({"output": self.data.output_data})
 
-Restart the web server, use the same ``curl`` command and you should see the following output::
+Restart the web server, use the same command as before and you should see the following output:
+
+On Linux/MacOS::
 
     % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                     Dload  Upload   Total   Spent    Left  Speed
     100    53  100    25  100    28    806    903 --:--:-- --:--:-- --:--:--  1709
     {"output": "TEST PHRASE"}
+
+On Windows (in Powershell)::
+
+    StatusCode        : 200
+    StatusDescription : OK
+    Content           : {"output": "TEST PHRASE"}
+    RawContent        : HTTP/1.1 200 OK
+                        Content-Length: 25
+                        Content-Type: application/json; charset=UTF-8
+                        Date: Mon, 17 Jun 2019 06:43:54 GMT
+                        Server: TornadoServer/6.0.2
+
+                        {"output": "TEST PHRASE"}
+    Forms             : {}
+    Headers           : {[Content-Length, 25], [Content-Type, application/json; charset=UTF-8], [Date, Mon, 17 Jun 2019 06:43:54 GMT], [Server, TornadoServer/6.0.2]}
+    Images            : {}
+    InputFields       : {}
+    Links             : {}
+    ParsedHtml        : mshtml.HTMLDocumentClass
+    RawContentLength  : 25
 
 Thats it, you are now serving a Surround pipeline! Now you could potentially use this pipeline in virtually any
 application.
