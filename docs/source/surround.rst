@@ -1,6 +1,6 @@
 .. _surround-api:
 
-API
+API Reference
 *****************
 Here you can find documentation on all classes and their methods in Surround.
 

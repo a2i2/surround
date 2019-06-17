@@ -14,7 +14,6 @@ method or class? See :ref:`surround-api`.
 
 .. toctree:: 
     :maxdepth: 2
-    :caption: Users's Guide
 
     about.rst
     getting-started.rst
@@ -22,6 +21,5 @@ method or class? See :ref:`surround-api`.
 
 .. toctree::
    :maxdepth: 3
-   :caption: API Reference
 
    surround.rst
