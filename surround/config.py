@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from collections.abc import Mapping
 from pkg_resources import resource_stream
-from .remote.cli import get_project_root_from_current_dir
 
 import yaml
 
@@ -48,7 +47,7 @@ class Config(Mapping):
         SURRROUND_PREDICT_DEBUG=False
     """
 
-    def __init__(self, project_root=get_project_root_from_current_dir(), package_path=None):
+    def __init__(self, project_root=None, package_path=None):
         """
         Constructor of the Config class, loads the default YAML file into storage.
         If the :attr:`project_root` is provided then the project's `config.yaml`
@@ -64,6 +63,10 @@ class Config(Mapping):
         """
 
         self._storage = self.__load_defaults()
+
+        # Try to get the project root if none specified
+        if not project_root:
+            project_root = self.__get_project_root_from_current_dir()
 
         # Set framework paths
         if project_root:
@@ -170,6 +173,21 @@ class Config(Mapping):
             err.strerror = 'Unable to load default config file'
             raise
         return config
+
+    def __get_project_root_from_current_dir(self):
+        return self.__get_project_root(os.getcwd())
+
+    def __get_project_root(self, current_directory):
+        home = str(Path.home())
+
+        while True:
+            list_ = os.listdir(current_directory)
+            parent_directory = os.path.dirname(current_directory)
+            if current_directory in (home, parent_directory):
+                break
+            elif ".surround" in list_:
+                return current_directory
+            current_directory = parent_directory
 
     def __merge_configs(self, configs):
         """
