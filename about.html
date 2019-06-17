@@ -35,9 +35,9 @@
             
   <div class="section" id="about">
 <span id="id1"></span><h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="what-is-surround-exactly">
-<h2>What is Surround exactly?<a class="headerlink" href="#what-is-surround-exactly" title="Permalink to this headline">¶</a></h2>
-<p>Surround is an open-source framework developed by the Applied Artificial Intelligence Institute (<cite>A</cite><sup>2</sup><cite>I</cite><sup>2</sup>) to take machine
+<div class="section" id="what-is-surround">
+<h2>What is Surround?<a class="headerlink" href="#what-is-surround" title="Permalink to this headline">¶</a></h2>
+<p>Surround is an open-source framework developed by the <a class="reference external" href="https://a2i2.deakin.edu.au/">Applied Artificial Intelligence Institute</a> (<cite>A</cite><sup>2</sup><cite>I</cite><sup>2</sup>) to take machine
 learning solutions through from exploration all the way to production. For this reason, it is developed with both
 research engineers and software developers in mind. Designed to play nice with existing machine learning frameworks
 (Tensorflow, MXNet, PyTorch, etc) and cloud services (Google Cloud AI, SageMaker, Rekognition etc), engineers have the freedom
@@ -138,7 +138,7 @@ to be added to the project before Surround will make the wrappers available.</p>
 <h2>How does Surround work at its core?<a class="headerlink" href="#how-does-surround-work-at-its-core" title="Permalink to this headline">¶</a></h2>
 <p>At its core, there are four main concepts that you need to understand while using Surround, these are:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a></p></li>
+<li><p><a class="reference internal" href="surround.html#assembler"><span class="std std-ref">Assembler</span></a></p></li>
 <li><p><a class="reference internal" href="#stages"><span class="std std-ref">Stages</span></a></p></li>
 <li><p><a class="reference internal" href="#configuration"><span class="std std-ref">Configuration</span></a></p></li>
 <li><p><a class="reference internal" href="#data"><span class="std std-ref">Data</span></a></p></li>
@@ -230,7 +230,7 @@ during evaluation of the model, the visualiser may display an example image it p
 </div>
 <div class="section" id="configuration">
 <span id="id8"></span><h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
-<p>Every instance of <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a> has a configuration object constructed from the project’s configuration file. This
+<p>Every instance of <a class="reference internal" href="surround.html#assembler"><span class="std std-ref">Assembler</span></a> has a configuration object constructed from the project’s configuration file. This
 configuration object is passed between each stage of the pipeline during initialization and execution. The configuration
 file uses the <a class="reference external" href="https://yaml.org/">YAML</a> data-serialization language.</p>
 <p>Example configuration file:</p>
@@ -270,7 +270,7 @@ file uses the <a class="reference external" href="https://yaml.org/">YAML</a> da
 </div>
 <div class="section" id="data">
 <span id="id9"></span><h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
-<p>Every time an <a class="reference internal" href="#assembler"><span class="std std-ref">Assembler</span></a> is ran, it requires an object that will be used to store the input data and eventually store
+<p>Every time an <a class="reference internal" href="surround.html#assembler"><span class="std std-ref">Assembler</span></a> is ran, it requires an object that will be used to store the input data and eventually store
 the output. Passed between stages during execution, it can also be used to store any intermediate data between stages.</p>
 </div>
 </div>
@@ -298,19 +298,17 @@ the output. Passed between stages during execution, it can also be used to store
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Users's Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">About</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-surround-exactly">What is Surround exactly?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-surround">What is Surround?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-does-surround-work-at-its-core">How does Surround work at its core?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli-guide.html">Command-line Interface</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="surround.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surround.html">API Reference</a></li>
 </ul>
 
 <div class="relations">

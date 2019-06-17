@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>API &#8212; Surround 0.0.9 documentation</title>
+    <title>API Reference &#8212; Surround 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,8 +32,8 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="api">
-<span id="surround-api"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="api-reference">
+<span id="surround-api"></span><h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
 <p>Here you can find documentation on all classes and their methods in Surround.</p>
 <div class="section" id="assembler">
 <span id="id1"></span><h2>Assembler<a class="headerlink" href="#assembler" title="Permalink to this headline">¶</a></h2>
@@ -690,227 +690,6 @@ you generate a project using the CLI tool.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="linter">
-<span id="id2"></span><h2>Linter<a class="headerlink" href="#linter" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-surround.linter"></span><dl class="class">
-<dt id="surround.linter.Linter">
-<em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">Linter</code><a class="reference internal" href="_modules/surround/linter.html#Linter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.Linter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents the Surround linter which performs multiple checks on the surround project
-and displays warnings/errors found during the linting process.</p>
-<p>This class is used by the Surround CLI to perform the linting of a project via the
-<cite>lint</cite> sub-command.</p>
-<p>To add a new check to the linter, append an instance of it to the <code class="docutils literal notranslate"><span class="pre">filters</span></code> list.</p>
-<dl class="method">
-<dt id="surround.linter.Linter.check_project">
-<code class="descname">check_project</code><span class="sig-paren">(</span><em>project</em>, <em>project_root='.'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#Linter.check_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.Linter.check_project" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs the linter against the project specified, returning any warnings/errors.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – expected file structure of the project</p></li>
-<li><p><strong>project_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the root of the project (default: current directory)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>errors and warnings found (if any)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(list of error strings, list of warning strings)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.linter.Linter.dump_checks">
-<code class="descname">dump_checks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#Linter.dump_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.Linter.dump_checks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dumps a list of the checks in this linter.
-The list is compiled using the <code class="xref py py-attr docutils literal notranslate"><span class="pre">LinterStage.key</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">LinterStage.description</span></code>
-attributes of each check.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>formatted list of the checkers in the linter</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<div class="section" id="linterstage">
-<h3>LinterStage<a class="headerlink" href="#linterstage" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.linter.LinterStage">
-<em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">LinterStage</code><span class="sig-paren">(</span><em>key</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#LinterStage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.LinterStage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#surround.stage.Filter" title="surround.stage.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.stage.Filter</span></code></a></p>
-<p>Base class for a check in the Surround <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>.</p>
-<p>Provides functions for creating warnings and errors that are
-found during the linting process.</p>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CheckExists</span><span class="p">(</span><span class="n">LinterStage</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">project_root</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;Project doesn&#39;t exist!&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Constructor for a linter stage.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – identifier of the linter stage</p></li>
-<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – short description of the linter stage</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="method">
-<dt id="surround.linter.LinterStage.add_error">
-<code class="descname">add_error</code><span class="sig-paren">(</span><em>data</em>, <em>string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#LinterStage.add_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.LinterStage.add_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an error which will be displayed and stop the <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="#surround.linter.ProjectData" title="surround.linter.ProjectData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProjectData</span></code></a>) – the data being passed between stages</p></li>
-<li><p><strong>string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – description of the error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.linter.LinterStage.add_warning">
-<code class="descname">add_warning</code><span class="sig-paren">(</span><em>data</em>, <em>string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#LinterStage.add_warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.LinterStage.add_warning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a warning that will be displayed but the <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> will continue.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="#surround.linter.ProjectData" title="surround.linter.ProjectData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProjectData</span></code></a>) – the data being passed between stages</p></li>
-<li><p><strong>string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – description of the warning</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="surround.linter.LinterStage.operate">
-<code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#LinterStage.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.LinterStage.operate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executed by the <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>, performs the linting specific to this stage.
-<strong>Must</strong> be implemented in extended versions of this class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>surround_data</strong> (<a class="reference internal" href="#surround.linter.ProjectData" title="surround.linter.ProjectData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProjectData</span></code></a>) – the data being passed between stages</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – the configuration data for the linter</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="projectdata">
-<h3>ProjectData<a class="headerlink" href="#projectdata" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.linter.ProjectData">
-<em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">ProjectData</code><span class="sig-paren">(</span><em>project_structure</em>, <em>project_root</em>, <em>project_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#ProjectData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.ProjectData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">surround.surround.SurroundData</span></code></p>
-<p>Class containing the data passed between each <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinterStage</span></code></a>.</p>
-<p><strong>Attributes:</strong></p>
-<ul class="simple">
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">project_structure</span></code> - expected file structure of the surround project (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>)</p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">project_root</span></code> - path to the root of the surround project (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">project_name</span></code> - name of the surround project (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>)</p></li>
-</ul>
-<p>Constructor for the ProjectData class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>project_structure</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – the expected file structure of the project</p></li>
-<li><p><strong>project_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to the root of the project</p></li>
-<li><p><strong>project_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – name of the project</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="checkdata">
-<h3>CheckData<a class="headerlink" href="#checkdata" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.linter.CheckData">
-<em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">CheckData</code><a class="reference internal" href="_modules/surround/linter.html#CheckData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.linter.LinterStage</span></code></a></p>
-<p><a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> stage that checks the data folder in the surround project for files.</p>
-<dl class="method">
-<dt id="surround.linter.CheckData.operate">
-<code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#CheckData.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckData.operate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executed by the <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>, checks if there is any files in the project’s data folder.
-If there is none then a warning will be issued.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>surround_data</strong> (<a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – the data being passed between stages</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – the linter’s configuration data</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="checkfiles">
-<h3>CheckFiles<a class="headerlink" href="#checkfiles" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.linter.CheckFiles">
-<em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">CheckFiles</code><a class="reference internal" href="_modules/surround/linter.html#CheckFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckFiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.linter.LinterStage</span></code></a></p>
-<p><a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> stage that checks the surround project files exist.</p>
-<dl class="method">
-<dt id="surround.linter.CheckFiles.operate">
-<code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#CheckFiles.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckFiles.operate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executed by the <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>, checks if the files in the project structure exist.
-Will create errors if required surround project files are missing in the root directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>surround_data</strong> (<a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – the data being passed between stages</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – the linter’s configuation data</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="checkdirectories">
-<h3>CheckDirectories<a class="headerlink" href="#checkdirectories" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="surround.linter.CheckDirectories">
-<em class="property">class </em><code class="descclassname">surround.linter.</code><code class="descname">CheckDirectories</code><a class="reference internal" href="_modules/surround/linter.html#CheckDirectories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckDirectories" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#surround.linter.LinterStage" title="surround.linter.LinterStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.linter.LinterStage</span></code></a></p>
-<p><a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a> stage that checks the surround project directories exist.</p>
-<dl class="method">
-<dt id="surround.linter.CheckDirectories.operate">
-<code class="descname">operate</code><span class="sig-paren">(</span><em>surround_data</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/surround/linter.html#CheckDirectories.operate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#surround.linter.CheckDirectories.operate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executed by the <a class="reference internal" href="#surround.linter.Linter" title="surround.linter.Linter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Linter</span></code></a>, checks whether the project directories exist.
-If the expected directories don’t exist then errors will be created.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>surround_data</strong> (<a class="reference internal" href="#surround.SurroundData" title="surround.SurroundData"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.SurroundData</span></code></a>) – the data being passed between stages</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#surround.config.Config" title="surround.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">surround.config.Config</span></code></a>) – the linter’s configuration data</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-</div>
 </div>
 
 
@@ -935,15 +714,13 @@ If the expected directories don’t exist then errors will be created.</p>
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Users's Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli-guide.html">Command-line Interface</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#assembler">Assembler</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#config">Config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#surrounddata">SurroundData</a></li>
@@ -955,14 +732,6 @@ If the expected directories don’t exist then errors will be created.</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#runner">Runner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#linter">Linter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#linterstage">LinterStage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#projectdata">ProjectData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkdata">CheckData</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkfiles">CheckFiles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkdirectories">CheckDirectories</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

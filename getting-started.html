@@ -312,7 +312,12 @@ this command: <code class="docutils literal notranslate"><span class="pre">$</sp
 <p>If you are running this on Windows and don’t see the above, try using <code class="docutils literal notranslate"><span class="pre">http://192.168.99.100:8080/info</span></code> instead.</p>
 </div>
 <p>Next we are going to test the <code class="docutils literal notranslate"><span class="pre">/estimate</span></code> endpoint by using the following command in another terminal:</p>
+<p>On Linux/MacOS:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ curl -d &quot;{ \&quot;message\&quot;: \&quot;test phrase\&quot; }&quot; http://localhost:8080/estimate
+</pre></div>
+</div>
+<p>On Windows (in Powershell):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ Invoke-WebRequest http://192.168.99.100:8080/estimate -Method POST -Body &quot;{ &quot;&quot;message&quot;&quot;: &quot;&quot;test phrase&quot;&quot; }&quot;
 </pre></div>
 </div>
 <p>You should see the following output in the terminal running the pipeline:</p>
@@ -328,11 +333,32 @@ this command: <code class="docutils literal notranslate"><span class="pre">$</sp
 <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">output_data</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>Restart the web server, use the same <code class="docutils literal notranslate"><span class="pre">curl</span></code> command and you should see the following output:</p>
+<p>Restart the web server, use the same command as before and you should see the following output:</p>
+<p>On Linux/MacOS:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">Total</span>    <span class="o">%</span> <span class="n">Received</span> <span class="o">%</span> <span class="n">Xferd</span>  <span class="n">Average</span> <span class="n">Speed</span>   <span class="n">Time</span>    <span class="n">Time</span>     <span class="n">Time</span>  <span class="n">Current</span>
                                 <span class="n">Dload</span>  <span class="n">Upload</span>   <span class="n">Total</span>   <span class="n">Spent</span>    <span class="n">Left</span>  <span class="n">Speed</span>
 <span class="mi">100</span>    <span class="mi">53</span>  <span class="mi">100</span>    <span class="mi">25</span>  <span class="mi">100</span>    <span class="mi">28</span>    <span class="mi">806</span>    <span class="mi">903</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span>  <span class="mi">1709</span>
 <span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST PHRASE&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>On Windows (in Powershell):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">StatusCode</span>        <span class="p">:</span> <span class="mi">200</span>
+<span class="n">StatusDescription</span> <span class="p">:</span> <span class="n">OK</span>
+<span class="n">Content</span>           <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST PHRASE&quot;</span><span class="p">}</span>
+<span class="n">RawContent</span>        <span class="p">:</span> <span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span> <span class="mi">200</span> <span class="n">OK</span>
+                    <span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">:</span> <span class="mi">25</span>
+                    <span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span><span class="p">;</span> <span class="n">charset</span><span class="o">=</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+                    <span class="n">Date</span><span class="p">:</span> <span class="n">Mon</span><span class="p">,</span> <span class="mi">17</span> <span class="n">Jun</span> <span class="mi">2019</span> <span class="mi">06</span><span class="p">:</span><span class="mi">43</span><span class="p">:</span><span class="mi">54</span> <span class="n">GMT</span>
+                    <span class="n">Server</span><span class="p">:</span> <span class="n">TornadoServer</span><span class="o">/</span><span class="mf">6.0</span><span class="o">.</span><span class="mi">2</span>
+
+                    <span class="p">{</span><span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST PHRASE&quot;</span><span class="p">}</span>
+<span class="n">Forms</span>             <span class="p">:</span> <span class="p">{}</span>
+<span class="n">Headers</span>           <span class="p">:</span> <span class="p">{[</span><span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span> <span class="p">[</span><span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">,</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span><span class="p">;</span> <span class="n">charset</span><span class="o">=</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="n">Date</span><span class="p">,</span> <span class="n">Mon</span><span class="p">,</span> <span class="mi">17</span> <span class="n">Jun</span> <span class="mi">2019</span> <span class="mi">06</span><span class="p">:</span><span class="mi">43</span><span class="p">:</span><span class="mi">54</span> <span class="n">GMT</span><span class="p">],</span> <span class="p">[</span><span class="n">Server</span><span class="p">,</span> <span class="n">TornadoServer</span><span class="o">/</span><span class="mf">6.0</span><span class="o">.</span><span class="mi">2</span><span class="p">]}</span>
+<span class="n">Images</span>            <span class="p">:</span> <span class="p">{}</span>
+<span class="n">InputFields</span>       <span class="p">:</span> <span class="p">{}</span>
+<span class="n">Links</span>             <span class="p">:</span> <span class="p">{}</span>
+<span class="n">ParsedHtml</span>        <span class="p">:</span> <span class="n">mshtml</span><span class="o">.</span><span class="n">HTMLDocumentClass</span>
+<span class="n">RawContentLength</span>  <span class="p">:</span> <span class="mi">25</span>
 </pre></div>
 </div>
 <p>Thats it, you are now serving a Surround pipeline! Now you could potentially use this pipeline in virtually any
@@ -367,7 +393,6 @@ using the <code class="docutils literal notranslate"><span class="pre">BatchRunn
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Users's Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
@@ -380,9 +405,8 @@ using the <code class="docutils literal notranslate"><span class="pre">BatchRunn
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli-guide.html">Command-line Interface</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="surround.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surround.html">API Reference</a></li>
 </ul>
 
 <div class="relations">
