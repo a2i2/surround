@@ -46,11 +46,13 @@ def task_batch():
 def task_train_local():
     """Run training mode locally"""
     return {{
+        'basename': 'trainLocal',
         'actions': ["%s -m {project_name} --mode train" % sys.executable]
     }}
 
 def task_batch_local():
     """Run batch mode locally"""
     return {{
+        'basename': 'batchLocal',
         'actions': ["%s -m {project_name} --mode batch" % sys.executable]
     }}
