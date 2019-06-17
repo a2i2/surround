@@ -99,3 +99,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Doit files
+.doit*
