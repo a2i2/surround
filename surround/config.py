@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from collections.abc import Mapping
 from pkg_resources import resource_stream
+from .remote.cli import get_project_root_from_current_dir
 
 import yaml
 
@@ -47,7 +48,7 @@ class Config(Mapping):
         SURRROUND_PREDICT_DEBUG=False
     """
 
-    def __init__(self, project_root=None, package_path=None):
+    def __init__(self, project_root=get_project_root_from_current_dir(), package_path=None):
         """
         Constructor of the Config class, loads the default YAML file into storage.
         If the :attr:`project_root` is provided then the project's `config.yaml`
