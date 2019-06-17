@@ -11,7 +11,7 @@ Surround is a lightweight framework for serving machine learning pipelines in Py
 
 ### Used in projects by:
 
-<img src="./docs/source/a2i2_logo.png" width="300">
+<img src="./docs/source/a2i2_logo.PNG" width="300">
 
 ## Installation
 
