@@ -3,7 +3,7 @@
 About
 =====
 
-What is Surround exactly?
+What is Surround?
 *************************
 
 Surround is an open-source framework developed by the Applied Artificial Intelligence Institute (`A`:superscript:`2`\ `I`:superscript:`2`) to take machine
