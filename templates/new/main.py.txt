@@ -5,6 +5,7 @@ from {runner_file} import {runner_class}
 
 def main():
     assembler = Assembler("Default project", ValidateData(), Main())
+    assembler.load_config("{project_name}")
     {runner_class}(assembler).run()
 
 

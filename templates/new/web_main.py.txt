@@ -13,6 +13,8 @@ def main():
 
 def execute_assembler(mode):
     assembler = Assembler("Default project", ValidateData(), Main())
+    assembler.load_config("{project_name}")
+
     if mode == "train":
         BatchRunner(assembler).run(True)
     elif mode == "batch":
