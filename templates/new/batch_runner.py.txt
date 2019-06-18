@@ -1,13 +1,13 @@
 import logging
 from surround import Runner
-from stages import {project_name}Data
+from stages import {safe_project_name}Data
 
 logging.basicConfig(level=logging.INFO)
 
 class BatchRunner(Runner):
     def run(self, is_training=False):
         self.assembler.init_assembler(True)
-        data = {project_name}Data()
+        data = {safe_project_name}Data()
 
         # Load data to be processed
         raw_data = "TODO: Load raw data here"
