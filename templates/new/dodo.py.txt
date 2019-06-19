@@ -20,7 +20,7 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["project_root"], IMAGE)]
+        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)]
     }}
 
 def task_prod():
@@ -32,12 +32,18 @@ def task_prod():
 
 def task_train():
     """Run training mode inside the container"""
+    output_path = CONFIG["volume_path"] + "/output"
+    data_path = CONFIG["volume_path"] + "/data"
+
     return {{
-        'actions': ["docker run %s python3 -m {project_name} --mode train" % IMAGE]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode train" % (output_path, data_path, IMAGE)]
     }}
 
 def task_batch():
     """Run batch mode inside the container"""
+    output_path = CONFIG["volume_path"] + "/output"
+    data_path = CONFIG["volume_path"] + "/data"
+
     return {{
-        'actions': ["docker run %s python3 -m {project_name} --mode batch" % IMAGE]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode batch" % (output_path, data_path, IMAGE)]
     }}
