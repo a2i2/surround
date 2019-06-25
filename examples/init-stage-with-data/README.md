@@ -2,7 +2,7 @@
 In this example, values are loaded to a data object in each stage and printed to screen.
 
 - In each of the two stages defined (HelloSurround and HelloWorld), the constructor initialises a variable self.data.
-- In the `init_stage()` method, the file with the text to be loaded is read by accessing the path set in config.yaml
+- In the `initialise()` method, the file with the text to be loaded is read by accessing the path set in config.yaml
 for the corresponding stage, the file contents are saved in the data variable.
 - In each stage's `operate()` method, the contents of the stage's data are printed to screen.
 

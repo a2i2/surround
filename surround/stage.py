@@ -23,7 +23,7 @@ class Stage(ABC):
         :type config: :class:`surround.config.Config`
         """
 
-    def init_stage(self, config):
+    def initialise(self, config):
         """
         Initialise the stage, this may be loading a model or loading data.
 

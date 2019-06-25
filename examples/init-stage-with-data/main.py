@@ -9,7 +9,7 @@ class HelloWorld(Estimator):
     def __init__(self):
         self.file_ = None
 
-    def init_stage(self, config):
+    def initialise(self, config):
         filename = config.get_path("surround.path_to_HelloWorld")
         self.file_ = open(prefix + filename, "r")
 

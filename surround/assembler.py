@@ -111,9 +111,9 @@ class Assembler(ABC):
         try:
             if self.pre_filters:
                 for pre_filter in self.pre_filters:
-                    pre_filter.init_stage(self.config)
+                    pre_filter.initialise(self.config)
 
-            self.estimator.init_stage(self.config)
+            self.estimator.initialise(self.config)
 
             if self.post_filters:
                 for post_filter in self.post_filters:
