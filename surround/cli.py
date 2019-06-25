@@ -424,7 +424,7 @@ def execute_cli():
     """
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
-    parser.add_argument('-v', '--version', help="Show the current version of Surround")
+    parser.add_argument('-v', '--version', action='store_true', help="Show the current version of Surround")
 
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
 
