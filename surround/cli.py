@@ -400,6 +400,13 @@ def parse_tool_args(parsed_args, remote_parser, tool):
     else:
         parse_init_args(parsed_args)
 
+def print_version():
+    """
+    Prints the current Surround package version to the console.
+    """
+
+    print("Surround v" + pkg_resources.get_distribution("surround").version)
+
 def execute_cli():
     """
     Uses the argparse module to parse sys.argv for sub-commands and any arguments (if required).
@@ -417,6 +424,8 @@ def execute_cli():
     """
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
+    parser.add_argument('-v', '--version', help="Show the current version of Surround")
+
     sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
 
     init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
@@ -445,6 +454,8 @@ def execute_cli():
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
+        elif sys.argv[1] in ['-v', '--version']:
+            print_version()
         elif len(sys.argv) < 2 or not sys.argv[1] in tools:
             print("Invalid subcommand, must be one of %s" % tools)
             parser.print_help()
