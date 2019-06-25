@@ -201,7 +201,7 @@ class Main(Estimator):
         print("No training implemented")
 
 
-class ProjectData(SurroundData):
+class ProjectData(State):
     """
     Class containing the data passed between each :class:`LinterStage`.
 

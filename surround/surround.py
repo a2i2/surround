@@ -44,7 +44,7 @@ class Frozen():
         self.__isfrozen = False
 
 
-class SurroundData(Frozen):
+class State(Frozen):
     """
     Stores the data to be passed between each stage in a pipeline.
     Each stage is responsible for setting the attributes to this class.

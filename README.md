@@ -29,6 +29,7 @@ $ pip3 install surround
 
 A short explanation is provided in the hello-world example's [README](examples/hello-world/) file.
 ```python
+from surround import Stage, State, Surround
 import logging
 from surround import SurroundData, Validator, Estimator, Assembler
 
@@ -44,7 +45,7 @@ class ValidateData(Validator):
         if surround_data.text:
             raise ValueError("'text' is not None")
 
-class BasicData(SurroundData):
+class BasicData(State):
     text = None
 
 if __name__ == "__main__":

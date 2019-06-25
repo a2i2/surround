@@ -9,7 +9,7 @@ client's complaint (column 'Consumer complaint narrative').
 
  - `CSVValidator` inherits from `Validator` will validate that `inputs` is properly loaded.
 
- - `BasicData` inherits from `SurroundData` and consists of three fields: **row_dict** (the row as read from the csv file),
+ - `BasicData` inherits from `State` and consists of three fields: **row_dict** (the row as read from the csv file),
  **word_count** and **company**.
 
  - The `assembler.run()` method calls the `estimate()` method of the stage `ProcessCSV`, where the word_count

@@ -42,7 +42,7 @@ class Visualiser(ABC):
         .. note:: This should only be called by the :ref:`assembler`!
 
         :param surround_data: Stores the results of the pipeline execution
-        :type surround_data: Instance or child of :class:`surround.SurroundData`
+        :type surround_data: Instance or child of :class:`surround.State`
         :param config: Config of the pipeline
         :type config: :class:`surround.config.Config`
         """

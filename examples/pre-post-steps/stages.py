@@ -1,4 +1,4 @@
-from surround import Filter, Estimator, SurroundData, Validator
+from surround import Filter, Estimator, State, Validator
 
 
 class AddHello(Filter):
@@ -19,7 +19,7 @@ class AddSurround(Filter):
         surround_data.text += ", Surround"
 
 
-class BasicData(SurroundData):
+class BasicData(State):
     text = None
 
 

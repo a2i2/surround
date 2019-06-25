@@ -1,7 +1,7 @@
 import logging
 import os
 
-from surround import Estimator, SurroundData, Assembler, Config, Validator
+from surround import Estimator, State, Assembler, Config, Validator
 
 prefix = ""
 
@@ -20,7 +20,7 @@ class HelloWorld(Estimator):
         print("No training implemented")
 
 
-class BasicData(SurroundData):
+class BasicData(State):
     text = None
 
 

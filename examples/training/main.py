@@ -1,5 +1,5 @@
 import logging
-from surround import SurroundData, Validator, Estimator, Assembler, Visualiser
+from surround import State, Validator, Estimator, Assembler, Visualiser
 
 
 class HelloWorld(Estimator):
@@ -20,7 +20,7 @@ class ValidateData(Validator):
             raise ValueError("'text' is not None")
 
 
-class BasicData(SurroundData):
+class BasicData(State):
     training_message = None
     text = None
 

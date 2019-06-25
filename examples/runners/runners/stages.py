@@ -1,7 +1,7 @@
-from surround import Validator, Estimator, SurroundData
+from surround import Validator, Estimator, State
 
 
-class RunnersData(SurroundData):
+class RunnersData(State):
     input_data = None
     output_data = ""
 

@@ -1,6 +1,6 @@
 import unittest
 import os
-from surround import Assembler, Estimator, SurroundData, Config, Validator, Filter
+from surround import Assembler, Estimator, State, Config, Validator
 
 
 test_text = "hello"
@@ -16,7 +16,7 @@ class HelloStage(Estimator):
         print("No training implemented")
 
 
-class BasicData(SurroundData):
+class BasicData(State):
     text = None
     config_value = None
     stage1 = None

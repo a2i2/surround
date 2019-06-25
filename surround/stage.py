@@ -18,7 +18,7 @@ class Stage(ABC):
         .. note:: This is called by :meth:`surround.assembler.Assembler.run` (when dumping output is requested).
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`surround.SurroundData`
+        :type surround_data: Instance or child of the State class
         :param config: Config of the pipeline
         :type config: :class:`surround.config.Config`
         """
@@ -58,7 +58,7 @@ class Validator(ABC):
         .. note:: This should only be called by :meth:`surround.assembler.Assembler.run`.
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`surround.SurroundData`
+        :type surround_data: Instance or child of the State class
         :param config: Config of the pipeline
         :type config: :class:`surround.config.Config`
         """
@@ -110,7 +110,7 @@ class Filter(Stage):
         .. note:: This should only be called by :meth:`surround.assembler.Assembler.run`.
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`surround.SurroundData`
+        :type surround_data: Instance or child of the State class
         :param config: Contains the settings for each stage
         :type config: :class:`surround.config.Config`
         """
@@ -145,7 +145,7 @@ class Estimator(Stage):
                   running in predict/batch-predict mode.
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`surround.SurroundData`
+        :type surround_data: Instance or child of the State class
         :param config: Contains the settings for each stage
         :type config: :class:`surround.config.Config`
         """
@@ -158,7 +158,7 @@ class Estimator(Stage):
                   running in training mode.
 
         :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of :class:`surround.SurroundData`
+        :type surround_data: Instance or child of the State class
         :param config: Contains the settings for each stage
         :type config: :class:`surround.config.Config`
         """

@@ -22,10 +22,10 @@ Assembler
  
         .. automodule:: surround  
  
-    SurroundData                              
+    State                              
     ^^^^^^^^^^^^   
                 
-    .. autoclass:: surround.SurroundData        
+    .. autoclass:: surround.State        
         :members:                   
 
     .. automodule:: surround.stage

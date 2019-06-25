@@ -1,6 +1,6 @@
 import logging
 import os
-from surround import Validator, Filter, Estimator, SurroundData, Assembler, Config
+from surround import Validator, Filter, Estimator, State, Assembler, Config
 
 hello_file_path = "/stages/WriteHello/Output.txt"
 world_file_path = "/stages/WriteWorld/Output.txt"
@@ -34,7 +34,7 @@ class WriteWorld(Estimator):
         print("Not training implementation")
 
 
-class BasicData(SurroundData):
+class BasicData(State):
     text = None
 
 

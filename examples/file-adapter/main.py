@@ -2,7 +2,7 @@ import logging
 import os
 import csv
 
-from surround import Estimator, SurroundData, Assembler, Validator, Config, Runner
+from surround import Estimator, State, Assembler, Validator, Config, Runner
 
 prefix = ""
 
@@ -51,7 +51,7 @@ class ProcessCSV(Estimator):
         print("No training implemented")
 
 
-class BasicData(SurroundData):
+class BasicData(State):
     outputs = []
     row = None
     word_count = None
