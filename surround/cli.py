@@ -201,13 +201,13 @@ def is_valid_name(aparser, arg):
     :rype: string
     """
 
-    if not arg.isalpha() or not arg.islower():
-        aparser.error("Name %s must be lowercase letters" % arg)
+    if not re.match("^[A-Za-z_]*$", arg) or not arg.islower():
+        aparser.error("Name %s must be lowercase letters and underscores only" % arg)
     else:
         return arg
 
 def make_name_safe(project_name):
-    words = re.split('_|-', project_name)
+    words = re.split('_', project_name)
     result = ''
 
     for word in words:
@@ -352,8 +352,8 @@ def parse_init_args(args):
         else:
             while True:
                 project_name = input("Name of project: ")
-                if not re.match("^[A-Za-z_-]*$", project_name) or not project_name.islower():
-                    print("error: project name requires lowercase letters and hyphens only")
+                if not re.match("^[A-Za-z_]*$", project_name) or not project_name.islower():
+                    print("error: project name requires lowercase letters and underscores only")
                 else:
                     break
 
