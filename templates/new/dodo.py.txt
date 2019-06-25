@@ -35,19 +35,19 @@ def task_prod():
 def task_train():
     """Run training mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
-    data_path = CONFIG["volume_path"] + "/data"
+    data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m %s --mode train" % (output_path, data_path, IMAGE, PACKAGE_PATH)]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train" % (output_path, data_path, IMAGE)]
     }}
 
 def task_batch():
     """Run batch mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
-    data_path = CONFIG["volume_path"] + "/data"
+    data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m %s --mode batch" % (output_path, data_path, IMAGE, PACKAGE_PATH)]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch" % (output_path, data_path, IMAGE)]
     }}
 
 def task_train_local():
