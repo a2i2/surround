@@ -3,7 +3,7 @@ from stages import Main, ValidateData
 from {runner_file} import {runner_class}
 
 
-def main():
+def main() -> None:
     assembler = Assembler("Default project", ValidateData(), Main())
     {runner_class}(assembler).run()
 

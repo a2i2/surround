@@ -4,13 +4,13 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-from surround import Runner
+from surround import Runner, Assembler
 from stages import {safe_project_name}Data
 
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
-    def run(self, is_training=False):
+    def run(self, is_training: bool = False) -> None:
         # Setup web service
         self.assembler.init_assembler()
         self.application = Application(self.assembler)
@@ -20,7 +20,7 @@ class WebRunner(Runner):
 
 
 class Application(tornado.web.Application):
-    def __init__(self, assembler):
+    def __init__(self, assembler: Assembler) -> None:
         handlers = [
             (r"/estimate", EstimateHandler, {{'assembler': assembler}}),
             (r"/info", InfoHandler, {{'assembler': assembler}}),
@@ -29,11 +29,11 @@ class Application(tornado.web.Application):
 
 
 class EstimateHandler(tornado.web.RequestHandler):
-    def initialize(self, assembler):
-        self.assembler = assembler
-        self.data = {safe_project_name}Data()
+    def initialize(self, assembler: Assembler) -> None:
+        self.assembler: Assembler = assembler
+        self.data: {safe_project_name}Data = {safe_project_name}Data()
 
-    def post(self):
+    def post(self) -> None:
         req_data = json.loads(self.request.body)
 
         # Clean output_data on every request
@@ -48,8 +48,8 @@ class EstimateHandler(tornado.web.RequestHandler):
 
 
 class InfoHandler(tornado.web.RequestHandler):
-    def initialize(self, assembler):
-        self.assembler = assembler
+    def initialize(self, assembler: Assembler) -> None:
+        self.assembler: Assembler = assembler
 
-    def get(self):
+    def get(self) -> None:
       self.write({{'version': '0.0.1'}})
