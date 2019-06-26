@@ -2,12 +2,21 @@ import logging
 import os
 import csv
 
+from typing import List, Tuple
 from surround import Estimator, SurroundData, Assembler, Validator, Config, Runner
 
 prefix = ""
 
+
+class BasicData(SurroundData):
+    outputs: List[Tuple[int, str]] = []
+    row: int = None
+    word_count: int = None
+    company: str = None
+
+
 class MainRunner(Runner):
-    def run(self, is_training=False):
+    def run(self, is_training: bool = False) -> None:
         self.assembler.init_assembler()
         data = BasicData()
         input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
@@ -21,7 +30,7 @@ class MainRunner(Runner):
 
         self.save_result(data, self.assembler.config)
 
-    def save_result(self, surround_data, config):
+    def save_result(self, surround_data: BasicData, config: Config) -> None:
         output_path = prefix + config.get_path("Surround.Loader.output")
         with open(output_path, "w") as output_file:
             for a, b in surround_data.outputs:
@@ -33,13 +42,13 @@ class MainRunner(Runner):
 
 
 class CSVValidator(Validator):
-    def validate(self, surround_data, config):
+    def validate(self, surround_data: BasicData, config: Config) -> None:
         if not surround_data.active_row:
             raise ValueError("'active_row' is empty")
 
 
 class ProcessCSV(Estimator):
-    def estimate(self, surround_data, config):
+    def estimate(self, surround_data: BasicData, config: Config) -> None:
         surround_data.word_count = len(surround_data.active_row['Consumer complaint narrative'].split())
 
         if config and config.get_path("ProcessCSV.include_company"):
@@ -47,15 +56,8 @@ class ProcessCSV(Estimator):
 
         surround_data.outputs.append((surround_data.word_count, surround_data.company))
 
-    def fit(self, surround_data, config):
+    def fit(self, surround_data: BasicData, config: Config) -> None:
         print("No training implemented")
-
-
-class BasicData(SurroundData):
-    outputs = []
-    row = None
-    word_count = None
-    company = None
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ class WebRunner(Runner):
     def run(self, is_training: bool = False) -> None:
         # Setup web service
         self.assembler.init_assembler()
-        self.application = Application(self.assembler)
+        self.application: Application = Application(self.assembler)
         self.application.listen(8080)
         logging.info("Server started at http://localhost:8080")
         tornado.ioloop.IOLoop.instance().start()

@@ -4,7 +4,7 @@ from .batch_runner import BatchRunner
 # pylint: disable=unused-import
 from .web_runner import WebRunner
 
-def main():
+def main() -> None:
     assembler = Assembler("Default project", ValidateData(), HelloWorld())
 
     # Example for running batch processing

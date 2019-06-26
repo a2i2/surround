@@ -5,7 +5,7 @@ from .stages import RunnersData
 
 class BatchRunner(Runner):
 
-    def run(self, is_training=False):
+    def run(self, is_training: bool = False) -> None:
         self.assembler.init_assembler(True)
 
         path = os.path.dirname(__file__) + "/data/input.txt"

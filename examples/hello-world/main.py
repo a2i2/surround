@@ -1,23 +1,23 @@
 import logging
-from surround import SurroundData, Validator, Estimator, Assembler
+from surround import SurroundData, Validator, Estimator, Assembler, Config
+
+
+class BasicData(SurroundData):
+    text: str = None
 
 
 class HelloWorld(Estimator):
-    def estimate(self, surround_data, config):
+    def estimate(self, surround_data: BasicData, config: Config) -> None:
         surround_data.text = "Hello world"
 
-    def fit(self, surround_data, config):
+    def fit(self, surround_data: BasicData, config: Config) -> None:
         print("No training implemented")
 
 
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
+    def validate(self, surround_data: BasicData, config: Config) -> None:
         if surround_data.text:
             raise ValueError("'text' is not None")
-
-
-class BasicData(SurroundData):
-    text = None
 
 
 if __name__ == "__main__":

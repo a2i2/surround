@@ -1,31 +1,33 @@
 import logging
 import os
 
+from typing import TextIO
 from surround import Estimator, SurroundData, Assembler, Config, Validator
 
 prefix = ""
 
-class HelloWorld(Estimator):
-    def __init__(self):
-        self.file_ = None
 
-    def init_stage(self, config):
+class BasicData(SurroundData):
+    text: str = None
+
+
+class HelloWorld(Estimator):
+    def __init__(self) -> None:
+        self.file_: TextIO = None
+
+    def init_stage(self, config: Config) -> None:
         filename = config.get_path("surround.path_to_HelloWorld")
         self.file_ = open(prefix + filename, "r")
 
-    def estimate(self, surround_data, config):
+    def estimate(self, surround_data: BasicData, config: Config) -> None:
         surround_data.text = self.file_.read()
 
-    def fit(self, surround_data, config):
+    def fit(self, surround_data: BasicData, config: Config) -> None:
         print("No training implemented")
 
 
-class BasicData(SurroundData):
-    text = None
-
-
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
+    def validate(self, surround_data: BasicData, config: Config) -> None:
         if surround_data.text:
             raise ValueError("'text' is not None")
 

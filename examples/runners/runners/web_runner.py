@@ -4,22 +4,22 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-from surround import Runner
+from surround import Runner, Assembler
 from .stages import RunnersData
 
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
-    def run(self, is_training=False):
+    def run(self, is_training: bool = False) -> None:
         self.assembler.init_assembler()
-        self.application = Application(self.assembler)
+        self.application: Application = Application(self.assembler)
         self.application.listen(8080)
         logging.info("Server started at http://localhost:8080")
         tornado.ioloop.IOLoop.instance().start()
 
 
 class Application(tornado.web.Application):
-    def __init__(self, assembler):
+    def __init__(self, assembler: Assembler) -> None:
         handlers = [
             (r"/message", MessageHandler, {'assembler': assembler})
         ]
@@ -27,11 +27,11 @@ class Application(tornado.web.Application):
 
 
 class MessageHandler(tornado.web.RequestHandler):
-    def initialize(self, assembler):
-        self.assembler = assembler
-        self.data = RunnersData()
+    def initialize(self, assembler: Assembler) -> None:
+        self.assembler: Assembler = assembler
+        self.data: RunnersData = RunnersData()
 
-    def post(self):
+    def post(self) -> None:
         req_data = json.loads(self.request.body)
 
         # Clean output_data on every request
