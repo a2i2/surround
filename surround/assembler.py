@@ -90,6 +90,7 @@ class Assembler(ABC):
         self.post_filters = None
         self.visualiser = None
         self.batch_mode = False
+        self.finaliser = None
 
     def init_assembler(self, batch_mode=False):
         """
@@ -151,6 +152,9 @@ class Assembler(ABC):
             self.__run_pipeline(is_training)
         except Exception:
             LOGGER.exception("Failed running Assembler")
+        finally:
+            if self.finaliser:
+                self.finaliser.operate(surround_data, self.config)
 
     def __run_pipeline(self, is_training):
         """
@@ -358,3 +362,9 @@ class Assembler(ABC):
         if not visualiser and not isinstance(visualiser, Visualiser):
             raise TypeError("visualiser should be of class Visualiser")
         self.visualiser = visualiser
+
+    def set_finaliser(self, finaliser):
+        # finaliser must be a type of filter
+        if not finaliser and not isinstance(finaliser, Filter):
+            raise TypeError("finaliser should be of class Filter")
+        self.finaliser = finaliser
