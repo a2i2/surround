@@ -1,6 +1,7 @@
 import os
 from abc import abstractmethod
 from pathlib import Path
+from typing import List, Any, Union
 import yaml
 from surround.config import Config
 
@@ -32,11 +33,11 @@ class BaseRemote():
     - file_exists_on_remote(path_to_remote, relative_path_to_remote_file, append_to)
     """
 
-    def __init__(self):
-        self.message = ""
-        self.messages = []
+    def __init__(self) -> None:
+        self.message: str = ""
+        self.messages: List[str] = []
 
-    def write_config(self, what_to_write, file_, name, path=None):
+    def write_config(self, what_to_write: str, file_: str, name: str, path: str = None) -> None:
         """
         Write configuration data to a YAML file specified.
 
@@ -72,7 +73,7 @@ class BaseRemote():
         with open(file_, "w") as f:
             yaml.dump(read_config, f, default_flow_style=False)
 
-    def read_from_config(self, what_to_read, key):
+    def read_from_config(self, what_to_read: str, key: str) -> Any:
         """
         Reads data from first the local config and if no data found tries the global config.
 
@@ -87,7 +88,7 @@ class BaseRemote():
         local = self.read_from_local_config(what_to_read, key)
         return local if local is not None else self.read_from_global_config(what_to_read, key)
 
-    def read_from_local_config(self, what_to_read, key):
+    def read_from_local_config(self, what_to_read: str, key: str) -> Any:
         """
         Reads data from the local config YAML file.
         The local config file can be found at ".surround/config.yaml".
@@ -107,7 +108,7 @@ class BaseRemote():
             read_items = config.get(what_to_read, None)
             return read_items.get(key, None) if read_items is not None else None
 
-    def read_from_global_config(self, what_to_read, key):
+    def read_from_global_config(self, what_to_read: str, key: str) -> Any:
         """
         Reads data from the global config YAML file.
         The global config file can be found at "$HOME/.surround/config.yaml".
@@ -127,7 +128,7 @@ class BaseRemote():
             read_items = config.get(what_to_read, None)
             return read_items.get(key, None) if read_items is not None else None
 
-    def read_all_from_local_config(self, what_to_read):
+    def read_all_from_local_config(self, what_to_read: str) -> Any:
         """
         Reads all data for a specified category from the local config file.
         The local config file can be found at ".surround/config.yaml".
@@ -145,7 +146,7 @@ class BaseRemote():
             read_items = config.get(what_to_read, None)
             return read_items
 
-    def read_all_from_global_config(self, what_to_read):
+    def read_all_from_global_config(self, what_to_read: str) -> Any:
         """
         Reads all data for a specified category from the global config file.
         The global config file can be found at "$HOME/.surround/config.yaml".
@@ -164,7 +165,7 @@ class BaseRemote():
             read_items = config.get(what_to_read, None)
             return read_items
 
-    def add(self, add_to, key):
+    def add(self, add_to: str, key: str) -> str:
         """
         Add a file to the remote specified.
 
@@ -195,7 +196,7 @@ class BaseRemote():
 
         return self.message
 
-    def pull(self, what_to_pull, key=None):
+    def pull(self, what_to_pull: str, key: str = None) -> str:
         """
         Pull file(s) from the remote specified, if no file specified, all files will be pulled.
         This will not overwrite already existing files locally.
@@ -241,7 +242,7 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def pull_file(self, what_to_pull: str, key: str, path_to_remote: str, relative_path_to_remote_file: str, path_to_local_file: str) -> str:
         """
         Get the file stored on the remote and save it locally.
 
@@ -257,7 +258,7 @@ class BaseRemote():
         :rtype: string
         """
 
-    def push(self, what_to_push, key=None):
+    def push(self, what_to_push: str, key: str = None) -> str:
         """
         Push file(s) to the remote, if no file specified then all files will be pushed.
 
@@ -303,8 +304,9 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def push_file(self, what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
-        """Get the file stored on the remote
+    def push_file(self, what_to_push: str, key: str, path_to_remote: str, relative_path_to_remote_file: str, path_to_local_file: str) -> str:
+        """
+        Get the file stored on the remote
 
         :param what_to_push: what to push to remote
         :type what_to_push: string
@@ -318,7 +320,7 @@ class BaseRemote():
         :rtype: string
         """
 
-    def list_(self, remote_to_list):
+    def list_(self, remote_to_list: str) -> Union[str, List[str]]:
         """
         Returns the list of files contained in the remote specified.
 
@@ -339,7 +341,7 @@ class BaseRemote():
         return self.list_files(path_to_remote, project_name)
 
     @abstractmethod
-    def list_files(self, path_to_remote, project_name):
+    def list_files(self, path_to_remote: str, project_name: str) -> Union[str, List[str]]:
         """
         Returns a list of files on the remote specified.
 
@@ -353,7 +355,7 @@ class BaseRemote():
 
         raise NotImplementedError
 
-    def get_file_name(self, file_):
+    def get_file_name(self, file_: str) -> str:
         """
         Extract filename from path specified.
 
@@ -365,7 +367,7 @@ class BaseRemote():
 
         return os.path.basename(file_)
 
-    def get_project_name(self):
+    def get_project_name(self) -> str:
         """
         Returns the project name found in the local config file.
 
@@ -378,7 +380,7 @@ class BaseRemote():
             return project_name
         self.add_message("error: project name not present in config")
 
-    def get_path_to_remote(self, remote_to_read):
+    def get_path_to_remote(self, remote_to_read: str) -> Union[str, None]:
         """
         Returns the path/URL to the remote saved in configuration.
 
@@ -393,7 +395,7 @@ class BaseRemote():
             return remote
         self.add_message("error: no remote named " + remote_to_read)
 
-    def add_message(self, message, append_to=True):
+    def add_message(self, message: str, append_to: bool = True) -> None:
         """
         Store message and if required append that to the list.
 
@@ -408,7 +410,7 @@ class BaseRemote():
             self.messages.append(self.message)
 
     @abstractmethod
-    def file_exists_on_remote(self, path_to_remote, relative_path_to_remote_file, append_to=True):
+    def file_exists_on_remote(self, path_to_remote: str, relative_path_to_remote_file: str, append_to: bool = True) -> bool:
         """
         Check if file is already present on remote. This is used to prevent overwriting of files.
 
@@ -420,7 +422,7 @@ class BaseRemote():
         :type append_to: bool
         """
 
-    def file_exists_locally(self, path_to_file, append_to=True):
+    def file_exists_locally(self, path_to_file: str, append_to: bool = True) -> bool:
         """
         Check if file is already present on remote. This is used to prevent overwriting of files.
 

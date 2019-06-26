@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+from argparse import ArgumentParser, Namespace
+from typing import Dict
 
 from . import base
 from . import local
@@ -7,10 +9,10 @@ from . import local
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/26'
 
-BASE_REMOTE = base.BaseRemote()
-LOCAL = local.Local()
+BASE_REMOTE: base.BaseRemote = base.BaseRemote()
+LOCAL: local.Local = local.Local()
 
-def is_surround_project():
+def is_surround_project() -> bool:
     """
     Checks whether inside a surround project folder.
     Check for the .surround folder.
@@ -24,7 +26,7 @@ def is_surround_project():
         return False
     return True
 
-def get_project_root_from_current_dir():
+def get_project_root_from_current_dir() -> str:
     """
     Returns the project root directory for the current project we're in.
 
@@ -34,7 +36,7 @@ def get_project_root_from_current_dir():
 
     return get_project_root(os.getcwd())
 
-def get_project_root(current_directory):
+def get_project_root(current_directory: str) -> str:
     """
     Returns the project root directory for the project at the provided directory.
 
@@ -53,7 +55,7 @@ def get_project_root(current_directory):
             return current_directory
         current_directory = parent_directory
 
-def add_remote_parser(sub_parser):
+def add_remote_parser(sub_parser: ArgumentParser) -> ArgumentParser:
     """
     Adds a sub-parser for the "remote" sub-command to the parser provided.
 
@@ -72,7 +74,7 @@ def add_remote_parser(sub_parser):
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
     return remote_parser
 
-def create_add_parser(sub_parser):
+def create_add_parser(sub_parser: ArgumentParser) -> None:
     """
     Adds a sub-parser for the "add" sub-command to the parser provided.
 
@@ -84,7 +86,7 @@ def create_add_parser(sub_parser):
     add_parser.add_argument('remote', help="remote to add to")
     add_parser.add_argument('key', help="name of file to add")
 
-def add_pull_parser(sub_parser):
+def add_pull_parser(sub_parser: ArgumentParser) -> None:
     """
     Adds a sub-parser for the "pull" sub-command to the parser provided.
 
@@ -96,7 +98,7 @@ def add_pull_parser(sub_parser):
     pull_parser.add_argument('remote', help="remote to pull")
     pull_parser.add_argument('-k', '--key', help="key of file to pull (from .surround/config.yaml)")
 
-def add_push_parser(sub_parser):
+def add_push_parser(sub_parser: ArgumentParser) -> None:
     """
     Adds a sub-parser for the "push" sub-command to the parser provided.
 
@@ -108,7 +110,7 @@ def add_push_parser(sub_parser):
     push_parser.add_argument('remote', help="remote to push")
     push_parser.add_argument('-k', '--key', help="key of file to push (from .surround/config.yaml)")
 
-def add_list_parser(sub_parser):
+def add_list_parser(sub_parser: ArgumentParser) -> None:
     """
     Adds a sub-parser for the "list" sub-command to the parser provided.
 
@@ -119,7 +121,7 @@ def add_list_parser(sub_parser):
     list_parser = sub_parser.add_parser('list', help="List file in remote")
     list_parser.add_argument('remote', help="remote to list")
 
-def write_remote_config(parsed_args, remote_parser, file_to_write, type_):
+def write_remote_config(parsed_args: Namespace, remote_parser: ArgumentParser, file_to_write: str, type_: str) -> None:
     """
     Writes the new remote's configuration to the specified YAML file.
 
@@ -144,7 +146,7 @@ def write_remote_config(parsed_args, remote_parser, file_to_write, type_):
         remote_parser.print_usage()
         print("error: [-a ADD] [-n NAME] [-u URL] are mutually inclusive")
 
-def add_remote(remote_parser, parsed_args, type_):
+def add_remote(remote_parser: ArgumentParser, parsed_args: Namespace, type_: str) -> None:
     """
     Adds a new remote to the current Surround project.
     Writes the new remote's information to the project's ".surround/config.yaml" file.
@@ -179,7 +181,7 @@ def add_remote(remote_parser, parsed_args, type_):
             else:
                 print("error: not a surround project")
 
-def print_remote_info(parsed_args, remotes):
+def print_remote_info(parsed_args: Namespace, remotes: Dict[str, str]) -> None:
     """
     Prints the collection of remotes to the console.
     If the "--verbose" argument is provided then the URL will be displayed too.
@@ -202,7 +204,7 @@ def print_remote_info(parsed_args, remotes):
     else:
         print("info: no remote found")
 
-def parse_remote_args(remote_parser, parsed_args):
+def parse_remote_args(remote_parser: ArgumentParser, parsed_args: Namespace) -> None:
     """
     Executes the "remote" sub-command which will either add new remote
     or list remotes in the current project depending on the arguments.
@@ -240,7 +242,7 @@ def parse_remote_args(remote_parser, parsed_args):
             else:
                 print("error: not a surround project")
 
-def parse_add_args(parsed_args):
+def parse_add_args(parsed_args: Namespace) -> None:
     """
     Executes the "add" sub-command which adds a file to a specified remote.
 
@@ -259,7 +261,7 @@ def parse_add_args(parsed_args):
     else:
         print("error: not a surround project")
 
-def parse_pull_args(parsed_args):
+def parse_pull_args(parsed_args: Namespace) -> None:
     """
     Executes the "pull" sub-command which pulls a file from a specified remote.
 
@@ -288,7 +290,7 @@ def parse_pull_args(parsed_args):
     else:
         print("error: not a surround project")
 
-def parse_push_args(parsed_args):
+def parse_push_args(parsed_args: Namespace) -> None:
     """
     Executes the "push" sub-command which pushes a file to a specified remote.
 
@@ -317,7 +319,7 @@ def parse_push_args(parsed_args):
     else:
         print("error: not a surround project")
 
-def parse_list_args(parsed_args):
+def parse_list_args(parsed_args: Namespace) -> None:
     """
     Executes the "list" sub-command which lists all the files in a specified remote.
 
@@ -344,7 +346,7 @@ def parse_list_args(parsed_args):
     else:
         print("error: not a surround project")
 
-def get_corresponding_remote(remote):
+def get_corresponding_remote(remote: str) -> base.BaseRemote:
     """
     Returns the remote corresponding to the URL given.
     NOTE: Only returns an instance of a Local remote, will be fully implemented later.
