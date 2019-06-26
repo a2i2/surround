@@ -1,12 +1,13 @@
 import ast
 import os
+from typing import MutableMapping, Any, Iterable, List, Dict
 from pathlib import Path
 from collections.abc import Mapping
 from pkg_resources import resource_stream
 
 import yaml
 
-ENV_VAR_PREFIX = "SURROUND_"
+ENV_VAR_PREFIX: str = "SURROUND_"
 
 class Config(Mapping):
     """
@@ -47,7 +48,7 @@ class Config(Mapping):
         SURRROUND_PREDICT_DEBUG=False
     """
 
-    def __init__(self, project_root=None, package_path=None):
+    def __init__(self, project_root: str = None, package_path: str = None) -> None:
         """
         Constructor of the Config class, loads the default YAML file into storage.
         If the :attr:`project_root` is provided then the project's `config.yaml`
@@ -62,7 +63,7 @@ class Config(Mapping):
         :type package_path: str
         """
 
-        self._storage = self.__load_defaults()
+        self._storage: MutableMapping[str, Any] = self.__load_defaults()
 
         # Set framework paths
         if project_root:
@@ -93,7 +94,7 @@ class Config(Mapping):
             if os.path.exists(config_path):
                 self.read_config_files([config_path])
 
-    def read_config_files(self, yaml_files):
+    def read_config_files(self, yaml_files: Iterable[str]) -> bool:
         """
         Parses the YAML files provided and stores their key-value pairs in config.
 
@@ -103,7 +104,7 @@ class Config(Mapping):
         :rtype: bool
         """
 
-        configs = []
+        configs: List[str] = []
         try:
             for path in yaml_files:
                 with open(path) as afile:
@@ -116,7 +117,7 @@ class Config(Mapping):
         self.__insert_environment_variables()
         return True
 
-    def read_from_dict(self, config_dict):
+    def read_from_dict(self, config_dict: Dict[str, Any]) -> bool:
         """
         Retrieve all key-value pairs from the dict provided and store in config.
 
@@ -133,7 +134,7 @@ class Config(Mapping):
         self.__insert_environment_variables()
         return True
 
-    def get_path(self, path):
+    def get_path(self, path: str) -> Any:
         """
         Returns value that can be found at the key path provided (useful for nested values).
 
@@ -154,7 +155,7 @@ class Config(Mapping):
             return self._storage[path]
         return self.__iterate_over_dict(self._storage, path.split("."))
 
-    def __load_defaults(self):
+    def __load_defaults(self) -> MutableMapping[str, Any]:
         """
         Returns the config key-value pairs loaded from defaults.yaml.
 
@@ -170,7 +171,7 @@ class Config(Mapping):
             raise
         return config
 
-    def __merge_configs(self, configs):
+    def __merge_configs(self, configs: Iterable[MutableMapping[str, Any]]) -> None:
         """
         Merges a list of dictionaries into the dictionary of this class. Note that lists are
         overriden completely not extended.
@@ -205,7 +206,7 @@ class Config(Mapping):
         for config in configs:
             extend_dict(self._storage, config)
 
-    def __insert_environment_variables(self):
+    def __insert_environment_variables(self) -> None:
         """
         Inserts environment variables prefixed with ENV_VAR_PREFIX into storage. Overriding any
         clashing key-value pairs in storage already.
@@ -221,7 +222,7 @@ class Config(Mapping):
             surround_variables = [n.lower() for n in var[len(ENV_VAR_PREFIX):].split("_") if n]
             self.__override_or_add_var(self._storage, surround_variables, os.getenv(var))
 
-    def __override_or_add_var(self, config, key_list, value):
+    def __override_or_add_var(self, config: MutableMapping[str, Any], key_list: List[str], value: Any) -> MutableMapping[str, Any]:
         """
         Recursively inserts or overrides the value in the storage specified at the specified path.
 
@@ -249,7 +250,7 @@ class Config(Mapping):
             config[new_key] = the_type(value)
         return config
 
-    def __iterate_over_dict(self, dictionary, key_list):
+    def __iterate_over_dict(self, dictionary: MutableMapping[str, Any], key_list: List[str]) -> Any:
         """
         Return the value of the last key in the key list provided by traversing the dict tree.
 
@@ -272,7 +273,7 @@ class Config(Mapping):
             return dictionary[key]
         return None
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         """
         Provides access to stored data via the [] operator.
 
@@ -303,7 +304,7 @@ class Config(Mapping):
 
         return iter(self._storage)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the length of the config dictionary.
 

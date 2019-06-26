@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-
+from .config import Config
+from .surround import SurroundData
 
 class Visualiser(ABC):
     """
@@ -32,7 +33,7 @@ class Visualiser(ABC):
     """
 
     @abstractmethod
-    def visualise(self, surround_data, config):
+    def visualise(self, surround_data: SurroundData, config: Config):
         """
         Prettify/format the data contained in ``surround_data``.
 

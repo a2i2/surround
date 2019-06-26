@@ -1,8 +1,38 @@
 import os
 import io
+from typing import List, Tuple
 from .stage import Filter, Estimator, Validator
 from .surround import SurroundData
 from .assembler import Assembler
+from .config import Config
+
+
+class ProjectData(SurroundData):
+    """
+    Class containing the data passed between each :class:`LinterStage`.
+
+    **Attributes:**
+
+    - :attr:`project_structure` - expected file structure of the surround project (:class:`dict`)
+    - :attr:`project_root` - path to the root of the surround project (:class:`str`)
+    - :attr:`project_name` - name of the surround project (:class:`str`)
+    """
+
+    def __init__(self, project_structure: dict, project_root: str, project_name: str) -> None:
+        """
+        Constructor for the ProjectData class.
+
+        :param project_structure: the expected file structure of the project
+        :type project_structure: dict
+        :param project_root: path to the root of the project
+        :type project_root: str
+        :param project_name: name of the project
+        :type project_name: str
+        """
+
+        self.project_structure: dict = project_structure
+        self.project_root: str = project_root
+        self.project_name: str = project_name
 
 
 class LinterStage(Filter):
@@ -30,10 +60,10 @@ class LinterStage(Filter):
         :type description: str
         """
 
-        self.key = key
-        self.description = description
+        self.key: str = key
+        self.description: str = description
 
-    def add_error(self, data, string):
+    def add_error(self, data: ProjectData, string: str) -> None:
         """
         Creates an error which will be displayed and stop the :class:`Linter`.
 
@@ -45,7 +75,7 @@ class LinterStage(Filter):
 
         data.errors.append("ERROR: %s_CHECK: %s" % (self.key, string))
 
-    def add_warning(self, data, string):
+    def add_warning(self, data: ProjectData, string: str) -> None:
         """
         Creates a warning that will be displayed but the :class:`Linter` will continue.
 
@@ -57,7 +87,7 @@ class LinterStage(Filter):
 
         data.warnings.append("WARNING: %s_CHECK: %s" % (self.key, string))
 
-    def operate(self, surround_data, config):
+    def operate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Executed by the :class:`Linter`, performs the linting specific to this stage.
         **Must** be implemented in extended versions of this class.
@@ -74,10 +104,10 @@ class CheckData(LinterStage):
     :class:`Linter` stage that checks the data folder in the surround project for files.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         LinterStage.__init__(self, "DATA", "Check data files")
 
-    def operate(self, surround_data, config):
+    def operate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Executed by the :class:`Linter`, checks if there is any files in the project's data folder.
         If there is none then a warning will be issued.
@@ -98,10 +128,10 @@ class CheckFiles(LinterStage):
     :class:`Linter` stage that checks the surround project files exist.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         LinterStage.__init__(self, "FILES", "Check for Surround project files")
 
-    def operate(self, surround_data, config):
+    def operate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Executed by the :class:`Linter`, checks if the files in the project structure exist.
         Will create errors if required surround project files are missing in the root directory.
@@ -126,12 +156,12 @@ class CheckDirectories(LinterStage):
     :class:`Linter` stage that checks the surround project directories exist.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         LinterStage.__init__(
             self, "DIRECTORIES",
             "Check for validating Surround's directory structure")
 
-    def operate(self, surround_data, config):
+    def operate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Executed by the :class:`Linter`, checks whether the project directories exist.
         If the expected directories don't exist then errors will be created.
@@ -176,16 +206,16 @@ class Main(Estimator):
     """
     Class responsible for executing all of the :class:`LinterStage`'s in the Surround Linter.
     """
-
-    def __init__(self, filters):
+    
+    def __init__(self, filters: List[LinterStage]) -> None:
         """
         :param filters: list of stages in the linter
         :type filters: list of :class:`LinterStage`
         """
+        
+        self.filters: List[LinterStage] = filters
 
-        self.filters = filters
-
-    def estimate(self, surround_data, config):
+    def estimate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Execute each stage in the linter.
         """
@@ -193,40 +223,12 @@ class Main(Estimator):
         for filters in self.filters:
             filters.operate(surround_data, config)
 
-    def fit(self, surround_data, config):
+    def fit(self, surround_data: SurroundData, config: Config) -> None:
         """
         Should never be called.
         """
 
         print("No training implemented")
-
-
-class ProjectData(SurroundData):
-    """
-    Class containing the data passed between each :class:`LinterStage`.
-
-    **Attributes:**
-
-    - :attr:`project_structure` - expected file structure of the surround project (:class:`dict`)
-    - :attr:`project_root` - path to the root of the surround project (:class:`str`)
-    - :attr:`project_name` - name of the surround project (:class:`str`)
-    """
-
-    def __init__(self, project_structure, project_root, project_name):
-        """
-        Constructor for the ProjectData class.
-
-        :param project_structure: the expected file structure of the project
-        :type project_structure: dict
-        :param project_root: path to the root of the project
-        :type project_root: str
-        :param project_name: name of the project
-        :type project_name: str
-        """
-
-        self.project_structure = project_structure
-        self.project_root = project_root
-        self.project_name = project_name
 
 
 class Linter():
@@ -240,9 +242,9 @@ class Linter():
     To add a new check to the linter, append an instance of it to the ``filters`` list.
     """
 
-    filters = [CheckDirectories(), CheckFiles(), CheckData()]
+    filters: List[LinterStage] = [CheckDirectories(), CheckFiles(), CheckData()]
 
-    def dump_checks(self):
+    def dump_checks(self) -> str:
         """
         Dumps a list of the checks in this linter.
         The list is compiled using the :attr:`LinterStage.key` and :attr:`LinterStage.description`
@@ -260,7 +262,7 @@ class Linter():
         return output
 
 
-    def check_project(self, project, project_root=os.curdir):
+    def check_project(self, project: dict, project_root: str = os.curdir) -> Tuple[List[str], List[str]]:
         """
         Runs the linter against the project specified, returning any warnings/errors.
 

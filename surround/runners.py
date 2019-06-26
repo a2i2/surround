@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+from .assembler import Assembler
 
 class Runner(ABC):
     """
@@ -33,16 +33,16 @@ class Runner(ABC):
               you generate a project using the CLI tool.
     """
 
-    def __init__(self, assembler):
+    def __init__(self, assembler: Assembler) -> None:
         """
         :param assembler: The assembler the runner will execute
         :type assembler: :class:`surround.assembler.Assembler`
         """
 
-        self.assembler = assembler
+        self.assembler: Assembler = assembler
 
     @abstractmethod
-    def run(self, is_training=False):
+    def run(self, is_training: bool = False) -> None:
         """
         Prepare data and execute the :class:`surround.assembler.Assembler`.
 

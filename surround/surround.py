@@ -2,6 +2,7 @@
 #
 # Manages a set of stages and the data that is passed between them.
 import logging
+from typing import Any, List
 
 LOGGER = logging.getLogger(__name__)
 
@@ -11,10 +12,10 @@ class Frozen():
     When the class is considered frozen, adding new attributes will
     trigger a :exc:`TypeError` exception.
     """
-
-    __isfrozen = False
-
-    def __setattr__(self, key, value):
+    
+    __isfrozen: bool = False
+    
+    def __setattr__(self, key: str, value: Any):
         """
         Called when an attribute is created/modified, throws an exception when frozen and adding a new attribute.
         Otherwise sets the attribute at the provided key to the provided value.
@@ -90,7 +91,7 @@ class SurroundData(Frozen):
         is added during pipeline execution.
     """
 
-    stage_metadata = []
-    execution_time = None
-    errors = []
-    warnings = []
+    stage_metadata: List[Any] = []
+    execution_time: float = None
+    errors: List[str] = []
+    warnings: List[str] = []

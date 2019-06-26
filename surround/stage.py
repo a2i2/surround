@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-
+from .config import Config
+from .surround import SurroundData
 
 class Stage(ABC):
     """
@@ -11,7 +12,7 @@ class Stage(ABC):
     - :class:`surround.stage.Filter`
     """
 
-    def dump_output(self, surround_data, config):
+    def dump_output(self, surround_data: SurroundData, config: Config) -> None:
         """
         Dump the output of the stage after the stage has transformed the data.
 
@@ -23,7 +24,7 @@ class Stage(ABC):
         :type config: :class:`surround.config.Config`
         """
 
-    def init_stage(self, config):
+    def init_stage(self, config: Config) -> None:
         """
         Initialise the stage, this may be loading a model or loading data.
 
@@ -50,7 +51,7 @@ class Validator(ABC):
     """
 
     @abstractmethod
-    def validate(self, surround_data, config):
+    def validate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Validate data being loaded into the pipeline. Appending to ``surround_data.errors``
         or ``surround_data.warnings`` when problems are found with the input data.
@@ -103,7 +104,7 @@ class Filter(Stage):
     """
 
     @abstractmethod
-    def operate(self, surround_data, config):
+    def operate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Modify data before/after it enters an :class:`surround.stage.Estimator`.
 
@@ -137,7 +138,7 @@ class Estimator(Stage):
     """
 
     @abstractmethod
-    def estimate(self, surround_data, config):
+    def estimate(self, surround_data: SurroundData, config: Config) -> None:
         """
         Process input data and store estimated values.
 
@@ -150,7 +151,7 @@ class Estimator(Stage):
         :type config: :class:`surround.config.Config`
         """
 
-    def fit(self, surround_data, config):
+    def fit(self, surround_data: SurroundData, config: Config) -> None:
         """
         Train a model using the input data.
 

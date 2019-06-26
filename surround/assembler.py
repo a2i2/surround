@@ -6,7 +6,9 @@ import logging
 
 from abc import ABC
 from datetime import datetime
+from typing import List
 
+from .surround import SurroundData
 from .config import Config
 from .visualiser import Visualiser
 from .stage import Filter, Estimator, Validator
@@ -59,13 +61,12 @@ class Assembler(ABC):
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, assembler_name="", validator=None, estimator=None, config=None):
         """
         Constructor for an Assembler pipeline:
 
         :param assembler_name: The name of the pipeline
-        :type assembler_name: str
         :param validator: The validator to use on input data (default: None)
+        :type assembler_name: str
         :type validator: :class:`surround.stage.Validator`
         :param estimator: The estimator to use on input data (default: None)
         :type estimator: :class:`surround.stage.Estimator`
@@ -73,6 +74,7 @@ class Assembler(ABC):
         :type config: :class:`surround.config.Config`
         """
 
+    def __init__(self, assembler_name: str = "", validator: Validator = None, estimator: Estimator = None, config: Config = None) -> None:
         if not validator:
             raise ValueError("'Validator' is required to run an assembler")
         if not isinstance(validator, Validator):
@@ -82,16 +84,17 @@ class Assembler(ABC):
         if config and not isinstance(config, Config):
             raise TypeError("'config' should be of class Config")
 
-        self.assembler_name = assembler_name
-        self.config = config
-        self.estimator = estimator
-        self.validator = validator
-        self.pre_filters = None
-        self.post_filters = None
-        self.visualiser = None
-        self.batch_mode = False
+        self.assembler_name: str = assembler_name
+        self.config: Config = config
+        self.estimator: Estimator = estimator
+        self.validator: Validator = validator
+        self.pre_filters: List[Filter] = None
+        self.post_filters: List[Filter] = None
+        self.visualiser: Visualiser = None
+        self.batch_mode: bool = False
+        self.surround_data: SurroundData = None
 
-    def init_assembler(self, batch_mode=False):
+    def init_assembler(self, batch_mode: bool = False) -> None:
         """
         Initializes the assembler and all of it's stages.
 
@@ -120,7 +123,7 @@ class Assembler(ABC):
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
-    def run(self, surround_data=None, is_training=False):
+    def run(self, surround_data: SurroundData = None, is_training: bool = False) -> None:
         """
         Run the pipeline using the input data provided.
 
@@ -152,7 +155,7 @@ class Assembler(ABC):
         except Exception:
             LOGGER.exception("Failed running Assembler")
 
-    def __run_pipeline(self, is_training):
+    def __run_pipeline(self, is_training: bool) -> None:
         """
         Executes the pre-filter(s), then the estimator (estimate/fit), then the post-filter(s)
         then the visualiser (only if ``is_training`` or ``batch_mode`` has been set).
@@ -175,7 +178,7 @@ class Assembler(ABC):
         if (is_training or self.batch_mode) and self.visualiser:
             self.visualiser.visualise(self.surround_data, self.config)
 
-    def __execute_filters(self, filters, surround_data):
+    def __execute_filters(self, filters: List[Filter], surround_data: SurroundData) -> None:
         """
         Safely executes each filter in the list provided on the
         data provided and calculates time taken to execute the filters.
@@ -204,7 +207,7 @@ class Assembler(ABC):
 
         surround_data.thaw()
 
-    def __execute_filter(self, stage, stage_data):
+    def __execute_filter(self, stage: Filter, stage_data: SurroundData) -> None:
         """
         Executes a single filter on the data provided.
         Taking care of execution time tracking.
@@ -226,7 +229,7 @@ class Assembler(ABC):
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
         LOGGER.info("Filter %s took %s secs", type(stage).__name__, stage_execution_time)
 
-    def __execute_main(self, surround_data):
+    def __execute_main(self, surround_data: SurroundData) -> None:
         """
         Executes the :meth:`surround.stage.Estimator.estimate` method (used for
         batch-predict/predict mode), taking care of time tracking and dumping
@@ -248,7 +251,7 @@ class Assembler(ABC):
         LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
 
 
-    def __execute_fit(self, surround_data):
+    def __execute_fit(self, surround_data: SurroundData) -> None:
         """
         Executes the :meth:`surround.stage.Estimator.fit` method (used for training mode),
         taking care of time tracking and dumping output (if requested)
@@ -268,7 +271,7 @@ class Assembler(ABC):
         surround_data.stage_metadata.append({type(self.estimator).__name__: str(fit_execution_time)})
         LOGGER.info("Fitting %s took %s secs", type(self.estimator).__name__, fit_execution_time)
 
-    def load_config(self, module):
+    def load_config(self, module: str) -> None:
         """
         Given a module contained in the root of the project, create an instance of
         :class:`surround.config.Config` loading configuration data from the ``config.yaml``
@@ -296,7 +299,7 @@ class Assembler(ABC):
         else:
             self.set_config(Config())
 
-    def set_config(self, config):
+    def set_config(self, config: Config) -> None:
         """
         Set the configuration data to be used during pipeline execution.
 
@@ -310,7 +313,7 @@ class Assembler(ABC):
             raise TypeError("config should be of class Config")
         self.config = config
 
-    def set_estimator(self, estimator=None, pre_filters=None, post_filters=None):
+    def set_estimator(self, estimator: Estimator = None, pre_filters: List[Filter] = None, post_filters: List[Filter] = None) -> None:
         """
         Set the estimator that should be used during pipeline execution and any filters (if required).
 
@@ -343,7 +346,7 @@ class Assembler(ABC):
                     raise TypeError("post_filter should be of class Filter")
         self.post_filters = post_filters
 
-    def set_visualiser(self, visualiser):
+    def set_visualiser(self, visualiser: Visualiser) -> None:
         """
         Set the visualiser that will be executed after all other stages during
         batch-predict/training mode.
