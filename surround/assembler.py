@@ -118,6 +118,9 @@ class Assembler(ABC):
             if self.post_filters:
                 for post_filter in self.post_filters:
                     post_filter.init_stage(self.config)
+
+            if self.finaliser:
+                self.finaliser.init_stage(self.config)
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
