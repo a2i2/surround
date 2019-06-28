@@ -27,25 +27,6 @@ Now the Surround library and command-line tool should be installed! To make sure
 
 If it works then you are ready for the :ref:`project-setup` stage.
 
-Install via Source
-^^^^^^^^^^^^^^^^^^
-If for some reason the above isn't working for you, or you plan to extend Surround, then you can install via the source.
-So first clone the repository like so::
-
-    $ git clone https://github.com/a2i2/surround.git
-    $ cd surround
-
-Then install the package using the ``setup.py`` script::
-
-    $ python3 setup.py install
-
-.. note:: This step requires the module ``setuptools`` to be installed. See `here <https://pypi.org/project/setuptools/>`_ on how to install it.
-
-Then test the installation by running the tests and trying the surround CLI::
-
-    $ python3 setup.py test
-    $ surround
-
 .. _project-setup:
 
 Project Setup
