@@ -75,7 +75,7 @@ For example during project generation, the following structure is used::
 
 Every Surround project has the following characteristics:
 
-- ``Dockerfile`` for bundling up the project as a web application.
+- ``Dockerfile`` for bundling up the project as a Docker container.
 - ``dodo.py`` file containing useful tasks such as train, batch predict and test for a project.
 - Tests for catching training serving skew.
 - A single entry point for running the application, ``__main__.py``.

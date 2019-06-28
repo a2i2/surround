@@ -61,31 +61,9 @@
 </div>
 <p>If it works then you are ready for the <a class="reference internal" href="#project-setup"><span class="std std-ref">Project Setup</span></a> stage.</p>
 </div>
-<div class="section" id="install-via-source">
-<h3>Install via Source<a class="headerlink" href="#install-via-source" title="Permalink to this headline">¶</a></h3>
-<p>If for some reason the above isn’t working for you, or you plan to extend Surround, then you can install via the source.
-So first clone the repository like so:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/a2i2/surround.git
-$ cd surround
-</pre></div>
-</div>
-<p>Then install the package using the <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py install
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This step requires the module <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> to be installed. See <a class="reference external" href="https://pypi.org/project/setuptools/">here</a> on how to install it.</p>
-</div>
-<p>Then test the installation by running the tests and trying the surround CLI:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 setup.py test
-$ surround
-</pre></div>
-</div>
-</div>
 </div>
 <div class="section" id="project-setup">
-<span id="id3"></span><h2>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
 <p>Before we can create our first pipeline, we need to generate an empty Surround project.
 Use the following command to generate a new project:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ surround init -p testproject -d &quot;Our first pipeline&quot;
