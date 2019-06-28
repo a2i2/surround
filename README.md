@@ -25,13 +25,6 @@ Use package manager [pip](https://pip.pypa.io/en/stable/) to install the latest 
 $ pip3 install surround
 ``` 
 
-To install the most recent version (may be unstable!) use the following commands:
-```
-$ git clone https://github.com/a2i2/surround.git
-$ cd surround
-$ python3 setup.py install
-```
-
 ## Simple usage
 
 A short explanation is provided in the hello-world example's [README](examples/hello-world/) file.
