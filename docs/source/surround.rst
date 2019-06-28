@@ -1,28 +1,66 @@
-API Documentation
+.. _surround-api:
+
+API Reference
 *****************
+Here you can find documentation on all classes and their methods in Surround.
+
+.. _assembler:   
+
+Assembler
+========
+
+.. autoclass:: surround.assembler.Assembler
+    :members:
 
 .. automodule:: surround
 
-Surround
-========
+    Config
+    ^^^^^^
+    
+    .. autoclass:: surround.config.Config       
+        :members:          
+ 
+        .. automodule:: surround  
+ 
+    SurroundData                              
+    ^^^^^^^^^^^^   
+                
+    .. autoclass:: surround.SurroundData        
+        :members:                   
 
-.. autoclass:: Surround
-   :members:
+    .. automodule:: surround.stage
 
-SurroundData
-============
+    Stage
+    ^^^^^
+    
+    .. autoclass:: surround.stage.Stage
+        :members:      
 
-.. autoclass:: SurroundData
-   :members:
+    Validator
+    ^^^^^^^^^
 
-Stage
-=====
+    .. autoclass:: surround.stage.Validator
+        :members:
 
-.. autoclass:: Stage
-   :members:
+    Filter
+    ^^^^^^
 
-Config
-======
+    .. autoclass:: surround.stage.Filter
+        :members:
 
-.. autoclass:: Config
-   :members:
+    Estimator
+    ^^^^^^^^^
+
+    .. autoclass:: surround.stage.Estimator
+        :members:
+
+    Visualiser
+    ^^^^^^^^^^
+
+    .. autoclass:: surround.visualiser.Visualiser
+        :members: 
+
+Runner
+=======
+.. autoclass:: surround.runners.Runner  
+    :members:

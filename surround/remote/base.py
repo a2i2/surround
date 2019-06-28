@@ -8,22 +8,46 @@ __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/18'
 
 class BaseRemote():
+    """
+    Abstract base class for all different types of remotes.
+    Provides an interface for pushing and pulling data from a remote irrespective of the service used.
+
+    Public methods:
+    - add(add_to, key)
+    - pull(what_to_pull, key)
+    - push(what_to_push, key)
+    - list_(remote_name)
+    - file_exists_locally(path_to_file, append_to)
+    - add_message(message, append_to)
+    - get_path_to_remote(remote)
+    - get_project_name()
+    - get_file_name(file)
+    - write_config(what_to_write, file, name, path)
+    - read_from_config(what_to_read, key)
+
+    Abstract methods:
+    - pull_file(what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
+    - push_file(what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
+    - list_files(path_to_remote, project_name)
+    - file_exists_on_remote(path_to_remote, relative_path_to_remote_file, append_to)
+    """
 
     def __init__(self):
         self.message = ""
         self.messages = []
 
     def write_config(self, what_to_write, file_, name, path=None):
-        """Write config to a file
+        """
+        Write configuration data to a YAML file specified.
 
         :param what_to_write: For example remote, data, model etc.
-        :type what_to_write: str
-        :param file_: file to write
-        :type file_: str
+        :type what_to_write: string
+        :param file_: path to configuration file
+        :type file_: string
         :param name: name of the remote
-        :type name: str
+        :type name: string
         :param path: path to the remote
-        :type path: str
+        :type path: string
         """
 
         if os.path.exists(file_):
@@ -49,10 +73,33 @@ class BaseRemote():
             yaml.dump(read_config, f, default_flow_style=False)
 
     def read_from_config(self, what_to_read, key):
+        """
+        Reads data from first the local config and if no data found tries the global config.
+
+        :param what_to_read: what data category, for example remote, data, model, etc.
+        :type what_to_read: string
+        :param key: the key for the data wanted
+        :type key: string
+        :return: the data found or None if not found
+        :rtype: any
+        """
+
         local = self.read_from_local_config(what_to_read, key)
         return local if local is not None else self.read_from_global_config(what_to_read, key)
 
     def read_from_local_config(self, what_to_read, key):
+        """
+        Reads data from the local config YAML file.
+        The local config file can be found at ".surround/config.yaml".
+
+        :param what_to_read: what data category to read from
+        :type what_to_read: string
+        :param key: the key for the data wanted
+        :type key: string
+        :return: the data found or None if not found
+        :rtype: any
+        """
+
         config = Config()
 
         if Path(".surround/config.yaml").exists():
@@ -61,6 +108,18 @@ class BaseRemote():
             return read_items.get(key, None) if read_items is not None else None
 
     def read_from_global_config(self, what_to_read, key):
+        """
+        Reads data from the global config YAML file.
+        The global config file can be found at "$HOME/.surround/config.yaml".
+
+        :param what_to_read: what data category to read from
+        :type what_to_read: string
+        :param key: the key for the data wanted
+        :type key: string
+        :return: the data found or None if not found
+        :rtype: any
+        """
+
         config = Config()
         home = str(Path.home())
         if Path(os.path.join(home, ".surround/config.yaml")).exists():
@@ -69,6 +128,16 @@ class BaseRemote():
             return read_items.get(key, None) if read_items is not None else None
 
     def read_all_from_local_config(self, what_to_read):
+        """
+        Reads all data for a specified category from the local config file.
+        The local config file can be found at ".surround/config.yaml".
+
+        :param what_to_read: what data category to read all data from
+        :type what_to_read: string
+        :return: all data contained in the category or None if category not found
+        :rtype: any
+        """
+
         config = Config()
 
         if Path(".surround/config.yaml").exists():
@@ -77,6 +146,16 @@ class BaseRemote():
             return read_items
 
     def read_all_from_global_config(self, what_to_read):
+        """
+        Reads all data for a specified category from the global config file.
+        The global config file can be found at "$HOME/.surround/config.yaml".
+
+        :param what_to_read: what data category to read all data from
+        :type what_to_read: string
+        :return: all data contained in the category or None if category not found
+        :rtype: any
+        """
+
         config = Config()
         home = str(Path.home())
 
@@ -86,13 +165,17 @@ class BaseRemote():
             return read_items
 
     def add(self, add_to, key):
-        """Add data to remote
+        """
+        Add a file to the remote specified.
 
         :param add_to: remote to add to
-        :type add_to: str
+        :type add_to: string
         :param key: file to add
-        :type key: str
+        :type key: string
+        :return: messages on whether the process completed properly
+        :rtype: list of strings
         """
+
         project_name = self.get_project_name()
         if project_name is None:
             return self.message
@@ -113,13 +196,18 @@ class BaseRemote():
         return self.message
 
     def pull(self, what_to_pull, key=None):
-        """Pull from remote
+        """
+        Pull file(s) from the remote specified, if no file specified, all files will be pulled.
+        This will not overwrite already existing files locally.
 
         :param what_to_pull: what to pull from remote. By convention it is remote name. If remote name is data, it will pull data.
-        :type what_to_pull: str
-        :param key: file to pull
-        :type key: str
+        :type what_to_pull: string
+        :param key: file to pull (default: None)
+        :type key: string
+        :return: messages on whether the process completed successfully
+        :rtype: list of strings
         """
+
         project_name = self.get_project_name()
         if project_name is None:
             return self.messages
@@ -154,26 +242,33 @@ class BaseRemote():
 
     @abstractmethod
     def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
-        """Get the file stored on the remote
+        """
+        Get the file stored on the remote and save it locally.
 
         :param what_to_pull: what to pull from remote
-        :type what_to_pull: str
-        :param path_to_remote: path to the remote.
-        :type path_to_remote: str
+        :type what_to_pull: string
+        :param path_to_remote: path to the remote
+        :type path_to_remote: string
         :param relative_path_to_remote_file: path to file on remote relative to the remote path
-        :type relative_path_to_remote_file: str
+        :type relative_path_to_remote_file: string
         :param path_to_local_file: path to the local file
-        :type path_to_local_file: str
+        :type path_to_local_file: string
+        :return: message detailing the result of the pulling
+        :rtype: string
         """
 
     def push(self, what_to_push, key=None):
-        """Push to remote
+        """
+        Push file(s) to the remote, if no file specified then all files will be pushed.
 
         :param what_to_push: what to push to remote. By convention it is remote name. If remote name is data, it will push data.
-        :type what_to_push: str
+        :type what_to_push: string
         :param key: file to push
-        :type key: str
+        :type key: string
+        :return: messages detailing the result of the process
+        :rtype: list of string or string
         """
+
         project_name = self.get_project_name()
         if project_name is None:
             return self.messages
@@ -212,21 +307,27 @@ class BaseRemote():
         """Get the file stored on the remote
 
         :param what_to_push: what to push to remote
-        :type what_to_push: str
+        :type what_to_push: string
         :param path_to_remote: path to the remote.
-        :type path_to_remote: str
+        :type path_to_remote: string
         :param relative_path_to_remote_file: path to file on remote relative to the remote path
-        :type relative_path_to_remote_file: str
+        :type relative_path_to_remote_file: string
         :param path_to_local_file: path to the local file
-        :type path_to_local_file: str
+        :type path_to_local_file: string
+        :return: message detailing the result of the process
+        :rtype: string
         """
 
     def list_(self, remote_to_list):
-        """General method for listing files on the remote
+        """
+        Returns the list of files contained in the remote specified.
 
         :param remote_to_list: remote to list
-        :type remote_to_list: str
+        :type remote_to_list: string
+        :return: list of the files or a message on error
+        :rtype: list of string or string on error
         """
+
         project_name = self.get_project_name()
         if project_name is None:
             return self.message
@@ -239,67 +340,96 @@ class BaseRemote():
 
     @abstractmethod
     def list_files(self, path_to_remote, project_name):
-        """List the files in the remote
+        """
+        Returns a list of files on the remote specified.
 
         :param path_to_remote: path to the remote
-        :type path_to_remote: str
+        :type path_to_remote: string
         :param project_name: name of the project
-        :type project_name: str
+        :type project_name: string
+        :return: list of the files or a message on error
+        :rtype: list of string or string
         """
+
         raise NotImplementedError
 
     def get_file_name(self, file_):
-        """Extract filename from path
+        """
+        Extract filename from path specified.
 
         :param file_: path to file
-        :type file_: str
+        :type file_: string
+        :return: the filename
+        :rtype: string
         """
+
         return os.path.basename(file_)
 
     def get_project_name(self):
+        """
+        Returns the project name found in the local config file.
+
+        :return: the name of the project or None if no project found locally
+        :rtype: string
+        """
+
         project_name = self.read_from_local_config("project-info", "project-name")
         if project_name:
             return project_name
         self.add_message("error: project name not present in config")
 
     def get_path_to_remote(self, remote_to_read):
+        """
+        Returns the path/URL to the remote saved in configuration.
+
+        :param remote_to_read: the name of the remote
+        :type remote_to_read: string
+        :return: path/URL of the remote or None if could not be found
+        :rtype: string
+        """
+
         remote = self.read_from_config("remote", remote_to_read)
         if remote:
             return remote
         self.add_message("error: no remote named " + remote_to_read)
 
     def add_message(self, message, append_to=True):
-        """Store message and if required append that to the list
+        """
+        Store message and if required append that to the list.
 
         :param message: message to display
         :type message: str
         :param append_to: append message to messages list
         :type append_to: bool
         """
+
         self.message = message
         if append_to:
             self.messages.append(self.message)
 
     @abstractmethod
     def file_exists_on_remote(self, path_to_remote, relative_path_to_remote_file, append_to=True):
-        """Check if file is already present on remote. This is used to prevent overwriting of files.
+        """
+        Check if file is already present on remote. This is used to prevent overwriting of files.
 
         :param path_to_remote: path to remote
-        :type path_to_remote: str
+        :type path_to_remote: string
         :param relative_path_to_remote_file: path to file on remote relative to the remote path
-        :type relative_path_to_remote_file: str
-        :param append_to: Append message to messages list. By default, it is true.
+        :type relative_path_to_remote_file: string
+        :param append_to: append message to messages list. By default, it is true.
         :type append_to: bool
         """
 
     def file_exists_locally(self, path_to_file, append_to=True):
-        """Check if file is already present on remote. This is used to prevent overwriting of files.
+        """
+        Check if file is already present on remote. This is used to prevent overwriting of files.
 
         :param path_to_file: path to file
-        :type path_to_file: str
+        :type path_to_file: string
         :param append_to: Append message to messages list. By default, it is true.
         :type append_to: bool
         """
+
         if Path(path_to_file).exists():
             self.add_message("info: " + path_to_file + " already exists", append_to)
             return True

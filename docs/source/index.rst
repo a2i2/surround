@@ -1,13 +1,25 @@
-.. surround documentation master file, created by
-   sphinx-quickstart on Wed Mar  6 16:54:44 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. image:: temp_logo_hq.png
+    :alt: Surround
+    :align: center
+    :scale: 45%
 
-Welcome to surround's documentation!
+Welcome to Surround
 ====================================
 
+Welcome to Surround's documentation! Surround is a framework for building machine learning pipelines in Python. 
+
+For a quick rundown on getting started with Surround see :ref:`getting-started`.
+For more information on the aim and philosophy of Surround see :ref:`about`. Just need to learn more about a particular
+method or class? See :ref:`surround-api`.
+
+.. toctree:: 
+    :maxdepth: 2
+
+    about.rst
+    getting-started.rst
+    cli-guide.rst
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
 
    surround.rst
