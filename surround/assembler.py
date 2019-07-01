@@ -61,6 +61,7 @@ class Assembler(ABC):
     """
 
     # pylint: disable=too-many-instance-attributes
+    def __init__(self, assembler_name: str = "", validator: Validator = None, estimator: Estimator = None, config: Config = None) -> None:
         """
         Constructor for an Assembler pipeline:
 
@@ -74,7 +75,6 @@ class Assembler(ABC):
         :type config: :class:`surround.config.Config`
         """
 
-    def __init__(self, assembler_name: str = "", validator: Validator = None, estimator: Estimator = None, config: Config = None) -> None:
         if not validator:
             raise ValueError("'Validator' is required to run an assembler")
         if not isinstance(validator, Validator):
