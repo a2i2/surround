@@ -207,6 +207,14 @@ def is_valid_name(aparser, arg):
         return arg
 
 def make_name_safe(project_name):
+    """
+    Converts a name with underscores into a valid class name (PascalCase).
+    E.g. test_project will become TestProject
+
+    :param project_name: the name we want to convert
+    :type project_name: str
+    """
+
     words = re.split('_', project_name)
     result = ''
 
