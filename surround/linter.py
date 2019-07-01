@@ -206,13 +206,13 @@ class Main(Estimator):
     """
     Class responsible for executing all of the :class:`LinterStage`'s in the Surround Linter.
     """
-    
+
     def __init__(self, filters: List[LinterStage]) -> None:
         """
         :param filters: list of stages in the linter
         :type filters: list of :class:`LinterStage`
         """
-        
+
         self.filters: List[LinterStage] = filters
 
     def estimate(self, surround_data: SurroundData, config: Config) -> None:

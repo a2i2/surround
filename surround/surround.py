@@ -12,9 +12,9 @@ class Frozen():
     When the class is considered frozen, adding new attributes will
     trigger a :exc:`TypeError` exception.
     """
-    
+
     __isfrozen: bool = False
-    
+
     def __setattr__(self, key: str, value: Any):
         """
         Called when an attribute is created/modified, throws an exception when frozen and adding a new attribute.
