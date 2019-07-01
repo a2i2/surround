@@ -367,6 +367,14 @@ class Assembler(ABC):
         self.visualiser = visualiser
 
     def set_finaliser(self, finaliser):
+        """
+        Set the final stage that will be executed no matter how the pipeline runs.
+        This will be executed even when the pipeline fails or throws an error.
+
+        :param finaliser: the final stage instance
+        :type finaliser: :class:`surround.stage.Filter`
+        """
+
         # finaliser must be a type of filter
         if not finaliser and not isinstance(finaliser, Filter):
             raise TypeError("finaliser should be of class Filter")
