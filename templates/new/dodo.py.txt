@@ -1,4 +1,5 @@
 import os
+import sys
 from surround import Config
 
 CONFIG = Config(os.path.dirname(__file__))
@@ -46,4 +47,18 @@ def task_batch():
 
     return {{
         'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode batch" % (output_path, data_path, IMAGE)]
+    }}
+
+def task_train_local():
+    """Run training mode locally"""
+    return {{
+        'basename': 'trainLocal',
+        'actions': ["%s -m {project_name} --mode train" % sys.executable]
+    }}
+
+def task_batch_local():
+    """Run batch mode locally"""
+    return {{
+        'basename': 'batchLocal',
+        'actions': ["%s -m {project_name} --mode batch" % sys.executable]
     }}
