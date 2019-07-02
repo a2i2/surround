@@ -7,6 +7,17 @@ from pkg_resources import resource_stream
 import yaml
 
 ENV_VAR_PREFIX = "SURROUND_"
+IGNORE_DIRS = [
+    ".surround",
+    "data",
+    "output",
+    "docs",
+    "models",
+    "notebooks",
+    "scripts",
+    "spikes",
+    "tests",
+]
 
 class Config(Mapping):
     """
@@ -76,6 +87,10 @@ class Config(Mapping):
                 drive_letter = split_path[0][0].lower()
                 path = split_path[1].replace('\\', '/')
                 volume_path = '/' + drive_letter + path
+
+            # Attempt to find package path by looking for config.yaml
+            if not package_path:
+                package_path = self.__find_package_path(project_root)
 
             self._storage["project_root"] = project_root
             self._storage["package_path"] = package_path
@@ -153,6 +168,22 @@ class Config(Mapping):
         if not "." in path:
             return self._storage[path]
         return self.__iterate_over_dict(self._storage, path.split("."))
+
+    def __find_package_path(self, project_root):
+        """
+        Attempts to find the projects package path by looking for the config.yaml file.
+        This should only be used when the package name seems to be different from the root folder name.
+
+        :param project_root: root of the project
+        :type project_root: str
+        :return: path to the package or None if unable to find it
+        :rtype: str
+        """
+
+        results = [path for path, _, files in os.walk(project_root) if 'config.yaml' in files]
+        results = [path for path in results if os.path.basename(path) not in IGNORE_DIRS]
+
+        return results[0] if len(results) == 1 else None
 
     def __load_defaults(self):
         """

@@ -4,6 +4,7 @@ from surround import Config
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
+PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
 def task_build():
@@ -21,13 +22,13 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run -p 8080:8080 --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)]
+        'actions': ["docker run -p 8080:8080 --volume \"%s/\":/app %s python3 -m %s" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH)]
     }}
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
-        'actions': ["docker run -p 8080:8080 %s" % IMAGE],
+        'actions': ["docker run -p 8080:8080 %s python3 -m %s" % (IMAGE, PACKAGE_PATH)],
         'task_dep': ["build"]
     }}
 
@@ -37,7 +38,7 @@ def task_train():
     data_path = CONFIG["volume_path"] + "/data"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode train" % (output_path, data_path, IMAGE)]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m %s --mode train" % (output_path, data_path, IMAGE, PACKAGE_PATH)]
     }}
 
 def task_batch():
@@ -46,32 +47,32 @@ def task_batch():
     data_path = CONFIG["volume_path"] + "/data"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode batch" % (output_path, data_path, IMAGE)]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m %s --mode batch" % (output_path, data_path, IMAGE, PACKAGE_PATH)]
     }}
 
 def task_train_local():
     """Run training mode locally"""
     return {{
         'basename': 'trainLocal',
-        'actions': ["%s -m {project_name} --mode train" % sys.executable]
+        'actions': ["%s -m %s --mode train" % (sys.executable, PACKAGE_PATH)]
     }}
 
 def task_batch_local():
     """Run batch mode locally"""
     return {{
         'basename': 'batchLocal',
-        'actions': ["%s -m {project_name} --mode batch" % sys.executable]
+        'actions': ["%s -m %s --mode batch" % (sys.executable, PACKAGE_PATH)]
     }}
 
 def task_web():
     """Run web mode inside the container"""
     return {{
-        'actions': ["docker run -p 8080:8080  %s python3 -m {project_name} --mode web" % IMAGE]
+        'actions': ["docker run -p 8080:8080  %s python3 -m %s --mode web" % (IMAGE, PACKAGE_PATH)]
     }}
 
 def task_web_local():
     """Run web mode locally"""
     return {{
         'basename': 'webLocal',
-        'actions': ["%s -m {project_name} --mode web" % sys.executable]
+        'actions': ["%s -m %s --mode web" % (sys.executable, PACKAGE_PATH)]
     }}
