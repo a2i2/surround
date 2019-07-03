@@ -1,23 +1,15 @@
 import ast
 import os
+
 from pathlib import Path
 from collections.abc import Mapping
 from pkg_resources import resource_stream
 
 import yaml
 
+from .project import PROJECTS
+
 ENV_VAR_PREFIX = "SURROUND_"
-IGNORE_DIRS = [
-    ".surround",
-    "data",
-    "output",
-    "docs",
-    "models",
-    "notebooks",
-    "scripts",
-    "spikes",
-    "tests",
-]
 
 class Config(Mapping):
     """
@@ -181,7 +173,7 @@ class Config(Mapping):
         """
 
         results = [path for path, _, files in os.walk(project_root) if 'config.yaml' in files]
-        results = [path for path in results if os.path.basename(path) not in IGNORE_DIRS]
+        results = [path for path in results if os.path.basename(path) not in PROJECTS['new']['dirs']]
 
         return results[0] if len(results) == 1 else None
 
