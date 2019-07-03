@@ -1,6 +1,6 @@
 import os
 import io
-from .stage import Filter, Estimator
+from .stage import Filter, Estimator, Validator
 from .surround import SurroundData
 from .assembler import Assembler
 
@@ -148,6 +148,29 @@ class CheckDirectories(LinterStage):
             if not os.path.isdir(path):
                 self.add_error(surround_data, "Directory %s does not exist" % path)
 
+class LinterValidator(Validator):
+    """
+    Linter's validator stage, checks the data given in the ProjectData is valid.
+    """
+
+    def validate(self, surround_data, config):
+        """
+        Executed by the :class:`Linter`, checks whther the paths contained are valid.
+
+        :param surround_data: the data being passed between linter stages
+        :type surround_data: :class:`surround.SurroundData`
+        :param config: the linter's configuration data
+        :type config: :class:`surround.config.Config`
+        """
+
+        if not isinstance(surround_data.project_name, str):
+            surround_data.errors.append("ERROR: PROJECT_CHECK: Project name is not a string")
+
+        if not isinstance(surround_data.project_structure, dict):
+            surround_data.errors.append("ERROR: PROJECT_CHECK: Project structure invalid format")
+
+        if not isinstance(surround_data.project_root, str):
+            surround_data.errors.append("ERROR: PROJECT_CHECK: Project root path is not a string")
 
 class Main(Estimator):
     """
@@ -252,7 +275,7 @@ class Linter():
         root = os.path.abspath(project_root)
         project_name = os.path.basename(root)
         data = ProjectData(project, root, project_name)
-        assembler = Assembler("Linting", data, Main(self.filters))
+        assembler = Assembler("Linting", LinterValidator(), Main(self.filters))
         assembler.init_assembler()
-        assembler.run()
+        assembler.run(data)
         return data.errors, data.warnings
