@@ -43,6 +43,7 @@ PROJECTS = {
             ("{project_name}/config.yaml", "config.yaml.txt", False, False),
             (".gitignore", ".gitignore.txt", False, False),
             ("data/.gitignore", ".gitignoredata.txt", False, False)
+            ("data/.gitignore", ".gitignoredata.txt", False, True)
         ]
     }
 }
