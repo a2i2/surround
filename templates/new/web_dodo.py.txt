@@ -21,7 +21,7 @@ def task_remove():
                         echo There is no docker image.Build the image first
                         else
                         docker rmi %s -f
-                        fi""" % (IMAGE,IMAGE)]]
+                        fi""" % (IMAGE,IMAGE)]
     }}
 
 def task_dev():
