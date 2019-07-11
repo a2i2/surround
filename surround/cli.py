@@ -41,7 +41,7 @@ PROJECTS = {
             ("dodo.py", "web_dodo.py.txt", False, True),
             ("Dockerfile", "Dockerfile.txt", False, False),
             ("{project_name}/config.yaml", "config.yaml.txt", False, False),
-            (".gitignore", ".gitignore.txt", False, False)
+            (".gitignore", ".gitignore.txt", False, False),
             ("data/.gitignore", ".gitignoredata.txt", False, False)
         ]
     }
