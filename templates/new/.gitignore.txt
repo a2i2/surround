@@ -9,7 +9,6 @@ __pycache__/
 
 # Distribution / packaging
 build/
-data/
 
 ## Python egg metadata, regenerated from source files by setuptools.
 **/*.egg-info
