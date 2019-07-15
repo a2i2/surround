@@ -1,0 +1,47 @@
+version: v0.1
+
+summary:
+  creator: Zac Brannelly
+  title: Inventory & Accounting data
+  subject:
+    - EY
+    - Inventory
+    - Presentation
+    - Trial balance
+  description: Original data from EY, contains inventory data.
+  publisher: Ernst & Young
+  contributor: John Doe (john.doe@ey.com)
+  date: 2019-11-20T12:00:00
+  types:
+    - StillImage
+    - Text
+    - Dataset
+  formats:
+    - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    - application/pdf
+  identifier: 6BFEC6FBF46766746D147626A1EE3E99F2BA189C
+  language: en
+  rights: Commercial
+
+manifests:
+  - path: Copy of Plastics Inc_Quarterly data (7 periods).xlsx
+    title: Quarterly financial information (7 periods)
+    subject:
+      - Trial balance
+      - Chart of accounts
+    description: Excel document containing trial balance for 7 quarters.
+    type: Dataset
+    format: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    language: en
+
+  - path: Inventory 2018 other.xlsx
+    title: Inventory information for 2018
+    subject:
+      - Inventory
+      - Stock levels
+      - Movement history
+      - Sales history
+    description: Excel document containing inventory information for 2018.
+    type: Dataset
+    format: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    language: en
