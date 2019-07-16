@@ -1,10 +1,22 @@
 import os
 import sys
 from surround import Config
+import subprocess
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
+
+def image_check(mylist):
+
+    proc=subprocess.Popen(mylist,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.wait()
+    (stdout,stderr)=proc.communicate()
+        
+    if stderr.decode("utf-8") != "":
+        print("There is no docker image. Build the image first")
+
+
 
 def task_build():
     """Build the Docker image for the current project"""
@@ -14,27 +26,28 @@ def task_build():
 
 def task_remove():
     """Remove the Docker image for the current project"""
-    return {{
-        'actions': ["""
-                        if [[ "$(docker images -q %s 2> /dev/null)" == "" ]];
-                        then
-                        echo There is no docker image.Build the image first
-                        else
-                        docker rmi %s -f
-                        fi""" % (IMAGE,IMAGE)]
-    }}
+    
+    mylist=['docker', 'rmi', '{0}'.format(IMAGE),'-f']
+
+    return {{'actions': [(image_check,)],
+            'params':[{'name':'mylist',
+            'long':'mylist',
+            'type':list,
+            'default':mylist
+            }]}}
 
 def task_dev():
     """Run the main task for the project"""
-    return {{
-        'actions': ["""
-                        if [[ "$(docker images -q %s 2> /dev/null)" == "" ]];
-                        then
-                        echo There is no docker image.Build the image first
-                        else
-                        docker run -p 8080:8080 --volume \"%s/\":/app %s
-                        fi""" % (IMAGE,CONFIG["volume_path"],IMAGE)]
-    }}
+    
+    mylist=['docker', 'run','-p','8080:8080','--volume','{}{}'.format(CONFIG["volume_path"],"/:/app"),'{}'.format(IMAGE)]
+        
+        
+    return {{'actions': [(image_check,)],
+            'params':[{'name':'mylist',
+            'long':'mylist',
+            'type':list,
+            'default':mylist
+            }]}}
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
@@ -47,31 +60,30 @@ def task_train():
     """Run training mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/data"
+    
+    mylist=['docker', 'run','--volume','{}{}'.format(output_path,":/app/output"),'--volume','{}{}'.format(data_path,":/app/data"),'{}'.format(IMAGE),'python3','-m','{project_name}','--mode','train']
+    
 
-    return {{
-        'actions': ["""
-                        if [[ "$(docker images -q %s 2> /dev/null)" == "" ]];
-                        then
-                        echo There is no docker image.Build the image first
-                        else
-                        docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode train
-                        fi""" % (IMAGE,output_path, data_path, IMAGE)]
-    }}
+    return {{'actions': [(image_check,)],
+            'params':[{'name':'mylist',
+            'long':'mylist',
+            'type':list,
+            'default':mylist
+            }]}}
 
 def task_batch():
     """Run batch mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/data"
 
-    return {{
-        'actions': ["""
-                        if [[ "$(docker images -q %s 2> /dev/null)" == "" ]];
-                        then
-                        echo There is no docker image.Build the image first
-                        else
-                        docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode batch
-                        fi""" % (IMAGE,output_path, data_path, IMAGE)]
-    }}
+    mylist=['docker', 'run','--volume','{}{}'.format(output_path,":/app/output"),'--volume','{}{}'.format(data_path,":/app/data"),'{}'.format(IMAGE),'python3','-m','{project_name}','--mode','batch']
+        
+    return {{'actions': [(image_check,)],
+            'params':[{'name':'mylist',
+            'long':'mylist',
+            'type':list,
+            'default':mylist
+            }]}}
 
 def task_train_local():
     """Run training mode locally"""
@@ -89,15 +101,17 @@ def task_batch_local():
 
 def task_web():
     """Run web mode inside the container"""
-    return {{
-        'actions': ["""
-                        if [[ "$(docker images -q %s 2> /dev/null)" == "" ]];
-                        then
-                        echo There is no docker image.Build the image first
-                        else
-                        docker run -p 8080:8080  %s python3 -m {project_name} --mode web
-                        fi""" % (IMAGE,IMAGE)]
-    }}
+    
+    mylist=['docker', 'run','-p','8080:8080','{}'.format(IMAGE),'python3','-m','{project_name}','--mode','web']
+        
+
+
+    return {{'actions': [(image_check,)],
+            'params':[{'name':'mylist',
+            'long':'mylist',
+            'type':list,
+            'default':mylist
+            }]}}
 
 def task_web_local():
     """Run web mode locally"""
