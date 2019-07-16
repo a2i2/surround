@@ -46,11 +46,6 @@ PROJECTS = {
     }
 }
 
-
-
-
-
-
 def process_directories(directories, project_dir, project_name):
     """
     Creates new directories in the project folder according to the list provided.
