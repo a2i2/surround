@@ -3,7 +3,7 @@ from collections.abc import Mapping
 import os
 import yaml
 
-from .util import get_formats_from_directory, get_formats_from_files, get_types_from_formats, hash_file
+from .util import get_formats_from_directory, get_formats_from_files, get_types_from_formats
 
 class Metadata(Mapping):
     """
@@ -71,25 +71,12 @@ class Metadata(Mapping):
         if root_level_dirs:
             types.append("Collection")
 
-        self.__storage['summary'] = {
-            'title': None,
-            'creator': None,
-            'subject': None,
-            'description': None,
-            'publisher': None,
-            'contributor': None,
-            'date': None,
-            'types': types,
-            'formats': formats,
-            'identifier': None,
-            'source': None,
-            'language': None,
-            'rights': None,
-            'under-ethics': None,
-        }
+        self.__storage['summary']['formats'] = formats
+        self.__storage['summary']['types'] = types
 
         if root_level_dirs:
             self.__storage['manifests'] = []
+
             for root_dir in root_level_dirs:
                 formats = get_formats_from_directory(root_dir)
                 types = get_types_from_formats(formats)
@@ -121,22 +108,9 @@ class Metadata(Mapping):
     def generate_from_file(self, filepath):
         formats = get_formats_from_files([filepath])
         types = get_types_from_formats(formats)
-        self.__storage['summary'] = {
-            'title': None,
-            'creator': None,
-            'subject': None,
-            'description': None,
-            'publisher': None,
-            'contributor': None,
-            'date': None,
-            'types': types,
-            'formats': formats,
-            'identifier': hash_file(filepath),
-            'source': None,
-            'language': None,
-            'rights': None,
-            'under-ethics': None
-        }
+
+        self.__storage['summary']['formats'] = formats
+        self.__storage['summary']['types'] = types
 
     def load_from_path(self, path):
         with open(path, "r") as yaml_file:
