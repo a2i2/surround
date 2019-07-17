@@ -26,28 +26,41 @@ def task_build():
 
 def task_remove():
     """Remove the Docker image for the current project"""
-    
-    mylist=['docker', 'rmi', '{0}'.format(IMAGE),'-f']
 
-    return {{'actions': [(image_check,)],
-            'params':[{'name':'mylist',
-            'long':'mylist',
-            'type':list,
-            'default':mylist
-            }]}}
+
+    def image_check():
+
+    proc=subprocess.Popen(["docker", "rmi", "%s" %IMAGE,"-f"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.wait()
+    (stdout,stderr)=proc.communicate()
+        
+    if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
+            print("There is no docker image. Build the image first")
+
+    return {{
+            
+            'actions': [image_check]
+            
+            }}
 
 def task_dev():
     """Run the main task for the project"""
-    
-    mylist=['docker', 'run','-p','8080:8080','--volume','{}{}'.format(CONFIG["volume_path"],"/:/app"),'{}'.format(IMAGE)]
+
+    def image_check():
+        
+        proc=subprocess.Popen(["docker", "run","-p","8080:8080","--volume","%s" %(CONFIG["volume_path"]+"/:/app"),"%s" %IMAGE],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        proc.wait()
+
+        (stdout,stderr)=proc.communicate()
         
         
-    return {{'actions': [(image_check,)],
-            'params':[{'name':'mylist',
-            'long':'mylist',
-            'type':list,
-            'default':mylist
-            }]}}
+        if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
+            print("There is no docker image. Build the image first")
+        
+        
+    return {{'actions': [image_check]
+            }}
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
@@ -61,29 +74,39 @@ def task_train():
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/data"
     
-    mylist=['docker', 'run','--volume','{}{}'.format(output_path,":/app/output"),'--volume','{}{}'.format(data_path,":/app/data"),'{}'.format(IMAGE),'python3','-m','{project_name}','--mode','train']
+    def image_check():
+        
+        proc=subprocess.Popen(["docker", "run", "--volume","%s" %(output_path+":/app/output"),"--volume","%s" %(data_path,":/app/data"),"%s" %IMAGE,"python3","-m","%s" %{project_name},"--mode","train"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc.wait()
+        (stdout,stderr)=proc.communicate()
+        
+        
+        if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
+            print("There is no docker image. Build the image first")
     
 
-    return {{'actions': [(image_check,)],
-            'params':[{'name':'mylist',
-            'long':'mylist',
-            'type':list,
-            'default':mylist
-            }]}}
+    return {{'actions': [image_check]
+            
+            }}
 
 def task_batch():
     """Run batch mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/data"
 
-    mylist=['docker', 'run','--volume','{}{}'.format(output_path,":/app/output"),'--volume','{}{}'.format(data_path,":/app/data"),'{}'.format(IMAGE),'python3','-m','{project_name}','--mode','batch']
+    def image_check():
         
-    return {{'actions': [(image_check,)],
-            'params':[{'name':'mylist',
-            'long':'mylist',
-            'type':list,
-            'default':mylist
-            }]}}
+        proc=subprocess.Popen(["docker", "run", "--volume","%s" %(output_path+":/app/output"),"--volume","%s" %(data_path,":/app/data"),"%s" %IMAGE,"python3","-m","%s" %{project_name},"--mode","batch"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc.wait()
+        (stdout,stderr)=proc.communicate()
+        
+        
+        if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
+            print("There is no docker image. Build the image first")
+        
+    return {{'actions': [image_check]
+            
+            }}
 
 def task_train_local():
     """Run training mode locally"""
@@ -101,17 +124,21 @@ def task_batch_local():
 
 def task_web():
     """Run web mode inside the container"""
-    
-    mylist=['docker', 'run','-p','8080:8080','{}'.format(IMAGE),'python3','-m','{project_name}','--mode','web']
+
+    def image_check():
+        
+        proc=subprocess.Popen(["docker", "run", "-p","8080:8080","%s" %IMAGE,"python3","-m","%s" %{project_name},"--mode","web"],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc.wait()
+        (stdout,stderr)=proc.communicate()
+        
+        
+        if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
+            print("There is no docker image. Build the image first")
         
 
 
-    return {{'actions': [(image_check,)],
-            'params':[{'name':'mylist',
-            'long':'mylist',
-            'type':list,
-            'default':mylist
-            }]}}
+    return {{'actions': [image_check]
+            }}
 
 def task_web_local():
     """Run web mode locally"""
