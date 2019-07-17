@@ -45,18 +45,8 @@ class Metadata(Mapping):
             'version': version,
         }
 
-    def generate_from_directory(self, directory):
-        root_level_dirs = []
-        all_files = []
-
-        for root, dirs, files in os.walk(directory):
-            for name in files:
-                all_files.append(os.path.join(root, name))
-
-            if os.path.abspath(root) == os.path.abspath(directory):
-                root_level_dirs.extend(dirs)
-
-        formats = get_formats_from_files(all_files)
+    def generate_from_files(self, files, root_level_dirs):
+        formats = get_formats_from_files(files)
         types = get_types_from_formats(formats)
 
         if root_level_dirs:
@@ -95,6 +85,19 @@ class Metadata(Mapping):
                     'types': types,
                     'language': None,
                 })
+
+    def generate_from_directory(self, directory):
+        root_level_dirs = []
+        all_files = []
+
+        for root, dirs, files in os.walk(directory):
+            for name in files:
+                all_files.append(os.path.join(root, name))
+
+            if os.path.abspath(root) == os.path.abspath(directory):
+                root_level_dirs.extend(dirs)
+
+        self.generate_from_files(all_files, root_level_dirs)
 
     def generate_from_file(self, filepath):
         formats = get_formats_from_files([filepath])

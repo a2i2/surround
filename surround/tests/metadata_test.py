@@ -163,6 +163,43 @@ class TestMetadata(unittest.TestCase):
         self.assertIn('Collection', metadata['summary']['types'])
         self.assertIn('text/plain', metadata['summary']['formats'])
 
+    def test_generate_from_files(self):
+        os.mkdir('test_data')
+
+        all_files = [
+            'test_data/image01.png',
+            'test_data/image02.png',
+            'test_dataset.csv',
+            'test_video.mp4'
+        ]
+
+        root_level_dirs = ['test_data']
+
+        for test_file in all_files:
+            with open(test_file, "w+") as f:
+                f.write("TEST_DATA")
+
+        metadata = Metadata()
+        metadata.generate_from_files(all_files, root_level_dirs)
+
+        for test_file in all_files:
+            os.unlink(test_file)
+
+        os.rmdir('test_data')
+
+        self.assertIn('image/png', metadata['summary']['formats'])
+        self.assertIn('application/vnd.ms-excel', metadata['summary']['formats'])
+        self.assertIn('video/mp4', metadata['summary']['formats'])
+        self.assertIn('StillImage', metadata['summary']['types'])
+        self.assertIn('MovingImage', metadata['summary']['types'])
+        self.assertIn('Dataset', metadata['summary']['types'])
+        self.assertIn('Collection', metadata['summary']['types'])
+
+        self.assertEqual('test_data', metadata['manifests'][0]['path'])
+        self.assertIn('image/png', metadata['manifests'][0]['formats'])
+        self.assertIn('StillImage', metadata['manifests'][0]['types'])
+        self.assertIn('Collection', metadata['manifests'][0]['types'])
+
     def test_generate_from_file(self):
         with open("test-file.txt", "w+") as f:
             f.write("This is a test data file")
