@@ -7,7 +7,7 @@ TYPE_FORMAT_MAPPING = {
     'Text': ['text/.*', 'application/pdf'],
     'StillImage': ['image/.*', 'application/pdf'],
     'MovingImage': ['video/.*'],
-    'Dataset': ['application/vnd.ms-excel', 'application/json'],
+    'Dataset': ['application/vnd.ms-excel', 'application/json', 'text/csv'],
     'Sound': ['audio/.*'],
     'Collection': ['application/x-zip-compressed']
 }

@@ -188,7 +188,11 @@ class TestMetadata(unittest.TestCase):
         os.rmdir('test_data')
 
         self.assertIn('image/png', metadata['summary']['formats'])
-        self.assertIn('application/vnd.ms-excel', metadata['summary']['formats'])
+
+        csv_type_in = 'application/vnd.ms-excel' in metadata['summary']['formats']
+        csv_type_in |= 'text/csv' in metadata['summary']['formats']
+
+        self.assertTrue(csv_type_in, msg="CSV mimetype must be found!")
         self.assertIn('video/mp4', metadata['summary']['formats'])
         self.assertIn('StillImage', metadata['summary']['types'])
         self.assertIn('MovingImage', metadata['summary']['types'])
