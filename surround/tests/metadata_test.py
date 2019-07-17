@@ -35,9 +35,27 @@ class TestMetadata(unittest.TestCase):
         if os.path.exists('test-file.txt'):
             os.unlink('test-file.txt')
 
+        all_files = [
+            'test_data/image01.png',
+            'test_data/image02.png',
+            'test_dataset.csv',
+            'test_video.mp4'
+        ]
+
+        for test_file in all_files:
+            if os.path.exists(test_file):
+                os.unlink(test_file)
+
+        if os.path.exists('test_data'):
+            os.rmdir('test_data')
+
     def test_create(self):
-        metadata = Metadata(version='v0.2')
-        self.assertEqual(metadata.get_property("version"), "v0.2")
+        metadata = Metadata(version='v0.1')
+
+        self.assertEqual(metadata.get_property("version"), "v0.1")
+        self.assertIn('title', metadata['summary'])
+        self.assertIn('description', metadata['summary'])
+        self.assertIsNone(metadata.get_property("manifests"))
 
     def test_load_from_path(self):
         metadata = Metadata()

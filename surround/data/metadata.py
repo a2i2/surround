@@ -10,40 +10,59 @@ class Metadata(Mapping):
     Represents metadata of a Data Container.
     """
 
+    # (TYPE, REQUIRED, SUB_SCHEMA)
     REQUIRED_FIELDS = {
         'v0.1': {
-            'version': True,
-            'summary': {
-                'title': True,
-                'creator': True,
-                'subject': True,
-                'description': True,
-                'publisher': True,
-                'contributor': True,
-                'date': True,
-                'types': True,
-                'formats': True,
-                'identifier': True,
-                'source': False,
-                'language': True,
-                'rights': True,
-                'under-ethics': True,
-            },
-            'manifests': {
-                'path': True,
-                'description': True,
-                'types': True,
-                'formats': True,
-                'language': True,
-            }
+            'version': (bool, True, None),
+            'summary': (dict, True, {
+                'title': (str, True, None),
+                'creator': (str, True, None),
+                'subject': (str, True, None),
+                'description': (str, True, None),
+                'publisher': (str, True, None),
+                'contributor': (str, True, None),
+                'date': (str, True, None),
+                'types': (list, True, None),
+                'formats': (list, True, None),
+                'identifier': (str, True, None),
+                'source': (str, False, None),
+                'language': (str, True, None),
+                'rights': (str, True, None),
+                'under-ethics': (bool, True, None),
+            }),
+            'manifests': (list, False, {
+                'path': (str, True, None),
+                'description': (str, True, None),
+                'types': (list, True, None),
+                'formats': (list, True, None),
+                'language': (str, True, None),
+            })
         }
     }
 
     def __init__(self, version='v0.1'):
         self.version = version
-        self.__storage = {
-            'version': version,
-        }
+        self.__storage = self.generate_default(version)
+
+    def generate_default(self, version):
+        def gen_dict(schema):
+            result = {}
+
+            for key, value in schema.items():
+                typ = value[0]
+                required = value[1]
+                sub_schema = value[2]
+
+                if required and typ is dict:
+                    result[key] = gen_dict(sub_schema)
+                elif key == 'version':
+                    result[key] = version
+                elif required:
+                    result[key] = typ()
+
+            return result
+
+        return gen_dict(self.REQUIRED_FIELDS[version])
 
     def generate_from_files(self, files, root_level_dirs):
         formats = get_formats_from_files(files)
