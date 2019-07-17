@@ -80,7 +80,7 @@ class Metadata(Mapping):
         }
 
         if root_level_dirs:
-            self.__storage['manifiests'] = []
+            self.__storage['manifests'] = []
             for root_dir in root_level_dirs:
                 formats = get_formats_from_directory(root_dir)
                 types = get_types_from_formats(formats)
