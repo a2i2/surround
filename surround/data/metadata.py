@@ -11,7 +11,7 @@ class Metadata(Mapping):
     """
 
     # (TYPE, REQUIRED, SUB_SCHEMA)
-    REQUIRED_FIELDS = {
+    SCHEMA = {
         'v0.1': {
             'version': (bool, True, None),
             'summary': (dict, True, {
@@ -62,7 +62,7 @@ class Metadata(Mapping):
 
             return result
 
-        return gen_dict(self.REQUIRED_FIELDS[version])
+        return gen_dict(self.SCHEMA[version])
 
     def generate_from_files(self, files, root_level_dirs):
         formats = get_formats_from_files(files)
