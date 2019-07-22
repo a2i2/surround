@@ -46,6 +46,8 @@ PROJECTS = {
     }
 }
 
+
+
 def process_directories(directories, project_dir, project_name):
     """
     Creates new directories in the project folder according to the list provided.
@@ -286,12 +288,25 @@ def parse_lint_args(args):
     :param args: the arguments parsed from the user
     :type args: <class 'argparse.Namespace'>
     """
-
+    
     linter = Linter()
+
+    if args.project_type:
+            project_type = args.project_type
+    else:
+        while True:
+            project_type = input("Is it a web based application (y/n) ")
+            if project_type.lower() == "y":
+                project_type = "y"
+                break
+            if project_type.lower() == "n":
+                project_type = "n"
+                break
+                
     if args.list:
         print(linter.dump_checks())
     else:
-        errors, warnings = linter.check_project(PROJECTS, args.path)
+        errors, warnings = linter.check_project(PROJECTS, args.path,project_type.lower())
         for e in errors + warnings:
             print(e)
         if not errors and not warnings:
@@ -455,6 +470,8 @@ def execute_cli():
     run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
+    linter_parser.add_argument('-p', '--project_type', help="Is this a web application or not?")
+    
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
     linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")

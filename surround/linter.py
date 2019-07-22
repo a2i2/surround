@@ -117,8 +117,13 @@ class CheckFiles(LinterStage):
             path = os.path.join(
                 surround_data.project_root,
                 file_name.format(project_name=surround_data.project_name))
+
+
             if not os.path.isfile(path):
-                self.add_error(surround_data, "Path %s does not exist" % path)
+                if surround_data.project_type=="n" and os.path.basename(path)=="web_runner.py":
+                    print("")
+                else:    
+                    self.add_error(surround_data, "Path %s does not exist" % path)
 
 
 class CheckDirectories(LinterStage):
@@ -172,6 +177,9 @@ class LinterValidator(Validator):
         if not isinstance(surround_data.project_root, str):
             surround_data.errors.append("ERROR: PROJECT_CHECK: Project root path is not a string")
 
+        if not isinstance(surround_data.project_type, str):
+            surround_data.errors.append("ERROR: PROJECT_CHECK: Project type  is not a string")
+
 class Main(Estimator):
     """
     Class responsible for executing all of the :class:`LinterStage`'s in the Surround Linter.
@@ -212,7 +220,7 @@ class ProjectData(SurroundData):
     - :attr:`project_name` - name of the surround project (:class:`str`)
     """
 
-    def __init__(self, project_structure, project_root, project_name):
+    def __init__(self, project_structure, project_root, project_name,project_type):
         """
         Constructor for the ProjectData class.
 
@@ -227,6 +235,7 @@ class ProjectData(SurroundData):
         self.project_structure = project_structure
         self.project_root = project_root
         self.project_name = project_name
+        self.project_type=project_type
 
 
 class Linter():
@@ -260,7 +269,7 @@ class Linter():
         return output
 
 
-    def check_project(self, project, project_root=os.curdir):
+    def check_project(self, project, project_root=os.curdir,project_type='n'):
         """
         Runs the linter against the project specified, returning any warnings/errors.
 
@@ -274,7 +283,7 @@ class Linter():
 
         root = os.path.abspath(project_root)
         project_name = os.path.basename(root)
-        data = ProjectData(project, root, project_name)
+        data = ProjectData(project, root, project_name,project_type)
         assembler = Assembler("Linting", LinterValidator(), Main(self.filters))
         assembler.init_assembler()
         assembler.run(data)

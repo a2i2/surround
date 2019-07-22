@@ -23,7 +23,7 @@ class LinterTest(unittest.TestCase):
         Test the linter on a valid project
         """
 
-        process = subprocess.Popen(['surround', 'lint'], cwd='test_proj/', encoding='utf-8', stdout=subprocess.PIPE)
+        process = subprocess.Popen(['surround', 'lint','-p','y'], cwd='test_proj/', encoding='utf-8', stdout=subprocess.PIPE)
         output = process.communicate()[0]
 
         # Linter should be able to locate .surround folder if project valid
@@ -34,7 +34,7 @@ class LinterTest(unittest.TestCase):
         Test the linter on an invalid project
         """
 
-        process = subprocess.Popen(['surround', 'lint'], cwd='.', encoding='utf-8', stdout=subprocess.PIPE)
+        process = subprocess.Popen(['surround', 'lint','-p','y'], cwd='.', encoding='utf-8', stdout=subprocess.PIPE)
         output = process.communicate()[0]
 
         # Linter won't be able to find .surround when attempting to lint an invalid dir
