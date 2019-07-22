@@ -7,11 +7,13 @@ CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
+
+
 def task_build():
     """Build the Docker image for the current project"""
     return {{
         'actions': ['docker build --tag=%s .' % IMAGE]
-    }}
+        }}
 
 
 def task_remove():
@@ -22,7 +24,10 @@ def task_remove():
         (stdout,stderr)=proc.communicate()
 
         if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
-           print("There is no docker image. Build the image first")
+                print("There is no docker image. Build the image first")
+        else:
+                print(stderr.decode("utf-8"))
+
 
     return {{ 'actions': [image_check]}}
 
@@ -39,7 +44,9 @@ def task_dev():
 
 
         if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
-            print("There is no docker image. Build the image first")
+                print("There is no docker image. Build the image first")
+        else:
+                print(stderr.decode("utf-8"))
 
 
     return {{'actions': [image_check]
@@ -66,6 +73,8 @@ def task_train():
 
         if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
                 print("There is no docker image. Build the image first")
+        else:
+                print(stderr.decode("utf-8"))
     return {{'actions': [image_check]
         }}
 
@@ -82,7 +91,9 @@ def task_batch():
 
 
         if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
-            print("There is no docker image. Build the image first")
+                print("There is no docker image. Build the image first")
+        else:
+                print(stderr.decode("utf-8"))
 
     return {{'actions': [image_check]
 
@@ -113,12 +124,13 @@ def task_web():
 
 
         if ("Unable to find image" in stderr.decode("utf-8")) or ("No such image" in stderr.decode("utf-8")):
-            print("There is no docker image. Build the image first")
-
+             print("There is no docker image. Build the image first")
+        else:
+            print(stderr.decode("utf-8"))
 
 
     return {{'actions': [image_check]
-            }}
+                }}
 
 def task_web_local():
     """Run web mode locally"""
