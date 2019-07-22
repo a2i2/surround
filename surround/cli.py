@@ -306,7 +306,7 @@ def parse_lint_args(args):
     if args.list:
         print(linter.dump_checks())
     else:
-        errors, warnings = linter.check_project(PROJECTS, args.path,project_type.lower())
+        errors, warnings = linter.check_project(PROJECTS, args.path, project_type.lower())
         for e in errors + warnings:
             print(e)
         if not errors and not warnings:

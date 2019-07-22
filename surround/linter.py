@@ -120,7 +120,7 @@ class CheckFiles(LinterStage):
 
 
             if not os.path.isfile(path):
-                if surround_data.project_type=="n" and os.path.basename(path)=="web_runner.py":
+                if surround_data.project_type == "n" and os.path.basename(path) == "web_runner.py":
                     print("")
                 else:    
                     self.add_error(surround_data, "Path %s does not exist" % path)
@@ -220,7 +220,7 @@ class ProjectData(SurroundData):
     - :attr:`project_name` - name of the surround project (:class:`str`)
     """
 
-    def __init__(self, project_structure, project_root, project_name,project_type):
+    def __init__(self, project_structure, project_root, project_name, project_type):
         """
         Constructor for the ProjectData class.
 
@@ -235,7 +235,7 @@ class ProjectData(SurroundData):
         self.project_structure = project_structure
         self.project_root = project_root
         self.project_name = project_name
-        self.project_type=project_type
+        self.project_type = project_type
 
 
 class Linter():
@@ -269,7 +269,7 @@ class Linter():
         return output
 
 
-    def check_project(self, project, project_root=os.curdir,project_type='n'):
+    def check_project(self, project, project_root=os.curdir, project_type='n'):
         """
         Runs the linter against the project specified, returning any warnings/errors.
 
@@ -283,7 +283,7 @@ class Linter():
 
         root = os.path.abspath(project_root)
         project_name = os.path.basename(root)
-        data = ProjectData(project, root, project_name,project_type)
+        data = ProjectData(project, root, project_name, project_type)
         assembler = Assembler("Linting", LinterValidator(), Main(self.filters))
         assembler.init_assembler()
         assembler.run(data)
