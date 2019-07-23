@@ -17,7 +17,7 @@ setup(name='surround',
       author='Scott Barnett',
       author_email='scott.barnett@deakin.edu.au',
       include_package_data=True,
-      packages=['surround', 'templates', 'surround.remote', 'surround.split', 'surround.visualise', 'surround.data'],
+      packages=['surround', 'templates', 'surround.remote', 'surround.split', 'surround.visualise', 'surround.data', 'surround.data.cli'],
       test_suite='surround.tests',
       entry_points={
           'console_scripts': [

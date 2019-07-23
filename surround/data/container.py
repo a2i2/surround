@@ -63,7 +63,7 @@ class DataContainer:
             metadata = self.metadata.save_to_data()
             container.writestr('manifest.yaml', metadata)
 
-    def import_directory(self, path, generate_metadata=True):
+    def import_directory(self, path, generate_metadata=True, reimport=True):
         if generate_metadata:
             # Generate the automatic fields in the metadata using the directory
             self.metadata.generate_from_directory(path)
@@ -76,6 +76,10 @@ class DataContainer:
             for name in files:
                 filepath = os.path.join(root, name)
                 internal_path = os.path.relpath(filepath, start=path)
+
+                # If requested, don't reimport already imported files
+                if not reimport and any([f[0] == filepath for f in self.__imported_files]):
+                    continue
 
                 self.import_file(filepath, internal_path, False)
 
