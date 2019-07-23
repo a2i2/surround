@@ -64,7 +64,7 @@ class Metadata(Mapping):
 
         return gen_dict(self.SCHEMA[version])
 
-    def generate_from_files(self, files, root_level_dirs):
+    def generate_from_files(self, files, root, root_level_dirs):
         formats = get_formats_from_files(files)
         types = get_types_from_formats(formats)
 
@@ -78,7 +78,7 @@ class Metadata(Mapping):
             self.__storage['manifests'] = []
 
             for root_dir in root_level_dirs:
-                formats = get_formats_from_directory(root_dir)
+                formats = get_formats_from_directory(os.path.join(root, root_dir))
                 types = get_types_from_formats(formats)
 
                 if 'Collection' not in types:
@@ -103,7 +103,7 @@ class Metadata(Mapping):
             if os.path.abspath(root) == os.path.abspath(directory):
                 root_level_dirs.extend(dirs)
 
-        self.generate_from_files(all_files, root_level_dirs)
+        self.generate_from_files(all_files, directory, root_level_dirs)
 
     def generate_from_file(self, filepath):
         formats = get_formats_from_files([filepath])

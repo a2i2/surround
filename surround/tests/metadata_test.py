@@ -47,6 +47,10 @@ class TestMetadata(unittest.TestCase):
                 os.unlink(test_file)
 
         if os.path.exists('test_data'):
+            for root, _, files in os.walk('test_data'):
+                for f in files:
+                    os.unlink(os.path.join(root, f))
+
             os.rmdir('test_data')
 
     def test_create(self):
@@ -174,12 +178,37 @@ class TestMetadata(unittest.TestCase):
         self.assertEqual(metadata['summary']['title'], 'test_title')
 
     def test_generate_from_directory(self):
+        os.mkdir('test_data')
+
+        test_files = ['test_data/file.png', 'test_data/file1.txt', 'test_data/file2.mp4']
+        for test_file in test_files:
+            with open(test_file, "w+") as f:
+                f.write("TEST_DATA")
+
         metadata = Metadata()
         metadata.generate_from_directory('.')
 
         self.assertIn('Text', metadata['summary']['types'])
+        self.assertIn('StillImage', metadata['summary']['types'])
+        self.assertIn('MovingImage', metadata['summary']['types'])
         self.assertIn('Collection', metadata['summary']['types'])
         self.assertIn('text/plain', metadata['summary']['formats'])
+        self.assertIn('image/png', metadata['summary']['formats'])
+        self.assertIn('video/mp4', metadata['summary']['formats'])
+
+        manifest = next(manifest for manifest in metadata['manifests'] if 'test_data' in manifest['path'])
+        self.assertIn('Text', manifest['types'])
+        self.assertIn('StillImage', manifest['types'])
+        self.assertIn('MovingImage', manifest['types'])
+        self.assertIn('Collection', manifest['types'])
+        self.assertIn('text/plain', manifest['formats'])
+        self.assertIn('image/png', manifest['formats'])
+        self.assertIn('video/mp4', manifest['formats'])
+
+        for test_file in test_files:
+            os.unlink(test_file)
+
+        os.rmdir('test_data')
 
     def test_generate_from_files(self):
         os.mkdir('test_data')
@@ -198,7 +227,7 @@ class TestMetadata(unittest.TestCase):
                 f.write("TEST_DATA")
 
         metadata = Metadata()
-        metadata.generate_from_files(all_files, root_level_dirs)
+        metadata.generate_from_files(all_files, '.', root_level_dirs)
 
         for test_file in all_files:
             os.unlink(test_file)
