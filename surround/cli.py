@@ -288,11 +288,10 @@ def parse_lint_args(args):
     :param args: the arguments parsed from the user
     :type args: <class 'argparse.Namespace'>
     """
-    
     linter = Linter()
 
     if args.project_type:
-            project_type = args.project_type
+        project_type = args.project_type
     else:
         while True:
             project_type = input("Is it a web based application (y/n) ")
@@ -302,7 +301,6 @@ def parse_lint_args(args):
             if project_type.lower() == "n":
                 project_type = "n"
                 break
-                
     if args.list:
         print(linter.dump_checks())
     else:
@@ -471,11 +469,9 @@ def execute_cli():
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_parser.add_argument('-p', '--project_type', help="Is this a web application or not?")
-    
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
     linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
-
     remote_parser = remote_cli.add_remote_parser(sub_parser)
     remote_cli.create_add_parser(sub_parser)
     remote_cli.add_pull_parser(sub_parser)

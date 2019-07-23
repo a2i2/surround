@@ -120,9 +120,10 @@ class CheckFiles(LinterStage):
 
 
             if not os.path.isfile(path):
+                
                 if surround_data.project_type == "n" and os.path.basename(path) == "web_runner.py":
                     print("")
-                else:    
+                else:
                     self.add_error(surround_data, "Path %s does not exist" % path)
 
 
