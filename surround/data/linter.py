@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from .container import DataContainer
-from .metadata import Metadata
 from .util import hash_zip, get_formats_from_files
 
 class DataLinterStage(ABC):
