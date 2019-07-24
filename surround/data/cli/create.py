@@ -194,6 +194,27 @@ def get_metadata_for_group(manifest, default_lang, group_number, group_count):
     manifest['description'] = description
     manifest['language'] = language
 
+def create_group_manifest(path, files, metadata):
+    formats = get_formats_from_files(files)
+    types = get_types_from_formats(formats)
+
+    if 'Collection' not in types:
+        types.append('Collection')
+
+    # Create manifests property if doesn't exist
+    manifests = metadata.get_property('manifests')
+    if manifests is None:
+        metadata.set_property('manifests', [])
+
+    # Create a manifest for this group
+    metadata['manifests'].append({
+        'path': path,
+        'description': None,
+        'language': None,
+        'formats': formats,
+        'types': types
+    })
+
 def attempt_detect_sequences(metadata, root_files):
     print("Searching for potential sequential groups...\n")
     names = [(name, os.path.splitext(os.path.basename(name))[0]) for name in root_files]
@@ -213,21 +234,8 @@ def attempt_detect_sequences(metadata, root_files):
         name = prompt("Enter a name if you would like to group them (or hit [ENTER] to skip): ", required=False)
 
         if name:
-            # Create a manifest for this group
-            formats = get_formats_from_files(group)
-            types = get_types_from_formats(formats)
-
-            if 'Collection' not in types:
-                types.append('Collection')
-
-            metadata['manifests'].append({
-                'path': name,
-                'description': None,
-                'language': None,
-                'formats': formats,
-                'types': types
-            })
-
+            # Create a manifest for the group in the metadata
+            create_group_manifest(name, group, metadata)
             return (name, group)
 
     return None
@@ -249,20 +257,7 @@ def attempt_detect_large_count(metadata, root_files):
 
             if name:
                 # Create a manifest for this group
-                formats = get_formats_from_files(group)
-                types = get_types_from_formats(formats)
-
-                if 'Collection' not in types:
-                    types.append('Collection')
-
-                metadata['manifests'].append({
-                    'path': name,
-                    'description': None,
-                    'language': None,
-                    'formats': formats,
-                    'types': types
-                })
-
+                create_group_manifest(name, group, metadata)
                 groups.append((name, group))
 
     return groups
@@ -296,21 +291,10 @@ def create_custom_groups(metadata, directory, existing_groups):
                     error_msg='This name is already taken! Please try again.')
 
                 if name:
-                    formats = get_formats_from_files(files)
-                    types = get_types_from_formats(formats)
-
-                    if 'Collection' not in types:
-                        types.append('Collection')
-
-                    metadata['manifests'].append({
-                        'path': name,
-                        'description': None,
-                        'language': None,
-                        'formats': formats,
-                        'types': types
-                    })
-
+                    # Create a manifest in the metadata for this group
+                    create_group_manifest(name, files, metadata)
                     groups.append((name, files))
+
             else:
                 print("No files were found for that pattern, skipping...\n")
 
