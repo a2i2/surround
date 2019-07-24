@@ -388,7 +388,7 @@ def execute_data_create_tool(parser, args):
         # Import the custom groups
         for name, files in groups:
             for f in files:
-                container.import_file(f, os.path.join(name, os.path.basename(f)))
+                container.import_file(f, os.path.join(name, os.path.basename(f)), generate_metadata=False)
 
         # Import the entire directory (without re-importing the custom files)
         container.import_directory(args.directory, generate_metadata=False, reimport=False)
