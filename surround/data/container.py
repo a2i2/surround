@@ -1,7 +1,7 @@
 import os
 import zipfile
 from .metadata import Metadata
-from .util import hash_file
+from .util import hash_zip
 
 class MetadataNotFoundError(Exception):
     """
@@ -53,7 +53,7 @@ class DataContainer:
         self.__imported_files.clear()
 
         # Hash the zip file without the metadata
-        container_hash = hash_file(self.path)
+        container_hash = hash_zip(self.path)
 
         with zipfile.ZipFile(self.path, 'a') as container:
             # Set the identifier field to the calculated hash
