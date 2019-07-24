@@ -112,15 +112,13 @@ class CheckFiles(LinterStage):
         :type config: :class:`surround.config.Config`
         """
 
-        for result in surround_data.project_structure["new"]["files"] + surround_data.project_structure["new"]["templates"]:
+        for result in surround_data.project_structure["new"]["files"] + surround_data.project_structure["new"][
+                "templates"]:
             file_name = result[0]
-            path = os.path.join(
-                surround_data.project_root,
-                file_name.format(project_name=surround_data.project_name))
-
+            path = os.path.join(surround_data.project_root, file_name.format(project_name=surround_data.project_name))
 
             if not os.path.isfile(path):
-                
+
                 if surround_data.project_type == "n" and os.path.basename(path) == "web_runner.py":
                     print("")
                 else:
@@ -133,9 +131,7 @@ class CheckDirectories(LinterStage):
     """
 
     def __init__(self):
-        LinterStage.__init__(
-            self, "DIRECTORIES",
-            "Check for validating Surround's directory structure")
+        LinterStage.__init__(self, "DIRECTORIES", "Check for validating Surround's directory structure")
 
     def operate(self, surround_data, config):
         """
@@ -149,10 +145,10 @@ class CheckDirectories(LinterStage):
         """
 
         for d in surround_data.project_structure["new"]["dirs"]:
-            path = os.path.join(surround_data.project_root,
-                                d.format(project_name=surround_data.project_name))
+            path = os.path.join(surround_data.project_root, d.format(project_name=surround_data.project_name))
             if not os.path.isdir(path):
                 self.add_error(surround_data, "Directory %s does not exist" % path)
+
 
 class LinterValidator(Validator):
     """
@@ -180,6 +176,7 @@ class LinterValidator(Validator):
 
         if not isinstance(surround_data.project_type, str):
             surround_data.errors.append("ERROR: PROJECT_CHECK: Project type  is not a string")
+
 
 class Main(Estimator):
     """
@@ -268,7 +265,6 @@ class Linter():
                 s.write("\n%s - %s" % (stage.key, stage.description))
             output = s.getvalue()
         return output
-
 
     def check_project(self, project, project_root=os.curdir, project_type='n'):
         """
