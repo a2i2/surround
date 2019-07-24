@@ -13,11 +13,11 @@ class Metadata(Mapping):
     # (TYPE, REQUIRED, SUB_SCHEMA)
     SCHEMA = {
         'v0.1': {
-            'version': (bool, True, None),
+            'version': (str, True, None),
             'summary': (dict, True, {
                 'title': (str, True, None),
                 'creator': (str, True, None),
-                'subject': (str, True, None),
+                'subject': (list, True, None),
                 'description': (str, True, None),
                 'publisher': (str, True, None),
                 'contributor': (str, True, None),
