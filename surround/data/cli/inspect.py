@@ -49,13 +49,14 @@ def perform_metadata_inspection(container):
     print("  Language:       %s" % metadata['summary']['language'])
     print()
 
-    for manifest in metadata['manifests']:
-        print("'%s' Group Metadata:" % manifest['path'])
-        print("  Description:   %s" % manifest['description'])
-        print("  Language:      %s" % manifest['language'])
-        print("  Formats:       %s" % manifest['formats'])
-        print("  Types:         %s" % manifest['types'])
-        print()
+    if metadata.get_property('manifests'):
+        for manifest in metadata['manifests']:
+            print("'%s' Group Metadata:" % manifest['path'])
+            print("  Description:   %s" % manifest['description'])
+            print("  Language:      %s" % manifest['language'])
+            print("  Formats:       %s" % manifest['formats'])
+            print("  Types:         %s" % manifest['types'])
+            print()
 
 def perform_content_inspection(container):
     print("Contents:")

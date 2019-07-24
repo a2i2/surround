@@ -247,7 +247,7 @@ def attempt_detect_large_count(metadata, root_files):
     for extension in unique_extensions:
         group = [f for f in root_files if os.path.splitext(f)[1] == extension]
         if len(group) > 4:
-            print("Possible group deteted (via extensions)!")
+            print("Possible group with %i files detected (via extensions)!" % len(group))
             print("Here are the first few detected:")
             for name in group[:5]:
                 print(name)
@@ -323,8 +323,9 @@ def get_metadata_for_groups(metadata, directory):
     groups.extend(create_custom_groups(metadata, directory, groups))
 
     # Fill in metadata for folders & groups in the directory
-    for i, manifest in enumerate(metadata['manifests']):
-        get_metadata_for_group(manifest, metadata['summary']['language'], i + 1, len(metadata['manifests']))
+    if metadata.get_property('manifests'):
+        for i, manifest in enumerate(metadata['manifests']):
+            get_metadata_for_group(manifest, metadata['summary']['language'], i + 1, len(metadata['manifests']))
 
     return groups
 
