@@ -89,7 +89,7 @@ class CheckData(LinterStage):
         """
 
         path = os.path.join(surround_data.project_root, "data")
-        if not os.listdir(path):
+        if os.path.exists(path) and not os.listdir(path):
             self.add_warning(surround_data, "No data available, data directory is empty")
 
 
