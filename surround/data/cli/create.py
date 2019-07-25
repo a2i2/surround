@@ -3,6 +3,7 @@ import re
 import argparse
 import datetime
 import mimetypes
+import uuid
 
 from ..metadata import Metadata
 from ..container import DataContainer
@@ -377,6 +378,7 @@ def generate_metadata():
     # Set the formats and types to the summary metadata
     metadata.set_property("summary.formats", formats)
     metadata.set_property("summary.types", types)
+    metadata.set_property("summary.identifier", str(uuid.uuid4()))
 
     if groups:
         groups = [g.split() for g in re.split(',| ,', groups)]
