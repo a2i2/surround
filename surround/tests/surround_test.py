@@ -7,12 +7,12 @@ test_text = "hello"
 
 
 class HelloStage(Estimator):
-    def estimate(self, surround_data, config):
-        surround_data.text = test_text
+    def estimate(self, state, config):
+        state.text = test_text
         if "helloStage" in config:
-            surround_data.config_value = config["helloStage"]["suffix"]
+            state.config_value = config["helloStage"]["suffix"]
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("No training implemented")
 
 
@@ -25,17 +25,17 @@ class BasicData(State):
 
 
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if surround_data.text:
+    def validate(self, state, config):
+        if state.text:
             raise ValueError("'text' is not None")
 
-        if surround_data.config_value:
+        if state.config_value:
             raise ValueError("'config_value' is not None")
 
-        if surround_data.stage1:
+        if state.stage1:
             raise ValueError("'stage1' is not None")
 
-        if surround_data.stage2:
+        if state.stage2:
             raise ValueError("'stage2' is not None")
 
 

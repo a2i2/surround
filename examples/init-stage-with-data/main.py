@@ -13,10 +13,10 @@ class HelloWorld(Estimator):
         filename = config.get_path("surround.path_to_HelloWorld")
         self.file_ = open(prefix + filename, "r")
 
-    def estimate(self, surround_data, config):
-        surround_data.text = self.file_.read()
+    def estimate(self, state, config):
+        state.text = self.file_.read()
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("No training implemented")
 
 
@@ -25,8 +25,8 @@ class BasicData(State):
 
 
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if surround_data.text:
+    def validate(self, state, config):
+        if state.text:
             raise ValueError("'text' is not None")
 
 

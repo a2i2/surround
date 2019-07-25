@@ -34,15 +34,15 @@ import logging
 from surround import State, Validator, Estimator, Assembler
 
 class HelloWorld(Estimator):
-    def estimate(self, surround_data, config):
-        surround_data.text = "Hello world"
+    def estimate(self, state, config):
+        state.text = "Hello world"
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("No training implemented")
 
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if surround_data.text:
+    def validate(self, state, config):
+        if state.text:
             raise ValueError("'text' is not None")
 
 class BasicData(State):

@@ -15,9 +15,9 @@ class Visualiser(ABC):
         import matplotlib.pyplot as plt
 
         class Accuracy(Visualiser):
-            def visualise(self, surround_data, config):
-                x = get_epochs(surround_data)
-                y = get_accuracy_over_epochs(surround_data)
+            def visualise(self, state, config):
+                x = get_epochs(state)
+                y = get_accuracy_over_epochs(state)
 
                 plt.plot(x, y)
                 plt.title("Epochs vs Accuracy")
@@ -32,17 +32,17 @@ class Visualiser(ABC):
     """
 
     @abstractmethod
-    def visualise(self, surround_data, config):
+    def visualise(self, state, config):
         """
-        Prettify/format the data contained in ``surround_data``.
+        Prettify/format the data contained in ``state``.
 
         Called by :meth:`surround.assembler.Assembler.run` after all other stages in
         the pipline have been executed.
 
         .. note:: This should only be called by the :ref:`assembler`!
 
-        :param surround_data: Stores the results of the pipeline execution
-        :type surround_data: Instance or child of :class:`surround.State`
+        :param state: Stores the results of the pipeline execution
+        :type state: Instance or child of :class:`surround.State`
         :param config: Config of the pipeline
         :type config: :class:`surround.config.Config`
         """

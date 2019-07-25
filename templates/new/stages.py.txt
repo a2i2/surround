@@ -7,13 +7,13 @@ class {safe_project_name}Data(State):
 
 
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if not surround_data.input_data:
+    def validate(self, state, config):
+        if not state.input_data:
             raise ValueError("'input_data' is None")
 
 class Main(Estimator):
-    def estimate(self, surround_data, config):
-        surround_data.output_data = surround_data.input_data
+    def estimate(self, state, config):
+        state.output_data = state.input_data
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("TODO: Train your model here")

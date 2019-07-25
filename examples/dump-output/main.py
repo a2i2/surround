@@ -9,28 +9,28 @@ class WriteHello(Filter):
     def __init__(self, dir_path):
         self.dir_path = dir_path
 
-    def dump_output(self, surround_data, config):
+    def dump_output(self, state, config):
         text_file = open(self.dir_path + hello_file_path, "w")
-        text_file.write(surround_data.text)
+        text_file.write(state.text)
         text_file.close()
 
-    def operate(self, surround_data, config):
-        surround_data.text = "Hello"
+    def operate(self, state, config):
+        state.text = "Hello"
 
 
 class WriteWorld(Estimator):
     def __init__(self, dir_path):
         self.dir_path = dir_path
 
-    def dump_output(self, surround_data, config):
+    def dump_output(self, state, config):
         text_file = open(self.dir_path + world_file_path, "w")
-        text_file.write(surround_data.text)
+        text_file.write(state.text)
         text_file.close()
 
-    def estimate(self, surround_data, config):
-        surround_data.text = "World"
+    def estimate(self, state, config):
+        state.text = "World"
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("Not training implementation")
 
 
@@ -39,8 +39,8 @@ class BasicData(State):
 
 
 class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if surround_data.text:
+    def validate(self, state, config):
+        if state.text:
             raise ValueError("'text' is not None")
 
 if __name__ == "__main__":

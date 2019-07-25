@@ -11,14 +11,14 @@ class Stage(ABC):
     - :class:`surround.stage.Filter`
     """
 
-    def dump_output(self, surround_data, config):
+    def dump_output(self, state, config):
         """
         Dump the output of the stage after the stage has transformed the data.
 
         .. note:: This is called by :meth:`surround.assembler.Assembler.run` (when dumping output is requested).
 
-        :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of the :class:`surround.State` class
+        :param state: Stores intermediate data from each stage in the pipeline
+        :type state: Instance or child of the :class:`surround.State` class
         :param config: Config of the pipeline
         :type config: :class:`surround.config.Config`
         """
@@ -43,22 +43,22 @@ class Validator(ABC):
     Example::
 
         class ValidateData(Validator):
-            def validate(self, surround_data, config):
-                if not surround_data.input_data:
+            def validate(self, state, config):
+                if not state.input_data:
                     # Stop the pipeline, we have no data!
-                    surround_data.errors.append("'input_data' is None")
+                    state.errors.append("'input_data' is None")
     """
 
     @abstractmethod
-    def validate(self, surround_data, config):
+    def validate(self, state, config):
         """
-        Validate data being loaded into the pipeline. Appending to ``surround_data.errors``
-        or ``surround_data.warnings`` when problems are found with the input data.
+        Validate data being loaded into the pipeline. Appending to ``state.errors``
+        or ``state.warnings`` when problems are found with the input data.
 
         .. note:: This should only be called by :meth:`surround.assembler.Assembler.run`.
 
-        :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of the :class:`surround.State` class
+        :param state: Stores intermediate data from each stage in the pipeline
+        :type state: Instance or child of the :class:`surround.State` class
         :param config: Config of the pipeline
         :type config: :class:`surround.config.Config`
         """
@@ -83,12 +83,12 @@ class Filter(Stage):
     Example::
 
         class ConvertFromJSONString(Filter):
-            def operate(self, surround_data, config):
-                surround_data.input_data = json.loads(self.input_data)
+            def operate(self, state, config):
+                state.input_data = json.loads(self.input_data)
 
         class ConvertToJSONString(Filter):
-            def operate(self, surround_data, config):
-                surround_data.output_data = json.dumps(self.input_data)
+            def operate(self, state, config):
+                state.output_data = json.dumps(self.input_data)
 
         assembler = Assembler("Example", ValidationStage())
 
@@ -103,14 +103,14 @@ class Filter(Stage):
     """
 
     @abstractmethod
-    def operate(self, surround_data, config):
+    def operate(self, state, config):
         """
         Modify data before/after it enters an :class:`surround.stage.Estimator`.
 
         .. note:: This should only be called by :meth:`surround.assembler.Assembler.run`.
 
-        :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of the :class:`surround.State` class
+        :param state: Stores intermediate data from each stage in the pipeline
+        :type state: Instance or child of the :class:`surround.State` class
         :param config: Contains the settings for each stage
         :type config: :class:`surround.config.Config`
         """
@@ -129,36 +129,36 @@ class Estimator(Stage):
             def init_stage(self, config):
                 self.model = load_model(os.path.join(config["models_path"], "model.pb"))
 
-            def estimate(self, surround_data, config):
-                surround_data.output_data = run_model(self.model)
+            def estimate(self, state, config):
+                state.output_data = run_model(self.model)
 
-            def fit(self, surround_data, config):
-                surround_data.output_data = train_model(self.model)
+            def fit(self, state, config):
+                state.output_data = train_model(self.model)
     """
 
     @abstractmethod
-    def estimate(self, surround_data, config):
+    def estimate(self, state, config):
         """
         Process input data and store estimated values.
 
         .. note:: This method is ONLY called by :meth:`surround.assembler.Assembler.run` when
                   running in predict/batch-predict mode.
 
-        :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of the :class:`surround.State` class
+        :param state: Stores intermediate data from each stage in the pipeline
+        :type state: Instance or child of the :class:`surround.State` class
         :param config: Contains the settings for each stage
         :type config: :class:`surround.config.Config`
         """
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         """
         Train a model using the input data.
 
         .. note:: This method is ONLY called by :meth:`surround.assembler.Assembler.run` when
                   running in training mode.
 
-        :param surround_data: Stores intermediate data from each stage in the pipeline
-        :type surround_data: Instance or child of the :class:`surround.State` class
+        :param state: Stores intermediate data from each stage in the pipeline
+        :type state: Instance or child of the :class:`surround.State` class
         :param config: Contains the settings for each stage
         :type config: :class:`surround.config.Config`
         """

@@ -124,7 +124,7 @@ class Assembler(ABC):
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
-    def run(self, surround_data=None, is_training=False):
+    def run(self, state=None, is_training=False):
         """
         Run the pipeline using the input data provided.
 
@@ -137,21 +137,21 @@ class Assembler(ABC):
         If ``surround.enable_stage_output_dump`` is enabled in the Config instance then each filter and
         estimator's :meth:`surround.stage.Stage.dump_output` method will be called.
 
-        This method doesn't return anything, instead results should be stored in the ``surround_data``
+        This method doesn't return anything, instead results should be stored in the ``state``
         object passed in the parameters.
 
-        :param surround_data: Data passed between each stage in the pipeline
-        :type surround_data: :class:`surround.State`
+        :param state: Data passed between each stage in the pipeline
+        :type state: :class:`surround.State`
         :param is_training: Run the pipeline in training mode or not
         :type is_training: bool
         """
 
         LOGGER.info("Starting '%s'", self.assembler_name)
-        if not surround_data:
-            raise ValueError("surround_data is required to run an assembler")
-        self.surround_data = surround_data
+        if not state:
+            raise ValueError("state is required to run an assembler")
+        self.state = state
         try:
-            self.validator.validate(self.surround_data, self.config)
+            self.validator.validate(self.state, self.config)
             self.__run_pipeline(is_training)
         except Exception:
             LOGGER.exception("Failed running Assembler")
@@ -169,47 +169,47 @@ class Assembler(ABC):
         """
 
         if self.pre_filters:
-            self.__execute_filters(self.pre_filters, self.surround_data)
+            self.__execute_filters(self.pre_filters, self.state)
 
         if is_training:
-            self.__execute_fit(self.surround_data)
+            self.__execute_fit(self.state)
         else:
-            self.__execute_main(self.surround_data)
+            self.__execute_main(self.state)
 
         if self.post_filters:
-            self.__execute_filters(self.post_filters, self.surround_data)
+            self.__execute_filters(self.post_filters, self.state)
 
         if (is_training or self.batch_mode) and self.visualiser:
-            self.visualiser.visualise(self.surround_data, self.config)
+            self.visualiser.visualise(self.state, self.config)
 
-    def __execute_filters(self, filters, surround_data):
+    def __execute_filters(self, filters, state):
         """
         Safely executes each filter in the list provided on the
         data provided and calculates time taken to execute the filters.
 
         :param filters: collection of filters to be executed
         :type filters: list of :class:`surround.stage.Filter`
-        :param surround_data: the data being filtered
-        :type surround_data: :class:`surround.State`
+        :param state: the data being filtered
+        :type state: :class:`surround.State`
         """
 
-        surround_data.freeze()
+        state.freeze()
         start_time = datetime.now()
 
         try:
             for stage in filters:
-                self.__execute_filter(stage, surround_data)
-                if surround_data.errors:
+                self.__execute_filter(stage, state)
+                if state.errors:
                     LOGGER.error("Error during processing")
-                    LOGGER.error(surround_data.errors)
+                    LOGGER.error(state.errors)
                     break
             execution_time = datetime.now() - start_time
-            surround_data.execution_time = str(execution_time)
+            state.execution_time = str(execution_time)
             LOGGER.info("Filter took %s secs", execution_time)
         except Exception:
             LOGGER.exception("Failed processing Surround Filters")
 
-        surround_data.thaw()
+        state.thaw()
 
     def __execute_filter(self, stage, stage_data):
         """
@@ -233,46 +233,46 @@ class Assembler(ABC):
         stage_data.stage_metadata.append({type(stage).__name__: str(stage_execution_time)})
         LOGGER.info("Filter %s took %s secs", type(stage).__name__, stage_execution_time)
 
-    def __execute_main(self, surround_data):
+    def __execute_main(self, state):
         """
         Executes the :meth:`surround.stage.Estimator.estimate` method (used for
         batch-predict/predict mode), taking care of time tracking and dumping
         output (if requested).
 
-        :param surround_data: data being fed into the estimator
-        :type surround_data: :class:`surround.State`
+        :param state: data being fed into the estimator
+        :type state: :class:`surround.State`
         """
 
         main_start = datetime.now()
-        self.estimator.estimate(surround_data, self.config)
+        self.estimator.estimate(state, self.config)
 
         if self.config and self.config["surround"]["enable_stage_output_dump"]:
-            self.estimator.dump_output(surround_data, self.config)
+            self.estimator.dump_output(state, self.config)
 
         # Calculate and log filter duration
         main_execution_time = datetime.now() - main_start
-        surround_data.stage_metadata.append({type(self.estimator).__name__: str(main_execution_time)})
+        state.stage_metadata.append({type(self.estimator).__name__: str(main_execution_time)})
         LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
 
 
-    def __execute_fit(self, surround_data):
+    def __execute_fit(self, state):
         """
         Executes the :meth:`surround.stage.Estimator.fit` method (used for training mode),
         taking care of time tracking and dumping output (if requested)
 
-        :param surround_data: data being fed into the estimator
-        :type surround_data: :class:`surround.State`
+        :param state: data being fed into the estimator
+        :type state: :class:`surround.State`
         """
 
         fit_start = datetime.now()
-        self.estimator.fit(surround_data, self.config)
+        self.estimator.fit(state, self.config)
 
         if self.config and self.config["surround"]["enable_stage_output_dump"]:
-            self.estimator.dump_output(surround_data, self.config)
+            self.estimator.dump_output(state, self.config)
 
         # Calculate and log filter duration
         fit_execution_time = datetime.now() - fit_start
-        surround_data.stage_metadata.append({type(self.estimator).__name__: str(fit_execution_time)})
+        state.stage_metadata.append({type(self.estimator).__name__: str(fit_execution_time)})
         LOGGER.info("Fitting %s took %s secs", type(self.estimator).__name__, fit_execution_time)
 
     def load_config(self, module):

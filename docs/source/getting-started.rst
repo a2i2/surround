@@ -97,33 +97,33 @@ Open the script ``stages.py`` and you should see the following code already gene
         output_data = None
 
     class ValidateData(Validator):
-        def validate(self, surround_data, config):
-            if not surround_data.input_data:
+        def validate(self, state, config):
+            if not state.input_data:
                 raise ValueError("'input_data' is None")
 
     class Main(Estimator):
-        def estimate(self, surround_data, config):
-            surround_data.output_data = surround_data.input_data
+        def estimate(self, state, config):
+            state.output_data = state.input_data
 
-        def fit(self, surround_data, config):
+        def fit(self, state, config):
             print("TODO: Train your model here")
 
 As you can see we are already given the ``ValidateData`` stage, we just need to edit the ``operate`` method to
 check if the input data is the correct data type (:class:`str`)::
 
-    def validate(self, surround_data, config):
-        if not isinstance(surround_data.input_data, str):
+    def validate(self, state, config):
+        if not isinstance(state.input_data, str):
             # Create an error sine the data is wrong, this will stop the pipeline
-            surround_data.errors.append('Input is not a string!')
+            state.errors.append('Input is not a string!')
 
 Now we need to rename ``Main`` to ``MakeUpperCase`` and perform the data transformation in ``estimate``::
 
     class MakeUpperCase(Estimator):
-        def estimate(self, surround_data, config):
+        def estimate(self, state, config):
             # Convert the input into upper case
-            surround_data.output_data = surround_data.input_data.upper()
+            state.output_data = state.input_data.upper()
         
-        def fit(self, surround_data, config):
+        def fit(self, state, config):
             # Leave the fit method the same 
             # We aren't doing any training in this guide
             print("TODO: Train your model here")
