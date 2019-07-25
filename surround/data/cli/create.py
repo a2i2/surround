@@ -156,9 +156,9 @@ def get_summary_metadata_from_user(metadata):
     contributor = prompt("What is the name of the individual who sent you this data: ", validator=lambda x: re.match('[A-Za-z]+', x), error_msg='Must contain letters only!')
 
     print("When did they send you this data? Hit [ENTER] to use the current date & time.")
-    print("Date formatting (ISO 8601): YYYY-MM-DDThh:mm:ss")
+    print("Date formatting (ISO 8601): YYYY-MM-DDThh:mm")
 
-    date_pattern = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}"
+    date_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}"
     current_date = re.match(date_pattern, datetime.datetime.now().isoformat())
     current_date = current_date.group(0)
 
