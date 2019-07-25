@@ -31,7 +31,7 @@ A short explanation is provided in the hello-world example's [README](examples/h
 ```python
 from surround import Stage, State, Surround
 import logging
-from surround import SurroundData, Validator, Estimator, Assembler
+from surround import State, Validator, Estimator, Assembler
 
 class HelloWorld(Estimator):
     def estimate(self, surround_data, config):

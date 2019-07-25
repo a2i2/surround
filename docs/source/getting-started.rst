@@ -90,9 +90,9 @@ from lower case to upper case. This pipeline is going to consist of two stages, 
 
 Open the script ``stages.py`` and you should see the following code already generated::
 
-    from surround import Estimator, SurroundData, Validator
+    from surround import Estimator, State, Validator
 
-    class TestprojectData(SurroundData):
+    class TestprojectData(State):
         input_data = None
         output_data = None
 

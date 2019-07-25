@@ -141,7 +141,7 @@ class Assembler(ABC):
         object passed in the parameters.
 
         :param surround_data: Data passed between each stage in the pipeline
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         :param is_training: Run the pipeline in training mode or not
         :type is_training: bool
         """
@@ -190,7 +190,7 @@ class Assembler(ABC):
         :param filters: collection of filters to be executed
         :type filters: list of :class:`surround.stage.Filter`
         :param surround_data: the data being filtered
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         """
 
         surround_data.freeze()
@@ -219,7 +219,7 @@ class Assembler(ABC):
         :param stage: the filter
         :type stage: :class:`surround.stage.Filter`
         :param stage_data: data being filtered
-        :type stage_data: :class:`surround.SurroundData`
+        :type stage_data: :class:`surround.State`
         """
 
         stage_start = datetime.now()
@@ -240,7 +240,7 @@ class Assembler(ABC):
         output (if requested).
 
         :param surround_data: data being fed into the estimator
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         """
 
         main_start = datetime.now()
@@ -261,7 +261,7 @@ class Assembler(ABC):
         taking care of time tracking and dumping output (if requested)
 
         :param surround_data: data being fed into the estimator
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         """
 
         fit_start = datetime.now()

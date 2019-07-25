@@ -60,7 +60,7 @@ class State(Frozen):
 
     Example::
 
-        class PipelineData(SurroundData):
+        class PipelineData(State):
             # Extra attributes must be defined before the pipeline is ran!
             input_data = None
             output_data = None

@@ -1,7 +1,7 @@
 import os
 import io
 from .stage import Filter, Estimator, Validator
-from .surround import SurroundData
+from .state import State
 from .assembler import Assembler
 
 
@@ -83,7 +83,7 @@ class CheckData(LinterStage):
         If there is none then a warning will be issued.
 
         :param surround_data: the data being passed between stages
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
@@ -107,7 +107,7 @@ class CheckFiles(LinterStage):
         Will create errors if required surround project files are missing in the root directory.
 
         :param surround_data: the data being passed between stages
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         :param config: the linter's configuation data
         :type config: :class:`surround.config.Config`
         """
@@ -137,7 +137,7 @@ class CheckDirectories(LinterStage):
         If the expected directories don't exist then errors will be created.
 
         :param surround_data: the data being passed between stages
-        :type surround_data: :class:`surround.SurroundData`
+        :type surround_data: :class:`surround.State`
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
