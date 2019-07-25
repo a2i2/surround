@@ -2,6 +2,7 @@ import os
 import re
 import argparse
 import datetime
+import mimetypes
 
 from ..metadata import Metadata
 from ..container import DataContainer
@@ -72,6 +73,8 @@ def get_data_create_parser():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', '--file', type=lambda x: is_valid_file(parser, x), help="Path to file to import into container")
     group.add_argument('-d', '--directory', type=lambda x: is_valid_dir(parser, x), help="Path to directory to import into container")
+    group.add_argument('-nd', '--no-data', action='store_true', help="Generate metadata without a file system")
+
     parser.add_argument('-o', '--output', type=lambda x: is_valid_output_file(parser, x), help="Path to file to export container to (default: specified-path.data.zip)")
     parser.add_argument('-e', '--export-metadata', type=lambda x: is_valid_json_output(parser, x), help="Path to JSON file to export metadata to")
 
@@ -121,7 +124,7 @@ def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, 
         return answer
 
 def parse_subject(subject):
-    return re.split(', |,', subject)
+    return [s.split() for s in re.split(', |,', subject)]
 
 def validate_language_code(language_code):
     return re.match('[a-z]{2}', language_code)
@@ -337,7 +340,7 @@ def get_metadata_for_groups(metadata, directory):
 
     return groups
 
-def generate_metadata(args):
+def generate_metadata_from_data(args):
     metadata = Metadata()
 
     # Get manual fields filled in by the user
@@ -353,6 +356,54 @@ def generate_metadata(args):
         groups = get_metadata_for_groups(metadata, args.directory)
 
     return metadata, groups
+
+def is_valid_mime_type(mime_type):
+    types = re.split(',| ,', mime_type)
+    return all([re.match(r'^.+/.+$', m) and m.strip() in mimetypes.types_map.values() for m in types])
+
+def generate_metadata():
+    metadata = Metadata()
+
+    # Get the manual fields fileld in by the user
+    get_summary_metadata_from_user(metadata)
+
+    # Get the formats and groups from the user since these can't be auto genereated
+    formats = prompt("What data formats make up the data? (MIME type e.g. text/plain)\nAnswer (comma separated): ", validator=is_valid_mime_type)
+    groups = prompt("What groups (folders, collections) are in the data?\nAnswer (comma separated): ", required=False)
+
+    formats = [f.strip() for f in re.split(',| ,', formats)]
+    types = get_types_from_formats(formats)
+
+    # Set the formats and types to the summary metadata
+    metadata.set_property("summary.formats", formats)
+    metadata.set_property("summary.types", types)
+
+    if groups:
+        groups = [g.split() for g in re.split(',| ,', groups)]
+        metadata.set_property('manifests', [])
+
+        # Get all the metadata for each group
+        for i, group in enumerate(groups):
+            manifest = {
+                'path': group,
+                'description': None,
+                'language': None,
+                'formats': None,
+                'types': None
+            }
+
+            get_metadata_for_group(manifest, metadata['summary']['language'], i + 1, len(groups))
+
+            formats = prompt("What data formats make up the group? (MIME type e.g. text/plain)\nAnswer (comma separated): ", validator=is_valid_mime_type)
+            formats = [f.strip() for f in re.split(',| ,', formats)]
+            types = get_types_from_formats(formats)
+
+            manifest['formats'] = formats
+            manifest['types'] = types
+
+            metadata['manifests'].append(manifest)
+
+    return metadata
 
 def create_container(metadata, groups, args):
     # If no output specified, use folder/file name with .data.zip as output path
@@ -387,26 +438,34 @@ def create_container(metadata, groups, args):
 
     print("Success! Data container exported to path %s" % output_file)
 
-    return container
-
 def execute_data_create_tool(parser, args):
     # Ensure paths given are converted to absolute paths
     if args.file:
         args.file = os.path.abspath(args.file)
-    else:
+    elif args.directory:
         args.directory = os.path.abspath(args.directory)
+    elif not args.export_metadata:
+        print("error: --export-metadata argument required when using no data!")
+        return
 
-    print("============[Creating a data container]============")
-    print("Generating metadata...")
-    print()
-    metadata, groups = generate_metadata(args)
+    if args.no_data:
+        print("============[Creating data metadata]=============")
+        print("Generating metadata...")
+        print()
 
-    print("Creating the container...")
-    container = create_container(metadata, groups, args)
+        metadata = generate_metadata()
+    else:
+        print("============[Creating a data container]============")
+        print("Generating metadata...")
+        print()
+        metadata, groups = generate_metadata_from_data(args)
+
+        print("Creating the container...")
+        create_container(metadata, groups, args)
 
     # Export metadata to JSON file if requested
     if args.export_metadata:
-        container.metadata.save_to_json_file(args.export_metadata)
+        metadata.save_to_json_file(args.export_metadata)
         print("Exported the metadata to a JSON file: %s" % args.export_metadata)
 
 def main():
