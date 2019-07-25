@@ -174,11 +174,7 @@ class DataLinter:
             return False
 
         metadata = container.metadata
-
-        if check_id is not None:
-            stages = [self.stages[check_id - 1]]
-        else:
-            stages = self.stages
+        stages = [self.stages[check_id - 1]] if check_id is not None else self.stages
 
         for i, stage in enumerate(stages):
             # If we are just doing one check, skip all the rest
