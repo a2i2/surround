@@ -59,6 +59,13 @@ def is_valid_output_file(parser, x):
 
     return x
 
+def is_valid_json_output(parser, x):
+    if not os.path.exists(os.path.dirname(os.path.abspath(x))):
+        parser.error('Cannot export the metadata to that path!')
+        return False
+
+    return x
+
 def get_data_create_parser():
     parser = argparse.ArgumentParser(description='Create a data container from a file or directory', add_help=False)
 
@@ -66,6 +73,7 @@ def get_data_create_parser():
     group.add_argument('-f', '--file', type=lambda x: is_valid_file(parser, x), help="Path to file to import into container")
     group.add_argument('-d', '--directory', type=lambda x: is_valid_dir(parser, x), help="Path to directory to import into container")
     parser.add_argument('-o', '--output', type=lambda x: is_valid_output_file(parser, x), help="Path to file to export container to (default: specified-path.data.zip)")
+    parser.add_argument('-e', '--export-metadata', type=lambda x: is_valid_json_output(parser, x), help="Path to JSON file to export metadata to")
 
     return parser
 
@@ -329,26 +337,7 @@ def get_metadata_for_groups(metadata, directory):
 
     return groups
 
-def execute_data_create_tool(parser, args):
-    # Ensure paths given are converted to absolute paths
-    if args.file:
-        args.file = os.path.abspath(args.file)
-    else:
-        args.directory = os.path.abspath(args.directory)
-
-    # If no output specified, use folder/file name with .data.zip as output path
-    if not args.output:
-        if args.file:
-            output_file = os.path.splitext(args.file)[0] + ".data.zip"
-        else:
-            output_file = os.path.join(os.path.dirname(args.directory), os.path.basename(args.directory) + ".data.zip")
-    else:
-        output_file = args.output
-
-    print("============[Creating a data container]============")
-    print("Generating metadata...")
-    print()
-
+def generate_metadata(args):
     metadata = Metadata()
 
     # Get manual fields filled in by the user
@@ -363,7 +352,17 @@ def execute_data_create_tool(parser, args):
         # Create groups based on patterns and get their individual metadata from the user
         groups = get_metadata_for_groups(metadata, args.directory)
 
-    print("Creating the container...")
+    return metadata, groups
+
+def create_container(metadata, groups, args):
+    # If no output specified, use folder/file name with .data.zip as output path
+    if not args.output:
+        if args.file:
+            output_file = os.path.splitext(args.file)[0] + ".data.zip"
+        else:
+            output_file = os.path.join(os.path.dirname(args.directory), os.path.basename(args.directory) + ".data.zip")
+    else:
+        output_file = args.output
 
     # Import the data into a container
     container = DataContainer()
@@ -387,6 +386,28 @@ def execute_data_create_tool(parser, args):
     container.export(output_file)
 
     print("Success! Data container exported to path %s" % output_file)
+
+    return container
+
+def execute_data_create_tool(parser, args):
+    # Ensure paths given are converted to absolute paths
+    if args.file:
+        args.file = os.path.abspath(args.file)
+    else:
+        args.directory = os.path.abspath(args.directory)
+
+    print("============[Creating a data container]============")
+    print("Generating metadata...")
+    print()
+    metadata, groups = generate_metadata(args)
+
+    print("Creating the container...")
+    container = create_container(metadata, groups, args)
+
+    # Export metadata to JSON file if requested
+    if args.export_metadata:
+        container.metadata.save_to_json_file(args.export_metadata)
+        print("Exported the metadata to a JSON file: %s" % args.export_metadata)
 
 def main():
     parser = get_data_create_parser()

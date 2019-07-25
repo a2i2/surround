@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 
 import os
+import json
 import yaml
 
 from .util import get_formats_from_directory, get_formats_from_files, get_types_from_formats
@@ -125,6 +126,13 @@ class Metadata(Mapping):
 
     def save_to_data(self):
         return yaml.dump(self.__storage)
+
+    def save_to_json(self, indent=4):
+        return json.dumps(self.__storage, indent=indent)
+
+    def save_to_json_file(self, path, indent=4):
+        with open(path, "w+") as f:
+            json.dump(self.__storage, f, indent=indent)
 
     def validate(self):
         raise NotImplementedError
