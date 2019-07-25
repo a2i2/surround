@@ -125,7 +125,7 @@ def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, 
         return answer
 
 def parse_subject(subject):
-    return [s.split() for s in re.split(', |,', subject)]
+    return list({s.strip() for s in re.split(', |,', subject)})
 
 def validate_language_code(language_code):
     return re.match('[a-z]{2}', language_code)
