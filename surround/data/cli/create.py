@@ -7,7 +7,7 @@ import uuid
 
 from ..metadata import Metadata
 from ..container import DataContainer
-from ..util import get_formats_from_files, get_types_from_formats
+from ..util import get_formats_from_files, get_types_from_formats, prompt
 
 language_options = [
     ('English', 'en'),
@@ -80,49 +80,6 @@ def get_data_create_parser():
     parser.add_argument('-e', '--export-metadata', type=lambda x: is_valid_json_output(parser, x), help="Path to JSON file to export metadata to")
 
     return parser
-
-def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, please try again!', validator=None, default=None, help_msg=None):
-    if required and default:
-        required = False
-
-    while True:
-        answer = input(question)
-
-        if answer == "" and required:
-            print('This field is required!')
-            print()
-            continue
-        elif answer == "" and not required:
-            print()
-            return default
-
-        if answer == "?" and help_msg:
-            print(help_msg)
-            print()
-            continue
-
-        if answer_type != bool:
-            try:
-                answer = answer_type(answer)
-            except ValueError:
-                print(error_msg)
-                print()
-                continue
-        else:
-            if 'y' in answer.lower() or 'n' in answer.lower():
-                return answer.lower() == 'y'
-
-            print(error_msg)
-            print()
-            continue
-
-        if validator and not validator(answer):
-            print(error_msg)
-            print()
-            continue
-
-        print()
-        return answer
 
 def parse_subject(subject):
     return list({s.strip() for s in re.split(', |,', subject)})
@@ -424,8 +381,7 @@ def create_container(metadata, groups, args):
     if args.directory:
         # Import the custom groups
         for name, files in groups:
-            for f in files:
-                container.import_file(f, os.path.join(name, os.path.basename(f)), generate_metadata=False)
+            container.import_files([(f, os.path.join(name, os.path.basename(f))) for f in files], generate_metadata=False)
 
         # Import the entire directory (without re-importing the custom files)
         container.import_directory(args.directory, generate_metadata=False, reimport=False)

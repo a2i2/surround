@@ -39,6 +39,49 @@ def get_types_from_formats(formats):
 
     return types
 
+def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, please try again!', validator=None, default=None, help_msg=None):
+    if required and default:
+        required = False
+
+    while True:
+        answer = input(question)
+
+        if answer == "" and required:
+            print('This field is required!')
+            print()
+            continue
+        elif answer == "" and not required:
+            print()
+            return default
+
+        if answer == "?" and help_msg:
+            print(help_msg)
+            print()
+            continue
+
+        if answer_type != bool:
+            try:
+                answer = answer_type(answer)
+            except ValueError:
+                print(error_msg)
+                print()
+                continue
+        else:
+            if 'y' in answer.lower() or 'n' in answer.lower():
+                return answer.lower() == 'y'
+
+            print(error_msg)
+            print()
+            continue
+
+        if validator and not validator(answer):
+            print(error_msg)
+            print()
+            continue
+
+        print()
+        return answer
+
 def hash_file(path):
     sha1 = hashlib.sha1()
     block_size = 256 * 1024 * 1024
