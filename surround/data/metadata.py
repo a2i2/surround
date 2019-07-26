@@ -113,6 +113,31 @@ class Metadata(Mapping):
         self.__storage['summary']['formats'] = formats
         self.__storage['summary']['types'] = types
 
+    def generate_manifest_for_group(self, group_name, files, formats=None):
+        if not formats:
+            formats = []
+
+        formats.extend(get_formats_from_files(files))
+        types = get_types_from_formats(formats)
+
+        if 'Collection' not in types:
+            types.append('Collection')
+
+        if 'manifests' not in self.__storage:
+            self.__storage['manifests'] = []
+
+        manifest = {
+            'path': group_name,
+            'description': None,
+            'language': None,
+            'formats': formats,
+            'types': types
+        }
+
+        self.__storage['manifests'].append(manifest)
+
+        return manifest
+
     def load_from_path(self, path):
         with open(path, "r") as yaml_file:
             self.__storage = yaml.safe_load(yaml_file.read())

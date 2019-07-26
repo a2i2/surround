@@ -7,7 +7,7 @@ import uuid
 
 from ..metadata import Metadata
 from ..container import DataContainer
-from ..util import get_formats_from_files, get_types_from_formats, prompt
+from ..util import get_types_from_formats, prompt
 
 language_options = [
     ('English', 'en'),
@@ -163,27 +163,6 @@ def get_metadata_for_group(manifest, default_lang, group_number, group_count):
     manifest['description'] = description
     manifest['language'] = language
 
-def create_group_manifest(path, files, metadata):
-    formats = get_formats_from_files(files)
-    types = get_types_from_formats(formats)
-
-    if 'Collection' not in types:
-        types.append('Collection')
-
-    # Create manifests property if doesn't exist
-    manifests = metadata.get_property('manifests')
-    if manifests is None:
-        metadata.set_property('manifests', [])
-
-    # Create a manifest for this group
-    metadata['manifests'].append({
-        'path': path,
-        'description': None,
-        'language': None,
-        'formats': formats,
-        'types': types
-    })
-
 def attempt_detect_sequences(metadata, root_files):
     print("Searching for potential sequential groups...\n")
     names = [(name, os.path.splitext(os.path.basename(name))[0]) for name in root_files]
@@ -204,7 +183,7 @@ def attempt_detect_sequences(metadata, root_files):
 
         if name:
             # Create a manifest for the group in the metadata
-            create_group_manifest(name, group, metadata)
+            metadata.generate_manifest_for_group(name, group)
             return (name, group)
 
     return None
@@ -226,7 +205,7 @@ def attempt_detect_large_count(metadata, root_files):
 
             if name:
                 # Create a manifest for this group
-                create_group_manifest(name, group, metadata)
+                metadata.generate_manifest_for_group(name, group)
                 groups.append((name, group))
 
     return groups
@@ -261,7 +240,7 @@ def create_custom_groups(metadata, directory, existing_groups):
 
                 if name:
                     # Create a manifest in the metadata for this group
-                    create_group_manifest(name, files, metadata)
+                    metadata.generate_manifest_for_group(name, files)
                     groups.append((name, files))
 
             else:
@@ -338,29 +317,27 @@ def generate_metadata():
     metadata.set_property("summary.identifier", str(uuid.uuid4()))
 
     if groups:
-        groups = [g.split() for g in re.split(',| ,', groups)]
+        groups = [g.strip() for g in re.split(',| ,', groups)]
         metadata.set_property('manifests', [])
 
         # Get all the metadata for each group
         for i, group in enumerate(groups):
-            manifest = {
-                'path': group,
+            user_fields = {
                 'description': None,
                 'language': None,
-                'formats': None,
-                'types': None
             }
 
-            get_metadata_for_group(manifest, metadata['summary']['language'], i + 1, len(groups))
+            # Get the description and language from the user
+            get_metadata_for_group(user_fields, metadata['summary']['language'], i + 1, len(groups))
 
+            # Get the formats from the user
             formats = prompt("What data formats make up the group? (MIME type e.g. text/plain)\nAnswer (comma separated): ", validator=is_valid_mime_type)
             formats = [f.strip() for f in re.split(',| ,', formats)]
-            types = get_types_from_formats(formats)
 
-            manifest['formats'] = formats
-            manifest['types'] = types
-
-            metadata['manifests'].append(manifest)
+            # Generate the manifest
+            manifest = metadata.generate_manifest_for_group(group, [], formats)
+            manifest['description'] = user_fields['description']
+            manifest['language'] = user_fields['language']
 
     return metadata
 
