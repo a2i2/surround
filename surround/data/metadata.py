@@ -120,7 +120,8 @@ class Metadata(Mapping):
         formats.extend(get_formats_from_files(files))
         types = get_types_from_formats(formats)
 
-        if 'Collection' not in types:
+        # Add collection to types if more than one file or format
+        if 'Collection' not in types and (len(files) > 1 or (formats and len(formats) > 1)):
             types.append('Collection')
 
         if 'manifests' not in self.__storage:

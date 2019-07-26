@@ -7,7 +7,7 @@ import uuid
 
 from ..metadata import Metadata
 from ..container import DataContainer
-from ..util import get_types_from_formats, prompt
+from ..util import get_types_from_formats, prompt, split_unique
 
 language_options = [
     ('English', 'en'),
@@ -22,7 +22,6 @@ language_options = [
 
 rights_options = [
     'Confidential',
-    'Sensitive',
     'Open',
     'Defence'
 ]
@@ -81,9 +80,6 @@ def get_data_create_parser():
 
     return parser
 
-def parse_subject(subject):
-    return list({s.strip() for s in re.split(', |,', subject)})
-
 def validate_language_code(language_code):
     return re.match('[a-z]{2}', language_code)
 
@@ -126,7 +122,7 @@ def get_summary_metadata_from_user(metadata):
         default=current_date)
 
     subject = prompt("List meaningful keywords related to this data (comma separated): ")
-    subject = parse_subject(subject)
+    subject = split_unique(',| ,', subject, strip=True)
 
     language = prompt_language()
 

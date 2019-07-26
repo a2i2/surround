@@ -114,3 +114,6 @@ def hash_zip(path, skip_files=None):
                     sha1.update(data)
 
     return sha1.hexdigest()
+
+def split_unique(pattern, data, strip=False):
+    return list({d.strip() if strip else d for d in re.split(pattern, data)})
