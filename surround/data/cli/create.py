@@ -73,7 +73,7 @@ def get_data_create_parser():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', '--file', type=lambda x: is_valid_file(parser, x), help="Path to file to import into container")
     group.add_argument('-d', '--directory', type=lambda x: is_valid_dir(parser, x), help="Path to directory to import into container")
-    group.add_argument('-nd', '--no-data', action='store_true', help="Generate metadata without a file system")
+    group.add_argument('-m', '--metadata-only', action='store_true', help="Generate metadata without a file system")
 
     parser.add_argument('-o', '--output', type=lambda x: is_valid_output_file(parser, x), help="Path to file to export container to (default: specified-path.data.zip)")
     parser.add_argument('-e', '--export-metadata', type=lambda x: is_valid_json_output(parser, x), help="Path to JSON file to export metadata to")
@@ -379,7 +379,7 @@ def execute_data_create_tool(parser, args):
         print("error: --export-metadata argument required when using no data!")
         return
 
-    if args.no_data:
+    if args.metadata_only:
         print("============[Creating data metadata]=============")
         print("Generating metadata...")
         print()
