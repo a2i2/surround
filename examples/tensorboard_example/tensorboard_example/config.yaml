@@ -1,0 +1,10 @@
+output:
+  text: Hello World
+
+image: tensorboard_example
+company: yourcompany
+version: latest
+
+data_size: 1000
+train_pct: 0.8
+epochs: 100
