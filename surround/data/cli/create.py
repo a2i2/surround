@@ -90,10 +90,18 @@ def prompt_language(default='en'):
     for i, option in enumerate(language_options):
         print("%i. %s (%s) %s" % (i + 1, option[0], option[1] if option[1] != '' else 'N/A', ("[DEFAULT]" if i + 1 == default_lang else "")))
 
-    language = prompt("Select the langauge most relevant to the data: ", validator=lambda x: 0 < x <= len(language_options), answer_type=int, default=default_lang)
+    language = prompt(
+        "Select the langauge most relevant to the data: ",
+        help_msg="Select the language code most relevant to the contents, or select not relevant.",
+        validator=lambda x: 0 < x <= len(language_options),
+        answer_type=int,
+        default=default_lang)
 
     if 'Other' in language_options[language - 1][0]:
-        language = prompt("Enter a language code following the ISO-639-1 standard: ", validator=validate_language_code)
+        language = prompt(
+            "Enter a language code following the ISO-639-1 standard: ",
+            help_msg="Enter the ISO-639-1 representation of the language the data is in.",
+            validator=validate_language_code)
     else:
         language = language_options[language - 1][1]
 
@@ -102,11 +110,29 @@ def prompt_language(default='en'):
 def get_summary_metadata_from_user(metadata):
     print("============[Creating summary metadata]============")
 
-    name = prompt("What is your name: ", validator=lambda x: re.match('[A-Za-z]+', x), error_msg='Must contain letters only!')
-    title = prompt("Give this data a short title: ")
-    description = prompt("Provide a brief description of this data: ")
-    publisher = prompt("What organisation is behind the creation of this data: ")
-    contributor = prompt("What is the name of the individual who sent you this data: ", validator=lambda x: re.match('[A-Za-z]+', x), error_msg='Must contain letters only!')
+    name = prompt(
+        "What is your name: ",
+        validator=lambda x: re.match('[A-Za-z]+', x),
+        error_msg="Must contain letters only!",
+        help_msg="Enter your full name, so you can be tracked down later if needed.")
+
+    title = prompt(
+        "Give this data a short title: ",
+        help_msg="Enter a short title that describes this data as a whole, e.g. Face Dataset")
+
+    description = prompt(
+        "Provide a brief description of this data: ",
+        help_msg="Enter a brief description of this data that describes it's contents and what it is used for.")
+
+    publisher = prompt(
+        "What organisation is behind the creation of this data: ",
+        help_msg="Enter the name of the organisation that created this data, so they can be tracked down later.")
+
+    contributor = prompt(
+        "What is the name of the individual who sent you this data: ",
+        validator=lambda x: re.match('[A-Za-z]+', x),
+        error_msg='Must contain letters only!',
+        help_msg="Enter the full name of the person who sent you this data, so they can be tracked down later.")
 
     print("When did they send you this data? Hit [ENTER] to use the current date & time.")
     print("Date formatting (ISO 8601): YYYY-MM-DDThh:mm")
@@ -117,11 +143,14 @@ def get_summary_metadata_from_user(metadata):
 
     date = prompt(
         "Date: ",
+        help_msg="Enter the date & time you received this data, in the ISO format (YYYY-MM-DDThh:mm) - 24 hour time.",
         validator=lambda x: re.match(date_pattern, x),
         required=False,
         default=current_date)
 
-    subject = prompt("List meaningful keywords related to this data (comma separated): ")
+    subject = prompt(
+        "List meaningful keywords related to this data (comma separated): ",
+        help_msg="Enter a comma separated list of keywords that relate to the data, for example: faces, recognition, dogs, cats")
     subject = split_unique(',| ,', subject, strip=True)
 
     language = prompt_language()
@@ -129,10 +158,18 @@ def get_summary_metadata_from_user(metadata):
     print("Rights:")
     for i, right in enumerate(rights_options):
         print("%i. %s %s" % (i + 1, right, "[DEFAULT]" if i == 0 else ""))
-    rights = prompt("Select a right that fits the data: ", validator=lambda x: 0 < x < 5, answer_type=int, default=1)
+    rights = prompt(
+        "Select a right that fits the data: ",
+        help_msg="Enter the number corresponding to the right that best fits what you are allowed to do with the data.",
+        validator=lambda x: 0 < x < 5,
+        answer_type=int,
+        default=1)
     rights = rights_options[rights - 1]
 
-    under_ethics = prompt("Is this data under any type of ethics (y/n): ", answer_type=bool)
+    under_ethics = prompt(
+        "Is this data under any type of ethics (y/n): ",
+        help_msg="Is this data under any ethical rules that make this data sensitive or impose any type of restrictions?",
+        answer_type=bool)
 
     metadata.set_property('summary.creator', name)
     metadata.set_property('summary.title', title)
@@ -152,7 +189,9 @@ def get_metadata_for_group(manifest, default_lang, group_number, group_count):
     print("Create metadata for group: %s\n" % manifest['path'])
 
     # Get answers from the user
-    description = prompt("Provide a breif description of this group: ")
+    description = prompt(
+        "Provide a breif description of this group: ",
+        help_msg="Enter a breif description of this data that describes its contents and what it is used for.")
     language = prompt_language(default_lang)
 
     # Set the manual fields to the manifest
@@ -175,7 +214,10 @@ def attempt_detect_sequences(metadata, root_files):
             print(name)
         print("...\n")
 
-        name = prompt("Enter a name if you would like to group them (or hit [ENTER] to skip): ", required=False)
+        name = prompt(
+            "Enter a name if you would like to group them (or hit [ENTER] to skip): ",
+            help_msg="Enter a name for the collection of files, the files will then be put in a folder of this name in the container.",
+            required=False)
 
         if name:
             # Create a manifest for the group in the metadata
@@ -197,7 +239,10 @@ def attempt_detect_large_count(metadata, root_files):
                 print(name)
             print("...\n")
 
-            name = prompt("Enter a name if you would like to group them (or hit [ENTER] to skip): ", required=False)
+            name = prompt(
+                "Enter a name if you would like to group them (or hit [ENTER] to skip): ",
+                help_msg="Enter a name for the collection of files, the files will then be put in a folder of this name in the container.",
+                required=False)
 
             if name:
                 # Create a manifest for this group
@@ -230,6 +275,7 @@ def create_custom_groups(metadata, directory, existing_groups):
 
                 name = prompt(
                     "\nEnter a name for this group (or press enter to skip this group): ",
+                    help_msg="Enter a name for the collection of files, the files will then be put in a folder of this name in the container.",
                     required=False,
                     validator=lambda x: not any([m['path'] == x for m in metadata['manifests']]),
                     error_msg='This name is already taken! Please try again.')
@@ -301,8 +347,14 @@ def generate_metadata():
     get_summary_metadata_from_user(metadata)
 
     # Get the formats and groups from the user since these can't be auto genereated
-    formats = prompt("What data formats make up the data? (MIME type e.g. text/plain)\nAnswer (comma separated): ", validator=is_valid_mime_type)
-    groups = prompt("What groups (folders, collections) are in the data?\nAnswer (comma separated): ", required=False)
+    formats = prompt(
+        "What data formats make up the data? (MIME type e.g. text/plain)\nAnswer (comma separated): ",
+        help_msg="Enter a comma separated list of MIME types that this data contains, e.g. text/plain, image/png",
+        validator=is_valid_mime_type)
+    groups = prompt(
+        "What groups (folders, collections) are in the data?\nAnswer (comma separated): ",
+        help_msg="Enter a comma separated list of group names that this data containes, e.g. image, documents",
+        required=False)
 
     formats = [f.strip() for f in re.split(',| ,', formats)]
     types = get_types_from_formats(formats)
@@ -327,7 +379,10 @@ def generate_metadata():
             get_metadata_for_group(user_fields, metadata['summary']['language'], i + 1, len(groups))
 
             # Get the formats from the user
-            formats = prompt("What data formats make up the group? (MIME type e.g. text/plain)\nAnswer (comma separated): ", validator=is_valid_mime_type)
+            formats = prompt(
+                "What data formats make up the group? (MIME type e.g. text/plain)\nAnswer (comma separated): ",
+                help_msg="Enter a comma separated list of group names that this data containes, e.g. image, documents",
+                validator=is_valid_mime_type)
             formats = [f.strip() for f in re.split(',| ,', formats)]
 
             # Generate the manifest
@@ -382,12 +437,14 @@ def execute_data_create_tool(parser, args):
     if args.metadata_only:
         print("============[Creating data metadata]=============")
         print("Generating metadata...")
+        print("Enter ? into fields for more information on how to answer.")
         print()
 
         metadata = generate_metadata()
     else:
         print("============[Creating a data container]============")
         print("Generating metadata...")
+        print("Enter ? into fields for more information on how to answer.")
         print()
         metadata, groups = generate_metadata_from_data(args)
 
