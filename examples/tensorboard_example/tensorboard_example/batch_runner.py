@@ -1,10 +1,11 @@
 import logging
 import os
 
+# pylint: disable=import-error
 import numpy as np
 
 from surround import Runner, Config
-from stages import TensorboardExampleData
+from .stages import TensorboardExampleData
 
 logging.basicConfig(level=logging.INFO)
 

@@ -4,6 +4,7 @@ from __future__ import print_function
 
 from datetime import datetime
 
+# pylint: disable=import-error
 import numpy as np
 
 import tensorflow as tf

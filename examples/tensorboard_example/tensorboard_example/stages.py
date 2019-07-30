@@ -1,10 +1,11 @@
 import os
-
 from datetime import datetime
 
+# pylint: disable=import-error
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+
 from surround import Estimator, SurroundData, Validator
 
 class TensorboardExampleData(SurroundData):
