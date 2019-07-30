@@ -1,7 +1,7 @@
 import argparse
 from surround import Assembler
-from stages import Main, ValidateData
-from batch_runner import BatchRunner
+from .stages import Main, ValidateData
+from .batch_runner import BatchRunner
 
 
 def main():
