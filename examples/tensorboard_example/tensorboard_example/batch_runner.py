@@ -1,9 +1,10 @@
 import logging
 import os
-from surround import Runner, Config
-from stages import TensorboardExampleData
 
 import numpy as np
+
+from surround import Runner, Config
+from stages import TensorboardExampleData
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,7 +16,7 @@ class BatchRunner(Runner):
         self.assembler.set_config(config)
         self.assembler.init_assembler(True)
 
-        data_size = config['data_size']   
+        data_size = config['data_size']
 
         if is_training:
             train_pct = config['train_pct']

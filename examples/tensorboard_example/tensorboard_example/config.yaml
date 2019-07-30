@@ -1,8 +1,5 @@
-output:
-  text: Hello World
-
 image: tensorboard_example
-company: yourcompany
+company: a2i2
 version: latest
 
 data_size: 1000

@@ -1,12 +1,11 @@
 import os
 
+from datetime import datetime
+
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-
-from datetime import datetime
 from surround import Estimator, SurroundData, Validator
-
 
 class TensorboardExampleData(SurroundData):
     x_train = None
@@ -15,7 +14,7 @@ class TensorboardExampleData(SurroundData):
     y_test = None
     train_size = None
     training_history = None
-    
+
 class ValidateData(Validator):
     def validate(self, surround_data, config):
         if surround_data.x_test is None or surround_data.y_test is None:
@@ -87,10 +86,10 @@ class Main(Estimator):
 
         if epoch > 10:
             lr = 0.02
-        
+
         if epoch > 20:
             lr = 0.01
-        
+
         if epoch > 50:
             lr = 0.005
 
