@@ -45,12 +45,36 @@ class TestConfig(unittest.TestCase):
         self.f2.write(str.encode(yaml2))
         self.f2.close()
 
+        os.mkdir("temp")
+        os.mkdir("temp/.surround")
+        os.mkdir("temp/temp")
+
+        with open("temp/temp/config.yaml", "w+") as f:
+            f.write(yaml2)
+
+        self.owd = os.getcwd()
+        os.chdir("temp/")
+
     def tearDown(self):
         os.unlink(self.f1.name)
         os.unlink(self.f2.name)
 
-    def test_merging_config(self):
+        os.chdir(self.owd)
 
+        os.unlink("temp/temp/config.yaml")
+        os.rmdir("temp/temp")
+        os.rmdir("temp/.surround")
+        os.rmdir("temp")
+
+    def test_auto_loading_project_config(self):
+        config = Config(auto_load=True)
+        self.assertEqual(config['main']['count'], 15)
+        self.assertTrue(config['enable_logging'])
+        self.assertIsInstance(config['objects'], list)
+        self.assertEqual(config['objects'][0]['node'], 43)
+        self.assertEqual(config['objects'][0]['size'], 355)
+
+    def test_merging_config(self):
         config = Config()
         config.read_config_files([self.f1.name, self.f2.name])
         output = {
@@ -74,7 +98,6 @@ class TestConfig(unittest.TestCase):
 
 
     def test_env_config(self):
-
         with patch.dict('os.environ', {
                 'SURROUND_MAIN_COUNT': str(45),
                 'SURROUND_TEMP': str(0.3)
