@@ -1,6 +1,6 @@
 import unittest
 import os
-from surround import Assembler, Estimator, SurroundData, Config, Validator
+from surround import Assembler, Estimator, SurroundData, Config, Validator, Filter
 
 
 test_text = "hello"
@@ -21,6 +21,7 @@ class BasicData(SurroundData):
     config_value = None
     stage1 = None
     stage2 = None
+    final_ran = False
 
 
 class ValidateData(Validator):
@@ -37,6 +38,10 @@ class ValidateData(Validator):
         if surround_data.stage2:
             raise ValueError("'stage2' is not None")
 
+
+class TestFinalStage(Filter):
+    def operate(self, surround_data, config):
+        surround_data.final_ran = True
 
 class TestSurround(unittest.TestCase):
 
@@ -62,3 +67,30 @@ class TestSurround(unittest.TestCase):
         assembler = Assembler("Surround config", ValidateData(), HelloStage(), config)
         assembler.run(data)
         self.assertEqual(data.config_value, "Scott")
+
+    def test_finaliser_successful_pipeline(self):
+        data = BasicData()
+        assembler = Assembler("Finalizer test", ValidateData(), HelloStage(), Config())
+        assembler.set_finaliser(TestFinalStage())
+        assembler.init_assembler()
+
+        # Run assembler which will succeed
+        assembler.run(data)
+
+        # Finalizer should be executed
+        self.assertTrue(data.final_ran)
+
+    def test_finaliser_fail_pipeline(self):
+        # Ensure pipeline will crash
+        data = BasicData()
+        data.text = ""
+
+        assembler = Assembler("Finalizer test", ValidateData(), HelloStage(), Config())
+        assembler.set_finaliser(TestFinalStage())
+        assembler.init_assembler()
+
+        # Run assembler which will fail
+        assembler.run(data)
+
+        # Finalizer should still be executed
+        self.assertTrue(data.final_ran)
