@@ -59,7 +59,7 @@ class Assembler(ABC):
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, assembler_name="", validator=None, estimator=None, config=Config()):
+    def __init__(self, assembler_name="", validator=None, estimator=None, config=Config(auto_load=True)):
         """
         Constructor for an Assembler pipeline:
 

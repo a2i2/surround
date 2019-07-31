@@ -47,7 +47,7 @@ class Config(Mapping):
         SURRROUND_PREDICT_DEBUG=False
     """
 
-    def __init__(self, project_root=None, package_path=None):
+    def __init__(self, project_root=None, package_path=None, auto_load=False):
         """
         Constructor of the Config class, loads the default YAML file into storage.
         If the :attr:`project_root` is provided then the project's `config.yaml`
@@ -60,12 +60,14 @@ class Config(Mapping):
         :type project_root: str
         :param package_path: path to the root directory of the package that contains the surround project (default: None)
         :type package_path: str
+        :param auto_load: Attempt to load the config.yaml file from the Surround project in the current directory (default: False)
+        :type auto_load: bool
         """
 
         self._storage = self.__load_defaults()
 
         # Try to get the project root if none specified
-        if not project_root:
+        if auto_load and not project_root:
             project_root = self.__get_project_root_from_current_dir()
 
         # Set framework paths
