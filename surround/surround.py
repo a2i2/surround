@@ -2,7 +2,7 @@
 #
 # Manages a set of stages and the data that is passed between them.
 import logging
-from typing import Any, List
+from typing import Any, List, Optional
 
 LOGGER = logging.getLogger(__name__)
 
@@ -92,6 +92,6 @@ class SurroundData(Frozen):
     """
 
     stage_metadata: List[Any] = []
-    execution_time: float = None
+    execution_time: Optional[str] = None
     errors: List[str] = []
     warnings: List[str] = []

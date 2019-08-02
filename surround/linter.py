@@ -1,7 +1,8 @@
 import os
 import io
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from .stage import Filter, Estimator, Validator
+
 from .surround import SurroundData
 from .assembler import Assembler
 from .config import Config
@@ -50,7 +51,7 @@ class LinterStage(Filter):
                     self.add_error(data, "Project doesn't exist!")
     """
 
-    def __init__(self, key, description):
+    def __init__(self, key: str, description: str):
         """
         Constructor for a linter stage.
 
@@ -63,7 +64,7 @@ class LinterStage(Filter):
         self.key: str = key
         self.description: str = description
 
-    def add_error(self, data: ProjectData, string: str) -> None:
+    def add_error(self, data: SurroundData, string: str) -> None:
         """
         Creates an error which will be displayed and stop the :class:`Linter`.
 
@@ -75,7 +76,7 @@ class LinterStage(Filter):
 
         data.errors.append("ERROR: %s_CHECK: %s" % (self.key, string))
 
-    def add_warning(self, data: ProjectData, string: str) -> None:
+    def add_warning(self, data: SurroundData, string: str) -> None:
         """
         Creates a warning that will be displayed but the :class:`Linter` will continue.
 
@@ -87,7 +88,7 @@ class LinterStage(Filter):
 
         data.warnings.append("WARNING: %s_CHECK: %s" % (self.key, string))
 
-    def operate(self, surround_data: SurroundData, config: Config) -> None:
+    def operate(self, surround_data: SurroundData, config: Optional[Config]) -> None:
         """
         Executed by the :class:`Linter`, performs the linting specific to this stage.
         **Must** be implemented in extended versions of this class.
@@ -107,7 +108,7 @@ class CheckData(LinterStage):
     def __init__(self) -> None:
         LinterStage.__init__(self, "DATA", "Check data files")
 
-    def operate(self, surround_data: SurroundData, config: Config) -> None:
+    def operate(self, surround_data: SurroundData, config: Optional[Config]) -> None:
         """
         Executed by the :class:`Linter`, checks if there is any files in the project's data folder.
         If there is none then a warning will be issued.
@@ -117,6 +118,8 @@ class CheckData(LinterStage):
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
+
+        assert isinstance(surround_data, ProjectData)
 
         path = os.path.join(surround_data.project_root, "data")
         if not os.listdir(path):
@@ -131,7 +134,7 @@ class CheckFiles(LinterStage):
     def __init__(self) -> None:
         LinterStage.__init__(self, "FILES", "Check for Surround project files")
 
-    def operate(self, surround_data: SurroundData, config: Config) -> None:
+    def operate(self, surround_data: SurroundData, config: Optional[Config]) -> None:
         """
         Executed by the :class:`Linter`, checks if the files in the project structure exist.
         Will create errors if required surround project files are missing in the root directory.
@@ -141,6 +144,8 @@ class CheckFiles(LinterStage):
         :param config: the linter's configuation data
         :type config: :class:`surround.config.Config`
         """
+
+        assert isinstance(surround_data, ProjectData)
 
         for result in surround_data.project_structure["new"]["files"] + surround_data.project_structure["new"]["templates"]:
             file_name = result[0]
@@ -161,7 +166,7 @@ class CheckDirectories(LinterStage):
             self, "DIRECTORIES",
             "Check for validating Surround's directory structure")
 
-    def operate(self, surround_data: SurroundData, config: Config) -> None:
+    def operate(self, surround_data: SurroundData, config: Optional[Config]) -> None:
         """
         Executed by the :class:`Linter`, checks whether the project directories exist.
         If the expected directories don't exist then errors will be created.
@@ -171,6 +176,8 @@ class CheckDirectories(LinterStage):
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
+
+        assert isinstance(surround_data, ProjectData)
 
         for d in surround_data.project_structure["new"]["dirs"]:
             path = os.path.join(surround_data.project_root,
@@ -183,7 +190,7 @@ class LinterValidator(Validator):
     Linter's validator stage, checks the data given in the ProjectData is valid.
     """
 
-    def validate(self, surround_data, config):
+    def validate(self, surround_data: SurroundData, config: Optional[Config]):
         """
         Executed by the :class:`Linter`, checks whther the paths contained are valid.
 
@@ -192,6 +199,8 @@ class LinterValidator(Validator):
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
+
+        assert isinstance(surround_data, ProjectData)
 
         if not isinstance(surround_data.project_name, str):
             surround_data.errors.append("ERROR: PROJECT_CHECK: Project name is not a string")
@@ -215,7 +224,7 @@ class Main(Estimator):
 
         self.filters: List[LinterStage] = filters
 
-    def estimate(self, surround_data: SurroundData, config: Config) -> None:
+    def estimate(self, surround_data: SurroundData, config: Optional[Config]) -> None:
         """
         Execute each stage in the linter.
         """
@@ -223,7 +232,7 @@ class Main(Estimator):
         for filters in self.filters:
             filters.operate(surround_data, config)
 
-    def fit(self, surround_data: SurroundData, config: Config) -> None:
+    def fit(self, surround_data: SurroundData, config: Optional[Config]) -> None:
         """
         Should never be called.
         """

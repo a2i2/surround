@@ -6,7 +6,7 @@ import logging
 
 from abc import ABC
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from .surround import SurroundData
 from .config import Config
@@ -85,14 +85,13 @@ class Assembler(ABC):
             raise TypeError("'config' should be of class Config")
 
         self.assembler_name: str = assembler_name
-        self.config: Config = config
-        self.estimator: Estimator = estimator
-        self.validator: Validator = validator
-        self.pre_filters: List[Filter] = None
-        self.post_filters: List[Filter] = None
-        self.visualiser: Visualiser = None
+        self.config: Optional[Config] = config
+        self.estimator: Optional[Estimator] = estimator
+        self.validator: Optional[Validator] = validator
+        self.pre_filters: Optional[List[Filter]] = None
+        self.post_filters: Optional[List[Filter]] = None
+        self.visualiser: Optional[Visualiser] = None
         self.batch_mode: bool = False
-        self.surround_data: SurroundData = None
 
     def init_assembler(self, batch_mode: bool = False) -> None:
         """
@@ -115,7 +114,8 @@ class Assembler(ABC):
                 for pre_filter in self.pre_filters:
                     pre_filter.init_stage(self.config)
 
-            self.estimator.init_stage(self.config)
+            if self.estimator:
+                self.estimator.init_stage(self.config)
 
             if self.post_filters:
                 for post_filter in self.post_filters:
@@ -123,7 +123,7 @@ class Assembler(ABC):
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
-    def run(self, surround_data: SurroundData = None, is_training: bool = False) -> None:
+    def run(self, surround_data: SurroundData, is_training: bool = False) -> None:
         """
         Run the pipeline using the input data provided.
 
@@ -148,9 +148,10 @@ class Assembler(ABC):
         LOGGER.info("Starting '%s'", self.assembler_name)
         if not surround_data:
             raise ValueError("surround_data is required to run an assembler")
-        self.surround_data = surround_data
+        self.surround_data: SurroundData = surround_data
         try:
-            self.validator.validate(self.surround_data, self.config)
+            if self.validator:
+                self.validator.validate(self.surround_data, self.config)
             self.__run_pipeline(is_training)
         except Exception:
             LOGGER.exception("Failed running Assembler")
@@ -239,16 +240,17 @@ class Assembler(ABC):
         :type surround_data: :class:`surround.SurroundData`
         """
 
-        main_start = datetime.now()
-        self.estimator.estimate(surround_data, self.config)
+        if self.estimator:
+            main_start = datetime.now()
+            self.estimator.estimate(surround_data, self.config)
 
-        if self.config and self.config["surround"]["enable_stage_output_dump"]:
-            self.estimator.dump_output(surround_data, self.config)
+            if self.config and self.config["surround"]["enable_stage_output_dump"]:
+                self.estimator.dump_output(surround_data, self.config)
 
-        # Calculate and log filter duration
-        main_execution_time = datetime.now() - main_start
-        surround_data.stage_metadata.append({type(self.estimator).__name__: str(main_execution_time)})
-        LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
+            # Calculate and log filter duration
+            main_execution_time = datetime.now() - main_start
+            surround_data.stage_metadata.append({type(self.estimator).__name__: str(main_execution_time)})
+            LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
 
 
     def __execute_fit(self, surround_data: SurroundData) -> None:
@@ -260,16 +262,17 @@ class Assembler(ABC):
         :type surround_data: :class:`surround.SurroundData`
         """
 
-        fit_start = datetime.now()
-        self.estimator.fit(surround_data, self.config)
+        if self.estimator:
+            fit_start = datetime.now()
+            self.estimator.fit(surround_data, self.config)
 
-        if self.config and self.config["surround"]["enable_stage_output_dump"]:
-            self.estimator.dump_output(surround_data, self.config)
+            if self.config and self.config["surround"]["enable_stage_output_dump"]:
+                self.estimator.dump_output(surround_data, self.config)
 
-        # Calculate and log filter duration
-        fit_execution_time = datetime.now() - fit_start
-        surround_data.stage_metadata.append({type(self.estimator).__name__: str(fit_execution_time)})
-        LOGGER.info("Fitting %s took %s secs", type(self.estimator).__name__, fit_execution_time)
+            # Calculate and log filter duration
+            fit_execution_time = datetime.now() - fit_start
+            surround_data.stage_metadata.append({type(self.estimator).__name__: str(fit_execution_time)})
+            LOGGER.info("Fitting %s took %s secs", type(self.estimator).__name__, fit_execution_time)
 
     def load_config(self, module: str) -> None:
         """
@@ -294,7 +297,7 @@ class Assembler(ABC):
 
             self.set_config(Config(root_path))
 
-            if not os.path.exists(self.config["output_path"]):
+            if self.config and not os.path.exists(self.config["output_path"]):
                 os.makedirs(self.config["output_path"])
         else:
             self.set_config(Config())

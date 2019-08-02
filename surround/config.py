@@ -104,7 +104,7 @@ class Config(Mapping):
         :rtype: bool
         """
 
-        configs: List[str] = []
+        configs: List[dict] = []
         try:
             for path in yaml_files:
                 with open(path) as afile:
@@ -128,7 +128,7 @@ class Config(Mapping):
         """
 
         if not isinstance(config_dict, dict):
-            return TypeError("config_dict should be a dict")
+            raise TypeError("config_dict should be a dict")
 
         self.__merge_configs([config_dict])
         self.__insert_environment_variables()
@@ -165,7 +165,7 @@ class Config(Mapping):
 
         try:
             with resource_stream(__name__, "defaults.yaml") as f:
-                config = yaml.safe_load(f)
+                config = yaml.safe_load(f.read().decode('utf-8'))
         except IOError as err:
             err.strerror = 'Unable to load default config file'
             raise

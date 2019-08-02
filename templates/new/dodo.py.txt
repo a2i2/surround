@@ -6,32 +6,32 @@ CONFIG: Config = Config(os.path.dirname(__file__))
 DOIT_CONFIG: dict = {{'verbosity':2}}
 IMAGE: str = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
-def task_build() -> dict:
+def task_build():
     """Build the Docker image for the current project"""
     return {{
         'actions': ['docker build --tag=%s .' % IMAGE]
     }}
 
-def task_remove() -> dict:
+def task_remove():
     """Remove the Docker image for the current project"""
     return {{
         'actions': ['docker rmi %s -f' % IMAGE]
     }}
 
-def task_dev() -> dict:
+def task_dev():
     """Run the main task for the project"""
     return {{
         'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)]
     }}
 
-def task_prod() -> dict:
+def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
         'actions': ["docker run %s" % IMAGE],
         'task_dep': ["build"]
     }}
 
-def task_train() -> dict:
+def task_train():
     """Run training mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/data"
@@ -40,7 +40,7 @@ def task_train() -> dict:
         'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/data %s python3 -m {project_name} --mode train" % (output_path, data_path, IMAGE)]
     }}
 
-def task_batch() -> dict:
+def task_batch():
     """Run batch mode inside the container"""
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/data"

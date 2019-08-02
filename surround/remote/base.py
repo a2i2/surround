@@ -196,7 +196,7 @@ class BaseRemote():
 
         return self.message
 
-    def pull(self, what_to_pull: str, key: str = None) -> str:
+    def pull(self, what_to_pull: str, key: str = None) -> Union[str, List[str]]:
         """
         Pull file(s) from the remote specified, if no file specified, all files will be pulled.
         This will not overwrite already existing files locally.
@@ -258,7 +258,7 @@ class BaseRemote():
         :rtype: string
         """
 
-    def push(self, what_to_push: str, key: str = None) -> str:
+    def push(self, what_to_push: str, key: str = None) -> Union[str, List[str]]:
         """
         Push file(s) to the remote, if no file specified then all files will be pushed.
 
@@ -367,7 +367,7 @@ class BaseRemote():
 
         return os.path.basename(file_)
 
-    def get_project_name(self) -> str:
+    def get_project_name(self) -> Union[str, None]:
         """
         Returns the project name found in the local config file.
 
@@ -378,7 +378,9 @@ class BaseRemote():
         project_name = self.read_from_local_config("project-info", "project-name")
         if project_name:
             return project_name
+
         self.add_message("error: project name not present in config")
+        return None
 
     def get_path_to_remote(self, remote_to_read: str) -> Union[str, None]:
         """
@@ -393,7 +395,9 @@ class BaseRemote():
         remote = self.read_from_config("remote", remote_to_read)
         if remote:
             return remote
+
         self.add_message("error: no remote named " + remote_to_read)
+        return None
 
     def add_message(self, message: str, append_to: bool = True) -> None:
         """
@@ -435,3 +439,5 @@ class BaseRemote():
         if Path(path_to_file).exists():
             self.add_message("info: " + path_to_file + " already exists", append_to)
             return True
+
+        return False
