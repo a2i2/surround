@@ -17,6 +17,7 @@ setup(name='surround',
       author='Scott Barnett',
       author_email='scott.barnett@deakin.edu.au',
       include_package_data=True,
+      package_data={'surround': ['py.typed']},
       packages=['surround', 'templates', 'surround.remote'],
       test_suite='surround.tests',
       entry_points={
