@@ -1,10 +1,26 @@
 import os
 import sys
+import subprocess
 from surround import Config
+from doit.tools import LongRunning
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
+
+def kill_container():
+    # Generate a kill list 
+    kill_list = subprocess.check_output(["docker", "ps", "-q", "-f", "ancestor=%s" % IMAGE], shell=True)
+    
+    if kill_list:
+        kill_list = kill_list.decode('utf-8').rstrip().split("\n")
+
+        print("Stopping the container..")
+        print("Please wait for this process to finish")
+
+        # Stop all the running containers
+        proc = subprocess.Popen(["docker", "stop", ' '.join(kill_list)])
+        proc.wait()
 
 def task_build():
     """Build the Docker image for the current project"""
@@ -21,13 +37,13 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run -p 8080:8080 --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)]
+        'actions': [LongRunning("docker run -p 8080:8080 --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)), kill_container]
     }}
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
-        'actions': ["docker run -p 8080:8080 %s" % IMAGE],
+        'actions': [LongRunning("docker run -p 8080:8080 %s" % IMAGE), kill_container],
         'task_dep': ["build"]
     }}
 
@@ -66,7 +82,7 @@ def task_batch_local():
 def task_web():
     """Run web mode inside the container"""
     return {{
-        'actions': ["docker run -p 8080:8080  %s python3 -m {project_name} --mode web" % IMAGE]
+        'actions': [LongRunning("docker run -p 8080:8080  %s python3 -m {project_name} --mode web" % IMAGE), kill_container]
     }}
 
 def task_web_local():

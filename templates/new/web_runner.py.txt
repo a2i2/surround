@@ -1,5 +1,6 @@
 import json
 import logging
+import signal
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -14,18 +15,34 @@ class WebRunner(Runner):
         # Setup web service
         self.assembler.init_assembler()
         self.application = Application(self.assembler)
+        signal.signal(signal.SIGINT, self.application.signal_handler)
+
         self.application.listen(8080)
         logging.info("Server started at http://localhost:8080")
+
+        tornado.ioloop.PeriodicCallback(self.application.try_exit, 100).start()
         tornado.ioloop.IOLoop.instance().start()
 
 
 class Application(tornado.web.Application):
+    is_closing = False
+
     def __init__(self, assembler):
         handlers = [
             (r"/estimate", EstimateHandler, {{'assembler': assembler}}),
             (r"/info", InfoHandler, {{'assembler': assembler}}),
         ]
         tornado.web.Application.__init__(self, handlers)
+
+    def signal_handler(self, signum, frame):
+        logging.info('exiting...')
+        self.is_closing = True
+
+    def try_exit(self):
+        if self.is_closing:
+            # clean up here
+            tornado.ioloop.IOLoop.instance().stop()
+            logging.info('exit success')
 
 
 class EstimateHandler(tornado.web.RequestHandler):
@@ -52,4 +69,4 @@ class InfoHandler(tornado.web.RequestHandler):
         self.assembler = assembler
 
     def get(self):
-      self.write({{'version': '0.0.1'}})
+        self.write({{'version': '0.0.1'}})
