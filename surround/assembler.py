@@ -90,6 +90,7 @@ class Assembler(ABC):
         self.post_filters = None
         self.visualiser = None
         self.batch_mode = False
+        self.finaliser = None
 
     def init_assembler(self, batch_mode=False):
         """
@@ -117,6 +118,9 @@ class Assembler(ABC):
             if self.post_filters:
                 for post_filter in self.post_filters:
                     post_filter.init_stage(self.config)
+
+            if self.finaliser:
+                self.finaliser.init_stage(self.config)
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
@@ -151,6 +155,9 @@ class Assembler(ABC):
             self.__run_pipeline(is_training)
         except Exception:
             LOGGER.exception("Failed running Assembler")
+        finally:
+            if self.finaliser:
+                self.finaliser.operate(surround_data, self.config)
 
     def __run_pipeline(self, is_training):
         """
@@ -358,3 +365,17 @@ class Assembler(ABC):
         if not visualiser and not isinstance(visualiser, Visualiser):
             raise TypeError("visualiser should be of class Visualiser")
         self.visualiser = visualiser
+
+    def set_finaliser(self, finaliser):
+        """
+        Set the final stage that will be executed no matter how the pipeline runs.
+        This will be executed even when the pipeline fails or throws an error.
+
+        :param finaliser: the final stage instance
+        :type finaliser: :class:`surround.stage.Filter`
+        """
+
+        # finaliser must be a type of filter
+        if not finaliser and not isinstance(finaliser, Filter):
+            raise TypeError("finaliser should be of class Filter")
+        self.finaliser = finaliser
