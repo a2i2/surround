@@ -1,26 +1,10 @@
 import os
 import sys
-import subprocess
 from surround import Config
-from doit.tools import LongRunning
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2}}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
-
-def kill_container():
-    # Generate a kill list 
-    kill_list = subprocess.check_output(["docker", "ps", "-q", "-f", "ancestor=%s" % IMAGE], shell=True)
-    
-    if kill_list:
-        kill_list = kill_list.decode('utf-8').rstrip().split("\n")
-
-        print("Stopping the container..")
-        print("Please wait for this process to finish")
-
-        # Stop all the running containers
-        proc = subprocess.Popen(["docker", "stop", ' '.join(kill_list)])
-        proc.wait()
 
 def task_build():
     """Build the Docker image for the current project"""
@@ -37,13 +21,13 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': [LongRunning("docker run --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)), kill_container]
+        'actions': ["docker run --volume \"%s/\":/app %s" % (CONFIG["volume_path"], IMAGE)]
     }}
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
-        'actions': [LongRunning("docker run %s" % IMAGE), kill_container],
+        'actions': ["docker run %s" % IMAGE],
         'task_dep': ["build"]
     }}
 
