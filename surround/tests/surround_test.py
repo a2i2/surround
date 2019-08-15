@@ -1,6 +1,6 @@
 import unittest
 import os
-from surround import Assembler, Estimator, State, Config, Validator
+from surround import Assembler, Estimator, State, Config, Validator, Filter
 
 
 test_text = "hello"
@@ -40,8 +40,8 @@ class InputValidator(Validator):
 
 
 class TestFinalStage(Filter):
-    def operate(self, surround_data, config):
-        surround_data.final_ran = True
+    def operate(self, state, config):
+        state.final_ran = True
 
 class TestSurround(unittest.TestCase):
 
@@ -69,8 +69,8 @@ class TestSurround(unittest.TestCase):
         self.assertEqual(data.config_value, "Scott")
 
     def test_finaliser_successful_pipeline(self):
-        data = BasicData()
-        assembler = Assembler("Finalizer test", ValidateData(), HelloStage(), Config())
+        data = AssemblerState()
+        assembler = Assembler("Finalizer test", InputValidator(), HelloStage(), Config())
         assembler.set_finaliser(TestFinalStage())
         assembler.init_assembler()
 
@@ -82,10 +82,10 @@ class TestSurround(unittest.TestCase):
 
     def test_finaliser_fail_pipeline(self):
         # Ensure pipeline will crash
-        data = BasicData()
+        data = AssemblerState()
         data.text = ""
 
-        assembler = Assembler("Finalizer test", ValidateData(), HelloStage(), Config())
+        assembler = Assembler("Finalizer test", InputValidator(), HelloStage(), Config())
         assembler.set_finaliser(TestFinalStage())
         assembler.init_assembler()
 

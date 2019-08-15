@@ -158,7 +158,7 @@ class LinterValidator(Validator):
         Executed by the :class:`Linter`, checks whther the paths contained are valid.
 
         :param state: the data being passed between linter stages
-        :type state: :class:`surround.SurroundData`
+        :type state: :class:`surround.State`
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """

@@ -49,7 +49,7 @@ class State(Frozen):
     Stores the data to be passed between each stage in a pipeline.
     Each stage is responsible for setting the attributes to this class.
 
-    Formerly know as ``SurroundData``.
+    Formerly know as ``State``.
 
     **Attributes:**
 

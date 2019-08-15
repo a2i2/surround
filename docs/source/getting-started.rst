@@ -50,7 +50,7 @@ This will create a new folder called ``testproject`` with the following file str
     │   ├── config.yaml
     │   ├── batch_runner.py
     │   └── stages.py
-    ├── data/
+    ├── input/
     ├── docs/
     ├── models/
     ├── notebooks/

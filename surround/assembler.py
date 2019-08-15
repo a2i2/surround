@@ -96,7 +96,7 @@ class Assembler(ABC):
         """
         Initializes the assembler and all of it's stages.
 
-        Calls the :meth:`surround.stage.Stage.init_stage` method of all filters and the estimator.
+        Calls the :meth:`surround.stage.Stage.initialise` method of all filters and the estimator.
         Also used set the variable ``batch_mode`` which is then used to determine if the visualiser
         should be used after all the stages have been executed.
 
@@ -117,10 +117,10 @@ class Assembler(ABC):
 
             if self.post_filters:
                 for post_filter in self.post_filters:
-                    post_filter.init_stage(self.config)
+                    post_filter.initialise(self.config)
 
             if self.finaliser:
-                self.finaliser.init_stage(self.config)
+                self.finaliser.initialise(self.config)
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
 
@@ -157,7 +157,7 @@ class Assembler(ABC):
             LOGGER.exception("Failed running Assembler")
         finally:
             if self.finaliser:
-                self.finaliser.operate(surround_data, self.config)
+                self.finaliser.operate(state, self.config)
 
     def __run_pipeline(self, is_training):
         """

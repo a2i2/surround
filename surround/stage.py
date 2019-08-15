@@ -126,7 +126,7 @@ class Estimator(Stage):
     Example::
 
         class Predict(Estimator):
-            def init_stage(self, config):
+            def initialise(self, config):
                 self.model = load_model(os.path.join(config["models_path"], "model.pb"))
 
             def estimate(self, state, config):
