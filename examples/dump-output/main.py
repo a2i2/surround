@@ -34,11 +34,11 @@ class WriteWorld(Estimator):
         print("Not training implementation")
 
 
-class BasicData(State):
+class AssemblerState(State):
     text = None
 
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
@@ -50,10 +50,10 @@ if __name__ == "__main__":
 
     app_config = Config()
     app_config.read_config_files([path + "/config.yaml"])
-    assembler = Assembler("Dump output example", ValidateData())
+    assembler = Assembler("Dump output example", InputValidator())
     assembler.set_config(app_config)
     assembler.set_estimator(WriteWorld(path), [WriteHello(path)])
-    assembler.run(BasicData())
+    assembler.run(AssemblerState())
 
     print("Hello output.txt contains '%s'" % open(path + hello_file_path, "r").read())
     print("World output.txt contains '%s'" % open(path + world_file_path, "r").read())

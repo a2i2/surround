@@ -19,11 +19,11 @@ class AddSurround(Filter):
         state.text += ", Surround"
 
 
-class BasicData(State):
+class AssemblerState(State):
     text = None
 
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")

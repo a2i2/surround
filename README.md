@@ -40,18 +40,18 @@ class HelloWorld(Estimator):
     def fit(self, state, config):
         print("No training implemented")
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
 
-class BasicData(State):
+class AssemblerState(State):
     text = None
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    data = BasicData()
-    assembler = Assembler("Hello world example", ValidateData(), HelloWorld())
+    data = AssemblerState()
+    assembler = Assembler("Hello world example", InputValidator(), HelloWorld())
     assembler.run(data)
     print("Text is '%s'" % data.text)
 ```

@@ -43,7 +43,7 @@ def process_files(files, project_dir, project_name, project_description, require
 
     for afile, content in files:
         actual_file = afile.format(project_name=project_name, project_description=project_description)
-        actual_content = content.format(project_name=project_name, safe_project_name=make_name_safe(project_name), project_description=project_description, version=pkg_resources.get_distribution("surround").version)
+        actual_content = content.format(project_name=project_name, project_description=project_description, version=pkg_resources.get_distribution("surround").version)
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
@@ -73,7 +73,7 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
     """
 
     for afile, template, capitalize, web_component in templates:
-        actual_file = afile.format(project_name=project_name, safe_project_name=make_name_safe(project_name), project_description=project_description)
+        actual_file = afile.format(project_name=project_name, project_description=project_description)
         path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
         if not require_web and web_component:
@@ -82,7 +82,7 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
         with open(os.path.join(path, "templates", folder, template)) as f:
             contents = f.read()
             name = project_name.capitalize() if capitalize else project_name
-            actual_contents = contents.format(project_name=name, safe_project_name=make_name_safe(project_name), project_description=project_description)
+            actual_contents = contents.format(project_name=name, project_description=project_description)
             file_path = os.path.join(project_dir, actual_file)
         with open(file_path, 'w') as f:
             f.write(actual_contents)
@@ -170,23 +170,6 @@ def is_valid_name(aparser, arg):
         aparser.error("Name %s must be lowercase letters and underscores only" % arg)
     else:
         return arg
-
-def make_name_safe(project_name):
-    """
-    Converts a name with underscores into a valid class name (PascalCase).
-    E.g. test_project will become TestProject
-
-    :param project_name: the name we want to convert
-    :type project_name: str
-    """
-
-    words = re.split('_', project_name)
-    result = ''
-
-    for word in words:
-        result += word.capitalize()
-
-    return result
 
 def load_modules_from_path(path, module_name):
     """

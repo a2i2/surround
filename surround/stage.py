@@ -42,7 +42,7 @@ class Validator(ABC):
 
     Example::
 
-        class ValidateData(Validator):
+        class InputValidator(Validator):
             def validate(self, state, config):
                 if not state.input_data:
                     # Stop the pipeline, we have no data!

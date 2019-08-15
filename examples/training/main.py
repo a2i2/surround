@@ -14,13 +14,13 @@ class HelloWorld(Estimator):
         state.training_message = "Training message"
 
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
 
 
-class BasicData(State):
+class AssemblerState(State):
     training_message = None
     text = None
 
@@ -32,8 +32,8 @@ class Formatter(Visualiser):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    data = BasicData()
-    assembler = Assembler("Training example", ValidateData(), HelloWorld())
+    data = AssemblerState()
+    assembler = Assembler("Training example", InputValidator(), HelloWorld())
     assembler.init_assembler(True)
     assembler.set_visualiser(Formatter())
 

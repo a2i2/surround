@@ -1,6 +1,6 @@
 import argparse
 from surround import Assembler
-from stages import Main, ValidateData
+from stages import Main, InputValidator
 from batch_runner import BatchRunner
 
 
@@ -11,7 +11,7 @@ def main():
 
 
 def execute_assembler(mode):
-    assembler = Assembler("Default project", ValidateData(), Main())
+    assembler = Assembler("Default project", InputValidator(), Main())
     if mode == "train":
         BatchRunner(assembler).run(True)
     else:

@@ -9,7 +9,7 @@ prefix = ""
 class MainRunner(Runner):
     def run(self, is_training=False):
         self.assembler.init_assembler()
-        data = BasicData()
+        data = AssemblerState()
         input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
 
         with open(input_path) as csv_file:
@@ -51,7 +51,7 @@ class ProcessCSV(Estimator):
         print("No training implemented")
 
 
-class BasicData(State):
+class AssemblerState(State):
     outputs = []
     row = None
     word_count = None

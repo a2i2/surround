@@ -9,11 +9,11 @@ client's complaint (column 'Consumer complaint narrative').
 
  - `CSVValidator` inherits from `Validator` will validate that `inputs` is properly loaded.
 
- - `BasicData` inherits from `State` and consists of three fields: **row_dict** (the row as read from the csv file),
+ - `AssemblerState` inherits from `State` and consists of three fields: **row_dict** (the row as read from the csv file),
  **word_count** and **company**.
 
  - The `assembler.run()` method calls the `estimate()` method of the stage `ProcessCSV`, where the word_count
- and company values are extracted from the row_dict field, and set on their corresponding fields in the `BasicData` object.
+ and company values are extracted from the row_dict field, and set on their corresponding fields in the `AssemblerState` object.
 
 ## Run
 The easiest way to run the example is by running `main.py` from surround's root folder. The arguments needed are pre-set in `main.py`:

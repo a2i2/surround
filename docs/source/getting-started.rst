@@ -86,7 +86,7 @@ Creating your first pipeline
 ****************************
 
 For our first Surround pipeline, we are going to do some very basic data transformation and convert the input string
-from lower case to upper case. This pipeline is going to consist of two stages, ``ValidateData`` and ``MakeUpperCase``.
+from lower case to upper case. This pipeline is going to consist of two stages, ``InputValidator`` and ``MakeUpperCase``.
 
 Open the script ``stages.py`` and you should see the following code already generated::
 
@@ -96,7 +96,7 @@ Open the script ``stages.py`` and you should see the following code already gene
         input_data = None
         output_data = None
 
-    class ValidateData(Validator):
+    class InputValidator(Validator):
         def validate(self, state, config):
             if not state.input_data:
                 raise ValueError("'input_data' is None")
@@ -108,7 +108,7 @@ Open the script ``stages.py`` and you should see the following code already gene
         def fit(self, state, config):
             print("TODO: Train your model here")
 
-As you can see we are already given the ``ValidateData`` stage, we just need to edit the ``operate`` method to
+As you can see we are already given the ``InputValidator`` stage, we just need to edit the ``operate`` method to
 check if the input data is the correct data type (:class:`str`)::
 
     def validate(self, state, config):
@@ -131,11 +131,11 @@ Now we need to rename ``Main`` to ``MakeUpperCase`` and perform the data transfo
 Since we renamed the estimator, we need to reflect that change when we create the ``Assembler``.
 So in ``__main__.py`` where the estimator is imported make sure it looks like so::
 
-    from stages import MakeUpperCase, ValidateData
+    from stages import MakeUpperCase, InputValidator
 
 And where the assembler is created, make sure it looks like so::
 
-    assembler = Assembler("Default project", ValidateData(), MakeUpperCase())
+    assembler = Assembler("Default project", InputValidator(), MakeUpperCase())
 
 That's it for the pipeline! 
 To test the pipeline with default input (``"TODO Load raw data here"`` string) just run the following command::

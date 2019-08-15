@@ -6,7 +6,7 @@ class RunnersData(State):
     output_data = ""
 
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if not state.input_data:
             raise ValueError("'input_data' is None")

@@ -16,7 +16,7 @@ class HelloStage(Estimator):
         print("No training implemented")
 
 
-class BasicData(State):
+class AssemblerState(State):
     text = None
     config_value = None
     stage1 = None
@@ -24,7 +24,7 @@ class BasicData(State):
     final_ran = False
 
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
@@ -46,15 +46,15 @@ class TestFinalStage(Filter):
 class TestSurround(unittest.TestCase):
 
     def test_happy_path(self):
-        data = BasicData()
-        assembler = Assembler("Happy path", ValidateData(), HelloStage(), Config())
+        data = AssemblerState()
+        assembler = Assembler("Happy path", InputValidator(), HelloStage(), Config())
         assembler.init_assembler()
         assembler.run(data)
         self.assertEqual(data.text, test_text)
 
     def test_rejecting_attributes(self):
-        data = BasicData()
-        assembler = Assembler("Reject attribute", ValidateData(), HelloStage(), Config())
+        data = AssemblerState()
+        assembler = Assembler("Reject attribute", InputValidator(), HelloStage(), Config())
         assembler.init_assembler()
         assembler.run(data)
         self.assertRaises(AttributeError, getattr, data, "no_text")
@@ -63,8 +63,8 @@ class TestSurround(unittest.TestCase):
         path = os.path.dirname(__file__)
         config = Config()
         config.read_config_files([os.path.join(path, "config.yaml")])
-        data = BasicData()
-        assembler = Assembler("Surround config", ValidateData(), HelloStage(), config)
+        data = AssemblerState()
+        assembler = Assembler("Surround config", InputValidator(), HelloStage(), config)
         assembler.run(data)
         self.assertEqual(data.config_value, "Scott")
 

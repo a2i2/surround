@@ -20,11 +20,11 @@ class HelloWorld(Estimator):
         print("No training implemented")
 
 
-class BasicData(State):
+class AssemblerState(State):
     text = None
 
 
-class ValidateData(Validator):
+class InputValidator(Validator):
     def validate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
@@ -40,8 +40,8 @@ if __name__ == "__main__":
     app_config = Config()
     app_config.read_config_files([prefix + "config.yaml"])
 
-    data = BasicData()
-    assembler = Assembler("Init state example", ValidateData(), HelloWorld(), app_config)
+    data = AssemblerState()
+    assembler = Assembler("Init state example", InputValidator(), HelloWorld(), app_config)
     assembler.init_assembler()
     assembler.run(data)
 

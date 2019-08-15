@@ -1,10 +1,10 @@
 from surround import Assembler
-from stages import Main, ValidateData
+from stages import Main, InputValidator
 from {runner_file} import {runner_class}
 
 
 def main():
-    assembler = Assembler("Default project", ValidateData(), Main())
+    assembler = Assembler("Default project", InputValidator(), Main())
     {runner_class}(assembler).run()
 
 
