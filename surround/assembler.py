@@ -39,7 +39,7 @@ class Assembler(ABC):
         assembler.set_estimator(PredictStage(), [PreFilter()], [PostFilter()])
         assembler.init_assembler(batch_mode=False)
 
-        data = TestData("some data")
+        data = AssemblyState("some data")
         assembler.run(data, is_training=False)
 
     Batch-predict mode::

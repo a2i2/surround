@@ -92,7 +92,7 @@ Open the script ``stages.py`` and you should see the following code already gene
 
     from surround import Estimator, State, Validator
 
-    class TestprojectData(State):
+    class AssemblyState(State):
         input_data = None
         output_data = None
 
@@ -152,14 +152,14 @@ To change what input is fed through the pipeline, modify ``batch_runner.py`` and
 
     import logging
     from surround import Runner
-    from stages import TestprojectData
+    from stages import AssemblyState
 
     logging.basicConfig(level=logging.INFO)
 
     class BatchRunner(Runner):
         def run(self, is_training=False):
             self.assembler.init_assembler(True)
-            data = TestprojectData()
+            data = AssemblyState()
 
             # Load data to be processed
             raw_data = "This daTa wiLL end UP captializED"

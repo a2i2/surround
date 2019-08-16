@@ -1,7 +1,7 @@
 from surround import Validator, Estimator, State
 
 
-class RunnersData(State):
+class AssemblyState(State):
     input_data = None
     output_data = ""
 
