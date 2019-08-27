@@ -66,7 +66,7 @@ def task_batch_local():
     }}
 
 def task_jupyter():
-    command = "pip install -r /home/jovyan/work/requirements.txt; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
+    command = "rm -r work; pip install -r /home/jovyan/requirements.txt; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
     
     def run_command():
         process = subprocess.Popen([
@@ -74,7 +74,7 @@ def task_jupyter():
             "run",
             "--rm",
             "--name", "{project_name}_surround_notebook",
-            "--volume", "%s:/home/jovyan/work" % CONFIG['volume_path'], 
+            "--volume", "%s:/home/jovyan" % CONFIG['volume_path'], 
             "-p", "8888:8888",
             "--user", "root",
             "-w", "/home/jovyan",
@@ -82,12 +82,14 @@ def task_jupyter():
             "bash",  "-c", command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         print("Starting jupyter notbook server...\n")
-        print("Linux/MacOS URL: http://localhost:8888/tree/work")
-        print("Windows URL:     http://192.168.99.100:8888/tree/work\n")
+        print("Linux/MacOS URL: http://localhost:8888/tree")
+        print("Windows URL:     http://192.168.99.100:8888/tree\n")
         print("Use CTRL+C to stop the server.")
 
         try:
             process.wait()
+        except KeyboardInterrupt:
+            pass
         finally:
             print("Closing server... (if this happened instantly, an error occured, check if Docker is running)")
             process = subprocess.Popen(['docker', 'stop', '{project_name}_surround_notebook'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
