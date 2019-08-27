@@ -94,7 +94,7 @@ class Config(Mapping):
             self._storage["package_path"] = package_path
             self._storage["volume_path"] = volume_path
             self._storage["output_path"] = os.path.join(project_root, "output")
-            self._storage["data_path"] = os.path.join(project_root, "data")
+            self._storage["input_path"] = os.path.join(project_root, "input")
             self._storage["models_path"] = os.path.join(project_root, "models")
 
             # Load project config

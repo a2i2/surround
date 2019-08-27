@@ -17,7 +17,7 @@ class Runner(ABC):
 
                 config = self.assembler.get_config()
                 path = os.path.join(config["data_path"], "input.txt")
-                data = RunnersData()
+                data = AssemblyState()
 
                 with open(path, 'r') as f:
                     for line in f:

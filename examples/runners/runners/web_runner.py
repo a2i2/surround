@@ -5,7 +5,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from surround import Runner
-from .stages import RunnersData
+from .stages import AssemblyState
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,7 +29,7 @@ class Application(tornado.web.Application):
 class MessageHandler(tornado.web.RequestHandler):
     def initialize(self, assembler):
         self.assembler = assembler
-        self.data = RunnersData()
+        self.data = AssemblyState()
 
     def post(self):
         req_data = json.loads(self.request.body)

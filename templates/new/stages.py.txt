@@ -1,19 +1,19 @@
-from surround import Estimator, SurroundData, Validator
+from surround import Estimator, State, Validator
 
 
-class {safe_project_name}Data(SurroundData):
+class AssemblerState(State):
     input_data = None
     output_data = None
 
 
-class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if not surround_data.input_data:
+class InputValidator(Validator):
+    def validate(self, state, config):
+        if not state.input_data:
             raise ValueError("'input_data' is None")
 
 class Main(Estimator):
-    def estimate(self, surround_data, config):
-        surround_data.output_data = surround_data.input_data
+    def estimate(self, state, config):
+        state.output_data = state.input_data
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("TODO: Train your model here")

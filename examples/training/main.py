@@ -1,39 +1,39 @@
 import logging
-from surround import SurroundData, Validator, Estimator, Assembler, Visualiser
+from surround import State, Validator, Estimator, Assembler, Visualiser
 
 
 class HelloWorld(Estimator):
-    def estimate(self, surround_data, config):
-        if surround_data.training_message:
-            surround_data.text = surround_data.training_message
+    def estimate(self, state, config):
+        if state.training_message:
+            state.text = state.training_message
         else:
-            surround_data.text = "Hello world"
+            state.text = "Hello world"
 
 
-    def fit(self, surround_data, config):
-        surround_data.training_message = "Training message"
+    def fit(self, state, config):
+        state.training_message = "Training message"
 
 
-class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if surround_data.text:
+class InputValidator(Validator):
+    def validate(self, state, config):
+        if state.text:
             raise ValueError("'text' is not None")
 
 
-class BasicData(SurroundData):
+class AssemblerState(State):
     training_message = None
     text = None
 
 
 class Formatter(Visualiser):
-    def visualise(self, surround_data, config):
-        print("Visualiser result: %s" % surround_data.training_message)
+    def visualise(self, state, config):
+        print("Visualiser result: %s" % state.training_message)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    data = BasicData()
-    assembler = Assembler("Training example", ValidateData(), HelloWorld())
+    data = AssemblerState()
+    assembler = Assembler("Training example", InputValidator(), HelloWorld())
     assembler.init_assembler(True)
     assembler.set_visualiser(Formatter())
 

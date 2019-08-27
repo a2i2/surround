@@ -1,10 +1,10 @@
 from surround import Assembler
-from stages import AddWorld, AddHello, AddSurround, BasicData, ValidateData
+from stages import AddWorld, AddHello, AddSurround, AssemblerState, InputValidator
 
 if __name__ == "__main__":
-    data = BasicData()
+    data = AssemblerState()
 
-    assembler = Assembler("Pre Post Example", ValidateData())
+    assembler = Assembler("Pre Post Example", InputValidator())
     assembler.set_estimator(AddWorld(), [AddHello()], [AddSurround()])
     assembler.run(data)
 

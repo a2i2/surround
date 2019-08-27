@@ -5,7 +5,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from surround import Runner
-from stages import {safe_project_name}Data
+from stages import AssemblerState
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,7 +31,7 @@ class Application(tornado.web.Application):
 class EstimateHandler(tornado.web.RequestHandler):
     def initialize(self, assembler):
         self.assembler = assembler
-        self.data = {safe_project_name}Data()
+        self.data = AssemblerState()
 
     def post(self):
         req_data = json.loads(self.request.body)

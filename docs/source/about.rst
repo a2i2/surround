@@ -182,7 +182,7 @@ A stage, at its base, can do three things:
 Between each stage, during processing, there are two objects passed between them:
 
 - :ref:`data` object which contains the input data, has a field for errors (which stops the execution when added to) and holds the output of each stage (if any).
-- :ref:`configuration` object which contains all the settings loaded in from YAML files plus paths to folders in the project such as ``data/`` and ``output/``.
+- :ref:`configuration` object which contains all the settings loaded in from YAML files plus paths to folders in the project such as ``input/`` and ``output/``.
 
 .. _validators:
 

@@ -1,7 +1,7 @@
 import os
 import io
 from .stage import Filter, Estimator, Validator
-from .surround import SurroundData
+from .state import State
 from .assembler import Assembler
 
 
@@ -57,13 +57,13 @@ class LinterStage(Filter):
 
         data.warnings.append("WARNING: %s_CHECK: %s" % (self.key, string))
 
-    def operate(self, surround_data, config):
+    def operate(self, state, config):
         """
         Executed by the :class:`Linter`, performs the linting specific to this stage.
         **Must** be implemented in extended versions of this class.
 
-        :param surround_data: the data being passed between stages
-        :type surround_data: :class:`ProjectData`
+        :param state: the data being passed between stages
+        :type state: :class:`ProjectData`
         :param config: the configuration data for the linter
         :type config: :class:`surround.config.Config`
         """
@@ -77,20 +77,20 @@ class CheckData(LinterStage):
     def __init__(self):
         LinterStage.__init__(self, "DATA", "Check data files")
 
-    def operate(self, surround_data, config):
+    def operate(self, state, config):
         """
         Executed by the :class:`Linter`, checks if there is any files in the project's data folder.
         If there is none then a warning will be issued.
 
-        :param surround_data: the data being passed between stages
-        :type surround_data: :class:`surround.SurroundData`
+        :param state: the data being passed between stages
+        :type state: :class:`surround.State`
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
 
-        path = os.path.join(surround_data.project_root, "data")
-        if not os.listdir(path):
-            self.add_warning(surround_data, "No data available, data directory is empty")
+        path = os.path.join(state.project_root, "data")
+        if os.path.exists(path) and not os.listdir(path):
+            self.add_warning(state, "No data available, data directory is empty")
 
 
 class CheckFiles(LinterStage):
@@ -101,24 +101,24 @@ class CheckFiles(LinterStage):
     def __init__(self):
         LinterStage.__init__(self, "FILES", "Check for Surround project files")
 
-    def operate(self, surround_data, config):
+    def operate(self, state, config):
         """
         Executed by the :class:`Linter`, checks if the files in the project structure exist.
         Will create errors if required surround project files are missing in the root directory.
 
-        :param surround_data: the data being passed between stages
-        :type surround_data: :class:`surround.SurroundData`
+        :param state: the data being passed between stages
+        :type state: :class:`surround.State`
         :param config: the linter's configuation data
         :type config: :class:`surround.config.Config`
         """
 
-        for result in surround_data.project_structure["new"]["files"] + surround_data.project_structure["new"]["templates"]:
+        for result in state.project_structure["new"]["files"] + state.project_structure["new"]["templates"]:
             file_name = result[0]
             path = os.path.join(
-                surround_data.project_root,
-                file_name.format(project_name=surround_data.project_name))
+                state.project_root,
+                file_name.format(project_name=state.project_name))
             if not os.path.isfile(path):
-                self.add_error(surround_data, "Path %s does not exist" % path)
+                self.add_error(state, "Path %s does not exist" % path)
 
 
 class CheckDirectories(LinterStage):
@@ -131,46 +131,46 @@ class CheckDirectories(LinterStage):
             self, "DIRECTORIES",
             "Check for validating Surround's directory structure")
 
-    def operate(self, surround_data, config):
+    def operate(self, state, config):
         """
         Executed by the :class:`Linter`, checks whether the project directories exist.
         If the expected directories don't exist then errors will be created.
 
-        :param surround_data: the data being passed between stages
-        :type surround_data: :class:`surround.SurroundData`
+        :param state: the data being passed between stages
+        :type state: :class:`surround.State`
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
 
-        for d in surround_data.project_structure["new"]["dirs"]:
-            path = os.path.join(surround_data.project_root,
-                                d.format(project_name=surround_data.project_name))
+        for d in state.project_structure["new"]["dirs"]:
+            path = os.path.join(state.project_root,
+                                d.format(project_name=state.project_name))
             if not os.path.isdir(path):
-                self.add_error(surround_data, "Directory %s does not exist" % path)
+                self.add_error(state, "Directory %s does not exist" % path)
 
 class LinterValidator(Validator):
     """
     Linter's validator stage, checks the data given in the ProjectData is valid.
     """
 
-    def validate(self, surround_data, config):
+    def validate(self, state, config):
         """
         Executed by the :class:`Linter`, checks whther the paths contained are valid.
 
-        :param surround_data: the data being passed between linter stages
-        :type surround_data: :class:`surround.SurroundData`
+        :param state: the data being passed between linter stages
+        :type state: :class:`surround.State`
         :param config: the linter's configuration data
         :type config: :class:`surround.config.Config`
         """
 
-        if not isinstance(surround_data.project_name, str):
-            surround_data.errors.append("ERROR: PROJECT_CHECK: Project name is not a string")
+        if not isinstance(state.project_name, str):
+            state.errors.append("ERROR: PROJECT_CHECK: Project name is not a string")
 
-        if not isinstance(surround_data.project_structure, dict):
-            surround_data.errors.append("ERROR: PROJECT_CHECK: Project structure invalid format")
+        if not isinstance(state.project_structure, dict):
+            state.errors.append("ERROR: PROJECT_CHECK: Project structure invalid format")
 
-        if not isinstance(surround_data.project_root, str):
-            surround_data.errors.append("ERROR: PROJECT_CHECK: Project root path is not a string")
+        if not isinstance(state.project_root, str):
+            state.errors.append("ERROR: PROJECT_CHECK: Project root path is not a string")
 
 class Main(Estimator):
     """
@@ -185,15 +185,15 @@ class Main(Estimator):
 
         self.filters = filters
 
-    def estimate(self, surround_data, config):
+    def estimate(self, state, config):
         """
         Execute each stage in the linter.
         """
 
         for filters in self.filters:
-            filters.operate(surround_data, config)
+            filters.operate(state, config)
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         """
         Should never be called.
         """
@@ -201,7 +201,7 @@ class Main(Estimator):
         print("No training implemented")
 
 
-class ProjectData(SurroundData):
+class ProjectData(State):
     """
     Class containing the data passed between each :class:`LinterStage`.
 

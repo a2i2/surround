@@ -1,6 +1,6 @@
 import os
 from surround import Runner
-from .stages import RunnersData
+from .stages import AssemblyState
 
 
 class BatchRunner(Runner):
@@ -9,7 +9,7 @@ class BatchRunner(Runner):
         self.assembler.init_assembler(True)
 
         path = os.path.dirname(__file__) + "/data/input.txt"
-        data = RunnersData()
+        data = AssemblyState()
 
         with open(path, 'r') as f:
             for line in f:

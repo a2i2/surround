@@ -1,11 +1,11 @@
 from surround import Assembler
-from .stages import ValidateData, HelloWorld
+from .stages import InputValidator, HelloWorld
 from .batch_runner import BatchRunner
 # pylint: disable=unused-import
 from .web_runner import WebRunner
 
 def main():
-    assembler = Assembler("Default project", ValidateData(), HelloWorld())
+    assembler = Assembler("Default project", InputValidator(), HelloWorld())
 
     # Example for running batch processing
     BatchRunner(assembler).run()

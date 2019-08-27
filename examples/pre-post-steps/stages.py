@@ -1,29 +1,29 @@
-from surround import Filter, Estimator, SurroundData, Validator
+from surround import Filter, Estimator, State, Validator
 
 
 class AddHello(Filter):
-    def operate(self, surround_data, config):
-        surround_data.text = "hello"
+    def operate(self, state, config):
+        state.text = "hello"
 
 
 class AddWorld(Estimator):
-    def estimate(self, surround_data, config):
-        surround_data.text += " world"
+    def estimate(self, state, config):
+        state.text += " world"
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("No training implemented")
 
 
 class AddSurround(Filter):
-    def operate(self, surround_data, config):
-        surround_data.text += ", Surround"
+    def operate(self, state, config):
+        state.text += ", Surround"
 
 
-class BasicData(SurroundData):
+class AssemblerState(State):
     text = None
 
 
-class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if surround_data.text:
+class InputValidator(Validator):
+    def validate(self, state, config):
+        if state.text:
             raise ValueError("'text' is not None")

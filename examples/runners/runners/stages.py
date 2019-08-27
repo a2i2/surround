@@ -1,20 +1,20 @@
-from surround import Validator, Estimator, SurroundData
+from surround import Validator, Estimator, State
 
 
-class RunnersData(SurroundData):
+class AssemblyState(State):
     input_data = None
     output_data = ""
 
 
-class ValidateData(Validator):
-    def validate(self, surround_data, config):
-        if not surround_data.input_data:
+class InputValidator(Validator):
+    def validate(self, state, config):
+        if not state.input_data:
             raise ValueError("'input_data' is None")
 
 
 class HelloWorld(Estimator):
-    def estimate(self, surround_data, config):
-        surround_data.output_data += surround_data.input_data
+    def estimate(self, state, config):
+        state.output_data += state.input_data
 
-    def fit(self, surround_data, config):
+    def fit(self, state, config):
         print("TODO: Building models")
