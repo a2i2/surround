@@ -75,15 +75,15 @@ def task_jupyter():
             "--rm",
             "--name", "{project_name}_surround_notebook",
             "--volume", "%s:/home/jovyan" % CONFIG['volume_path'], 
-            "-p", "8888:8888",
+            "-p", "55910:8888",
             "--user", "root",
             "-w", "/home/jovyan",
             "jupyter/base-notebook:307ad2bb5fce", 
             "bash",  "-c", command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         print("Starting jupyter notbook server...\n")
-        print("Linux/MacOS URL: http://localhost:8888/tree")
-        print("Windows URL:     http://192.168.99.100:8888/tree\n")
+        print("Linux/MacOS URL: http://localhost:55910/tree")
+        print("Windows URL:     http://192.168.99.100:55910/tree\n")
         print("Use CTRL+C to stop the server.")
 
         try:
