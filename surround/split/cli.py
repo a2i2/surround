@@ -61,9 +61,9 @@ def get_split_parser():
     group.add_argument("-r", "--reset", help="Path to directory containing train/test/validate folders to reset", type=lambda x: is_valid_dir(parser, x))
 
     parser.add_argument("-e", "--extension", help="File extension of the files to process (default: *)", type=str, default="*")
-    parser.add_argument("-tr", "--train", type=int, help="Percentage of files for training (default: 80%)", default=80)
-    parser.add_argument("-te", "--test", type=int, help="Percentage of files for test (default: 10%)", default=10)
-    parser.add_argument("-va", "--validate", type=int, help="Percentage of files for validate (default: 10%)", default=10)
+    parser.add_argument("-tr", "--train", type=int, help="Percentage of files for training (default: 80%%)", default=80)
+    parser.add_argument("-te", "--test", type=int, help="Percentage of files for test (default: 10%%)", default=10)
+    parser.add_argument("-va", "--validate", type=int, help="Percentage of files for validate (default: 10%%)", default=10)
     parser.add_argument("-nv", "--no-validate", action="store_true", help="Don't produce a validation set when splitting")
     parser.add_argument("-ns", "--no-shuffle", action="store_true", help="Don't randomise when splitting data")
     parser.add_argument("-nh", '--no-header', action="store_true", help="Use this flag when the text file has no headers")
