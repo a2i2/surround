@@ -66,7 +66,7 @@ def task_batch_local():
     }}
 
 def task_jupyter():
-    command = "rm -r work; pip install -r /home/jovyan/requirements.txt; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
+    command = "pip install -r /app/requirements.txt; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
     
     def run_command():
         process = subprocess.Popen([
@@ -74,10 +74,10 @@ def task_jupyter():
             "run",
             "--rm",
             "--name", "{project_name}_surround_notebook",
-            "--volume", "%s:/home/jovyan" % CONFIG['volume_path'], 
+            "--volume", "%s:/app" % CONFIG['volume_path'], 
             "-p", "55910:8888",
             "--user", "root",
-            "-w", "/home/jovyan",
+            "-w", "/app",
             "jupyter/base-notebook:307ad2bb5fce", 
             "bash",  "-c", command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
