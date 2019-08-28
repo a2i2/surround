@@ -8,6 +8,7 @@ import subprocess
 import pkg_resources
 
 from .remote import cli as remote_cli
+from .split import cli as split_cli
 from .linter import Linter
 from .project import PROJECTS
 
@@ -338,7 +339,7 @@ def parse_init_args(args):
     else:
         print("error: permission denied")
 
-def parse_tool_args(parsed_args, remote_parser, tool):
+def parse_tool_args(parsed_args, remote_parser, split_parser, tool):
     """
     Executes the tool/sub-command requested by the user via the CLI passing parsed arguments.
 
@@ -362,6 +363,8 @@ def parse_tool_args(parsed_args, remote_parser, tool):
         remote_cli.parse_push_args(parsed_args)
     elif tool == "list":
         remote_cli.parse_list_args(parsed_args)
+    elif tool == 'split':
+        split_cli.execute_split_tool(split_parser, parsed_args)
     else:
         parse_init_args(parsed_args)
 
@@ -386,6 +389,7 @@ def execute_cli():
     - pull - pulls files from the remote
     - push - pushes files to the remote
     - list - lists files in a remote
+    - split - splits a directory/file into test/train/validate sets
     """
 
     parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
@@ -413,9 +417,11 @@ def execute_cli():
     remote_cli.add_push_parser(sub_parser)
     remote_cli.add_list_parser(sub_parser)
 
+    split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
+
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list"]
+    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list", "split"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -427,7 +433,7 @@ def execute_cli():
         else:
             tool = sys.argv[1]
             parsed_args = parser.parse_args()
-            parse_tool_args(parsed_args, remote_parser, tool)
+            parse_tool_args(parsed_args, remote_parser, split_parser, tool)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 
