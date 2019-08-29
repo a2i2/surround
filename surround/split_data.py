@@ -77,8 +77,8 @@ def main(directory, file_extension, train, test, validate):
 
 def undo(directory, file_extension):
     if not os.path.isdir(os.path.join(directory, "test")) or not os.path.isdir(os.path.join(directory, "train")) or not os.path.isdir(os.path.join(directory, "validate")):
-       print("test, train or validate folders missing from %s" % directory)
-       return
+        print("test, train or validate folders missing from %s" % directory)
+        return
 
     files, test_dir, train_dir, validate_dir = prepare_folder(directory, file_extension)
 

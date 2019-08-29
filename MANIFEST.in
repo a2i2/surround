@@ -1,2 +1,3 @@
 include surround/*.yaml
+include surround/visualise/*.html.txt
 graft templates
