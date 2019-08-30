@@ -2,17 +2,6 @@
  "cells": [
   {{
    "cell_type": "code",
-   "execution_count": 5,
-   "metadata": {{}},
-   "outputs": [],
-   "source": [
-    "# Every notebook must have this at the beginning so you can import from the project\n",
-    "import sys\n",
-    "sys.path.append(\"../\")"
-   ]
-  }},
-  {{
-   "cell_type": "code",
    "execution_count": 7,
    "metadata": {{}},
    "outputs": [],

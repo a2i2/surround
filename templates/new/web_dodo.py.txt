@@ -81,7 +81,7 @@ def task_web_local():
     }}
 
 def task_jupyter():
-    command = "pip install -r /app/requirements.txt; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
+    command = "pip install -r /app/requirements.txt; mkdir /etc/ipython; echo \"c.InteractiveShellApp.extensions.append('autoreload')\nc.InteractiveShellApp.exec_lines = ['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']\" > /etc/ipython/ipython_config.py; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
     
     def run_command():
         process = subprocess.Popen([
