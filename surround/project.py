@@ -25,6 +25,8 @@ PROJECTS = {
             ("{project_name}/__main__.py", "batch_main.py.txt", True, False),
             ("{project_name}/__main__.py", "web_main.py.txt", True, True),
             ("{project_name}/__init__.py", "init.py.txt", True, False),
+            ("notebooks/example.ipynb", "example.ipynb.txt", False, False),
+            ("notebooks/example.ipynb", "example.ipynb.txt", False, True),
             ("dodo.py", "dodo.py.txt", False, False),
             ("dodo.py", "web_dodo.py.txt", False, True),
             ("Dockerfile", "Dockerfile.txt", False, False),
