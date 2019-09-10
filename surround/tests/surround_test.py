@@ -22,6 +22,7 @@ class AssemblerState(State):
     stage1 = None
     stage2 = None
     final_ran = False
+    use_errors_instead = False
 
 
 class InputValidator(Validator):
@@ -38,6 +39,13 @@ class InputValidator(Validator):
         if state.stage2:
             raise ValueError("'stage2' is not None")
 
+
+class BadFilter(Filter):
+    def operate(self, state, config):
+        if state.use_errors_instead:
+            state.errors.append("This will fail always")
+        else:
+            raise Exception("This will fail always")
 
 class TestFinalStage(Filter):
     def operate(self, state, config):
@@ -94,3 +102,29 @@ class TestSurround(unittest.TestCase):
 
         # Finalizer should still be executed
         self.assertTrue(data.final_ran)
+
+    def test_pipeline_stop_on_exception(self):
+        data = AssemblerState()
+
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [BadFilter()])
+        assembler.init_assembler()
+
+        # This should fail to execute HelloStage
+        assembler.run(data)
+
+        self.assertIsNone(data.text)
+
+    def test_pipeline_stop_on_error(self):
+        # Use the errors list in state instead
+        data = AssemblerState()
+        data.use_errors_instead = True
+
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [BadFilter()])
+        assembler.init_assembler()
+
+        # This should fail to execute HelloStage
+        assembler.run(data)
+
+        self.assertIsNone(data.text)
