@@ -4,6 +4,17 @@ import argparse
 from ..linter import DataLinter
 
 def is_valid_file(parser, x):
+    """
+    Checks whether argument is a valid path to a container (.data.zip)
+
+    :param parser: the parser
+    :type parser: :class:`argparse.ArgumentParser`
+    :param x: the value to check
+    :type x: str
+    :returns the value if valid, false otherwise
+    :rtype: str or bool
+    """
+
     if not os.path.exists(x):
         parser.error('Unable to locate the file!')
         return False
@@ -20,6 +31,17 @@ def is_valid_file(parser, x):
     return x
 
 def is_valid_check_id(parser, x):
+    """
+    Checks whether argument is a valid ID number for linter stages
+
+    :param parser: the parser
+    :type parser: :class:`argparse.ArgumentParser`
+    :param x: the value to check
+    :type x: str
+    :returns the value if valid, false otherwise
+    :rtype: int or bool
+    """
+
     try:
         x = int(x)
     except Exception:
@@ -33,6 +55,13 @@ def is_valid_check_id(parser, x):
     return x
 
 def get_data_lint_parser():
+    """
+    Generates the parser used for the lint sub-command of the data container CLI tool.
+
+    :returns: the parser generated
+    :rtype: :class:`argparse.ArgumentParser`
+    """
+
     parser = argparse.ArgumentParser(description='Check the validity of a data container', add_help=False)
 
     parser.add_argument("container_path", help="Path to the container to perform checks on", type=lambda x: is_valid_file(parser, x))
@@ -42,6 +71,11 @@ def get_data_lint_parser():
     return parser
 
 def execute_data_lint_tool(parser, args):
+    """
+    Executes the lint sub-command of the data container CLI tool.
+    Which uses the data linter to check the validity of a data container file provided.
+    """
+
     linter = DataLinter()
 
     if args.list:
@@ -52,6 +86,10 @@ def execute_data_lint_tool(parser, args):
         linter.lint(args.container_path, verbose=True)
 
 def main():
+    """
+    Entry point used when this script is executed directly.
+    """
+
     parser = get_data_lint_parser()
     args = parser.parse_args()
 

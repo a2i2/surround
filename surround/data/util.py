@@ -4,6 +4,7 @@ import mimetypes
 import hashlib
 import zipfile
 
+# Format to Type mapping via regular expression
 TYPE_FORMAT_MAPPING = {
     'Text': ['text/.*', 'application/pdf'],
     'StillImage': ['image/.*', 'application/pdf'],

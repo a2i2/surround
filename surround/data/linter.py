@@ -16,18 +16,39 @@ class DataLinterStage(ABC):
         self.verbose = False
 
     def log_info(self, msg):
+        """
+        Log general information message to info list (print to terminal when verbose)
+
+        :param msg: message to log
+        :type msg: str
+        """
+
         self.info.append(msg)
 
         if self.verbose:
             print(msg)
 
     def log_error(self, msg):
+        """
+        Log error message to errors list (print to terminal when verbose)
+
+        :param msg: error message
+        :type msg: str
+        """
+
         self.errors.append(msg)
 
         if self.verbose:
             print("ERROR: %s" % msg)
 
     def log_warning(self, msg):
+        """
+        Log warningm message to warnings list (print to terminal when verbose)
+
+        :param msg: warning message
+        :type msg: str
+        """
+
         self.warnings.append(msg)
 
         if self.verbose:
@@ -37,11 +58,17 @@ class DataLinterStage(ABC):
     def execute(self, container, metadata):
         """
         Perform the checks this stage must do on the container and it's metadata.
+
+        :param container: the data container being checked
+        :type container: :class:`surround.data.container.DataContainer`
+        :param metadata: the metadata of the container being checked
+        :type metadata: :class:`surround.data.metadata.Metadata`
         """
 
 class CheckDataIntegrity(DataLinterStage):
     """
     Represents the data integrity stage of the Data Linter.
+    Checks whether the hash stored in the metadata matches the actual hash of the data in the container.
     """
 
     def __init__(self):
@@ -64,6 +91,7 @@ class CheckDataIntegrity(DataLinterStage):
 class CheckFormats(DataLinterStage):
     """
     Represents the format checking stage of the Data Linter.
+    Checks whether the formats in the metadata match the formats in the actual container.
     """
 
     def __init__(self):
@@ -89,6 +117,7 @@ class CheckFormats(DataLinterStage):
 class CheckMetadata(DataLinterStage):
     """
     Represents the metadata checking stage of the Data Linter.
+    Checks whether the metadata contains the required fields and whether their values are the correct format.
     """
 
     def __init__(self):
@@ -148,6 +177,10 @@ class CheckMetadata(DataLinterStage):
             self.log_info("OK!")
 
 class DataLinter:
+    """
+    Represents the linter pipeline that checks the validity of the data container provided.
+    """
+
     def __init__(self):
         self.info = []
         self.warnings = []
@@ -155,11 +188,29 @@ class DataLinter:
         self.stages = [CheckDataIntegrity(), CheckFormats(), CheckMetadata()]
 
     def list_stages(self):
+        """
+        List all of the stages in the pipeline to the terminal
+        """
+
         print("============[Data Linter Stages]============")
         for i, stage in enumerate(self.stages):
             print("%i. %s - %s" % (i + 1, stage.name, stage.description))
 
     def lint(self, container_path, verbose=False, check_id=None):
+        """
+        Executes the linter on the provided data container, storing all messages in the
+        info, warnings, and errors lists.
+
+        :param container_path: path to the data container to lint
+        :type container_path: str
+        :param verbose: whether or not to print process to the terminal
+        :type verbose: bool
+        :param check_id: ID of a stage in the pipeline to run exclusively (all if None)
+        :type check_id: int
+        :returns: whether the data container is considered valid
+        :rtype: bool
+        """
+
         if verbose:
             print("==========[Running data linter]============")
             print("Performing checks on container: %s\n" % container_path)

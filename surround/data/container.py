@@ -11,9 +11,22 @@ class MetadataNotFoundError(Exception):
 class DataContainer:
     """
     Represents a data container which holds both data and metadata.
+
+    Responsibilities:
+
+    - Import files into a container and export
+    - Load existing containers
+    - Extract files
     """
 
     def __init__(self, path=None, metadata_version='v0.1'):
+        """
+        :param path: path for container to load (default: None)
+        :type path: str
+        :param metadata_version: the version of metadata being used (default: v0.1)
+        :type metadata_version: str
+        """
+
         self.path = path
         self.metadata = Metadata(metadata_version)
         self.__imported_files = []
@@ -23,6 +36,13 @@ class DataContainer:
             self.load(path)
 
     def load(self, path):
+        """
+        Load an existing data container, preparing it for extracting files.
+
+        :param path: path to the container
+        :type path: str
+        """
+
         self.path = path
 
         # Open the zip file and get all the contents
@@ -37,6 +57,14 @@ class DataContainer:
             raise MetadataNotFoundError
 
     def export(self, export_to):
+        """
+        Import all staged files into the container, hash the contents, set the hash to the
+        metadata and import the metadata file.
+
+        :param export_to: path to export the file to
+        :type export_to: str
+        """
+
         self.path = export_to
         self.__loaded_files.clear()
 
@@ -64,10 +92,30 @@ class DataContainer:
             container.writestr('manifest.yaml', metadata)
 
     def import_files(self, files, generate_metadata=True):
+        """
+        Stage the list of files for importing when export is requested.
+
+        :param files: list of files to import
+        :type files: list
+        :param generate_metadata: whether metadata should be generated for this file
+        :type generate_metadata: bool
+        """
+
         for path, internal_path in files:
             self.import_file(path, internal_path, generate_metadata)
 
     def import_directory(self, path, generate_metadata=True, reimport=True):
+        """
+        Stage the directory provided for importing when export is requested.
+
+        :param path: the directory of files to import
+        :type path: str
+        :param generate_metadata: whether metadata should be generated for this folder
+        :type generate_metadata: bool
+        :param reimport: whether or not files that are already staged should be staged again
+        :type reimport: bool
+        """
+
         if generate_metadata:
             # Generate the automatic fields in the metadata using the directory
             self.metadata.generate_from_directory(path)
@@ -88,6 +136,17 @@ class DataContainer:
                 self.import_file(filepath, internal_path, False)
 
     def import_file(self, import_path, internal_path, generate_metadata=True):
+        """
+        Stage file for importing when the next export operation is called.
+
+        :param import_path: path to the file on the users drive
+        :type import_path: str
+        :param internal_path: path to the file inside the container
+        :type internal_path: str
+        :param generate_metadata: whether metadata should be generated for this file
+        :type generate_metadata: bool
+        """
+
         if generate_metadata:
             # Generate the automatic fields in the metadata using the file
             self.metadata.generate_from_file(import_path)
@@ -104,6 +163,15 @@ class DataContainer:
         self.__imported_files.append((None, internal_path.replace('\\', '/'), data))
 
     def extract_file_bytes(self, path):
+        """
+        Extract the bytes of a file in the current data container
+
+        :param path: path inside the container
+        :type path: str
+        :returns: the bytes extracted or None if it doesn't exist
+        :rtype: bytes
+        """
+
         if self.file_exists(path):
             with zipfile.ZipFile(self.path, "r") as container:
                 with container.open(path) as myfile:
@@ -112,6 +180,16 @@ class DataContainer:
         return None
 
     def extract_file(self, internal_path, extract_path="."):
+        """
+        Extract a file in the current data container to a path on disk
+
+        :param internal_path: path inside the container
+        :type internal_path: str
+        :param extract_path: path to extract file to
+        :returns: true on success, false otherwise
+        :rtype: bool
+        """
+
         if self.file_exists(internal_path):
             with zipfile.ZipFile(self.path, "r") as container:
                 container.extract(internal_path, path=extract_path)
@@ -120,10 +198,33 @@ class DataContainer:
         return False
 
     def extract_files(self, internal_paths, extract_path="."):
+        """
+        Extract files in the current data container to a path on disk
+
+        :param internal_paths: list of files to extract
+        :type internal_paths: list
+        :param extract_path: path to extract files to
+        :type extract_path: str
+        :returns: true on success, false otherwise
+        :rtype: bool
+        """
+
+        result = True
         for internal_path in internal_paths:
-            self.extract_file(internal_path, extract_path)
+            result = result and self.extract_file(internal_path, extract_path)
+
+        return result
 
     def extract_all(self, extract_to):
+        """
+        Extract all files in the current data container to a path on disk
+
+        :param extract_to: path to extract files to
+        :type extract_to: str
+        :returns: true on success, false otherwise
+        :rtype: bool
+        """
+
         if self.path:
             with zipfile.ZipFile(self.path, 'r') as container:
                 container.extractall(extract_to)
@@ -133,7 +234,21 @@ class DataContainer:
             return False
 
     def file_exists(self, path):
+        """
+        Checks whether file exists in current data container
+
+        :returns: true if the file exists
+        :rtype: bool
+        """
+
         return path in self.__loaded_files
 
     def get_files(self):
+        """
+        Returns all the files in the current data container
+
+        :returns: list of the files
+        :rtype: list
+        """
+
         return self.__loaded_files

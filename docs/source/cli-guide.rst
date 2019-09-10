@@ -71,6 +71,15 @@ For more information on what this does, see :ref:`linter`.
     :prog: surround
     :path: lint
 
+data
+^^^^
+
+.. argparse::
+    :module: surround.cli
+    :func: execute_cli
+    :prog: surround
+    :path: data
+
 split
 ^^^^^
 
