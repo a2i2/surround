@@ -639,15 +639,13 @@ def execute_data_create_tool(parser, args):
     if args.metadata_only:
         print("============[Creating data metadata]=============")
         print("Generating metadata...")
-        print("Enter ? into fields for more information on how to answer.")
-        print()
+        print("Enter ? into fields for more information on how to answer.\n")
 
         metadata = generate_metadata()
     else:
         print("============[Creating a data container]============")
         print("Generating metadata...")
-        print("Enter ? into fields for more information on how to answer.")
-        print()
+        print("Enter ? into fields for more information on how to answer.\n")
         metadata, groups = generate_metadata_from_data(args)
 
         print("Creating the container...")

@@ -71,8 +71,7 @@ def perform_metadata_inspection(container):
     print("  Identifier:     %s" % metadata['summary']['identifier'])
     print("  Rights:         %s" % metadata['summary']['rights'])
     print("  Under Ethics:   %s" % metadata['summary']['under-ethics'])
-    print("  Language:       %s" % metadata['summary']['language'])
-    print()
+    print("  Language:       %s\n" % metadata['summary']['language'])
 
     if metadata.get_property('manifests'):
         for manifest in metadata['manifests']:
@@ -80,8 +79,7 @@ def perform_metadata_inspection(container):
             print("  Description:   %s" % manifest['description'])
             print("  Language:      %s" % manifest['language'])
             print("  Formats:       %s" % manifest['formats'])
-            print("  Types:         %s" % manifest['types'])
-            print()
+            print("  Types:         %s\n" % manifest['types'])
 
 def perform_content_inspection(container):
     """
