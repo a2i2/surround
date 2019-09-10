@@ -47,36 +47,31 @@ def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, 
         answer = input(question)
 
         if answer == "" and required:
-            print('This field is required!')
-            print()
+            print('This field is required!\n')
             continue
         elif answer == "" and not required:
             print()
             return default
 
         if answer == "?" and help_msg:
-            print(help_msg)
-            print()
+            print(help_msg, '\n')
             continue
 
         if answer_type != bool:
             try:
                 answer = answer_type(answer)
             except ValueError:
-                print(error_msg)
-                print()
+                print(error_msg, '\n')
                 continue
         else:
             if 'y' in answer.lower() or 'n' in answer.lower():
                 return answer.lower() == 'y'
 
-            print(error_msg)
-            print()
+            print(error_msg, '\n')
             continue
 
         if validator and not validator(answer):
-            print(error_msg)
-            print()
+            print(error_msg, '\n')
             continue
 
         print()

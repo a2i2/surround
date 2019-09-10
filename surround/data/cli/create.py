@@ -353,7 +353,7 @@ def generate_metadata():
         validator=is_valid_mime_type)
     groups = prompt(
         "What groups (folders, collections) are in the data?\nAnswer (comma separated): ",
-        help_msg="Enter a comma separated list of group names that this data containes, e.g. image, documents",
+        help_msg="Enter a comma separated list of group names that this data contains, e.g. image, documents",
         required=False)
 
     formats = [f.strip() for f in re.split(',| ,', formats)]
@@ -381,7 +381,7 @@ def generate_metadata():
             # Get the formats from the user
             formats = prompt(
                 "What data formats make up the group? (MIME type e.g. text/plain)\nAnswer (comma separated): ",
-                help_msg="Enter a comma separated list of group names that this data containes, e.g. image, documents",
+                help_msg="Enter a comma separated list of MIME types that this container will have. E.g. text/plain, image/png",
                 validator=is_valid_mime_type)
             formats = [f.strip() for f in re.split(',| ,', formats)]
 
