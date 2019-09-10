@@ -105,6 +105,8 @@ class Assembler(ABC):
 
         :param batch_mode: Whether batch mode should be used
         :type batch_mode: bool
+        :returns: whether the initialisation was successful
+        :rtype: bool
         """
 
         self.batch_mode = batch_mode
@@ -123,6 +125,9 @@ class Assembler(ABC):
                 self.finaliser.initialise(self.config)
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
+            return False
+
+        return True
 
     def run(self, state=None, is_training=False):
         """
@@ -169,7 +174,9 @@ class Assembler(ABC):
         """
 
         if self.pre_filters:
-            self.__execute_filters(self.pre_filters, self.state)
+            if not self.__execute_filters(self.pre_filters, self.state):
+                LOGGER.error("Failed running Assembler")
+                return
 
         if is_training:
             self.__execute_fit(self.state)
@@ -177,7 +184,9 @@ class Assembler(ABC):
             self.__execute_main(self.state)
 
         if self.post_filters:
-            self.__execute_filters(self.post_filters, self.state)
+            if not self.__execute_filters(self.post_filters, self.state):
+                LOGGER.error("Failed running Assembler")
+                return
 
         if (is_training or self.batch_mode) and self.visualiser:
             self.visualiser.visualise(self.state, self.config)
@@ -191,6 +200,8 @@ class Assembler(ABC):
         :type filters: list of :class:`surround.stage.Filter`
         :param state: the data being filtered
         :type state: :class:`surround.State`
+        :returns: whether execution succeeded
+        :rtype: bool
         """
 
         state.freeze()
@@ -202,14 +213,17 @@ class Assembler(ABC):
                 if state.errors:
                     LOGGER.error("Error during processing")
                     LOGGER.error(state.errors)
-                    break
+                    return False
+
             execution_time = datetime.now() - start_time
             state.execution_time = str(execution_time)
             LOGGER.info("Filter took %s secs", execution_time)
         except Exception:
             LOGGER.exception("Failed processing Surround Filters")
+            return False
 
         state.thaw()
+        return True
 
     def __execute_filter(self, stage, stage_data):
         """
