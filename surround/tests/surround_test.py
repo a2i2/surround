@@ -41,6 +41,9 @@ class InputValidator(Validator):
 
 
 class BadFilter(Filter):
+    def initialise(self, config):
+        raise Exception("This will fail always")
+
     def operate(self, state, config):
         if state.use_errors_instead:
             state.errors.append("This will fail always")
@@ -102,6 +105,15 @@ class TestSurround(unittest.TestCase):
 
         # Finalizer should still be executed
         self.assertTrue(data.final_ran)
+
+    def test_assembler_init_pass(self):
+        assembler = Assembler("Pass test", InputValidator(), HelloStage())
+        self.assertTrue(assembler.init_assembler())
+
+    def test_assembler_init_fail(self):
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [BadFilter()])
+        self.assertFalse(assembler.init_assembler())
 
     def test_pipeline_stop_on_exception(self):
         data = AssemblerState()
