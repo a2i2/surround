@@ -1,0 +1,12 @@
+import logging
+from surround import Runner, RunMode
+from stages import AssemblerState
+
+logging.basicConfig(level=logging.INFO)
+
+class FileSystemRunner(Runner):
+
+    def load_data(self, mode, config):
+        # Load data to be processed
+        raw_data = "TODO: Load raw data here"
+        return AssemblerState(raw_data)

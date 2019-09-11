@@ -1,0 +1,11 @@
+import logging
+from surround import Estimator
+
+LOGGING = logging.getLogger(__name__)
+
+class Baseline(Estimator):
+    def estimate(self, state, config):
+        state.output_data = state.input_data
+
+    def fit(self, state, config):
+        LOGGING.info("TODO: Train your model here")

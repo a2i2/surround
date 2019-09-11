@@ -285,13 +285,24 @@ def run_locally(args):
     :type args: <class 'argparse.Namespace'>
     """
 
-    if args.task:
-        task = args.task
-    else:
-        task = 'list'
+    run_args = [sys.executable, '-m', 'doit']
 
-    print("Project tasks:")
-    run_process = subprocess.Popen([sys.executable, '-m', 'doit', task])
+    if args.list:
+        # List which assemblies are available
+        run_args.append('_listAssemblies')
+    elif args.assembler and args.task:
+        # An assembler and task was provided so run the task
+        run_args.append(args.task)
+        run_args.append("--assembler")
+        run_args.append(args.assembler)
+    elif args.task:
+        run_args.append(args.task)
+    else:
+        # No arguments provided, so list the tasks available
+        print("Project tasks:")
+        run_args.append('list')
+
+    run_process = subprocess.Popen(run_args)
     run_process.wait()
 
 # pylint: disable=too-many-branches
@@ -407,7 +418,9 @@ def execute_cli():
     init_parser.add_argument('-w', '--require-web', help="Is web service required for the project")
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
-    run_parser.add_argument('task', help="Task defined in a Surround project dodo.py file.", nargs='?')
+    run_parser.add_argument('task', help="Task defined in dodo.py file of your project", nargs='?')
+    run_parser.add_argument('-a', '--assembler', help="Name or index of Assembler to use, defined in the __main__.py file of your project")
+    run_parser.add_argument('-l', '--list', help="List the assemblies available in the project", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)

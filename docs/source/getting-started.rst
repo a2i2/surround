@@ -35,21 +35,25 @@ Project Setup
 Before we can create our first pipeline, we need to generate an empty Surround project. 
 Use the following command to generate a new project::
 
-    $ surround init -p testproject -d "Our first pipeline"
+    $ surround init -p test_project -d "Our first pipeline"
 
 When it asks the following, respond with ``n`` (we'll cover this in later sections)::
     
     Does it require a web runner? (y/n) n
 
-This will create a new folder called ``testproject`` with the following file structure::
+This will create a new folder called ``test_project`` with the following file structure::
 
-    testproject
-    ├── testproject/
+    test_project
+    ├── test_project/
+    │   ├── stages
+    │   │   ├── __init__.py
+    │   │   ├── input_validator.py
+    │   │   ├── baseline.py
+    │   │   └── assembler_state.py
     │   ├── __main__.py
     │   ├── __init__.py    
     │   ├── config.yaml
-    │   ├── batch_runner.py
-    │   └── stages.py
+    │   └── file_system_runner.py
     ├── input/
     ├── docs/
     ├── models/
@@ -67,14 +71,14 @@ This will create a new folder called ``testproject`` with the following file str
 
 The generated project comes with an example pipeline that can be ran straight away using the command::
 
-    $ cd testproject
-    $ python3 -m testproject
+    $ cd test_project
+    $ surround run batchLocal
 
 Which should output the following::
 
-    INFO:surround.assembler:Starting 'Default project'
-    INFO:surround.assembler:Estimator Main took 0:00:00 secs
-    INFO:root:Batch Runner: TODO: Load raw data here
+    INFO:surround.assembler:Starting 'baseline'
+    INFO:surround.assembler:Validator InputValidator took 0:00:00 secs
+    INFO:surround.assembler:Estimator Baseline took 0:00:00 secs
 
 Now you are ready for :ref:`create-first-pipeline`. 
 
@@ -88,65 +92,79 @@ Creating your first pipeline
 For our first Surround pipeline, we are going to do some very basic data transformation and convert the input string
 from lower case to upper case. This pipeline is going to consist of two stages, ``InputValidator`` and ``MakeUpperCase``.
 
-Open the script ``stages.py`` and you should see the following code already generated::
+Open the script ``stages/validator.py`` and you should see the following code already generated::
 
-    from surround import Estimator, State, Validator
-
-    class AssemblyState(State):
-        input_data = None
-        output_data = None
+    from surround import Validator
 
     class InputValidator(Validator):
         def validate(self, state, config):
             if not state.input_data:
                 raise ValueError("'input_data' is None")
 
-    class Main(Estimator):
-        def estimate(self, state, config):
-            state.output_data = state.input_data
-
-        def fit(self, state, config):
-            print("TODO: Train your model here")
-
 As you can see we are already given the ``InputValidator`` stage, we just need to edit the ``operate`` method to
 check if the input data is the correct data type (:class:`str`)::
 
     def validate(self, state, config):
         if not isinstance(state.input_data, str):
-            # Create an error sine the data is wrong, this will stop the pipeline
-            state.errors.append('Input is not a string!')
+            # Raise an exception, this will stop the pipeline
+            raise ValueError('Input is not a string!')
 
-Now we need to rename ``Main`` to ``MakeUpperCase`` and perform the data transformation in ``estimate``::
+Now we need to create our ``MakeUpperCase`` stage, so head to ``stages/baseline.py``, you should see::
+
+    from surround import Estimator
+
+    class Baseline(Estimator):
+        def estimate(self, state, config):
+            state.output_data = state.input_data
+
+        def fit(self, state, config):
+            LOGGER.info("TODO: Train your model here")
+
+Make the following changes::
 
     class MakeUpperCase(Estimator):
         def estimate(self, state, config):
             # Convert the input into upper case
             state.output_data = state.input_data.upper()
+
+            # Print the output to the terminal (to check its working)
+            LOGGER.info("Output: %s" % state.output_data)
         
         def fit(self, state, config):
             # Leave the fit method the same 
             # We aren't doing any training in this guide
-            print("TODO: Train your model here")
+            LOGGER.info("TODO: Train your model here")
 
 Since we renamed the estimator, we need to reflect that change when we create the ``Assembler``.
-So in ``__main__.py`` where the estimator is imported make sure it looks like so::
+
+First head to the ``stages/__init__.py`` file and rename ``Baseline`` to ``MakeUpperCase``::
+
+    from .baseline import MakeUpperCase
+    from .input_validator import InputValidator
+    from .assembler_state import AssemblerState
+
+Then in ``__main__.py`` where the estimator is imported make sure it looks like so::
 
     from stages import MakeUpperCase, InputValidator
 
 And where the assembler is created, make sure it looks like so::
 
-    assembler = Assembler("Default project", InputValidator(), MakeUpperCase())
+    assemblies = [
+        Assembler("baseline")
+            .set_validator(InputValidator())
+            .set_estimator(MakeUpperCase())
+    ]
 
 That's it for the pipeline! 
 To test the pipeline with default input (``"TODO Load raw data here"`` string) just run the following command::
 
-    $ python3 -m testproject
+    $ surround run batchLocal
 
 The output should be the following::
 
-    INFO:surround.assembler:Starting 'Default project'
+    INFO:surround.assembler:Starting 'baseline'
+    INFO:stages.baseline:Output: TODO: LOAD RAW DATA HERE
     INFO:surround.assembler:Estimator MakeUpperCase took 0:00:00 secs
-    INFO:root:Batch Runner: TODO: LOAD RAW DATA HERE
 
 To change what input is fed through the pipeline, modify ``batch_runner.py`` and change what is given to ``data.input_data``::
 
@@ -156,25 +174,20 @@ To change what input is fed through the pipeline, modify ``batch_runner.py`` and
 
     logging.basicConfig(level=logging.INFO)
 
-    class BatchRunner(Runner):
-        def run(self, is_training=False):
-            self.assembler.init_assembler(True)
-            data = AssemblyState()
+    class FileSystemRunner(Runner):
+        def load_data(self, mode, config):
+            state = AssemblyState()
 
             # Load data to be processed
             raw_data = "This daTa wiLL end UP captializED"
 
             # Setup input data
-            data.input_data = raw_data
+            state.input_data = raw_data
 
-            # Run assembler
-            self.assembler.run(data, is_training)
-
-            logging.info("Batch Runner: %s", data.output_data)
-
+            return state
 
 .. note:: To test training mode (``fit`` will be called instead in the estimator), run the following command: 
-            ``$ python3 -m testproject --mode train``
+            ``$ surround run trainLocal``
 
 Running your first pipeline in a container
 ******************************************
@@ -198,14 +211,15 @@ Then when you are ready for production you can use the following command::
 Which will first build the image and then run the container without any linking to the host machine.
 The image created in the build can also then be committed to a Docker Hub repository and shared.
 
-.. note:: Both ``dev`` and ``prod`` will use the command ``$ python3 -m testproject`` inside the container.
-        Meaning they will use the default mode set in ``__main__.py`` (which is ``batch`` in default projects) 
-        when running the pipeline.
+.. note:: Both ``dev`` and ``prod`` will use the default mode of the project, which in non-web projects
+        is ``RunMode.BATCH_PREDICT``, otherwise it's ``RunMode.WEB``.
 
 The following commands will force which mode to use::
 
     $ surround run batch
     $ surround run train
+
+.. note:: To see a list of available tasks, just run the command ``$ surround run``
 
 Serving your first pipeline via Web Endpoint
 ********************************************
@@ -267,7 +281,7 @@ On Windows (in Powershell)::
 
 You should see the following output in the terminal running the pipeline::
 
-    INFO:surround.assembler:Starting 'Default project'
+    INFO:surround.assembler:Starting 'baseline'
     INFO:surround.assembler:Estimator MakeUpperCase took 0:00:00 secs
     INFO:root:Message: TEST PHRASE
     INFO:tornado.access:200 POST /estimate (::1) 1.95ms
@@ -312,4 +326,4 @@ Thats it, you are now serving a Surround pipeline! Now you could potentially use
 application.
 
 .. note:: Since this project was generated with a web runner, the default mode is ``web``, to run the pipeline
-        using the ``BatchRunner`` instead, use the command ``$ surround run batch`` or ``$ surround run train``.
+        using the ``FileSystemRunner`` instead, use the command ``$ surround run batch`` or ``$ surround run train``.

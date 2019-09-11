@@ -4,3 +4,6 @@ output:
 image: {project_name}
 company: yourcompany
 version: latest
+
+assembler:
+  default: baseline

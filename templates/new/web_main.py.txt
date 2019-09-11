@@ -1,25 +1,60 @@
 import argparse
-from surround import Assembler
-from stages import Main, InputValidator
-from batch_runner import BatchRunner
+from surround import Assembler, RunMode, Config
+from stages import Baseline, InputValidator
+from file_system_runner import FileSystemRunner
 from web_runner import WebRunner
 
+assemblies = [
+    Assembler("baseline")
+        .set_validator(InputValidator())
+        .set_estimator(Baseline())
+]
 
 def main():
+    config = Config(auto_load=True)
+    default_assembler = config.get_path('assembler.default')
+
     parser = argparse.ArgumentParser(prog='{project_name}', description="Surround mode(s) available to run this module")
-    parser.add_argument('--mode', help="Mode to run (train, batch)", default="web")
-    execute_assembler(parser.parse_args().mode)
+    parser.add_argument('--assembler', help="Assembler to run (index or name)", default=default_assembler if default_assembler is not None else "0")
+    parser.add_argument('--mode', help="Mode to run (train, batch)", default="batch")
 
+    args = parser.parse_args()
+    execute_assembler(args.assembler, args.mode)
 
-def execute_assembler(mode):
-    assembler = Assembler("Default project", InputValidator(), Main())
-    if mode == "train":
-        BatchRunner(assembler).run(True)
-    elif mode == "batch":
-        BatchRunner(assembler).run()
+def get_assembler(key, assembler_list):
+    assembler = None
+
+    # Try and get the assembler via index
+    try:
+        index = int(key)
+
+        if 0 <= index < len(assemblies):
+            assembler = assemblies[index]
+    except Exception:
+        pass
+
+    # Try and get the assember via key (name)
+    if not assembler:
+        assembler = next((x for x in assembler_list if x.assembler_name.lower() == key.lower()), None)
+
+    return assembler
+
+def execute_assembler(assembler_key, mode):
+    if mode == 'list':
+        for i, assembler in enumerate(assemblies):
+            print("%i. %s" % (i, assembler.assembler_name))
     else:
-        WebRunner(assembler).run()
+        assembler = get_assembler(assembler_key, assemblies)
 
+        if assembler:
+            if mode == "train":
+                FileSystemRunner(assembler).run(RunMode.TRAIN)
+            elif mode == "batch":
+                FileSystemRunner(assembler).run()
+            else:
+                WebRunner(assembler).run()
+        else:
+            print("Unable to find the assembler '%s'" % assembler_key)
 
 if __name__ == "__main__":
     main()

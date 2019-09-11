@@ -9,6 +9,8 @@ class Stage(ABC):
 
     - :class:`surround.stage.Estimator`
     - :class:`surround.stage.Filter`
+    - :class:`surround.stage.Validator`
+    - :class:`surround.visualiser.Visualiser`
     """
 
     def dump_output(self, state, config):
@@ -33,7 +35,7 @@ class Stage(ABC):
         :type config: :class:`surround.config.Config`
         """
 
-class Validator(ABC):
+class Validator(Stage):
     """
     Base class of a validation stage in a Surround pipeline. Responsible for checking the data being
     fed into the pipeline before passing the data onto the next stages (filtering, estimation, etc).
@@ -90,7 +92,7 @@ class Filter(Stage):
             def operate(self, state, config):
                 state.output_data = json.dumps(self.input_data)
 
-        assembler = Assembler("Example", ValidationStage())
+        assembler = Assembler("Example").set_validator(ValidationStage())
 
         # Set ConvertFromJSONString as a pre-filter, the other as a post-filter
         assembler.set_estimator(PredictStage, [ConvertFromJSONString()], [ConvertToJSONString()])

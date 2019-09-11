@@ -4,13 +4,16 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-from surround import Runner
+from surround import Runner, RunMode
 from stages import AssemblerState
 
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
-    def run(self, is_training=False):
+    def load_data(self, mode, config):
+        return None
+
+    def run(self, mode=RunMode.BATCH_PREDICT):
         # Setup web service
         self.assembler.init_assembler()
         self.application = Application(self.assembler)

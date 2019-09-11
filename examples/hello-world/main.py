@@ -23,6 +23,6 @@ class AssemblerState(State):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = AssemblerState()
-    assembler = Assembler("Hello world example", InputValidator(), HelloWorld())
+    assembler = Assembler("Hello world example").set_validator(InputValidator()).set_estimator(HelloWorld())
     assembler.run(data)
     print("Text is '%s'" % data.text)

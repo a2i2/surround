@@ -41,7 +41,7 @@ if __name__ == "__main__":
     app_config.read_config_files([prefix + "config.yaml"])
 
     data = AssemblerState()
-    assembler = Assembler("Init state example", InputValidator(), HelloWorld(), app_config)
+    assembler = Assembler("Init state example").set_validator(InputValidator()).set_estimator(HelloWorld()).set_config(app_config)
     assembler.init_assembler()
     assembler.run(data)
 
