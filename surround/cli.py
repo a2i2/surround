@@ -247,7 +247,7 @@ def parse_lint_args(args):
         if not errors and not warnings:
             print("All checks passed")
 
-def parse_run_args(args):
+def parse_run_args(args, extra_args):
     """
     Executes the "run" sub-command which will run the surround pipeline
     as a local app or a web app (depending on the arguments provided).
@@ -261,12 +261,12 @@ def parse_run_args(args):
     if remote_cli.is_surround_project():
         actual_current_dir = os.getcwd()
         os.chdir(remote_cli.get_project_root_from_current_dir())
-        run_locally(args)
+        run_locally(args, extra_args)
         os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
 
-def run_locally(args):
+def run_locally(args, extra_args):
     """
     Runs the surround pipeline locally executing the task provided
     (or will list tasks if none provided).
@@ -287,16 +287,12 @@ def run_locally(args):
 
     run_args = [sys.executable, '-m', 'doit']
 
-    if args.list:
-        # List which assemblies are available
-        run_args.append('_listAssemblies')
-    elif args.assembler and args.task:
-        # An assembler and task was provided so run the task
+    if args.task:
         run_args.append(args.task)
-        run_args.append("--assembler")
-        run_args.append(args.assembler)
-    elif args.task:
-        run_args.append(args.task)
+
+        if extra_args:
+            run_args.append("--args")
+            run_args.append(" ".join(extra_args))
     else:
         # No arguments provided, so list the tasks available
         print("Project tasks:")
@@ -351,7 +347,7 @@ def parse_init_args(args):
     else:
         print("error: permission denied")
 
-def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, tool):
+def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, tool, extra_args):
     """
     Executes the tool/sub-command requested by the user via the CLI passing parsed arguments.
 
@@ -364,7 +360,7 @@ def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, 
     if tool == "lint":
         parse_lint_args(parsed_args)
     elif tool == "run":
-        parse_run_args(parsed_args)
+        parse_run_args(parsed_args, extra_args)
     elif tool == "remote":
         remote_cli.parse_remote_args(remote_parser, parsed_args)
     elif tool == "add":
@@ -419,8 +415,6 @@ def execute_cli():
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
     run_parser.add_argument('task', help="Task defined in dodo.py file of your project", nargs='?')
-    run_parser.add_argument('-a', '--assembler', help="Name or index of Assembler to use, defined in the __main__.py file of your project")
-    run_parser.add_argument('-l', '--list', help="List the assemblies available in the project", action='store_true')
 
     linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
@@ -449,8 +443,8 @@ def execute_cli():
             parser.print_help()
         else:
             tool = sys.argv[1]
-            parsed_args = parser.parse_args()
-            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, tool)
+            parsed_args, extra_args = parser.parse_known_args()
+            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, tool, extra_args)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 

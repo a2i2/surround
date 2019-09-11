@@ -10,18 +10,28 @@ DOIT_CONFIG = {{'verbosity':2}}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
-DEFAULT_ASSEMBLER = CONFIG.get_path("assembler.default")
-DEFAULT_ASSEMBLER = "0" if DEFAULT_ASSEMBLER is None else DEFAULT_ASSEMBLER
-
 PARAMS = [
     {{
-        'name': 'assembler',
-        'short': 'a',
-        'long': 'assembler',
+        'name': 'args',
+        'long': 'args',
         'type': str,
-        'default': DEFAULT_ASSEMBLER
+        'default': ""
     }}
 ]
+
+def task_list_assemblies():
+    """List available assemblies in the project"""
+    return {{
+        'basename': 'listAssemblies',
+        'actions': ["%s -m %s --list-assemblies" % (sys.executable, PACKAGE_PATH)]
+    }}
+
+def task_list_runners():
+    """List available runners in the project"""
+    return {{
+        'basename': 'listRunners',
+        'actions': ["%s -m %s --list-runners" % (sys.executable, PACKAGE_PATH)]
+    }}
 
 def task_build():
     """Build the Docker image for the current project"""
@@ -40,7 +50,7 @@ def task_remove():
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run -p 8080:8080 --volume \"%s/\":/app %s python3 -m %s --assembler \"%s\"" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH, "%(assembler)s")],
+        'actions': ["docker run -p 8080:8080 --volume \"%s/\":/app %s python3 -m %s %s" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -57,7 +67,7 @@ def task_interactive():
 def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
-        'actions': ["docker run -p 8080:8080 %s python3 -m %s --assembler \"%s\"" % (IMAGE, PACKAGE_PATH, "%(assembler)s")],
+        'actions': ["docker run -p 8080:8080 %s python3 -m %s %s" % (IMAGE, PACKAGE_PATH, "%(args)s")],
         'task_dep': ["build"],
         'params': PARAMS
     }}
@@ -68,7 +78,7 @@ def task_train():
     data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train --assembler \"%s\"" % (output_path, data_path, IMAGE, "%(assembler)s")],
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train --runner 1 %s" % (output_path, data_path, IMAGE, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -78,7 +88,7 @@ def task_batch():
     data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch --assembler \"%s\"" % (output_path, data_path, IMAGE, "%(assembler)s")],
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch --runner 1 %s" % (output_path, data_path, IMAGE, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -86,7 +96,7 @@ def task_train_local():
     """Run training mode locally"""
     return {{
         'basename': 'trainLocal',
-        'actions': ["%s -m %s --mode train --assembler \"%s\"" % (sys.executable, PACKAGE_PATH, "%(assembler)s")],
+        'actions': ["%s -m %s --mode train --runner 1 %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -94,14 +104,14 @@ def task_batch_local():
     """Run batch mode locally"""
     return {{
         'basename': 'batchLocal',
-        'actions': ["%s -m %s --mode batch --assembler \"%s\"" % (sys.executable, PACKAGE_PATH, "%(assembler)s")],
+        'actions': ["%s -m %s --mode batch --runner 1 %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
 def task_web():
     """Run web mode inside the container"""
     return {{
-        'actions': ["docker run -p 8080:8080 %s python3 -m %s --mode web --assembler \"%s\"" % (IMAGE, PACKAGE_PATH, "%(assembler)s")],
+        'actions': ["docker run -p 8080:8080 %s python3 -m %s --runner WebRunner %s" % (IMAGE, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -109,16 +119,10 @@ def task_web_local():
     """Run web mode locally"""
     return {{
         'basename': 'webLocal',
-        'actions': ["%s -m %s --mode web --assembler \"%s\"" % (sys.executable, PACKAGE_PATH, "%(assembler)s")],
+        'actions': ["%s -m %s --runner WebRunner %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
-def task_list_assemblies():
-    """List the assemblies available"""
-    return {{
-        'basename': '_listAssemblies',
-        'actions': ["%s -m %s --mode list" % (sys.executable, PACKAGE_PATH)]
-    }}
 
 def task_jupyter():
     command = "pip install -r /app/requirements.txt; mkdir /etc/ipython; echo \"c.InteractiveShellApp.extensions.append('autoreload')\nc.InteractiveShellApp.exec_lines = ['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']\" > /etc/ipython/ipython_config.py; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"

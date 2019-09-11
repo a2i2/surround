@@ -1,5 +1,6 @@
 import pkg_resources
 
+from .surround import Surround
 from .state import State
 from .stage import Validator, Filter, Estimator
 from .visualiser import Visualiser
