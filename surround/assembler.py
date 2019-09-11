@@ -249,7 +249,7 @@ class Assembler(ABC):
         """
 
         stage_start = datetime.now()
-        self.visualiser.operate(state, self.config)
+        self.visualiser.visualise(state, self.config)
 
         if self.config and self.config["surround"]["enable_stage_output_dump"]:
             self.visualiser.dump_output(state, self.config)

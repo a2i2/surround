@@ -7,6 +7,9 @@ from surround import Estimator, State, Assembler, Validator, Config, Runner, Run
 prefix = ""
 
 class MainRunner(Runner):
+    def __init__(self, assem):
+        super().__init__("MainRunner", assem)
+
     def load_data(self, mode, config):
         state = AssemblerState()
         input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
