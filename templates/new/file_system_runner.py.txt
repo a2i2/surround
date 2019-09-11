@@ -5,8 +5,6 @@ from stages import AssemblerState
 logging.basicConfig(level=logging.INFO)
 
 class FileSystemRunner(Runner):
-    def __init__(self, assembler=None):
-        super().__init__("FileSystemRunner", assembler)
 
     def load_data(self, mode, config):
         # Load data to be processed

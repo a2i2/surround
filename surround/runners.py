@@ -38,15 +38,13 @@ class Runner(ABC):
               you generate a project using the CLI tool.
     """
 
-    def __init__(self, name, assembler=None):
+    def __init__(self, assembler=None):
         """
-        :param name: The name of the runner
-        :type name: str
         :param assembler: The assembler the runner will execute
         :type assembler: :class:`surround.assembler.Assembler`
         """
 
-        self.name = name
+        self.name = self.__class__.__name__
         self.assembler = assembler
 
     @abstractmethod

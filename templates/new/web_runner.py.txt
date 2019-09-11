@@ -10,8 +10,6 @@ from stages import AssemblerState
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
-    def __init__(self, assembler=None):
-        super().__init__("WebRunner", assembler)
 
     def load_data(self, mode, config):
         return None
