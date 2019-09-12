@@ -29,6 +29,7 @@ def task_dev():
     }}
 
 def task_interactive():
+    """Run the Docker container in interactive mode"""
     def run():
         process = subprocess.Popen(['docker', 'run', '-it', '--rm', '-w', '/app', '--volume', '%s/:/app' % CONFIG['volume_path'], IMAGE, 'bash'], encoding='utf-8')
         process.wait()
