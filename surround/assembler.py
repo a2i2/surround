@@ -67,6 +67,7 @@ class Assembler(ABC):
 
         self.assembler_name = assembler_name
         self.config = Config(auto_load=True)
+        self.stages = None
         self.estimator = None
         self.validator = None
         self.pre_filters = None
@@ -94,6 +95,10 @@ class Assembler(ABC):
 
         self.batch_mode = batch_mode
         try:
+            if self.stages:
+                for stage in self.stages:
+                    stage.initialise(self.config)
+
             if self.validator:
                 self.validator.initialise(self.config)
 
@@ -135,6 +140,9 @@ class Assembler(ABC):
         This method doesn't return anything, instead results should be stored in the ``state``
         object passed in the parameters.
 
+        If the ``set_stages`` method has been used, then instead of normal pipeline execution, it will
+        instead execute the filters given in that method one by one.
+
         :param state: Data passed between each stage in the pipeline
         :type state: :class:`surround.State`
         :param is_training: Run the pipeline in training mode or not
@@ -145,26 +153,31 @@ class Assembler(ABC):
 
         no_stages = not self.estimator and not self.pre_filters and not self.post_filters
         no_stages = no_stages and not self.validator and not self.finaliser and not self.visualiser
+        no_stages = no_stages and not self.stages
         if no_stages:
             LOGGER.warning("There are no stages to run!")
 
         if not state:
             raise ValueError("state is required to run an assembler")
         self.state = state
-        try:
-            if self.validator:
-                self.__execute_validator(state)
 
-            if self.state.errors:
-                LOGGER.error("Error while validating")
-                LOGGER.error(self.state.errors)
-            else:
-                self.__run_pipeline(is_training)
-        except Exception:
-            LOGGER.exception("Failed running Assembler")
-        finally:
-            if self.finaliser:
-                self.__execute_finaliser(state)
+        if self.stages:
+            self.__run_pipeline_stages()
+        else:
+            try:
+                if self.validator:
+                    self.__execute_validator(state)
+                
+                if self.state.errors:
+                    LOGGER.error("Error while validating")
+                    LOGGER.error(self.state.errors)
+                else:
+                    self.__run_pipeline(is_training)
+            except Exception:
+                LOGGER.exception("Failed running Assembler")
+            finally:
+                if self.finaliser:
+                    self.__execute_finaliser(state)
 
     def __run_pipeline(self, is_training):
         """
@@ -198,6 +211,13 @@ class Assembler(ABC):
 
         if (is_training or self.batch_mode) and self.visualiser:
             self.__execute_visualiser(self.state)
+
+    def __run_pipeline_stages(self):
+        """
+        Executes the pipeline using the stages set to the assembler rather than the estimator workflow.
+        """
+
+        self.__execute_filters(self.stages, self.state)
 
     def __execute_validator(self, state):
         """
@@ -421,6 +441,26 @@ class Assembler(ABC):
 
         return self
 
+    def set_stages(self, stages):
+        """
+        Set the stages to be executed one after the other in the pipeline.
+
+        .. note:: This cannot be used when the estimator has been set!
+
+        :param stages: list of stages to execute
+        :type stages: list of :class:`surround.stage.Filter`
+        """
+
+        if self.estimator:
+            raise Exception("Cannot set stages when there is an estimator present!")
+
+        if not isinstance(stages, list) or not all([isinstance(x, Filter) for x in stages]):
+            raise ValueError("stages must be a list of Filter's only!")
+
+        self.stages = stages
+
+        return self
+
     def set_estimator(self, estimator, pre_filters=None, post_filters=None):
         """
         Set the estimator that should be used during pipeline execution and any filters (if required).
@@ -434,6 +474,9 @@ class Assembler(ABC):
         :param post_filters: list of post-filters (default: None)
         :type post_filters: :class:`list` of :class:`surround.stage.Filter`
         """
+
+        if self.stages:
+            raise Exception("Cannot set an estimator when their are stages present!")
 
         # Estimator is required
         if estimator is None:
