@@ -8,6 +8,11 @@ test_text = "hello"
 
 class HelloStage(Estimator):
     def estimate(self, state, config):
+        if state.estimator_add_error:
+            state.errors.append("Error!!")
+        elif state.estimator_throw:
+            raise Exception("Error!!")
+
         state.text = test_text
         if "helloStage" in config:
             state.config_value = config["helloStage"]["suffix"]
@@ -16,14 +21,20 @@ class HelloStage(Estimator):
         print("No training implemented")
 
 
+# pylint: disable=too-many-instance-attributes
 class AssemblerState(State):
-    text = None
-    config_value = None
-    stage1 = None
-    stage2 = None
-    final_ran = False
-    use_errors_instead = False
-
+    def __init__(self):
+        self.errors = []
+        self.text = None
+        self.config_value = None
+        self.stage1 = None
+        self.final_ran = False
+        self.use_errors_instead = False
+        self.post_filter_ran = False
+        self.post_filter_throw = False
+        self.validator_add_error = False
+        self.estimator_throw = False
+        self.estimator_add_error = False
 
 class InputValidator(Validator):
     def validate(self, state, config):
@@ -36,9 +47,8 @@ class InputValidator(Validator):
         if state.stage1:
             raise ValueError("'stage1' is not None")
 
-        if state.stage2:
-            raise ValueError("'stage2' is not None")
-
+        if state.validator_add_error:
+            state.errors.append("Error!!")
 
 class BadFilter(Filter):
     def initialise(self, config):
@@ -49,6 +59,10 @@ class BadFilter(Filter):
             state.errors.append("This will fail always")
         else:
             raise Exception("This will fail always")
+
+class PostFilter(Filter):
+    def operate(self, state, config):
+        state.post_filter_ran = True
 
 class TestFinalStage(Filter):
     def operate(self, state, config):
@@ -115,28 +129,78 @@ class TestSurround(unittest.TestCase):
         assembler.set_estimator(HelloStage(), [BadFilter()])
         self.assertFalse(assembler.init_assembler())
 
-    def test_pipeline_stop_on_exception(self):
+    def test_pipeline_stop_on_exception_estimator(self):
+        data = AssemblerState()
+        data.estimator_throw = True
+
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [], [PostFilter()])
+
+        # This should fail to execute PostFilter
+        assembler.run(data)
+
+        self.assertFalse(data.post_filter_ran)
+
+    def test_pipeline_stop_on_error_estimator(self):
+        data = AssemblerState()
+        data.estimator_add_error = True
+
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [], [PostFilter()])
+
+        # This should fail to execute PostFilter
+        assembler.run(data)
+
+        self.assertFalse(data.post_filter_ran)
+
+    def test_pipeline_stop_on_exception_filter(self):
         data = AssemblerState()
 
         assembler = Assembler("Fail test", InputValidator())
-        assembler.set_estimator(HelloStage(), [BadFilter()])
-        assembler.init_assembler()
+        assembler.set_estimator(HelloStage(), [BadFilter()], [PostFilter()])
 
         # This should fail to execute HelloStage
         assembler.run(data)
 
         self.assertIsNone(data.text)
+        self.assertFalse(data.post_filter_ran)
 
-    def test_pipeline_stop_on_error(self):
+    def test_pipeline_stop_on_error_filter(self):
         # Use the errors list in state instead
         data = AssemblerState()
         data.use_errors_instead = True
 
         assembler = Assembler("Fail test", InputValidator())
-        assembler.set_estimator(HelloStage(), [BadFilter()])
-        assembler.init_assembler()
+        assembler.set_estimator(HelloStage(), [BadFilter()], [PostFilter()])
 
-        # This should fail to execute HelloStage
+        # This should fail to execute HelloStage & PostFilter
         assembler.run(data)
 
         self.assertIsNone(data.text)
+        self.assertFalse(data.post_filter_ran)
+
+    def test_pipeline_stop_on_exception_validator(self):
+        data = AssemblerState()
+        data.stage1 = "Now it will fail in the validator"
+
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [], [PostFilter()])
+
+        # This should fail to execute HelloStage & PostFilter
+        assembler.run(data)
+
+        self.assertIsNone(data.text)
+        self.assertFalse(data.post_filter_ran)
+
+    def test_pipeline_stop_on_error_validator(self):
+        data = AssemblerState()
+        data.validator_add_error = True
+
+        assembler = Assembler("Fail test", InputValidator())
+        assembler.set_estimator(HelloStage(), [], [PostFilter()])
+
+        # This should fail to execute HelloStage & PostFilter
+        assembler.run(data)
+
+        self.assertIsNone(data.text)
+        self.assertFalse(data.post_filter_ran)
