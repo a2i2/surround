@@ -157,7 +157,12 @@ class Assembler(ABC):
         self.state = state
         try:
             self.validator.validate(self.state, self.config)
-            self.__run_pipeline(is_training)
+
+            if self.state.errors:
+                LOGGER.error("Error while validating")
+                LOGGER.error(self.state.errors)
+            else:
+                self.__run_pipeline(is_training)
         except Exception:
             LOGGER.exception("Failed running Assembler")
         finally:
@@ -182,6 +187,11 @@ class Assembler(ABC):
             self.__execute_fit(self.state)
         else:
             self.__execute_main(self.state)
+
+        if self.state.errors:
+            LOGGER.error("Errors during executing the estimator")
+            LOGGER.error(self.state.errors)
+            return
 
         if self.post_filters:
             if not self.__execute_filters(self.post_filters, self.state):
