@@ -2,7 +2,7 @@ PROJECTS = {
     "new" : {
         "dirs" : [
             ".surround",
-            "data",
+            "input",
             "output",
             "docs",
             "models",
