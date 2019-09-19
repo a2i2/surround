@@ -368,8 +368,6 @@ def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, 
         parse_run_args(parsed_args, extra_args)
     elif tool == "remote":
         remote_cli.parse_remote_args(remote_parser, parsed_args)
-    elif tool == "add":
-        remote_cli.parse_add_args(parsed_args)
     elif tool == "pull":
         remote_cli.parse_pull_args(parsed_args)
     elif tool == "push":
@@ -429,7 +427,6 @@ def execute_cli():
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
 
     remote_parser = remote_cli.add_remote_parser(sub_parser)
-    remote_cli.create_add_parser(sub_parser)
     remote_cli.add_pull_parser(sub_parser)
     remote_cli.add_push_parser(sub_parser)
     remote_cli.add_list_parser(sub_parser)
@@ -440,7 +437,7 @@ def execute_cli():
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list", "split", "viz", "data"]
+    tools = ["init", "lint", "run", "remote", "pull", "push", "list", "split", "viz", "data"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()

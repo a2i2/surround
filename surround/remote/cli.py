@@ -72,18 +72,6 @@ def add_remote_parser(sub_parser):
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
     return remote_parser
 
-def create_add_parser(sub_parser):
-    """
-    Adds a sub-parser for the "add" sub-command to the parser provided.
-
-    :param sub_parser: the parser to add to
-    :type sub_parser: <class 'argparse.ArgumentParser'>
-    """
-
-    add_parser = sub_parser.add_parser('add', help="Add file to remote")
-    add_parser.add_argument('remote', help="remote to add to")
-    add_parser.add_argument('key', help="name of file to add")
-
 def add_pull_parser(sub_parser):
     """
     Adds a sub-parser for the "pull" sub-command to the parser provided.
@@ -239,25 +227,6 @@ def parse_remote_args(remote_parser, parsed_args):
                 os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
-
-def parse_add_args(parsed_args):
-    """
-    Executes the "add" sub-command which adds a file to a specified remote.
-
-    :param parsed_args: arguments parsed from the user (will contain the file path and remote name)
-    :type parsed_args: <class 'argparse.Namespace'>
-    """
-
-    if is_surround_project():
-        actual_current_dir = os.getcwd()
-        os.chdir(get_project_root_from_current_dir())
-        remote = parsed_args.remote
-        file_to_add = parsed_args.key
-        message = BASE_REMOTE.add(remote, file_to_add)
-        print(message)
-        os.chdir(actual_current_dir)
-    else:
-        print("error: not a surround project")
 
 def parse_pull_args(parsed_args):
     """

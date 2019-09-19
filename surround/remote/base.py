@@ -225,6 +225,9 @@ class BaseRemote():
 
             os.makedirs(what_to_pull, exist_ok=True)
             if self.file_exists_on_remote(path_to_remote, relative_path_to_remote_file, False):
+                # Ensure the file is being tracked in config
+                self.add(what_to_pull, key)
+
                 response = self.pull_file(what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
                 self.add_message(response)
             else:
@@ -287,6 +290,9 @@ class BaseRemote():
             path_to_local_file = os.path.join(what_to_push, key)
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
             if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
+                # Ensure the file is being tracked in config
+                self.add(what_to_push, key)
+
                 response = self.push_file(what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
                 self.add_message(response)
             else:
