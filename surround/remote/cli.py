@@ -67,7 +67,7 @@ def add_remote_parser(sub_parser):
     remote_parser.add_argument('-n', '--name', help="Name of the remote")
     remote_parser.add_argument('-u', '--url', help="Url of the remote")
     remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
-    remote_parser.add_argument('-t', '--type', choices=['data', 'model'])
+    remote_parser.add_argument('-t', '--type', choices=['data'])
     remote_parser.add_argument('-v', '--verbose', help="verbose remote", action='store_true')
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
     return remote_parser
