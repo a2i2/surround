@@ -121,11 +121,11 @@ class TestSurround(unittest.TestCase):
         self.assertTrue(data.final_ran)
 
     def test_assembler_init_pass(self):
-        assembler = Assembler("Pass test", InputValidator(), HelloStage())
+        assembler = Assembler("Pass test").set_validator(InputValidator()).set_estimator(HelloStage())
         self.assertTrue(assembler.init_assembler())
 
     def test_assembler_init_fail(self):
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [BadFilter()])
         self.assertFalse(assembler.init_assembler())
 
@@ -133,7 +133,7 @@ class TestSurround(unittest.TestCase):
         data = AssemblerState()
         data.estimator_throw = True
 
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [], [PostFilter()])
 
         # This should fail to execute PostFilter
@@ -145,7 +145,7 @@ class TestSurround(unittest.TestCase):
         data = AssemblerState()
         data.estimator_add_error = True
 
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [], [PostFilter()])
 
         # This should fail to execute PostFilter
@@ -156,7 +156,7 @@ class TestSurround(unittest.TestCase):
     def test_pipeline_stop_on_exception_filter(self):
         data = AssemblerState()
 
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [BadFilter()], [PostFilter()])
 
         # This should fail to execute HelloStage
@@ -170,7 +170,7 @@ class TestSurround(unittest.TestCase):
         data = AssemblerState()
         data.use_errors_instead = True
 
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [BadFilter()], [PostFilter()])
 
         # This should fail to execute HelloStage & PostFilter
@@ -183,7 +183,7 @@ class TestSurround(unittest.TestCase):
         data = AssemblerState()
         data.stage1 = "Now it will fail in the validator"
 
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [], [PostFilter()])
 
         # This should fail to execute HelloStage & PostFilter
@@ -196,7 +196,7 @@ class TestSurround(unittest.TestCase):
         data = AssemblerState()
         data.validator_add_error = True
 
-        assembler = Assembler("Fail test", InputValidator())
+        assembler = Assembler("Fail test").set_validator(InputValidator())
         assembler.set_estimator(HelloStage(), [], [PostFilter()])
 
         # This should fail to execute HelloStage & PostFilter
