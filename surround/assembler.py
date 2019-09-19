@@ -167,7 +167,7 @@ class Assembler(ABC):
             try:
                 if self.validator:
                     self.__execute_validator(state)
-                
+
                 if self.state.errors:
                     LOGGER.error("Error while validating")
                     LOGGER.error(self.state.errors)
