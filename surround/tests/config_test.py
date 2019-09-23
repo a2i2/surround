@@ -100,9 +100,19 @@ class TestConfig(unittest.TestCase):
     def test_env_config(self):
         with patch.dict('os.environ', {
                 'SURROUND_MAIN_COUNT': str(45),
-                'SURROUND_TEMP': str(0.3)
+                'SURROUND_TEMP': str(0.3),
+                'SURROUND_STRING': "this is a test string",
+                'SURROUND_BOOL': "true",
+                'SURROUND_BOOLTWO': "false",
+                "SURROUND_BOOLTHREE": "True",
+                "SURROUND_BOOLFOUR": "False"
         }):
             config = Config()
             config.read_from_dict(yaml.safe_load(yaml3))
             self.assertEqual(config["main"]["count"], 45)
             self.assertEqual(config["temp"], 0.3)
+            self.assertEqual(config["string"], "this is a test string")
+            self.assertTrue(config["bool"])
+            self.assertFalse(config["booltwo"])
+            self.assertTrue(config["boolthree"])
+            self.assertFalse(config["boolfour"])

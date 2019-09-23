@@ -289,7 +289,20 @@ class Config(Mapping):
             if new_key in config:
                 the_type = type(config[new_key])
             else:
-                the_type = type(ast.literal_eval(value))
+                try:
+                    the_type = type(ast.literal_eval(value))
+                    if the_type == bool:
+                        value = ast.literal_eval(value)
+                except Exception:
+                    if value.lower() == "true":
+                        value = True
+                        the_type = bool
+                    elif value.lower() == "false":
+                        value = False
+                        the_type = bool
+                    else:
+                        the_type = str
+
             config[new_key] = the_type(value)
         return config
 
