@@ -28,6 +28,16 @@ def task_dev():
         'actions': ["docker run --volume \"%s/\":/app %s python3 -m %s" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH)]
     }}
 
+def task_interactive():
+    """Run the Docker container in interactive mode"""
+    def run():
+        process = subprocess.Popen(['docker', 'run', '-it', '--rm', '-w', '/app', '--volume', '%s/:/app' % CONFIG['volume_path'], IMAGE, 'bash'], encoding='utf-8')
+        process.wait()
+
+    return {{
+        'actions': [run]
+    }}
+
 def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
