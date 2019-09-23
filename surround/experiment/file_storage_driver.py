@@ -21,7 +21,7 @@ class FileStorageDriver(StorageDriver):
             shutil.copyfile(path, local_path)
             return True
 
-        with open(path, "r") as f:
+        with open(path, "rb") as f:
             contents = f.read()
             return contents
 
