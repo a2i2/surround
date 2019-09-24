@@ -10,7 +10,7 @@ class InitTest(unittest.TestCase):
 
     def test_happy_path(self):
         process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE)
-        self.assertEqual(process.stdout, "info: project created at " + os.getcwd() + "/temp\n")
+        self.assertRegex(process.stdout, 'info: project created at .*temp\\n')
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
