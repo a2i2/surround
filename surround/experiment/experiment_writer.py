@@ -8,6 +8,7 @@ from pathlib import Path
 
 import tornado.template
 from .util import hash_zip, get_driver_type_from_url
+from .log_stream_handler import LogStreamHandler
 from ..config import Config
 
 DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S"
@@ -103,9 +104,11 @@ class ExperimentWriter:
             'project_root': project_root,
             'args': args,
             'time_started': datetime.datetime.now().strftime(DATETIME_FORMAT_STR),
-            'model_hash': self.__get_previous_model_hash(project_name),
-            'log_file_handler': logging.FileHandler(os.path.join(project_root, "log.txt"))
+            'model_hash': self.__get_previous_model_hash(project_name)
         }
+
+        # Capture log output and stream to experiment storage
+        self.current_experiment['log_file_handler'] = LogStreamHandler(self.storage, self.current_experiment)
 
         path = "experimentation/%s/experiments/%s/" % (project_name, self.current_experiment['time_started'])
 
@@ -142,7 +145,6 @@ class ExperimentWriter:
         # Stop capturing the logging output
         root_logger = logging.getLogger()
         root_logger.removeHandler(self.current_experiment['log_file_handler'])
-        self.current_experiment['log_file_handler'].close()
 
         project_root = self.current_experiment['project_root']
         path = "experimentation/%s/experiments/%s/" % (self.current_experiment['project_name'], self.current_experiment['time_started'])
