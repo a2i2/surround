@@ -28,7 +28,7 @@ class RemoteTest(unittest.TestCase):
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'data', '-u', os.getcwd(), '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
 
         process = subprocess.run(['surround', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
         self.assertEqual(process.stdout, "data\n")

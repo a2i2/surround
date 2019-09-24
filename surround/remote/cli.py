@@ -67,7 +67,6 @@ def add_remote_parser(sub_parser):
     remote_parser.add_argument('-n', '--name', help="Name of the remote")
     remote_parser.add_argument('-u', '--url', help="Url of the remote")
     remote_parser.add_argument('-a', '--add', help="Used to add a remote", action='store_true')
-    remote_parser.add_argument('-t', '--type', choices=['data'])
     remote_parser.add_argument('-v', '--verbose', help="verbose remote", action='store_true')
     remote_parser.add_argument('--global', help="Used to specify a global remote", action='store_true', dest='glob')
     return remote_parser
@@ -107,7 +106,7 @@ def add_list_parser(sub_parser):
     list_parser = sub_parser.add_parser('list', help="List file in remote")
     list_parser.add_argument('remote', help="remote to list")
 
-def write_remote_config(parsed_args, remote_parser, file_to_write, type_):
+def write_remote_config(parsed_args, remote_parser, file_to_write):
     """
     Writes the new remote's configuration to the specified YAML file.
 
@@ -117,8 +116,6 @@ def write_remote_config(parsed_args, remote_parser, file_to_write, type_):
     :type remote_parser: <class 'argparse.ArgumentParser'>
     :param file_to_write: path to the YAML file
     :type file_to_write: string
-    :param type_: the remote type
-    :type type_: string
     """
 
     remote_name = parsed_args.name
@@ -126,13 +123,12 @@ def write_remote_config(parsed_args, remote_parser, file_to_write, type_):
 
     if remote_name and remote_url:
         BASE_REMOTE.write_config("remote", file_to_write, remote_name, remote_url)
-        BASE_REMOTE.write_config("remote-type", file_to_write, remote_name, type_)
     else:
         print("error: supply remote name and url")
         remote_parser.print_usage()
         print("error: [-a ADD] [-n NAME] [-u URL] are mutually inclusive")
 
-def add_remote(remote_parser, parsed_args, type_):
+def add_remote(remote_parser, parsed_args):
     """
     Adds a new remote to the current Surround project.
     Writes the new remote's information to the project's ".surround/config.yaml" file.
@@ -141,8 +137,6 @@ def add_remote(remote_parser, parsed_args, type_):
     :type remote_parser: <class 'argparse.ArgumentParser'>
     :param parsed_args: arguments parsed from the user
     :type parsed_args: <class 'argparse.Namespace'>
-    :param type_: the type of remote
-    :type type_: string
     """
 
     verbose = parsed_args.verbose
@@ -157,12 +151,12 @@ def add_remote(remote_parser, parsed_args, type_):
             # Make directory if not exists
             home = str(Path.home())
             os.makedirs(os.path.dirname(os.path.join(home, ".surround/config.yaml")), exist_ok=True)
-            write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"), type_)
+            write_remote_config(parsed_args, remote_parser, os.path.join(home, ".surround/config.yaml"))
         else:
             if is_surround_project():
                 actual_current_dir = os.getcwd()
                 os.chdir(get_project_root_from_current_dir())
-                write_remote_config(parsed_args, remote_parser, ".surround/config.yaml", type_)
+                write_remote_config(parsed_args, remote_parser, ".surround/config.yaml")
                 os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
@@ -205,13 +199,9 @@ def parse_remote_args(remote_parser, parsed_args):
     add = parsed_args.add
     remote_name = parsed_args.name
     remote_url = parsed_args.url
-    type_ = parsed_args.type
 
-    if add and type_:
-        add_remote(remote_parser, parsed_args, type_)
-    elif add:
-        print("error: Supply type [-t TYPE]")
-        print("error: [-a ADD] [-t TYPE] are mutually inclusive")
+    if add:
+        add_remote(remote_parser, parsed_args)
     elif remote_name or remote_url:
         print("error: unknown switch [-n NAME] [-u URL]")
     else:

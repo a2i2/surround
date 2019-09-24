@@ -25,7 +25,7 @@ class AddTest(unittest.TestCase):
         os.chdir("../")
         self.assertEqual(result, "error: no remote named data")
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'data', '-u', os.getcwd(), '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
 
         os.chdir("temp")
         result = local_remote.add('data', 'temp.jpg')
@@ -40,7 +40,7 @@ class AddTest(unittest.TestCase):
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'data', '-u', os.getcwd(), '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
 
         local_remote = Local()
 

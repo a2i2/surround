@@ -25,7 +25,7 @@ class ListTest(unittest.TestCase):
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'temp_remote', '-u', os.getcwd() + '/temp', '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'temp_remote', '-u', os.getcwd() + '/temp'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
         self.assertEqual(process.stdout, '')
 
         process = subprocess.run(['surround', 'remote', '-v'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')

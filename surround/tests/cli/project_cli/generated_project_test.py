@@ -35,7 +35,7 @@ class InitTest(unittest.TestCase):
         process = subprocess.run(['surround', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         self.assertEqual(process.stdout, "info: no remote found\n")
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', '~', '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', '~'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         process = subprocess.run(['surround', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         self.assertEqual(process.stdout, "test_remote\n")
 
@@ -49,7 +49,7 @@ class InitTest(unittest.TestCase):
         process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         self.assertEqual(process.stdout, "error: no remote named test_remote\n")
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote', '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
 
         process = subprocess.run(['surround', 'pull', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
         self.assertEqual(process.stdout, "error: file does not exist\n")
@@ -70,7 +70,7 @@ class InitTest(unittest.TestCase):
         process = subprocess.run(['surround', 'push', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         self.assertEqual(process.stdout, "error: no remote named test_remote\n")
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote', '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
 
         process = subprocess.run(['surround', 'push', 'test_remote', '-k', 'a.jpg'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
         self.assertEqual(process.stdout, "error: file does not exist\n")
@@ -98,7 +98,7 @@ class InitTest(unittest.TestCase):
         process = subprocess.run(['surround', 'list', 'test_remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
         self.assertEqual(process.stdout, "error: no remote named test_remote\n")
 
-        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote', '-t', 'data'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
+        process = subprocess.run(['surround', 'remote', '-a', '-n', 'test_remote', '-u', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp/temp')
 
         process = subprocess.run(['surround', 'push', 'test_remote', '-k', 'a.txt'], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
         self.assertEqual(process.stdout, "info: a.txt pushed successfully\n")
