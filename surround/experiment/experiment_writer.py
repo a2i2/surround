@@ -153,6 +153,8 @@ class ExperimentWriter:
             key
         )
 
+        timestamp = datetime.datetime.now().strftime(DATETIME_FORMAT_STR)
+
         if key in self.current_experiment['metrics']:
             # If not a list, make a list since multiple values are being written
             if not isinstance(self.current_experiment['metrics'][key], list):
@@ -160,13 +162,13 @@ class ExperimentWriter:
 
             # Append new value to list and push to new file in experiment storage
             self.storage.push(
-                metrics_path + "%i.txt" % len(self.current_experiment['metrics'][key]),
+                metrics_path + "%s_%i.txt" % (timestamp, len(self.current_experiment['metrics'][key])),
                 bytes_data=str(value).encode('utf-8'))
             self.current_experiment['metrics'][key].append(value)
         else:
             # First time writing this metric, consider single value and write to file in storage
             self.current_experiment['metrics'][key] = value
-            self.storage.push(metrics_path + "0.txt", bytes_data=str(value).encode('utf-8'))
+            self.storage.push(metrics_path + "%s_0.txt" % timestamp, bytes_data=str(value).encode('utf-8'))
 
     def stop_experiment(self, metrics=None, notes=None):
         if not self.current_experiment:
