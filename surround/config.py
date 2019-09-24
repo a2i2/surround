@@ -167,6 +167,16 @@ class Config(Mapping):
             return self._storage[path]
         return self.__iterate_over_dict(self._storage, path.split("."))
 
+    def get_dict(self):
+        """
+        Returns the configuration data in a dictionary
+
+        :returns: dictionary of the configuration data
+        :rtype: dict
+        """
+
+        return self._storage
+
     def __find_package_path(self, project_root):
         """
         Attempts to find the projects package path by looking for the config.yaml file.
