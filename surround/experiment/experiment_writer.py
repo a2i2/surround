@@ -8,16 +8,25 @@ import datetime
 from pathlib import Path
 
 import tornado.template
-from .util import hash_zip
-from .file_storage_driver import FileStorageDriver
+from .util import hash_zip, get_driver_type_from_url
 from ..config import Config
 
 DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S"
 
-def get_global_config():
-    config_path = os.path.join(Path.home(), ".surround", "config.yaml")
+def get_config():
     config = Config(auto_load=False)
-    config.read_config_files([config_path])
+    local_config = Config(auto_load=True)
+
+    global_config_path = os.path.join(Path.home(), ".surround", "config.yaml")
+    local_config_path = os.path.join(local_config["project_root"], ".surround", "config.yaml")
+
+    # Load the configuration file from the global surround path
+    if os.path.exists(global_config_path):
+        config.read_config_files([global_config_path])
+
+    # Load the configuration file from the project surround path
+    if os.path.exists(local_config_path):
+        config.read_config_files([local_config_path])
 
     return config
 
@@ -38,13 +47,24 @@ class ExperimentWriter:
                     log.txt
     """
 
-    def __init__(self, storage_url=get_global_config().get_path("experiment.url"), storage_driver=FileStorageDriver):
+    def __init__(self, storage_url=None, storage_driver=None):
         self.current_experiment = None
         self.prev_experiment = None
         self.storage_url = storage_url
 
+        config = get_config()
+
         if not self.storage_url:
-            raise ValueError("No storage URL has been provided!")
+            self.storage_url = config.get_path("experiment.url")
+
+        if not self.storage_url or not isinstance(self.storage_url, str):
+            raise ValueError("No valid storage URL has been provided!")
+
+        if not storage_driver:
+            storage_driver = get_driver_type_from_url(self.storage_url)
+
+        if not storage_driver or not isinstance(storage_driver, type):
+            raise ValueError("No valid storage driver has been provided!")
 
         self.storage = storage_driver(self.storage_url)
 
@@ -145,7 +165,7 @@ class ExperimentWriter:
             for f in files:
                 self.storage.push(path + "output/" + f, os.path.join(root, f))
 
-        global_config = get_global_config()
+        global_config = get_config()
 
         results = {
             'author': {
