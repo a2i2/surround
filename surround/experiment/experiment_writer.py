@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import shutil
 import zipfile
@@ -105,7 +104,6 @@ class ExperimentWriter:
             'args': args,
             'time_started': datetime.datetime.now().strftime(DATETIME_FORMAT_STR),
             'model_hash': self.__get_previous_model_hash(project_name),
-            'log_stream_handler': logging.StreamHandler(sys.stdout),
             'log_file_handler': logging.FileHandler(os.path.join(project_root, "log.txt"))
         }
 
@@ -135,7 +133,6 @@ class ExperimentWriter:
         # Setup logging to go to both the console and file
         root_log = logging.getLogger()
         root_log.setLevel(logging.DEBUG)
-        root_log.addHandler(self.current_experiment['log_stream_handler'])
         root_log.addHandler(self.current_experiment['log_file_handler'])
 
     def stop_experiment(self, metrics=None, notes=None):
@@ -144,7 +141,6 @@ class ExperimentWriter:
 
         # Stop capturing the logging output
         root_logger = logging.getLogger()
-        root_logger.removeHandler(self.current_experiment['log_stream_handler'])
         root_logger.removeHandler(self.current_experiment['log_file_handler'])
         self.current_experiment['log_file_handler'].close()
 
