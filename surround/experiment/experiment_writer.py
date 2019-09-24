@@ -11,7 +11,7 @@ from .util import hash_zip, get_driver_type_from_url
 from .log_stream_handler import LogStreamHandler
 from ..config import Config
 
-DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S"
+DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S-%f"
 
 def get_config():
     config = Config(auto_load=False)
@@ -37,8 +37,12 @@ class ExperimentWriter:
         project_name/
             project.json
             experiments/
-                YYYY-MM-DDThh-mm-ss/
+                YYYY-MM-DDThh-mm-ss-mmmm/
+                    logs/
+                        ...
                     output/
+                        ...
+                    metrics/
                         ...
                     status.txt
                     code.zip
@@ -104,7 +108,8 @@ class ExperimentWriter:
             'project_root': project_root,
             'args': args,
             'time_started': datetime.datetime.now().strftime(DATETIME_FORMAT_STR),
-            'model_hash': self.__get_previous_model_hash(project_name)
+            'model_hash': self.__get_previous_model_hash(project_name),
+            'metrics': {}
         }
 
         # Capture log output and stream to experiment storage
@@ -138,6 +143,31 @@ class ExperimentWriter:
         root_log.setLevel(logging.DEBUG)
         root_log.addHandler(self.current_experiment['log_file_handler'])
 
+    def write_metric(self, key, value):
+        if not self.current_experiment:
+            raise Exception("No experiment is in progress!")
+
+        metrics_path = "experimentation/%s/experiments/%s/metrics/%s/" % (
+            self.current_experiment['project_name'],
+            self.current_experiment['time_started'],
+            key
+        )
+
+        if key in self.current_experiment['metrics']:
+            # If not a list, make a list since multiple values are being written
+            if not isinstance(self.current_experiment['metrics'][key], list):
+                self.current_experiment['metrics'][key] = [self.current_experiment['metrics'][key]]
+
+            # Append new value to list and push to new file in experiment storage
+            self.storage.push(
+                metrics_path + "%i.txt" % len(self.current_experiment['metrics'][key]),
+                bytes_data=str(value).encode('utf-8'))
+            self.current_experiment['metrics'][key].append(value)
+        else:
+            # First time writing this metric, consider single value and write to file in storage
+            self.current_experiment['metrics'][key] = value
+            self.storage.push(metrics_path + "0.txt", bytes_data=str(value).encode('utf-8'))
+
     def stop_experiment(self, metrics=None, notes=None):
         if not self.current_experiment:
             raise Exception("No experiment has been started!")
@@ -162,6 +192,11 @@ class ExperimentWriter:
         for root, _, files in os.walk(os.path.join(project_root, "output")):
             for f in files:
                 self.storage.push(path + "output/" + f, os.path.join(root, f))
+
+        if metrics:
+            metrics.update(self.current_experiment['metrics'])
+        else:
+            metrics = self.current_experiment['metrics']
 
         global_config = get_config()
 
