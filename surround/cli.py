@@ -10,6 +10,7 @@ import pkg_resources
 from .remote import cli as remote_cli
 from .split import cli as split_cli
 from .visualise import cli as visualise_cli
+from .configuration import cli as config_cli
 from .linter import Linter
 from .project import PROJECTS
 
@@ -347,7 +348,7 @@ def parse_init_args(args):
     else:
         print("error: permission denied")
 
-def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, tool, extra_args):
+def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, config_parser, tool, extra_args):
     """
     Executes the tool/sub-command requested by the user via the CLI passing parsed arguments.
 
@@ -375,6 +376,8 @@ def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, 
         split_cli.execute_split_tool(split_parser, parsed_args)
     elif tool == "viz":
         visualise_cli.execute_visualise_tool(visualise_parser, parsed_args)
+    elif tool == "config":
+        config_cli.execute_tool(config_parser, parsed_args)
     else:
         parse_init_args(parsed_args)
 
@@ -427,12 +430,13 @@ def execute_cli():
     remote_cli.add_push_parser(sub_parser)
     remote_cli.add_list_parser(sub_parser)
 
+    config_parser = sub_parser.add_parser('config', parents=[config_cli.get_parser()], add_help=False, help="Configure global/local configuration properties")
     split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
     visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list", "split", "viz"]
+    tools = ["config", "init", "lint", "run", "remote", "add", "pull", "push", "list", "split", "viz"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -444,7 +448,7 @@ def execute_cli():
         else:
             tool = sys.argv[1]
             parsed_args, extra_args = parser.parse_known_args()
-            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, tool, extra_args)
+            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, config_parser, tool, extra_args)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 
