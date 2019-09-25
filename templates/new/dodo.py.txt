@@ -70,7 +70,7 @@ def task_train():
     data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train %s" % (output_path, data_path, IMAGE, "%(args)s")],
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train --experiment %s" % (output_path, data_path, IMAGE, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -80,7 +80,7 @@ def task_batch():
     data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch %s" % (output_path, data_path, IMAGE, "%(args)s")],
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch --experiment %s" % (output_path, data_path, IMAGE, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -88,7 +88,7 @@ def task_train_local():
     """Run training mode locally"""
     return {{
         'basename': 'trainLocal',
-        'actions': ["%s -m %s --mode train %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'actions': ["%s -m %s --mode train --experiment %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -96,7 +96,7 @@ def task_batch_local():
     """Run batch mode locally"""
     return {{
         'basename': 'batchLocal',
-        'actions': ["%s -m %s --mode batch %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'actions': ["%s -m %s --mode batch --experiment %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 

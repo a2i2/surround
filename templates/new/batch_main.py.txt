@@ -25,13 +25,14 @@ def main():
     parser.add_argument('-r', '--runner', help="Runner for the Assembler (index or name)", default=default_runner if default_runner is not None else "0")
     parser.add_argument('-a', '--assembler', help="Assembler to run (index or name)", default=default_assembler if default_assembler is not None else "0")
     parser.add_argument('-e', '--experiment', help="Consider this run an experiment", action="store_true")
+    parser.add_argument('-ne', '--no-experiment', help="Don't consider this run an experiment", action="store_true")
     parser.add_argument('-n', '--note', help="Add a note to the experiment", type=str)
     parser.add_argument('--mode', help="Mode to run (train, batch)", default="batch")
     parser.add_argument('--status', help="Display information about the project such as available runners and assemblers", action="store_true")
 
     args = parser.parse_args()
 
-    if args.experiment:
+    if args.experiment and not args.no_experiment:
         writer = ExperimentWriter()
         writer.write_project('{project_name}', '{project_description}')
 
@@ -45,7 +46,7 @@ def main():
     else:
         runner = surround.run(args.runner, args.assembler, args.mode)
 
-        if args.experiment:
+        if args.experiment and not args.no_experiment:
             writer.stop_experiment(metrics=runner.assembler.state.metrics)
 
 if __name__ == "__main__":
