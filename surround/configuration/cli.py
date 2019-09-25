@@ -29,6 +29,10 @@ def get_parser():
 
 def write_config_to_file(config, filepath):
     data = config.get_dict()
+
+    if not os.path.exists(os.path.dirname(filepath)):
+        os.makedirs(os.path.dirname(filepath))
+
     with open(filepath, "w+") as f:
         yaml.safe_dump(data, f)
 
