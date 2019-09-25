@@ -126,7 +126,6 @@ class ExperimentWriter:
             'args': args,
             'time_started': datetime.datetime.now().strftime(DATETIME_FORMAT_STR),
             'model_hash': self.__get_previous_model_hash(project_name),
-            'metrics': {}
         }
 
         # Capture log output and stream to experiment storage
@@ -160,33 +159,6 @@ class ExperimentWriter:
         root_log.setLevel(logging.DEBUG)
         root_log.addHandler(self.current_experiment['log_file_handler'])
 
-    def write_metric(self, key, value):
-        if not self.current_experiment:
-            raise Exception("No experiment is in progress!")
-
-        metrics_path = "experimentation/%s/experiments/%s/metrics/%s/" % (
-            self.current_experiment['project_name'],
-            self.current_experiment['time_started'],
-            key
-        )
-
-        timestamp = datetime.datetime.now().strftime(DATETIME_FORMAT_STR)
-
-        if key in self.current_experiment['metrics']:
-            # If not a list, make a list since multiple values are being written
-            if not isinstance(self.current_experiment['metrics'][key], list):
-                self.current_experiment['metrics'][key] = [self.current_experiment['metrics'][key]]
-
-            # Append new value to list and push to new file in experiment storage
-            self.storage.push(
-                metrics_path + "%s_%i.txt" % (timestamp, len(self.current_experiment['metrics'][key])),
-                bytes_data=str(value).encode('utf-8'))
-            self.current_experiment['metrics'][key].append(value)
-        else:
-            # First time writing this metric, consider single value and write to file in storage
-            self.current_experiment['metrics'][key] = value
-            self.storage.push(metrics_path + "%s_0.txt" % timestamp, bytes_data=str(value).encode('utf-8'))
-
     def stop_experiment(self, metrics=None, notes=None):
         if not self.current_experiment:
             raise Exception("No experiment has been started!")
@@ -208,11 +180,6 @@ class ExperimentWriter:
         for root, _, files in os.walk(os.path.join(project_root, "output")):
             for f in files:
                 self.storage.push(path + "output/" + f, os.path.join(root, f))
-
-        if metrics:
-            metrics.update(self.current_experiment['metrics'])
-        else:
-            metrics = self.current_experiment['metrics']
 
         global_config = get_config()
 
