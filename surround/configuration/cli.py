@@ -9,8 +9,13 @@ from ..config import Config
 
 REQUIRED_CONFIG = {
     "user.name": "Enter your name (user.name): ",
-    "user.email": "Enter your email (user.email): ",
-    "experiment.url": "Enter the URL to the experiment storage (experiment.url): "
+    "user.email": "Enter your email (user.email): "
+}
+
+DEFAULT_CONFIG = {
+    "experiment.url": os.path.join(str(Path.home()), ".experiments", "local"),
+    "experiment.location.local": os.path.join(str(Path.home()), ".experiments", "local"),
+    "experiment.location.shared": os.path.join(str(Path.home()), ".experiments", "shared")
 }
 
 def get_parser():
@@ -83,6 +88,11 @@ def execute_tool(parser, args):
         for key, prompt in REQUIRED_CONFIG.items():
             if not config.get_path(key):
                 value = input(prompt)
+                generate_data(data, key.split("."), value)
+
+        # Ensure default values are in the config
+        for key, value in DEFAULT_CONFIG.items():
+            if not config.get_path(key):
                 generate_data(data, key.split("."), value)
 
         if data:
