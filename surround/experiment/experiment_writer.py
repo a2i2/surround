@@ -6,7 +6,6 @@ import logging
 import datetime
 from pathlib import Path
 
-import tornado.template
 from .util import hash_zip, get_driver_type_from_url
 from .log_stream_handler import LogStreamHandler
 from ..config import Config
@@ -206,16 +205,10 @@ class ExperimentWriter:
         # Generate results object (in JSON) and push to experiment storage
         self.storage.push(path + "results.json", bytes_data=json.dumps(results, indent=4).encode('utf-8'))
 
-        # Generate HTML page visualising the results (if templates available)
-        if os.path.exists(os.path.join(project_root, "templates/")):
-            try:
-                results_html = tornado.template.Loader(os.path.join(project_root, "templates/"))
-                results_html = results_html.load("results.html")
-                results_html = results_html.generate(results=results)
-
-                self.storage.push(path + "results.html", bytes_data=results_html)
-            except Exception:
-                logging.exception("Failed to generate the result HTML file for the experiment:")
+        # Upload results.html from output folder (if it exists)
+        results_html_path = os.path.join(project_root, "output", "results.html")
+        if os.path.exists(results_html_path):
+            self.storage.push(path + "results.html", local_path=results_html_path)
 
         self.prev_experiment = self.current_experiment
         self.current_experiment = None
