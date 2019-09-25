@@ -294,7 +294,7 @@ def run_locally(args, extra_args):
 
         if extra_args:
             run_args.append("--args")
-            run_args.append(" ".join(extra_args))
+            run_args.append(" ".join([arg if " " not in arg else "\"%s\"" % arg for arg in extra_args]))
     else:
         # No arguments provided, so list the tasks available
         print("Project tasks:")
