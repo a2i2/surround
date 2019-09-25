@@ -62,7 +62,6 @@ class ExperimentWriter:
                         ...
                     metrics/
                         ...
-                    status.txt
                     code.zip
                     results.json
                     results.html
@@ -133,11 +132,11 @@ class ExperimentWriter:
         # Capture log output and stream to experiment storage
         self.current_experiment['log_file_handler'] = LogStreamHandler(self.storage, self.current_experiment)
 
-        path = "experimentation/%s/experiments/%s/" % (project_name, self.current_experiment['time_started'])
-
-        # Write status file to experiment folder & update the projects metadata file
-        self.storage.push(path + "status.txt", bytes_data="RUNNING".encode('utf-8'))
+        # Update the "last updated time" for the project metadata file
         self.__update_project_meta(project_name)
+
+        # Generate path to the new experiment folder
+        path = "experimentation/%s/experiments/%s/" % (project_name, self.current_experiment['time_started'])
 
         os.makedirs('temp')
         try:
@@ -201,9 +200,6 @@ class ExperimentWriter:
 
         # Push the logs captured to the experiment folder and delete locally
         self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'))
-
-        # Update the status of the experiment to COMPLETE
-        self.storage.push(path + "status.txt", bytes_data="COMPLETE".encode('utf-8'), override_ok=True)
 
         # Update the project metadata file
         self.__update_project_meta(self.current_experiment['project_name'])
