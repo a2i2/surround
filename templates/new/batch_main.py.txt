@@ -43,7 +43,7 @@ def main():
         runner = surround.run(args.runner, args.assembler, args.mode)
 
         if args.experiment:
-            writer.stop_experiment(metrics=runner.assembler.state.metrics, notes=[])
+            writer.stop_experiment(metrics=runner.assembler.state.metrics)
 
 if __name__ == "__main__":
     main()

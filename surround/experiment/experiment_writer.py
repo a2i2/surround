@@ -104,7 +104,7 @@ class ExperimentWriter:
         if self.storage.exists('experimentation/' + project_name):
             self.storage.delete('experimentation/' + project_name)
 
-    def start_experiment(self, project_name, project_root, args=None):
+    def start_experiment(self, project_name, project_root, args=None, notes=None):
         if self.current_experiment:
             raise Exception("There is already an experiment in progress!")
 
@@ -123,7 +123,6 @@ class ExperimentWriter:
         self.current_experiment = {
             'project_name': project_name,
             'project_root': project_root,
-            'args': args,
             'time_started': datetime.datetime.now().strftime(DATETIME_FORMAT_STR),
             'model_hash': self.__get_previous_model_hash(project_name),
         }
@@ -154,12 +153,29 @@ class ExperimentWriter:
         finally:
             shutil.rmtree('temp')
 
+        global_config = get_config()
+
+        execution_info = {
+            'author': {
+                'name': global_config.get_path("user.name"),
+                'email': global_config.get_path("user.email")
+            },
+            'arguments': args,
+            'model_hash': self.current_experiment['model_hash'],
+            'start_time': self.current_experiment['time_started'],
+            'notes': notes if notes else [],
+            'input_files': self.__get_input_file_structure(project_root)
+        }
+
+        # Generate execution info object (in JSON) and push to experiment storage
+        self.storage.push(path + "execution_info.json", bytes_data=json.dumps(execution_info, indent=4).encode('utf-8'))
+
         # Setup logging to go to both the console and file
         root_log = logging.getLogger()
         root_log.setLevel(logging.DEBUG)
         root_log.addHandler(self.current_experiment['log_file_handler'])
 
-    def stop_experiment(self, metrics=None, notes=None):
+    def stop_experiment(self, metrics=None):
         if not self.current_experiment:
             raise Exception("No experiment has been started!")
 
@@ -181,19 +197,10 @@ class ExperimentWriter:
             for f in files:
                 self.storage.push(path + "output/" + f, os.path.join(root, f))
 
-        global_config = get_config()
-
         results = {
-            'author': {
-                'name': global_config.get_path("user.name"),
-                'email': global_config.get_path("user.email")
-            },
-            'arguments': self.current_experiment['args'],
             'start_time': self.current_experiment['time_started'],
             'end_time': datetime.datetime.now().strftime(DATETIME_FORMAT_STR),
-            'metrics': metrics if metrics else {},
-            'notes': notes if notes else [],
-            'model_hash': self.current_experiment['model_hash']
+            'metrics': metrics if metrics else {}
         }
 
         # Generate results object (in JSON) and push to experiment storage
@@ -216,7 +223,7 @@ class ExperimentWriter:
     def __package_project_code(self, project_root, export_path):
         project_root = os.path.abspath(project_root)
         staging = []
-        ignore_dirs = ['models', 'output', 'logs', '__pycache__']
+        ignore_dirs = ['models', 'output', 'logs', '__pycache__', 'input']
         ignore_files = ['log.txt', '.doit.db.bak', '.doit.db.dat', '.doit.db.dir']
 
         for root, _, files in os.walk(project_root):
@@ -233,6 +240,15 @@ class ExperimentWriter:
         with zipfile.ZipFile(export_path, 'w', zipfile.ZIP_DEFLATED) as f:
             for source_file in staging:
                 f.write(source_file, os.path.relpath(source_file, project_root))
+
+    def __get_input_file_structure(self, project_root):
+        project_root = os.path.abspath(project_root)
+        results = []
+        for root, _, files in os.walk(os.path.join(project_root, "input")):
+            for f in files:
+                results.append(os.path.relpath(os.path.join(root, f), project_root))
+
+        return results
 
     def __package_model(self, project_root, export_path):
         project_root = os.path.abspath(project_root)
