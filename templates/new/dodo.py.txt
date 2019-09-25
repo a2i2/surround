@@ -19,11 +19,10 @@ PARAMS = [
     }}
 ]
 
-def task_show_info():
+def task_status():
     """Show information about the project such as available runners and assemblers"""
     return {{
-        'basename': 'showInfo',
-        'actions': ["%s -m %s --info" % (sys.executable, PACKAGE_PATH)]
+        'actions': ["%s -m %s --status" % (sys.executable, PACKAGE_PATH)]
     }}
 
 def task_build():
