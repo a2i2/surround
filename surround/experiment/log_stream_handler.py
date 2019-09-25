@@ -1,5 +1,5 @@
 import os
-from logging import Handler
+from logging import Handler, Formatter
 from datetime import datetime
 
 class LogStreamHandler(Handler):
@@ -8,6 +8,7 @@ class LogStreamHandler(Handler):
         self.storage = storage
         self.experiment = experiment
         self.count = 0
+        self.setFormatter(Formatter("%(levelname)s:%(name)s:%(message)s"))
 
     def emit(self, record):
         msg = self.format(record)
