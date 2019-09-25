@@ -54,6 +54,27 @@ def set_property(path, value, config, config_path, is_local):
     else:
         print("info: successfully set property %s to %s in global configuration" % (path, value))
 
+def update_required_fields(config, config_path):
+    data = {}
+
+    # Ask the user to fill in the required fields
+    for key, prompt in REQUIRED_CONFIG.items():
+        if not config.get_path(key):
+            value = input(prompt)
+            generate_data(data, key.split("."), value)
+
+    # Ensure default values are in the config
+    for key, value in DEFAULT_CONFIG.items():
+        if not config.get_path(key):
+            generate_data(data, key.split("."), value)
+
+    if data:
+        # Save the answers to the global config
+        config.read_from_dict(data)
+        write_config_to_file(config, config_path)
+
+        print("info: successfully updated the global configuration!")
+
 def execute_tool(parser, args):
     if not args.local:
         # Get the global configuration path (in ~/.surround/config.yaml)
@@ -82,22 +103,4 @@ def execute_tool(parser, args):
     elif args.local:
         print("error: no configuration property and value specified!")
     else:
-        data = {}
-
-        # Ask the user to fill in the required fields
-        for key, prompt in REQUIRED_CONFIG.items():
-            if not config.get_path(key):
-                value = input(prompt)
-                generate_data(data, key.split("."), value)
-
-        # Ensure default values are in the config
-        for key, value in DEFAULT_CONFIG.items():
-            if not config.get_path(key):
-                generate_data(data, key.split("."), value)
-
-        if data:
-            # Save the answers to the global config
-            config.read_from_dict(data)
-            write_config_to_file(config, config_path)
-
-            print("info: successfully updated the global configuration!")
+        update_required_fields(config, config_path)
