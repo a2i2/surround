@@ -10,6 +10,7 @@ import tornado.template
 from .util import hash_zip, get_driver_type_from_url
 from .log_stream_handler import LogStreamHandler
 from ..config import Config
+from ..configuration import cli as config_cli
 
 DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S-%f"
 
@@ -20,13 +21,30 @@ def get_config():
     global_config_path = os.path.join(Path.home(), ".surround", "config.yaml")
     local_config_path = os.path.join(local_config["project_root"], ".surround", "config.yaml")
 
+    global_exists = os.path.exists(global_config_path)
+    local_exists = os.path.exists(local_config_path)
+
     # Load the configuration file from the global surround path
-    if os.path.exists(global_config_path):
+    if global_exists:
         config.read_config_files([global_config_path])
 
     # Load the configuration file from the project surround path
-    if os.path.exists(local_config_path):
+    if local_exists:
         config.read_config_files([local_config_path])
+
+    # If neither exist or we don't have the required property, setup the configuration
+    if not global_exists and (not local_exists or not config.get_path("experiment.url")):
+        logger = logging.getLogger(__name__)
+        logger.info("Setting up global configuration...")
+        logger.info("No username or email have been set in your configuration!")
+        logger.info("To set your name and email use the following commands:")
+        logger.info("$ surround config user.name John Doe")
+        logger.info("$ surround config user.email john.doe@email.com\n")
+
+        config_cli.update_required_fields(config, global_config_path, answers={
+            'user.name': 'Unknown',
+            'user.email': 'Unknown'
+        }, verbose=False)
 
     return config
 

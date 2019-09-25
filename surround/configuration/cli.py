@@ -54,14 +54,17 @@ def set_property(path, value, config, config_path, is_local):
     else:
         print("info: successfully set property %s to %s in global configuration" % (path, value))
 
-def update_required_fields(config, config_path):
+def update_required_fields(config, config_path, answers=None, verbose=True):
     data = {}
 
     # Ask the user to fill in the required fields
     for key, prompt in REQUIRED_CONFIG.items():
         if not config.get_path(key):
-            value = input(prompt)
-            generate_data(data, key.split("."), value)
+            if answers and key in answers:
+                generate_data(data, key.split("."), answers[key])
+            else:
+                value = input(prompt)
+                generate_data(data, key.split("."), value)
 
     # Ensure default values are in the config
     for key, value in DEFAULT_CONFIG.items():
@@ -73,7 +76,8 @@ def update_required_fields(config, config_path):
         config.read_from_dict(data)
         write_config_to_file(config, config_path)
 
-        print("info: successfully updated the global configuration!")
+        if verbose:
+            print("info: successfully updated the global configuration!")
 
 def execute_tool(parser, args):
     if not args.local:
