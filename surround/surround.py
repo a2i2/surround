@@ -32,6 +32,13 @@ class Surround:
 
         return runner
 
+    def show_info(self):
+        print("Available assemblies:")
+        self.list_assemblies()
+
+        print("\nAvailable runners:")
+        self.list_runners()
+
     def list_assemblies(self):
         for i, assembler in enumerate(self.assemblies):
             print("%i. %s" % (i, assembler.assembler_name))

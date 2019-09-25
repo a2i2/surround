@@ -19,18 +19,11 @@ PARAMS = [
     }}
 ]
 
-def task_list_assemblies():
-    """List available assemblies in the project"""
+def task_show_info():
+    """Show information about the project such as available runners and assemblers"""
     return {{
-        'basename': 'listAssemblies',
-        'actions': ["%s -m %s --list-assemblies" % (sys.executable, PACKAGE_PATH)]
-    }}
-
-def task_list_runners():
-    """List available runners in the project"""
-    return {{
-        'basename': 'listRunners',
-        'actions': ["%s -m %s --list-runners" % (sys.executable, PACKAGE_PATH)]
+        'basename': 'showInfo',
+        'actions': ["%s -m %s --info" % (sys.executable, PACKAGE_PATH)]
     }}
 
 def task_build():

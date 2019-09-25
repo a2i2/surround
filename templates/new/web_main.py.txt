@@ -25,17 +25,14 @@ def main():
     parser.add_argument('-r', '--runner', help="Runner for the Assembler (index or name)", default=default_runner if default_runner is not None else "0")
     parser.add_argument('-a', '--assembler', help="Assembler to run (index or name)", default=default_assembler if default_assembler is not None else "0")
     parser.add_argument('--mode', help="Mode to run (train, batch)", default="batch")
-    parser.add_argument('--list-assemblies', help="List all assemblies available in this project", action="store_true")
-    parser.add_argument('--list-runners', help="List all runners available in this project", action="store_true")
+    parser.add_argument('--info', help="Display information about the project such as available runners and assemblers", action="store_true")
 
     args = parser.parse_args()
 
     surround = Surround(runners, assemblies)
 
-    if args.list_assemblies:
-        surround.list_assemblies()
-    elif args.list_runners:
-        surround.list_runners()
+    if args.info:
+        surround.show_info()
     else:
         surround.run(args.runner, args.assembler, args.mode)
 
