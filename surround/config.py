@@ -158,7 +158,7 @@ class Config(Mapping):
         if not isinstance(path, str):
             raise TypeError("path should be a string")
         if not "." in path:
-            return self._storage[path]
+            return self._storage[path] if path in self._storage else None
         return self.__iterate_over_dict(self._storage, path.split("."))
 
     def get_dict(self):

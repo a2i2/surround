@@ -26,10 +26,13 @@ def get_surround_config():
     local_config = Config(auto_load=True)
 
     global_config_path = os.path.join(Path.home(), ".surround", "config.yaml")
-    local_config_path = os.path.join(local_config["project_root"], ".surround", "config.yaml")
+    local_config_path = None
+
+    if local_config.get_path("project_root"):
+        local_config_path = os.path.join(local_config["project_root"], ".surround", "config.yaml")
 
     global_exists = os.path.exists(global_config_path)
-    local_exists = os.path.exists(local_config_path)
+    local_exists = os.path.exists(local_config_path) if local_config_path else False
 
     # Load the configuration file from the global surround path
     if global_exists:
