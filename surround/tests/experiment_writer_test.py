@@ -189,6 +189,7 @@ class ExperimentWriterTest(unittest.TestCase):
         # Check log/ has a file for each log and the contents are correct
         log_files = os.listdir(os.path.join(path, "logs"))
         self.assertEqual(len(expected_logs), len(log_files))
+        log_files = sorted(log_files)
 
         for i, exp_log in enumerate(expected_logs):
             with open(os.path.join(path, "logs", log_files[i]), "r") as f:
