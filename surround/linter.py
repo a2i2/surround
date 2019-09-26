@@ -275,7 +275,7 @@ class Linter():
         root = os.path.abspath(project_root)
         project_name = os.path.basename(root)
         data = ProjectData(project, root, project_name)
-        assembler = Assembler("Linting", LinterValidator(), Main(self.filters))
+        assembler = Assembler("Linting").set_validator(LinterValidator()).set_estimator(Main(self.filters))
         assembler.init_assembler()
         assembler.run(data)
         return data.errors, data.warnings

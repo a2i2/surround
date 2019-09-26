@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from .stage import Stage
 
-
-class Visualiser(ABC):
+class Visualiser(Stage):
     """
     Base class for all visualisers that are executed at the end of a batch predict/training operation.
 
@@ -25,8 +25,10 @@ class Visualiser(ABC):
                 plt.ylabel("Accuracy")
                 plt.show()
 
-        assembler = Assembler("Example", Validate(), Predict())
-        assembler.set_visualiser(Accuracy())
+        assembler = Assembler("Example")
+                        .set_validator(Validate())
+                        .set_estimator(Predict())
+                        .set_visualiser(Accuracy())
 
         assembler.run(PipelineData(input_data))
     """

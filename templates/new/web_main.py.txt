@@ -1,25 +1,40 @@
 import argparse
-from surround import Assembler
-from stages import Main, InputValidator
-from batch_runner import BatchRunner
+from surround import Surround, Assembler, Config
+from stages import Baseline, InputValidator
+from file_system_runner import FileSystemRunner
 from web_runner import WebRunner
 
+runners = [
+    WebRunner(),
+    FileSystemRunner()
+]
+
+assemblies = [
+    Assembler("baseline")
+        .set_validator(InputValidator())
+        .set_estimator(Baseline())
+]
 
 def main():
+    config = Config(auto_load=True)
+    default_runner = config.get_path('runner.default')
+    default_assembler = config.get_path('assembler.default')
+
     parser = argparse.ArgumentParser(prog='{project_name}', description="Surround mode(s) available to run this module")
-    parser.add_argument('--mode', help="Mode to run (train, batch)", default="web")
-    execute_assembler(parser.parse_args().mode)
+    
+    parser.add_argument('-r', '--runner', help="Runner for the Assembler (index or name)", default=default_runner if default_runner is not None else "0")
+    parser.add_argument('-a', '--assembler', help="Assembler to run (index or name)", default=default_assembler if default_assembler is not None else "0")
+    parser.add_argument('--mode', help="Mode to run (train, batch)", default="batch")
+    parser.add_argument('--status', help="Display information about the project such as available runners and assemblers", action="store_true")
 
+    args = parser.parse_args()
 
-def execute_assembler(mode):
-    assembler = Assembler("Default project", InputValidator(), Main())
-    if mode == "train":
-        BatchRunner(assembler).run(True)
-    elif mode == "batch":
-        BatchRunner(assembler).run()
+    surround = Surround(runners, assemblies)
+
+    if args.status:
+        surround.show_info()
     else:
-        WebRunner(assembler).run()
-
+        surround.run(args.runner, args.assembler, args.mode)
 
 if __name__ == "__main__":
     main()

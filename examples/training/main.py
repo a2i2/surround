@@ -33,7 +33,9 @@ class Formatter(Visualiser):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = AssemblerState()
-    assembler = Assembler("Training example", InputValidator(), HelloWorld())
+    assembler = Assembler("Training example")
+    assembler.set_validator(InputValidator())
+    assembler.set_estimator(HelloWorld())
     assembler.init_assembler(True)
     assembler.set_visualiser(Formatter())
 

@@ -4,7 +4,8 @@ from stages import AddWorld, AddHello, AddSurround, AssemblerState, InputValidat
 if __name__ == "__main__":
     data = AssemblerState()
 
-    assembler = Assembler("Pre Post Example", InputValidator())
+    assembler = Assembler("Pre Post Example")
+    assembler.set_validator(InputValidator())
     assembler.set_estimator(AddWorld(), [AddHello()], [AddSurround()])
     assembler.run(data)
 

@@ -9,6 +9,7 @@ PROJECTS = {
             "notebooks",
             "scripts",
             "{project_name}",
+            "{project_name}/stages",
             "spikes",
             "tests",
         ],
@@ -19,8 +20,11 @@ PROJECTS = {
         "templates" : [
             # File name, template name, capitalize project name, is web component
             ("README.md", "README.md.txt", False, False),
-            ("{project_name}/stages.py", "stages.py.txt", True, False),
-            ("{project_name}/batch_runner.py", "batch_runner.py.txt", True, False),
+            ("{project_name}/stages/__init__.py", "stages_init.py.txt", True, False),
+            ("{project_name}/stages/assembler_state.py", "assembler_state.py.txt", True, False),
+            ("{project_name}/stages/baseline.py", "baseline.py.txt", True, False),
+            ("{project_name}/stages/input_validator.py", "input_validator.py.txt", True, False),
+            ("{project_name}/file_system_runner.py", "file_system_runner.py.txt", True, False),
             ("{project_name}/web_runner.py", "web_runner.py.txt", True, True),
             ("{project_name}/__main__.py", "batch_main.py.txt", True, False),
             ("{project_name}/__main__.py", "web_main.py.txt", True, True),

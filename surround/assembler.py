@@ -8,8 +8,8 @@ from abc import ABC
 from datetime import datetime
 
 from .config import Config
-from .visualiser import Visualiser
 from .stage import Filter, Estimator, Validator
+from .visualiser import Visualiser
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,10 +32,8 @@ class Assembler(ABC):
 
     Example::
 
-        config = Config()
-        config.read_config_files(["config.yaml"])
-
-        assembler = Assembler("Example pipeline", Validation(), None, config)
+        assembler = Assembler("Example pipeline")
+        assembler.set_validator(Validation())
         assembler.set_estimator(PredictStage(), [PreFilter()], [PostFilter()])
         assembler.init_assembler(batch_mode=False)
 
@@ -59,33 +57,19 @@ class Assembler(ABC):
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, assembler_name="", validator=None, estimator=None, config=Config(auto_load=True)):
+    def __init__(self, assembler_name=""):
         """
         Constructor for an Assembler pipeline:
 
         :param assembler_name: The name of the pipeline
         :type assembler_name: str
-        :param validator: The validator to use on input data (default: None)
-        :type validator: :class:`surround.stage.Validator`
-        :param estimator: The estimator to use on input data (default: None)
-        :type estimator: :class:`surround.stage.Estimator`
-        :param config: The pipeline configuration data
-        :type config: :class:`surround.config.Config`
         """
 
-        if not validator:
-            raise ValueError("'Validator' is required to run an assembler")
-        if not isinstance(validator, Validator):
-            raise TypeError("'validator' should be of class Validator")
-        if estimator and not isinstance(estimator, Estimator):
-            raise TypeError("'estimator' should be of class Estimator")
-        if config and not isinstance(config, Config):
-            raise TypeError("'config' should be of class Config")
-
         self.assembler_name = assembler_name
-        self.config = config
-        self.estimator = estimator
-        self.validator = validator
+        self.config = Config(auto_load=True)
+        self.stages = None
+        self.estimator = None
+        self.validator = None
         self.pre_filters = None
         self.post_filters = None
         self.visualiser = None
@@ -111,11 +95,19 @@ class Assembler(ABC):
 
         self.batch_mode = batch_mode
         try:
+            if self.stages:
+                for stage in self.stages:
+                    stage.initialise(self.config)
+
+            if self.validator:
+                self.validator.initialise(self.config)
+
             if self.pre_filters:
                 for pre_filter in self.pre_filters:
                     pre_filter.initialise(self.config)
 
-            self.estimator.initialise(self.config)
+            if self.estimator:
+                self.estimator.initialise(self.config)
 
             if self.post_filters:
                 for post_filter in self.post_filters:
@@ -123,6 +115,9 @@ class Assembler(ABC):
 
             if self.finaliser:
                 self.finaliser.initialise(self.config)
+
+            if self.visualiser:
+                self.visualiser.initialise(self.config)
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
             return False
@@ -145,6 +140,9 @@ class Assembler(ABC):
         This method doesn't return anything, instead results should be stored in the ``state``
         object passed in the parameters.
 
+        If the ``set_stages`` method has been used, then instead of normal pipeline execution, it will
+        instead execute the filters given in that method one by one.
+
         :param state: Data passed between each stage in the pipeline
         :type state: :class:`surround.State`
         :param is_training: Run the pipeline in training mode or not
@@ -152,22 +150,34 @@ class Assembler(ABC):
         """
 
         LOGGER.info("Starting '%s'", self.assembler_name)
+
+        no_stages = not self.estimator and not self.pre_filters and not self.post_filters
+        no_stages = no_stages and not self.validator and not self.finaliser and not self.visualiser
+        no_stages = no_stages and not self.stages
+        if no_stages:
+            LOGGER.warning("There are no stages to run!")
+
         if not state:
             raise ValueError("state is required to run an assembler")
         self.state = state
-        try:
-            self.validator.validate(self.state, self.config)
 
-            if self.state.errors:
-                LOGGER.error("Error while validating")
-                LOGGER.error(self.state.errors)
-            else:
-                self.__run_pipeline(is_training)
-        except Exception:
-            LOGGER.exception("Failed running Assembler")
-        finally:
-            if self.finaliser:
-                self.finaliser.operate(state, self.config)
+        if self.stages:
+            self.__run_pipeline_stages()
+        else:
+            try:
+                if self.validator:
+                    self.__execute_validator(state)
+
+                if self.state.errors:
+                    LOGGER.error("Error while validating")
+                    LOGGER.error(self.state.errors)
+                else:
+                    self.__run_pipeline(is_training)
+            except Exception:
+                LOGGER.exception("Failed running Assembler")
+            finally:
+                if self.finaliser:
+                    self.__execute_finaliser(state)
 
     def __run_pipeline(self, is_training):
         """
@@ -183,10 +193,11 @@ class Assembler(ABC):
                 LOGGER.error("Failed running Assembler")
                 return
 
-        if is_training:
-            self.__execute_fit(self.state)
-        else:
-            self.__execute_main(self.state)
+        if self.estimator:
+            if is_training:
+                self.__execute_fit(self.state)
+            else:
+                self.__execute_main(self.state)
 
         if self.state.errors:
             LOGGER.error("Errors during executing the estimator")
@@ -199,7 +210,74 @@ class Assembler(ABC):
                 return
 
         if (is_training or self.batch_mode) and self.visualiser:
-            self.visualiser.visualise(self.state, self.config)
+            self.__execute_visualiser(self.state)
+
+    def __run_pipeline_stages(self):
+        """
+        Executes the pipeline using the stages set to the assembler rather than the estimator workflow.
+        """
+
+        self.__execute_filters(self.stages, self.state)
+
+    def __execute_validator(self, state):
+        """
+        Executes the validator on the data provided.
+        Taking care of execution time tracking.
+
+        :param state: data being passed through the pipeline
+        :type state: :class:`surround.State`
+        """
+
+        stage_start = datetime.now()
+        self.validator.validate(state, self.config)
+
+        if self.config and self.config["surround"]["enable_stage_output_dump"]:
+            self.validator.dump_output(state, self.config)
+
+        # Calculate and log validator duration
+        stage_execution_time = datetime.now() - stage_start
+        state.stage_metadata.append({type(self.validator).__name__: str(stage_execution_time)})
+        LOGGER.info("Validator %s took %s secs", type(self.validator).__name__, stage_execution_time)
+
+    def __execute_finaliser(self, state):
+        """
+        Executes the finaliser on the data provided.
+        Taking care of execution time tracking.
+
+        :param state: data being passed through the pipeline
+        :type state: :class:`surround.State`
+        """
+
+        stage_start = datetime.now()
+        self.finaliser.operate(state, self.config)
+
+        if self.config and self.config["surround"]["enable_stage_output_dump"]:
+            self.finaliser.dump_output(state, self.config)
+
+        # Calculate and log validator duration
+        stage_execution_time = datetime.now() - stage_start
+        state.stage_metadata.append({type(self.finaliser).__name__: str(stage_execution_time)})
+        LOGGER.info("Finaliser %s took %s secs", type(self.finaliser).__name__, stage_execution_time)
+
+    def __execute_visualiser(self, state):
+        """
+        Executes the visualiser on the data provided.
+        Taking care of execution time tracking.
+
+        :param state: data being passed through the pipeline
+        :type state: :class:`surround.State`
+        """
+
+        stage_start = datetime.now()
+        self.visualiser.visualise(state, self.config)
+
+        if self.config and self.config["surround"]["enable_stage_output_dump"]:
+            self.visualiser.dump_output(state, self.config)
+
+        # Calculate and log validator duration
+        stage_execution_time = datetime.now() - stage_start
+        state.stage_metadata.append({type(self.visualiser).__name__: str(stage_execution_time)})
+        LOGGER.info("Visualiser %s took %s secs", type(self.visualiser).__name__, stage_execution_time)
 
     def __execute_filters(self, filters, state):
         """
@@ -278,7 +356,6 @@ class Assembler(ABC):
         state.stage_metadata.append({type(self.estimator).__name__: str(main_execution_time)})
         LOGGER.info("Estimator %s took %s secs", type(self.estimator).__name__, main_execution_time)
 
-
     def __execute_fit(self, state):
         """
         Executes the :meth:`surround.stage.Estimator.fit` method (used for training mode),
@@ -327,6 +404,8 @@ class Assembler(ABC):
         else:
             self.set_config(Config())
 
+        return self
+
     def set_config(self, config):
         """
         Set the configuration data to be used during pipeline execution.
@@ -341,7 +420,48 @@ class Assembler(ABC):
             raise TypeError("config should be of class Config")
         self.config = config
 
-    def set_estimator(self, estimator=None, pre_filters=None, post_filters=None):
+        return self
+
+    def set_validator(self, validator):
+        """
+        Set the validator that will be executed before any other stage in the pipeline.
+        The purpose of the validator is to check the contents of the state object to ensure
+        it is valid for use in the pipeline.
+
+        .. note:: Should be called before :meth:`surround.assembler.Assembler.init_assembler`.
+
+        :param validator: the validator to be used for this pipeline
+        :type validator: :class:`surround.stage.Validator`
+        """
+
+        if not isinstance(validator, Validator):
+            raise ValueError("validator must be of class Validator")
+
+        self.validator = validator
+
+        return self
+
+    def set_stages(self, stages):
+        """
+        Set the stages to be executed one after the other in the pipeline.
+
+        .. note:: This cannot be used when the estimator has been set!
+
+        :param stages: list of stages to execute
+        :type stages: list of :class:`surround.stage.Filter`
+        """
+
+        if self.estimator:
+            raise Exception("Cannot set stages when there is an estimator present!")
+
+        if not isinstance(stages, list) or not all([isinstance(x, Filter) for x in stages]):
+            raise ValueError("stages must be a list of Filter's only!")
+
+        self.stages = stages
+
+        return self
+
+    def set_estimator(self, estimator, pre_filters=None, post_filters=None):
         """
         Set the estimator that should be used during pipeline execution and any filters (if required).
 
@@ -355,6 +475,9 @@ class Assembler(ABC):
         :type post_filters: :class:`list` of :class:`surround.stage.Filter`
         """
 
+        if self.stages:
+            raise Exception("Cannot set an estimator when their are stages present!")
+
         # Estimator is required
         if estimator is None:
             raise ValueError("estimator is not provided")
@@ -365,14 +488,48 @@ class Assembler(ABC):
         if pre_filters:
             for pre_filter in pre_filters:
                 if not isinstance(pre_filter, Filter):
-                    raise TypeError("Prefilter should be of class Filter")
+                    raise TypeError("Pre-filter should be of class Filter")
         self.pre_filters = pre_filters
 
         if post_filters:
             for post_filter in post_filters:
                 if not isinstance(post_filter, Filter):
-                    raise TypeError("post_filter should be of class Filter")
+                    raise TypeError("Post-filter should be of class Filter")
         self.post_filters = post_filters
+
+        return self
+
+    def set_pre_filters(self, pre_filters):
+        """
+        Set the filters that will be executed (in order) before the estimator in the pipeline.
+
+        :param pre_filters: the filters
+        :type: pre_filters: :class:`list` of :class:`surround.stage.Filter`
+        """
+
+        for pre_filter in pre_filters:
+            if not isinstance(pre_filter, Filter):
+                raise TypeError("Pre-filter should be of class Filter")
+
+        self.pre_filters = pre_filters
+
+        return self
+
+    def set_post_filters(self, post_filters):
+        """
+        Set the filters that will be executed (in order) after the estimator in the pipeline.
+
+        :param post_filters: the filters
+        :type post_filters: :class:`list` of :class:`surround.stage.Filter`
+        """
+
+        for post_filter in post_filters:
+            if not isinstance(post_filter, Filter):
+                raise TypeError("Post-filter should be of class Filter")
+
+        self.post_filters = post_filters
+
+        return self
 
     def set_visualiser(self, visualiser):
         """
@@ -390,6 +547,8 @@ class Assembler(ABC):
             raise TypeError("visualiser should be of class Visualiser")
         self.visualiser = visualiser
 
+        return self
+
     def set_finaliser(self, finaliser):
         """
         Set the final stage that will be executed no matter how the pipeline runs.
@@ -403,3 +562,5 @@ class Assembler(ABC):
         if not finaliser and not isinstance(finaliser, Filter):
             raise TypeError("finaliser should be of class Filter")
         self.finaliser = finaliser
+
+        return self

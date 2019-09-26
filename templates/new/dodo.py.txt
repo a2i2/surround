@@ -10,22 +10,40 @@ DOIT_CONFIG = {{'verbosity':2}}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
+PARAMS = [
+    {{
+        'name': 'args',
+        'long': 'args',
+        'type': str,
+        'default': ""
+    }}
+]
+
+def task_status():
+    """Show information about the project such as available runners and assemblers"""
+    return {{
+        'actions': ["%s -m %s --status" % (sys.executable, PACKAGE_PATH)]
+    }}
+
 def task_build():
     """Build the Docker image for the current project"""
     return {{
-        'actions': ['docker build --tag=%s .' % IMAGE]
+        'actions': ['docker build --tag=%s .' % IMAGE],
+        'params': PARAMS
     }}
 
 def task_remove():
     """Remove the Docker image for the current project"""
     return {{
-        'actions': ['docker rmi %s -f' % IMAGE]
+        'actions': ['docker rmi %s -f' % IMAGE],
+        'params': PARAMS
     }}
 
 def task_dev():
     """Run the main task for the project"""
     return {{
-        'actions': ["docker run --volume \"%s/\":/app %s python3 -m %s" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH)]
+        'actions': ["docker run --volume \"%s/\":/app %s python3 -m %s %s" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH, "%(args)s")],
+        'params': PARAMS
     }}
 
 def task_interactive():
@@ -41,8 +59,9 @@ def task_interactive():
 def task_prod():
     """Run the main task inside a Docker container for use in production """
     return {{
-        'actions': ["docker run %s python3 -m %s" % (IMAGE, PACKAGE_PATH)],
-        'task_dep': ["build"]
+        'actions': ["docker run %s python3 -m %s %s" % (IMAGE, PACKAGE_PATH, "%(args)s")],
+        'task_dep': ["build"],
+        'params': PARAMS
     }}
 
 def task_train():
@@ -51,7 +70,8 @@ def task_train():
     data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train" % (output_path, data_path, IMAGE)]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train %s" % (output_path, data_path, IMAGE, "%(args)s")],
+        'params': PARAMS
     }}
 
 def task_batch():
@@ -60,22 +80,26 @@ def task_batch():
     data_path = CONFIG["volume_path"] + "/input"
 
     return {{
-        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch" % (output_path, data_path, IMAGE)]
+        'actions': ["docker run --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch %s" % (output_path, data_path, IMAGE, "%(args)s")],
+        'params': PARAMS
     }}
 
 def task_train_local():
     """Run training mode locally"""
     return {{
         'basename': 'trainLocal',
-        'actions': ["%s -m %s --mode train" % (sys.executable, PACKAGE_PATH)]
+        'actions': ["%s -m %s --mode train %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'params': PARAMS
     }}
 
 def task_batch_local():
     """Run batch mode locally"""
     return {{
         'basename': 'batchLocal',
-        'actions': ["%s -m %s --mode batch" % (sys.executable, PACKAGE_PATH)]
+        'actions': ["%s -m %s --mode batch %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'params': PARAMS
     }}
+
 
 def task_jupyter():
     command = "pip install -r /app/requirements.txt; mkdir /etc/ipython; echo \"c.InteractiveShellApp.extensions.append('autoreload')\nc.InteractiveShellApp.exec_lines = ['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']\" > /etc/ipython/ipython_config.py; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"

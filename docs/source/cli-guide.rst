@@ -26,17 +26,31 @@ Initialize a new Surround project.
 run
 ^^^
 
-Run a Surround project task, witout an argument all tasks will be shown.
+Run a Surround project assembler and task.
 
-Tasks are defined in the ``dodo.py`` file of the current project.
-The default tasks that come with every project are:
+Without any arguments, all tasks will be listed.
+
+Assemblers are defined in the ``__main__.py`` file of the current project. The default assembler that comes
+with every project is called ``baseline``.
+
+Tasks are defined in the ``dodo.py`` file of the current project. Each project comes with a set of default tasks listed below.
+
+**Containerised Tasks**:
 
 - ``build`` - Build a Docker image for your Surround project.
-- ``dev`` - Run the Docker image with the current source code (via drive mount).
-- ``prod`` - Build and run the Docker image (no drive mounting).
-- ``batch`` - Run the Docker image (no drive mounting) in batch mode.
-- ``train`` - Run the Docker image (no drive mounting) in train mode.
+- ``dev`` - Run the specified assembler in a Docker container with the current source code (via drive mount, no build neccessary).
+- ``prod`` - Build the Docker image and run the specified assembler inside a container (no drive mounting).
+- ``batch`` - Run the specified assembler in a Docker container (mounting ``input`` and ``output`` folders) set to batch mode.
+- ``train`` - Run the specified assembler in a Docker container (mounting ``input`` and ``output`` folders) set to train mode.
+- ``web`` - Serve the specified assembler via HTTP endpoints inside a Docker container.
 - ``remove`` - Remove the Docker image built for this project (if any).
+- ``jupyter`` - Run a jupyter notebook server in a Docker container (mounting the whole project).
+
+**Local Tasks**:
+
+- ``batchLocal`` - Run the specified assembler locally set to batch-predict mode.
+- ``trainLocal`` - Run the specified assembler locally set to train mode.
+- ``webLocal`` - Serve the specified assembler via HTTP endpoints locally. 
 
 .. argparse::
     :module: surround.cli
@@ -56,3 +70,33 @@ For more information on what this does, see :ref:`linter`.
     :func: execute_cli
     :prog: surround
     :path: lint
+
+split
+^^^^^
+
+Tool to randomly split data into test, train, and validation sets.
+
+Supports splitting:
+
+- Directory of files
+- CSV files
+- Text files (just ensure you use the ``--no-header`` flag)
+
+Example - Split a directory of images into train/test/validate::
+
+    $ surround split -d images -e png
+
+Example - Reset a split directory::
+
+    $ surround spit --reset images
+
+Example - Splitting and resetting a CSV file::
+
+    $ surround split -t test.csv
+    $ surround split --reset .
+
+.. argparse::
+    :module: surround.cli
+    :func: execute_cli
+    :prog: surround
+    :path: split

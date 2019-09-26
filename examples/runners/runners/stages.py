@@ -4,7 +4,7 @@ from surround import Validator, Estimator, State
 class AssemblyState(State):
     input_data = None
     output_data = ""
-
+    lines = []
 
 class InputValidator(Validator):
     def validate(self, state, config):

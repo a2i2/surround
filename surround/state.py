@@ -49,7 +49,7 @@ class State(Frozen):
     Stores the data to be passed between each stage in a pipeline.
     Each stage is responsible for setting the attributes to this class.
 
-    Formerly know as ``State``.
+    Formerly know as ``SurroundData``.
 
     **Attributes:**
 
@@ -78,7 +78,9 @@ class State(Frozen):
         class Predict(Estimator):
             # Do prediction here
 
-        pipeline = Assembler("Example", ValidationStage(), Predict())
+        pipeline = Assembler("Example")
+                    .set_validator(ValidationStage())
+                    .set_estimator(Predict())
         pipeline.init_assembler()
 
         data = PipelineData("received data")

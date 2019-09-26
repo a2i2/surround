@@ -57,12 +57,16 @@ For example during project generation, the following structure is used::
     ├── README.md
     ├── data
     ├── package name
+    │   ├── stages
+    │   │   ├── __init__.py
+    │   │   ├── input_validator.py
+    │   │   ├── baseline.py
+    │   │   └── assembler_state.py
     │   ├── __init__.py
     │   ├── __main__.py
     │   ├── web_runner.py
-    │   ├── batch_runner.py
-    │   ├── config.yaml
-    │   └── stages.py
+    │   ├── file_system_runner.py
+    │   └── config.yaml
     ├── docs
     ├── dodo.py
     ├── models
@@ -288,8 +292,8 @@ Example configuration file::
 
 .. _data:
 
-Data
-^^^^
+State
+^^^^^
 
 Every time an :ref:`assembler` is ran, it requires an object that will be used to store the input data and eventually store 
 the output. Passed between stages during execution, it can also be used to store any intermediate data between stages. 

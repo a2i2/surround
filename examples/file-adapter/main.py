@@ -2,24 +2,25 @@ import logging
 import os
 import csv
 
-from surround import Estimator, State, Assembler, Validator, Config, Runner
+from surround import Estimator, State, Assembler, Validator, Config, Runner, RunMode
 
 prefix = ""
 
 class MainRunner(Runner):
-    def run(self, is_training=False):
-        self.assembler.init_assembler()
-        data = AssemblerState()
+
+    def load_data(self, mode, config):
+        state = AssemblerState()
         input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
 
         with open(input_path) as csv_file:
-            content = csv.DictReader(csv_file, delimiter=',', quotechar='"')
-            # pylint: disable=unused-variable
-            for i, row in enumerate(content):
-                data.active_row = row
-                self.assembler.run(data)
+            state.rows = csv.DictReader(csv_file, delimiter=',', quotechar='"')
+            state.rows = [row for row in state.rows]
 
-        self.save_result(data, self.assembler.config)
+        return state
+
+    def run(self, mode=RunMode.BATCH_PREDICT):
+        super().run(mode)
+        self.save_result(self.assembler.state, self.assembler.config)
 
     def save_result(self, state, config):
         output_path = prefix + config.get_path("Surround.Loader.output")
@@ -34,18 +35,19 @@ class MainRunner(Runner):
 
 class CSVValidator(Validator):
     def validate(self, state, config):
-        if not state.active_row:
-            raise ValueError("'active_row' is empty")
+        if not state.rows:
+            raise ValueError("'rows' is empty")
 
 
 class ProcessCSV(Estimator):
     def estimate(self, state, config):
-        state.word_count = len(state.active_row['Consumer complaint narrative'].split())
+        for row in state.rows:
+            state.word_count = len(row['Consumer complaint narrative'].split())
 
-        if config and config.get_path("ProcessCSV.include_company"):
-            state.company = state.active_row['Company']
+            if config and config.get_path("ProcessCSV.include_company"):
+                state.company = row['Company']
 
-        state.outputs.append((state.word_count, state.company))
+            state.outputs.append((state.word_count, state.company))
 
     def fit(self, state, config):
         print("No training implemented")
@@ -53,10 +55,11 @@ class ProcessCSV(Estimator):
 
 class AssemblerState(State):
     outputs = []
+    rows = []
     row = None
     word_count = None
     company = None
-
+    csv_file = None
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -67,5 +70,6 @@ if __name__ == "__main__":
 
     app_config = Config()
     app_config.read_config_files([prefix + "config.yaml"])
-    assembler = Assembler("Loader example", CSVValidator(), ProcessCSV(), app_config)
+    assembler = Assembler("Loader example").set_validator(CSVValidator()).set_estimator(ProcessCSV()).set_config(app_config)
+
     MainRunner(assembler).run()

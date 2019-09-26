@@ -50,7 +50,8 @@ if __name__ == "__main__":
 
     app_config = Config()
     app_config.read_config_files([path + "/config.yaml"])
-    assembler = Assembler("Dump output example", InputValidator())
+    assembler = Assembler("Dump output example")
+    assembler.set_validator(InputValidator())
     assembler.set_config(app_config)
     assembler.set_estimator(WriteWorld(path), [WriteHello(path)])
     assembler.run(AssemblerState())

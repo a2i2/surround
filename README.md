@@ -29,7 +29,6 @@ $ pip3 install surround
 
 A short explanation is provided in the hello-world example's [README](examples/hello-world/) file.
 ```python
-from surround import Stage, State, Surround
 import logging
 from surround import State, Validator, Estimator, Assembler
 
@@ -75,7 +74,7 @@ Where a new folder in `path-to-dir` (current directory if left blank) will be cr
 ### Running projects
 You can then test the genereated pipeline using the `run` sub-command in the root of the project like so:
 ```
-$ surround run batch_local
+$ surround run batchLocal
 ```
 
 This will execute the pipeline locally in batch mode. If you want to run the pipeline in a container then use the following:
