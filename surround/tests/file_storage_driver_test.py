@@ -22,10 +22,6 @@ class FileStorageDriverTest(unittest.TestCase):
         shutil.rmtree("test_remote")
         shutil.rmtree("temp")
 
-    def test_invalid_path(self):
-        with self.assertRaises(OSError):
-            FileStorageDriver("adj#k:?jdl")
-
     def test_location_create(self):
         FileStorageDriver("test_remote/another_remote")
         self.assertTrue(os.path.exists("test_remote/another_remote"))
