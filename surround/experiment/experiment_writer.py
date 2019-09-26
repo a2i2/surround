@@ -148,8 +148,11 @@ class ExperimentWriter:
         project_root = self.current_experiment['project_root']
         path = "experimentation/%s/experiments/%s/" % (self.current_experiment['project_name'], self.current_experiment['time_started'])
 
-        # Push the logs captured to the experiment folder and delete locally
-        self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'))
+        # Push the logs captured to the experiment folder
+        if os.path.exists(os.path.join(project_root, 'log.txt')):
+            self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'))
+        else:
+            self.storage.push(path + "log.txt", bytes_data=" ".encode('utf-8'))
 
         # Update the project metadata file
         self.__update_project_meta(self.current_experiment['project_name'])
