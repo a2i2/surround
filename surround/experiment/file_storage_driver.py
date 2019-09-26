@@ -15,7 +15,7 @@ class FileStorageDriver(StorageDriver):
 
         if local_path:
             if not override_ok and os.path.exists(local_path):
-                raise Exception("File already exists at pull location!")
+                raise FileExistsError("File already exists at pull location!")
 
             os.makedirs(os.path.dirname(local_path), exist_ok=True)
             shutil.copyfile(path, local_path)
@@ -72,6 +72,6 @@ class FileStorageDriver(StorageDriver):
 
         for root, _, files in os.walk(path):
             for f in files:
-                results.append(os.path.join(root, f))
+                results.append(os.path.relpath(os.path.join(root, f), path))
 
         return results
