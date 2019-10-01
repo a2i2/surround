@@ -1,0 +1,6 @@
+output:
+  text: Hello World
+
+image: temp
+company: yourcompany
+version: latest
