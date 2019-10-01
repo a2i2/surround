@@ -13,10 +13,13 @@ class ViewLogs(tornado.web.RequestHandler):
         if not project_name or not start_time:
             self.redirect("./", permanent=True)
 
+        projects = self.experiment_reader.get_projects()
         project = self.experiment_reader.get_project(project_name)
         experiment = self.experiment_reader.get_experiment(project_name, start_time)
 
         log_files = self.experiment_reader.get_experiment_files(project_name, start_time, base_url="logs")
+        if not log_files:
+            log_files = []
 
         logs = []
         for log_file in log_files:
@@ -35,4 +38,4 @@ class ViewLogs(tornado.web.RequestHandler):
                 'message': msg
             })
 
-        self.render(os.path.join(os.path.dirname(__file__), "view_logs.html"), project=project, experiment=experiment, logs=logs)
+        self.render(os.path.join(os.path.dirname(__file__), "view_logs.html"), projects=projects, project=project, experiment=experiment, logs=logs)

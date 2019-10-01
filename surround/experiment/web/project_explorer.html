@@ -1,33 +1,79 @@
+<!DOCTYPE html>
 <html>
     <head>
-        <title>Project Explorer | Surround Experimentation</title>
-        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        {% include style.html %}
-
-        <style>
-            .project-explorer-btn {
-                background-color: deepskyblue;
-            }
-
-            .project-explorer-btn>a {
-                color: white;
-            }
-        </style>
+        <title>Project Explorer | Surround Experimentation</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     </head>
-
     <body>
-        {% include menu.html %}
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="./">
+                    <img src="https://github.com/a2i2/surround/raw/master/docs/source/temp_logo_hq.png" width="112" height="28">
+                </a>
+            
+                <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+              
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="./">
+                        Project Explorer
+                    </a>
+              
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            Experiment Explorer
+                        </a>
+              
+                        <div class="navbar-dropdown">
+                            {% for p in projects %}
+                                <a class="navbar-item" href="./experiment?project_name={{p['project_name']}}">
+                                    {{p['project_name']}}
+                                </a>
+                            {% end %}
+                        </div>
+                    </div>
 
-        <div id="body">
-            <h1>Project Explorer</h1>
-            <table class="pure-table pure-table-horizontal">
+                    <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link">
+                                Other Links
+                            </a>
+                    
+                            <div class="navbar-dropdown">
+                                <a class="navbar-item" href="https://surround.readthedocs.io">
+                                    Documentation
+                                </a>
+                                <a class="navbar-item" href="https://github.com/a2i2/surround">
+                                    GitHub
+                                </a>
+                            </div>
+                    </div>
+                </div>
+              
+                <div class="navbar-end">
+                    
+                </div>
+            </div>
+        </nav>
+
+        <hr class="hr" style="margin-top: 0"/>
+
+        <div class="container">
+            <h1 class="title">Project Explorer</h1>
+
+            <table class="table is-hoverable is-fullwidth">
                 <thead>
                     <tr>
-                        <td>Name</td>
-                        <td>Description</td>
-                        <td>Last updated</td>
+                        <th>Project Name</th>
+                        <th>Description</th>
+                        <th>Last updated</th>
                     </tr>
                 </thead>
                 <tbody>
