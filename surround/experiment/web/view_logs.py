@@ -26,7 +26,7 @@ class ViewLogs(tornado.web.RequestHandler):
             timestamp = log_file[:26]
             log = self.experiment_reader.pull_experiment_file(project_name, start_time, "logs/%s" % log_file)
 
-            log = re.match(r"^([A-Z]+):([a-z_\.]+):(.*)$", log.decode('utf-8'))
+            log = re.compile(r"^([A-Z]+):([a-z_\.]+):(.*)", re.DOTALL).match(log.decode('utf-8'))
             level = log.group(1)
             package = log.group(2)
             msg = log.group(3)
