@@ -26,26 +26,6 @@
 
                 <hr class="hr" />
 
-                <h2 class="title is-4">Parameters</h2>
-                <table class="table is-hoverable is-fullwidth is-striped">
-                    <thead>
-                        <tr>
-                            <th>Key</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{% for key, value in config.get_dict().items() %}}
-                        <tr>
-                            <td>{{{{key}}}}</td>
-                            <td>{{{{str(value)}}}}</td>
-                        </tr>
-                        {{% end %}}
-                    </tbody>
-                </table>
-
-                <hr class="hr" />
-
                 <h2 class="title is-4">Metrics</h2>
                 <table class="table is-hoverable is-fullwidth is-striped">
                     <thead>
@@ -59,6 +39,26 @@
                         <tr>
                             <td>{{{{m_key}}}}</td>
                             <td>{{{{str(m_value)}}}}</td>
+                        </tr>
+                        {{% end %}}
+                    </tbody>
+                </table>
+
+                <hr class="hr" />
+
+                <h2 class="title is-4">Config</h2>
+                <table class="table is-hoverable is-fullwidth is-striped">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{% for key, value in config.get_dict().items() %}}
+                        <tr>
+                            <td>{{{{key}}}}</td>
+                            <td>{{{{str(value)}}}}</td>
                         </tr>
                         {{% end %}}
                     </tbody>
