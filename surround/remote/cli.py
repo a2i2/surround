@@ -177,6 +177,7 @@ def add_remote(remote_parser, parsed_args):
                 actual_current_dir = os.getcwd()
                 os.chdir(get_project_root_from_current_dir())
                 write_remote_config(parsed_args, remote_parser, ".surround/config.yaml")
+                os.makedirs(parsed_args.name, exist_ok=True)
                 os.chdir(actual_current_dir)
             else:
                 print("error: not a surround project")
