@@ -133,9 +133,9 @@ class CheckMetadata(DataLinterStage):
                 self.log_error("Missing required field '%s'!" % field)
             elif prop_value is not None and not isinstance(prop_value, typ):
                 self.log_error("Expected value type %s for field %s, got %s instead!" % (typ, field, type(prop_value)))
-            elif sub_schema is not None and typ == list:
+            elif sub_schema is not None and typ == list and prop_value is not None:
                 self.check_list(sub_schema, prop_value)
-            elif sub_schema is not None and typ == dict:
+            elif sub_schema is not None and typ == dict and prop_value is not None:
                 self.check_dictionary(sub_schema, prop_value)
 
     def check_list(self, schema, elements):
@@ -168,9 +168,9 @@ class CheckMetadata(DataLinterStage):
                 self.log_error("Missing required field '%s'!" % field)
             elif prop_value is not None and not isinstance(prop_value, typ):
                 self.log_error("Expected value type %s for field %s, got %s instead!" % (typ, field, type(prop_value)))
-            elif sub_schema is not None and typ == list:
+            elif sub_schema is not None and typ == list and prop_value is not None:
                 self.check_list(sub_schema, prop_value)
-            elif sub_schema is not None and typ == dict:
+            elif sub_schema is not None and typ == dict and prop_value is not None:
                 self.check_dictionary(sub_schema, prop_value)
 
         if not self.errors:
