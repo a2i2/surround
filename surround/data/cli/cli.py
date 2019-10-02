@@ -28,7 +28,7 @@ def get_data_parser():
 
     return parser
 
-def execute_data_tool(parser, args):
+def execute_data_tool(parser, args, extra_args):
     """
     Executes the data container tool using the parser and arguments provided.
 
@@ -57,7 +57,7 @@ def main():
     parser = get_data_parser()
     args = parser.parse_args()
 
-    execute_data_tool(parser, args)
+    execute_data_tool(parser, args, [])
 
 if __name__ == "__main__":
     main()
