@@ -61,17 +61,16 @@ class ExperimentReaderTest(unittest.TestCase):
 
         self.assertIsInstance(projects, list)
 
+        expected_names = ["test_project", "test_project_two"]
+        expected_descs = ["test_description", "test_description_2"]
+
         for proj in projects:
             self.assertIn("project_name", proj)
             self.assertIn("project_description", proj)
             self.assertIn("last_time_updated", proj)
+            self.assertIn(proj['project_name'], expected_names)
+            self.assertIn(proj['project_description'], expected_descs)
             self.assertRegex(proj['last_time_updated'], r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}$")
-
-        self.assertEqual("test_project", projects[0]["project_name"])
-        self.assertEqual("test_description", projects[0]["project_description"])
-
-        self.assertEqual("test_project_two", projects[1]["project_name"])
-        self.assertEqual("test_description_2", projects[1]["project_description"])
 
     def test_get_project(self):
         reader = ExperimentReader(storage_url="temporary/experiments", storage_driver=FileStorageDriver)
