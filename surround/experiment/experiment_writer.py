@@ -226,14 +226,12 @@ class ExperimentWriter:
         return hash_zip(export_path)
 
     def __get_previous_model_hash(self, project_name):
-        remote_files = self.storage.get_files()
-        cache_files = [path for path in remote_files if os.path.basename(os.path.dirname(path)) == "cache" and os.path.splitext(path)[1] == ".zip" and project_name in path]
+        cache_files = self.storage.get_files(base_url="experimentation/%s/cache" % project_name)
 
         if cache_files:
-            # FORMAT: .../cache/models-YYYY-MM-DDTHH-MM-HH-MODEL_HASH_HERE.zip
-            dates = [(os.path.basename(path)[26:-4], os.path.basename(path)[6:25]) for path in cache_files]
+            # FORMAT: model-YYYY-MM-DDTHH-MM-SS-MMMMMM-MODEL_HASH_HERE.zip
+            dates = [(path[33:-4], path[6:32]) for path in cache_files]
             dates = [(hash_str, datetime.datetime.strptime(time_str, DATETIME_FORMAT_STR)) for hash_str, time_str in dates]
-
             last_model_hash, _ = max(dates, key=lambda x: x[1])
 
             return last_model_hash
