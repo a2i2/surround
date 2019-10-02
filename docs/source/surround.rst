@@ -23,7 +23,7 @@ Assembler
         .. automodule:: surround  
  
     State                              
-    ^^^^^^^^^^^^   
+    ^^^^^   
                 
     .. autoclass:: surround.State        
         :members:                   
@@ -63,4 +63,16 @@ Assembler
 Runner
 =======
 .. autoclass:: surround.runners.Runner  
+    :members:
+
+Data Container
+==============
+
+.. autoclass:: surround.data.container.DataContainer
+    :members:
+
+Metadata
+========
+
+.. autoclass:: surround.data.metadata.Metadata
     :members:
