@@ -53,6 +53,26 @@ def get_project_root(current_directory):
             return current_directory
         current_directory = parent_directory
 
+def add_store_parser(sub_parser):
+    """
+    Adds a sub-parser for the main "store" sub-command to the parser provided.
+
+    :param sub_parser: the parser to add to
+    :type sub_parser: <class 'argparse.ArgumentParser'>
+    :return: the parser added
+    :rtype: <class 'argparse.ArgumentParser'>
+    """
+
+    store_parser = sub_parser.add_parser('store', help="Data remote storage tool")
+    sub_parser = store_parser.add_subparsers(dest='sub_command', description="Must be called with one of the following commands")
+
+    add_remote_parser(sub_parser)
+    add_pull_parser(sub_parser)
+    add_push_parser(sub_parser)
+    add_list_parser(sub_parser)
+
+    return store_parser
+
 def add_remote_parser(sub_parser):
     """
     Adds a sub-parser for the "remote" sub-command to the parser provided.
@@ -183,6 +203,28 @@ def print_remote_info(parsed_args, remotes):
                     print(key)
     else:
         print("info: no remote found")
+
+def parse_store_args(remote_parser, parsed_args):
+    """
+    Executes the main "store" command, which in-turn executes one of the sub-commands
+    or shows help if no sub-command is specified.
+
+    :param remote_parser: the parser
+    :type remote_parser: <class 'argparse.ArgumentParser'>
+    :param parsed_args: the arguments parsed from user input
+    :type parsed_args: <class 'argparse.Namespace'>
+    """
+
+    if parsed_args.sub_command == "remote":
+        parse_remote_args(remote_parser, parsed_args)
+    elif parsed_args.sub_command == "pull":
+        parse_pull_args(parsed_args)
+    elif parsed_args.sub_command == "push":
+        parse_push_args(parsed_args)
+    elif parsed_args.sub_command == "list":
+        parse_list_args(parsed_args)
+    else:
+        remote_parser.print_help()
 
 def parse_remote_args(remote_parser, parsed_args):
     """
