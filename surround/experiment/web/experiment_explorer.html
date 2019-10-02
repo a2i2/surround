@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <title>Experiment Explorer | Surround Experimentation</title>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        {% include style.html %}
+    </head>
+
+    <body>
+        {% include menu.html %}
+        
+        <div id="body">
+                <a href="./">&lt;&lt; Go back to Project Explorer</a>
+
+            <h1>Experiment Explorer: {{project['project_name']}}</h1>
+            <table class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <td>Timestamp</td>
+                        <td>Status</td>
+                        <td>Author</td>
+                        <td>Notes</td>
+                        <td>Completion Time</td>
+                        <td>Actions</td>
+
+                        {% for metric_name in metric_names %}
+                            <td>{{metric_name}}</td>
+                        {% end %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exp in experiments %}
+                    <tr>
+                            <td><a href="./results?project_name={{project['project_name']}}&experiment={{exp['execution_info']['start_time']}}">{{exp['execution_info']['start_time']}}</a></td>
+                            {% if exp['results'] %}
+                                <td>Compete</td>
+                            {% else %}
+                                <td>Running</td>
+                            {% end %}
+                            <td>{{exp['execution_info']['author']['name']}}</td>
+                            <td>{% raw "<br />".join(exp['execution_info']['notes']) %}</td>
+                            {% if exp['results'] %}
+                                <td>{{exp['results']['end_time']}}</td>
+                            {% else %}
+                                <td>N/A</td>
+                            {% end %}
+
+                            <td><a href="./view_logs?project_name={{project['project_name']}}&experiment={{exp['execution_info']['start_time']}}">View Logs</a></td>
+
+                            {% for metric_name in metric_names %}
+                                {% if exp['results'] and metric_name in exp['results']['metrics'] %}
+                                    <td>{{str(exp['results']['metrics'][metric_name])}}</td>
+                                {% else %}
+                                    <td>N/A</td>    
+                                {% end %}
+                            {% end %}
+                    </tr>
+                    {% end %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

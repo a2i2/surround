@@ -12,6 +12,7 @@ from .split import cli as split_cli
 from .visualise import cli as visualise_cli
 from .data.cli import cli as data_cli
 from .configuration import cli as config_cli
+from .experiment.web import cli as experiment_cli
 from .linter import Linter
 from .project import PROJECTS
 
@@ -227,7 +228,7 @@ def load_class_from_name(modulename, classname):
 
     return cls
 
-def parse_lint_args(args):
+def parse_lint_args(parser, args, extra_args):
     """
     Executes the "lint" sub-command which will run the Surround Linter
     on the current project.
@@ -249,7 +250,7 @@ def parse_lint_args(args):
         if not errors and not warnings:
             print("All checks passed")
 
-def parse_run_args(args, extra_args):
+def parse_run_args(parser, args, extra_args):
     """
     Executes the "run" sub-command which will run the surround pipeline
     as a local app or a web app (depending on the arguments provided).
@@ -304,7 +305,7 @@ def run_locally(args, extra_args):
     run_process.wait()
 
 # pylint: disable=too-many-branches
-def parse_init_args(args):
+def parse_init_args(parser, args, extra_args):
     """
     Executes the "init" sub-command which creates a new project folder with
     the name and description provided in the current directory.
@@ -348,37 +349,6 @@ def parse_init_args(args):
             print("error: directory %s already exists" % new_dir)
     else:
         print("error: permission denied")
-
-def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, data_parser, config_parser, tool, extra_args):
-    """
-    Executes the tool/sub-command requested by the user via the CLI passing parsed arguments.
-
-    :param parsed_args: the arguments parsed by the argparse module from sys.argv
-    :type parsed_args: <class 'argparse.Namespace'>
-    :param remote_parser: the argument parser for the remote CLI
-    :type remote_parser: <class 'argparse.ArgumentParser'>
-    :param data_parser: the argument parser for the data container CLI
-    :type data_parser: <class 'argparse.ArgumentParser'>
-    :param tool: the name of the sub-command being used
-    :type tool: str
-    """
-
-    if tool == "lint":
-        parse_lint_args(parsed_args)
-    elif tool == "run":
-        parse_run_args(parsed_args, extra_args)
-    elif tool == 'split':
-        split_cli.execute_split_tool(split_parser, parsed_args)
-    elif tool == "viz":
-        visualise_cli.execute_visualise_tool(visualise_parser, parsed_args)
-    elif tool == "data":
-        data_cli.execute_data_tool(data_parser, parsed_args)
-    elif tool == "store":
-        remote_cli.parse_store_args(remote_parser, parsed_args)
-    elif tool == "config":
-        config_cli.execute_tool(config_parser, parsed_args)
-    else:
-        parse_init_args(parsed_args)
 
 def print_version():
     """
@@ -426,13 +396,27 @@ def execute_cli():
     remote_parser = remote_cli.add_store_parser(sub_parser)
 
     config_parser = sub_parser.add_parser('config', parents=[config_cli.get_parser()], add_help=False, help="Configure global/local configuration properties")
+    experiment_parser = sub_parser.add_parser('experimentation', parents=[experiment_cli.get_parser()], add_help=False, help="Start experimentation platform")
     split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
     visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
     data_parser = sub_parser.add_parser('data', parents=[data_cli.get_data_parser()], help="Surround Data Container Tool", add_help=False)
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["config", "init", "lint", "run", "store", "split", "viz", "data"]
+    # Tuple format: (tool_parser, func(parser, args, extra_args))
+    # Where extra_args are arguments parsed but not known to argparse
+    tools = {
+        "config": (config_parser, config_cli.execute_tool),
+        "init": (init_parser, parse_init_args),
+        "lint": (linter_parser, parse_lint_args),
+        "run": (run_parser, parse_run_args),
+        "store": (remote_parser, remote_cli.parse_store_args),
+        "split": (split_parser, split_cli.execute_split_tool),
+        "viz": (visualise_parser, visualise_cli.execute_visualise_tool),
+        "experimentation": (experiment_parser, experiment_cli.execute_tool),
+        "data": (data_parser, data_cli.execute_data_tool)
+    }
+
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -444,7 +428,9 @@ def execute_cli():
         else:
             tool = sys.argv[1]
             parsed_args, extra_args = parser.parse_known_args()
-            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, data_parser, config_parser, tool, extra_args)
+            tool_parser, tool_func = tools[tool]
+
+            tool_func(tool_parser, parsed_args, extra_args)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 

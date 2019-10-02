@@ -1,0 +1,40 @@
+<html>
+    <head>
+        <title>View Logs | Surround Experimentation</title>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% include style.html %}
+    </head>
+
+    <body>
+        {% include menu.html %}
+        
+        <div id="body">
+            <a href="./experiment?project_name={{project['project_name']}}">&lt;&lt; Go back to Experiment Explorer</a>
+            <h1>View Logs</h1>
+            <p>Project Name: {{project['project_name']}}</p>
+            <p>Experiment: {{experiment['execution_info']['start_time']}}</p>
+            <table class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <td>Timestamp</td>
+                        <td>Level</td>
+                        <td>Package</td>
+                        <td>Message</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{log['timestamp']}}</td>
+                        <td>{{log['level']}}</td>
+                        <td>{{log['package']}}</td>
+                        <td>{{log['message']}}</td>
+                    </tr>
+                    {% end %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

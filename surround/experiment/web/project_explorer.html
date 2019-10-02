@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>Project Explorer | Surround Experimentation</title>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% include style.html %}
+
+        <style>
+            .project-explorer-btn {
+                background-color: deepskyblue;
+            }
+
+            .project-explorer-btn>a {
+                color: white;
+            }
+        </style>
+    </head>
+
+    <body>
+        {% include menu.html %}
+
+        <div id="body">
+            <h1>Project Explorer</h1>
+            <table class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Description</td>
+                        <td>Last updated</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td><a href="./experiment?project_name={{project['project_name']}}">{{project['project_name']}}</a></td>
+                            <td>{{project['project_description']}}</td>
+                            <td>{{project['last_time_updated']}}</td>
+                        </tr>
+                    {% end %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

@@ -83,7 +83,7 @@ def update_required_fields(config, config_path, answers=None, verbose=True):
         if verbose:
             print("info: successfully updated the global configuration!")
 
-def execute_tool(parser, args):
+def execute_tool(parser, args, extra_args):
     if not args.local:
         # Get the global configuration path (in ~/.surround/config.yaml)
         config_path = os.path.join(str(Path.home()), ".surround", "config.yaml")

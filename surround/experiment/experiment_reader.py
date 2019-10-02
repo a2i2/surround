@@ -86,11 +86,14 @@ class ExperimentReader:
                 else:
                     result_obj = None
 
-                log = self.storage.pull(path + execution_info["start_time"] + "/log.txt").decode('utf-8')
+                if self.storage.exists(path + execution_info["start_time"] + "/log.txt"):
+                    log = self.storage.pull(path + execution_info["start_time"] + "/log.txt").decode('utf-8')
+                else:
+                    log = []
 
                 results.append({
                     'execution_info': execution_info,
-                    'logs': [l.rstrip() for l in log.split("\n")],
+                    'logs': [l.rstrip() for l in log.split("\n")] if log else [],
                     'results': result_obj
                 })
 
@@ -107,8 +110,11 @@ class ExperimentReader:
         execution_info = self.storage.pull(path + "execution_info.json").decode('utf-8')
         execution_info = json.loads(execution_info)
 
-        logs = self.storage.pull(path + "log.txt").decode('utf-8')
-        logs = [l.rstrip() for l in logs.rstrip().split("\n")]
+        if self.storage.exists(path + "log.txt"):
+            logs = self.storage.pull(path + "log.txt").decode('utf-8')
+            logs = [l.rstrip() for l in logs.rstrip().split("\n")]
+        else:
+            logs = []
 
         if self.storage.exists(path + "results.json"):
             results = self.storage.pull(path + "results.json").decode('utf-8')
@@ -122,11 +128,16 @@ class ExperimentReader:
             'results': results
         }
 
-    def get_experiment_files(self, project_name, experiment_date):
+    def get_experiment_files(self, project_name, experiment_date, base_url=None):
         if not self.has_experiment(project_name, experiment_date):
             return None
 
-        return self.storage.get_files(base_url="experimentation/%s/experiments/%s" % (project_name, experiment_date))
+        url = "experimentation/%s/experiments/%s" % (project_name, experiment_date)
+
+        if base_url:
+            url = "%s/%s" % (url, base_url)
+
+        return self.storage.get_files(base_url=url)
 
     def get_project_cache(self, project_name):
         if not self.storage.exists("experimentation/%s/cache" % project_name):

@@ -166,7 +166,7 @@ def is_directory_split_file(directory):
     # The directory is from a split file if there is one file name across both train and test sets
     return len(unique_values) == 1
 
-def execute_split_tool(parser, args):
+def execute_split_tool(parser, args, extra_args):
     """
     Execute the split command-line tool using arguments parsed from the user.
 
@@ -200,7 +200,7 @@ def main():
     parser = get_split_parser()
     args = parser.parse_args()
 
-    execute_split_tool(parser, args)
+    execute_split_tool(parser, args, [])
 
 if __name__ == "__main__":
     main()
