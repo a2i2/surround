@@ -6,6 +6,102 @@
         <title>Experiment Explorer | Surround Experimentation</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
         <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+
+        <script>
+            function showDeleteAreYouSure(button) {
+                if (button.hasAttribute("disabled"))
+                    return;
+
+                let dialog = document.getElementById("deleteAreYouSure");
+
+                if (!dialog.classList.contains("is-active"))
+                    dialog.classList.add("is-active");
+            }
+
+            function hideDeleteAreYouSure() {
+                let dialog = document.getElementById("deleteAreYouSure");
+                if (dialog.classList.contains("is-active"))
+                    dialog.classList.remove("is-active");
+            }
+
+            function onCheckboxChange() {
+                let table = document.getElementById("experiments");
+                let buttons = document.getElementsByClassName("exp-select-required");
+                
+                for (let i = 1; i < table.rows.length; i++) {
+                    let selected = table.rows[i].classList.contains("is-selected");
+                
+                    if (selected) {
+                        for (let j = 0; j < buttons.length; j++) {
+                            buttons[j].removeAttribute("disabled");
+                        }
+                        return;
+                    }
+                }
+
+                for (let j = 0; j < buttons.length; j++) {
+                    buttons[j].setAttribute("disabled", "");
+                }
+            }
+
+            function selectAllExperiments() {
+                let table = document.getElementById("experiments");
+                
+                let allSelected = true;
+                for (let i = 1; i < table.rows.length; i++) {
+                   allSelected = allSelected && table.rows[i].classList.contains("is-selected");
+                }
+
+                for (let i = 1; i < table.rows.length; i++) {
+                    if (allSelected)
+                        table.rows[i].classList.remove("is-selected");
+                    else
+                        table.rows[i].classList.add("is-selected");
+                }
+
+                onCheckboxChange();
+            }
+
+            function selectExperiment(obj) {
+                if (obj.classList.contains("is-selected"))
+                    obj.classList.remove("is-selected");
+                else
+                    obj.classList.add("is-selected");
+
+                onCheckboxChange();
+            }
+
+            function deleteSelectedExperiments() {
+                let table = document.getElementById("experiments");
+                let deleteButton = document.getElementById("deleteLink");
+
+                if (deleteButton.classList.contains("is-loading"))
+                    return;
+
+                let selected = [];
+                for (var i = 1; i < table.rows.length; i++) {
+                    if (table.rows[i].classList.contains("is-selected"))
+                        selected.push(table.rows[i].cells[0].childNodes[0].innerHTML)
+                }
+
+                if (selected.length > 0) {
+                    deleteButton.classList.add("is-loading");
+
+                    let request = new XMLHttpRequest();
+                    request.onreadystatechange = function() {
+                        if (request.readyState == 4) {
+                            location.reload();
+                        }
+                    }
+                    request.open("POST", window.location.origin + "/delete", true);
+                    request.setRequestHeader("Content-Type", "application/json");
+                    request.send(JSON.stringify({
+                        projectName: "{{project['project_name']}}",
+                        experiments: selected
+                    }));
+                }
+            }
+        </script>
     </head>
     <body>
         {% include menu.html %}
@@ -14,7 +110,18 @@
             <h1 class="title">Experiment Explorer</h1>
             <p class="subtitle">{{project['project_name']}}: {{project['project_description']}}</p>
 
-            <table class="table is-hoverable is-fullwidth">
+            <div class="level" style="margin-bottom: 5px">
+                <div class="level-left">
+                    <div class="level-item">
+                        <a class="button is-primary" onclick="selectAllExperiments()">Select All</a>
+                    </div>
+                    <div class="level-item">
+                        <a class="button is-danger exp-select-required" onclick="showDeleteAreYouSure(this)" disabled>Delete</a>
+                    </div>
+                </div>
+            </div>
+
+            <table id="experiments" class="table is-hoverable is-fullwidth">
                 <thead>
                     <tr>
                         <th>Timestamp</th>
@@ -30,7 +137,7 @@
                 </thead>
                 <tbody>
                     {% for exp in experiments %}
-                    <tr>
+                    <tr onclick="selectExperiment(this)" style="cursor: pointer;">
                             <td><a href="./results?project_name={{project['project_name']}}&experiment={{exp['execution_info']['start_time']}}">{{exp['execution_info']['start_time']}}</a></td>
                             {% if exp['results'] %}
                                 <td>Compete</td>
@@ -58,6 +165,23 @@
                     {% end %}
                 </tbody>
             </table>
+        </div>
+
+        <div id="deleteAreYouSure" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Are you sure?</p>
+                    <button class="delete" aria-label="close" onclick="hideDeleteAreYouSure()"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p>This will delete <strong>all</strong> of the experiment's data!<br />This <strong>cannot</strong> be undone!</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <a class="button is-danger" id="deleteLink" onclick="deleteSelectedExperiments()" href=".">Yes, delete!</a>
+                    <a class="button" onclick="hideDeleteAreYouSure()">Wait stop, go back</a>
+                </footer>
+            </div>
         </div>
     </body>
 </html>

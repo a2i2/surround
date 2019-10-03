@@ -64,6 +64,10 @@ class ExperimentWriter:
         if self.storage.exists('experimentation/' + project_name):
             self.storage.delete('experimentation/' + project_name)
 
+    def remove_experiment(self, project_name, experiment):
+        if self.storage.exists('experimentation/%s/experiments/%s' % (project_name, experiment)):
+            self.storage.delete('experimentation/%s/experiments/%s' % (project_name, experiment))
+
     def start_experiment(self, project_name, project_root, args=None, notes=None):
         if self.current_experiment:
             raise Exception("There is already an experiment in progress!")
