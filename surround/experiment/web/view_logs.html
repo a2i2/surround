@@ -16,12 +16,12 @@
                 <a href="./experiment?project_name={{project['project_name']}}">{{project['project_name']}}</a>: {{experiment['execution_info']['start_time']}}
             </p>
 
-            <table class="table is-hoverable is-fullwidth is-striped">
+            <table id="logs" class="table is-hoverable is-fullwidth" style="table-layout: fixed">
                 <thead>
                     <tr>
-                        <th>Timestamp</th>
-                        <th>Level</th>
-                        <th>Package</th>
+                        <th style="width: 250px">Timestamp</th>
+                        <th style="width: 80px">Level</th>
+                        <th style="width: 250px">Package</th>
                         <th>Message</th>
                     </tr>
                 </thead>
