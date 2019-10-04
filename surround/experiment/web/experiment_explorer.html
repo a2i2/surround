@@ -8,18 +8,86 @@
         <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 
         <script>
-            function showDeleteAreYouSure(button) {
-                if (button.hasAttribute("disabled"))
+            function showEditDialog(sender) {
+                if (sender.hasAttribute("disabled"))
+                    return;
+                
+                let projectName = "{{project['project_name']}}";
+                let table = document.getElementById("experiments");
+                
+                var experiment = null;
+                for (var i = 1; i < table.rows.length; i++) {
+                    if (table.rows[i].classList.contains("is-selected"))
+                        experiment = table.rows[i].cells[0].childNodes[0].innerHTML;
+                }
+
+                if (experiment == null)
                     return;
 
-                let dialog = document.getElementById("deleteAreYouSure");
+                var request = new XMLHttpRequest();
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4) {
+                        let textArea = document.getElementById("editTextArea");
+                        textArea.value = request.response;
 
+                        showDialog("editDialog", sender);
+                    }
+                }
+                request.open("GET", window.location.origin + "/notes?project_name=" + projectName + "&experiment=" + experiment, true);
+                request.send();
+            }
+
+            function saveEdits() {
+                var newChanges = document.getElementById("editTextArea").value;
+                newChanges = newChanges.split("\n")
+
+                let saveButton = document.getElementById("saveEditLink");
+
+                if (saveButton.classList.contains("is-loading"))
+                    return;
+                else
+                    saveButton.classList.add("is-loading");
+
+                let table = document.getElementById("experiments");
+                var experimentDate = null;
+                for (var i = 1; i < table.rows.length; i++) {
+                    if (table.rows[i].classList.contains("is-selected"))
+                        experimentDate = table.rows[i].cells[0].childNodes[0].innerHTML;
+                }
+
+                if (experimentDate == null)
+                    return;
+
+                let body = {
+                    projectName: "{{project['project_name']}}",
+                    experiment: experimentDate,
+                    notes: newChanges
+                };
+
+                let request = new XMLHttpRequest();
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4) {
+                        location.reload();
+                    }
+                }
+                request.open("POST", window.location.origin + "/notes", true);
+                request.setRequestHeader("Content-Type", "application/json");
+                request.send(JSON.stringify(body));
+            }
+
+            function showDialog(dialogId, sender) {
+                if (sender.hasAttribute("disabled"))
+                    return;
+
+                let dialog = document.getElementById(dialogId);
+                
                 if (!dialog.classList.contains("is-active"))
                     dialog.classList.add("is-active");
             }
 
-            function hideDeleteAreYouSure() {
-                let dialog = document.getElementById("deleteAreYouSure");
+            function hideDialog(dialogId) {
+                let dialog = document.getElementById(dialogId);
+                
                 if (dialog.classList.contains("is-active"))
                     dialog.classList.remove("is-active");
             }
@@ -28,19 +96,32 @@
                 let table = document.getElementById("experiments");
                 let buttons = document.getElementsByClassName("exp-select-required");
                 
+                var count = 0;
+
                 for (let i = 1; i < table.rows.length; i++) {
                     let selected = table.rows[i].classList.contains("is-selected");
                 
-                    if (selected) {
-                        for (let j = 0; j < buttons.length; j++) {
-                            buttons[j].removeAttribute("disabled");
-                        }
-                        return;
-                    }
+                    if (selected) 
+                        count++;
                 }
 
-                for (let j = 0; j < buttons.length; j++) {
-                    buttons[j].setAttribute("disabled", "");
+                if (count == 1) {
+                    for (let i = 0; i < buttons.length; i++) {
+                        buttons[i].removeAttribute("disabled");
+                    }
+                }
+                else if (count > 1) {
+                    for (let i = 0; i < buttons.length; i++) {
+                        if (buttons[i].classList.contains("exp-select-multiple"))
+                            buttons[i].removeAttribute("disabled");
+                        else
+                            buttons[i].setAttribute("disabled", "");
+                    }
+                } 
+                else {
+                    for (let i = 0; i < buttons.length; i++) {
+                        buttons[i].setAttribute("disabled", "");
+                    }
                 }
             }
 
@@ -116,7 +197,10 @@
                         <a class="button is-primary" onclick="selectAllExperiments()">Select All</a>
                     </div>
                     <div class="level-item">
-                        <a class="button is-danger exp-select-required" onclick="showDeleteAreYouSure(this)" disabled>Delete</a>
+                        <a class="button is-info exp-select-required" onclick="showEditDialog(this)" disabled>Edit Notes</a>
+                    </div>
+                    <div class="level-item">
+                        <a class="button is-danger exp-select-required exp-select-multiple" onclick="showDialog('deleteAreYouSure', this)" disabled>Delete</a>
                     </div>
                 </div>
             </div>
@@ -172,14 +256,30 @@
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">Are you sure?</p>
-                    <button class="delete" aria-label="close" onclick="hideDeleteAreYouSure()"></button>
+                    <button class="delete" aria-label="close" onclick="hideDialog('deleteAreYouSure')"></button>
                 </header>
                 <section class="modal-card-body">
                     <p>This will delete <strong>all</strong> of the experiment's data!<br />This <strong>cannot</strong> be undone!</p>
                 </section>
                 <footer class="modal-card-foot">
                     <a class="button is-danger" id="deleteLink" onclick="deleteSelectedExperiments()" href=".">Yes, delete!</a>
-                    <a class="button" onclick="hideDeleteAreYouSure()">Wait stop, go back</a>
+                    <a class="button" onclick="hideDialog('deleteAreYouSure')">Wait stop, go back</a>
+                </footer>
+            </div>
+        </div>
+        <div id="editDialog" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Edit Notes</p>
+                    <button class="delete" aria-label="close" onclick="hideDialog('editDialog')"></button>
+                </header>
+                <section class="modal-card-body">
+                    <textarea class="textarea" id="editTextArea"></textarea>
+                </section>
+                <footer class="modal-card-foot">
+                    <a class="button is-primary" id="saveEditLink" onclick="saveEdits()">Save</a>
+                    <a class="button" onclick="hideDialog('editDialog')">Cancel</a>
                 </footer>
             </div>
         </div>
