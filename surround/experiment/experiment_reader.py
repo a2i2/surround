@@ -1,5 +1,8 @@
 import re
+import os
 import json
+import zipfile
+from io import BytesIO
 from .util import get_surround_config, get_driver_type_from_url
 
 class ExperimentReader:
@@ -158,3 +161,106 @@ class ExperimentReader:
             return None
 
         return self.storage.pull(path)
+
+    def pull_model(self, project_name, model_hash):
+        if not self.has_project(project_name):
+            return None
+
+        files = self.storage.get_files(base_url="experimentation/%s/cache" % project_name)
+        for f in files:
+            if re.match(r"^model.+" + model_hash + r"\.zip$", f):
+                return self.pull_cache_file(project_name, f)
+
+        return None
+
+    def replicate(self, project_name, experiment_date, file_path=None, zip_path=None, include_output=False):
+        path = "experimentation/%s/experiments/%s" % (project_name, experiment_date)
+
+        if not self.storage.exists(path):
+            return None
+
+        if file_path and zip_path:
+            raise ValueError("cannot specify both a zip and file export path")
+
+        if file_path:
+            return self.__replicate_file(project_name, experiment_date, path, file_path, include_output)
+
+        return self.__replicate_zip(project_name, experiment_date, zip_path, include_output)
+
+    def __replicate_file(self, project_name, experiment_date, experiment_path, export_path, include_output):
+        # Export the code package
+        self.storage.pull(experiment_path + "/code.zip", local_path=os.path.join(export_path, "code.zip"))
+        with zipfile.ZipFile(os.path.join(export_path, "code.zip"), "r") as f:
+            for code_file in f.namelist():
+                # Create any sub-directories
+                os.makedirs(os.path.join(export_path, os.path.dirname(code_file)), exist_ok=True)
+
+                with open(os.path.join(export_path, code_file), "wb+") as cf:
+                    cf.write(f.read(code_file))
+
+        os.remove(os.path.join(export_path, "code.zip"))
+
+        # Export the model used (if any)
+        execution_info = self.pull_experiment_file(project_name, experiment_date, "execution_info.json")
+        execution_info = json.loads(execution_info.decode("utf-8"))
+
+        if execution_info["model_hash"]:
+            model_zip = self.pull_model(project_name, execution_info['model_hash'])
+            model_zip = BytesIO(model_zip)
+
+            with zipfile.ZipFile(model_zip, "r") as f:
+                for name in f.namelist():
+                    # Create any sub-directories
+                    os.makedirs(os.path.dirname(os.path.join(export_path, name)), exist_ok=True)
+
+                    with open(os.path.join(export_path, name), "wb+") as ef:
+                        ef.write(f.read(name))
+
+        # Export the output (if requested)
+        if include_output and self.storage.exists(experiment_path + "/output"):
+            for f in self.storage.get_files(base_url=experiment_path + "/output"):
+                self.storage.pull(experiment_path + "/output/" + f, local_path=os.path.join(export_path, "output", f))
+
+        return export_path
+
+    def __replicate_zip(self, project_name, experiment_date, export_path, include_output):
+        output_zip = BytesIO()
+
+        with zipfile.ZipFile(output_zip, "w") as output:
+            # Import code package into the output zip
+            code_zip = self.pull_experiment_file(project_name, experiment_date, "code.zip")
+            code_zip = BytesIO(code_zip)
+
+            with zipfile.ZipFile(code_zip, "r") as f:
+                for name in f.namelist():
+                    output.writestr(name, f.read(name))
+
+            # Import the model used (if any)
+            execution_info = self.pull_experiment_file(project_name, experiment_date, "execution_info.json")
+            execution_info = json.loads(execution_info.decode("utf-8"))
+
+            if execution_info["model_hash"]:
+                model_zip = self.pull_model(project_name, execution_info['model_hash'])
+                model_zip = BytesIO(model_zip)
+
+                with zipfile.ZipFile(model_zip, "r") as f:
+                    for name in f.namelist():
+                        output.writestr(name, f.read(name))
+
+            # Import the output (if requested)
+            if include_output:
+                for f in self.get_experiment_files(project_name, experiment_date, "output"):
+                    data = self.pull_experiment_file(project_name, experiment_date, "output/" + f)
+                    output.writestr("output/" + f, data)
+
+        # Export the zip to a file (if an export path specified)
+        if export_path:
+            with open(export_path, "wb+") as f:
+                output_zip.seek(0)
+                f.write(output_zip.read())
+
+            return export_path
+
+        # Otherwise return the zip as a byte array
+        output_zip.seek(0)
+        return output_zip.read()
