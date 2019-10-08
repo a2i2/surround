@@ -8,6 +8,7 @@ from .results import Results
 from .delete import Delete
 from .view_logs import ViewLogs
 from .edit_notes import EditNotes
+from .download import Download
 
 class ExperimentApp(tornado.web.Application):
     def __init__(self, storage_url=None):
@@ -21,6 +22,7 @@ class ExperimentApp(tornado.web.Application):
             (r'/view_logs', ViewLogs, {'experiment_reader': reader}),
             (r'/delete', Delete, {'experiment_reader': reader, 'experiment_writer': writer}),
             (r'/notes', EditNotes, {'experiment_reader': reader, 'experiment_writer': writer}),
+            (r'/download', Download, {'experiment_reader': reader})
         ]
 
         tornado.web.Application.__init__(self, handlers)
