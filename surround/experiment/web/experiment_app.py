@@ -1,3 +1,4 @@
+import os
 import tornado.web
 
 from ..experiment_reader import ExperimentReader
@@ -22,7 +23,8 @@ class ExperimentApp(tornado.web.Application):
             (r'/view_logs', ViewLogs, {'experiment_reader': reader}),
             (r'/delete', Delete, {'experiment_reader': reader, 'experiment_writer': writer}),
             (r'/notes', EditNotes, {'experiment_reader': reader, 'experiment_writer': writer}),
-            (r'/download', Download, {'experiment_reader': reader})
+            (r'/download', Download, {'experiment_reader': reader}),
+            (r'/(favicon.ico)', tornado.web.StaticFileHandler, {"path": os.path.dirname(__file__)})
         ]
 
         tornado.web.Application.__init__(self, handlers)
