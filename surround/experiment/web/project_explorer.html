@@ -53,7 +53,12 @@
                             <td><a href="./experiment?project_name={{project['project_name']}}">{{project['project_name']}}</a></td>
                             <td>{{project['project_description']}}</td>
                             <td>{{project['last_time_updated']}}</td>
-                            <td><a class="button is-danger" onclick="deleteProject('{{project['project_name']}}')">Delete</a></td>
+                            <td>
+                                <a class="button is-danger" onclick="deleteProject('{{project['project_name']}}')">
+                                    <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                                    <span>Delete</span>
+                                </a>
+                            </td>
                         </tr>
                     {% end %}
                 </tbody>
@@ -71,7 +76,10 @@
                     <p>This will delete <strong>all</strong> of the experiments from the experiment storage!<br />This <strong>cannot</strong> be undone!</p>
                 </section>
                 <footer class="modal-card-foot">
-                    <a class="button is-danger" id="deleteLink" onclick="hideDeleteAreYouSure()" href=".">Yes, delete!</a>
+                    <a class="button is-danger" id="deleteLink" onclick="hideDeleteAreYouSure()" href=".">
+                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                        <span>Yes, delete!</span>
+                    </a>
                     <a class="button" onclick="hideDeleteAreYouSure()">Wait stop, go back</a>
                 </footer>
             </div>
