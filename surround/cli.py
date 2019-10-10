@@ -366,22 +366,14 @@ def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, 
         parse_lint_args(parsed_args)
     elif tool == "run":
         parse_run_args(parsed_args, extra_args)
-    elif tool == "remote":
-        remote_cli.parse_remote_args(remote_parser, parsed_args)
-    elif tool == "add":
-        remote_cli.parse_add_args(parsed_args)
-    elif tool == "pull":
-        remote_cli.parse_pull_args(parsed_args)
-    elif tool == "push":
-        remote_cli.parse_push_args(parsed_args)
-    elif tool == "list":
-        remote_cli.parse_list_args(parsed_args)
     elif tool == 'split':
         split_cli.execute_split_tool(split_parser, parsed_args)
     elif tool == "viz":
         visualise_cli.execute_visualise_tool(visualise_parser, parsed_args)
     elif tool == "data":
         data_cli.execute_data_tool(data_parser, parsed_args)
+    elif tool == "store":
+        remote_cli.parse_store_args(remote_parser, parsed_args)
     else:
         parse_init_args(parsed_args)
 
@@ -401,11 +393,11 @@ def execute_cli():
     - init - creates a new surround project
     - run - runs a task defined in the projects dodo.py file
     - lint - runs the surround linter on the current project (see linter.py)
-    - remote - intializes a new remote
-    - add - adds a specified file to the remote
-    - pull - pulls files from the remote
-    - push - pushes files to the remote
-    - list - lists files in a remote
+    - store remote - intializes a new remote
+    - store add - adds a specified file to the remote
+    - store pull - pulls files from the remote
+    - store push - pushes files to the remote
+    - store list - lists files in a remote
     - split - splits a directory/file into test/train/validate sets
     """
 
@@ -428,11 +420,7 @@ def execute_cli():
     linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
     linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
 
-    remote_parser = remote_cli.add_remote_parser(sub_parser)
-    remote_cli.create_add_parser(sub_parser)
-    remote_cli.add_pull_parser(sub_parser)
-    remote_cli.add_push_parser(sub_parser)
-    remote_cli.add_list_parser(sub_parser)
+    remote_parser = remote_cli.add_store_parser(sub_parser)
 
     split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
     visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
@@ -440,7 +428,7 @@ def execute_cli():
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "lint", "run", "remote", "add", "pull", "push", "list", "split", "viz", "data"]
+    tools = ["init", "lint", "run", "store", "split", "viz", "data"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()

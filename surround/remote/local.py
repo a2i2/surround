@@ -17,6 +17,7 @@ class Local(BaseRemote):
 
     def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
         path_to_remote_file = os.path.join(path_to_remote, relative_path_to_remote_file)
+        os.makedirs(os.path.dirname(path_to_local_file), exist_ok=True)
         copyfile(path_to_remote_file, path_to_local_file)
         return "info: " + key + " pulled successfully"
 
