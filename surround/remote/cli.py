@@ -221,9 +221,9 @@ def parse_store_args(remote_parser, parsed_args, extra_args):
     elif parsed_args.sub_command == "pull":
         parse_pull_args(parsed_args)
     elif parsed_args.sub_command == "push":
-        parse_push_args(parsed_args)
+        parse_push_args(remote_parser, parsed_args, extra_args)
     elif parsed_args.sub_command == "list":
-        parse_list_args(parsed_args)
+        parse_list_args(remote_parser, parsed_args, extra_args)
     else:
         remote_parser.print_help()
 
