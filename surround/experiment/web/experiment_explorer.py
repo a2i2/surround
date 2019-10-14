@@ -12,7 +12,7 @@ class ExperimentExplorer(tornado.web.RequestHandler):
             self.redirect("./", permanent=True)
 
         projects = self.experiment_reader.get_projects()
-        project = self.experiment_reader.get_project(project_name)
+        project = [proj for proj in projects if proj['project_name'] == project_name][0]
         experiments = self.experiment_reader.get_experiments(project_name)
         experiments = sorted(experiments, key=lambda x: x['execution_info']['start_time'], reverse=True)
 

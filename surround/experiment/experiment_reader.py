@@ -68,13 +68,11 @@ class ExperimentReader:
         return project_meta
 
     def get_experiments(self, project_name):
-        if not self.has_project(project_name):
-            return None
-
         results = []
         path = "experimentation/%s/experiments/" % project_name
-        if self.storage.exists(path):
-            experiment_files = self.storage.get_files(base_url=path)
+        experiment_files = self.storage.get_files(base_url=path)
+
+        if experiment_files:
             execution_files = [f for f in experiment_files if re.match(r"^[T0-9\-]+[/\\]{1,2}execution_info.json$", f)]
 
             execution_infos = []
@@ -84,15 +82,15 @@ class ExperimentReader:
                 execution_infos.append(info_obj)
 
             for execution_info in execution_infos:
-                if self.storage.exists(path + execution_info["start_time"] + "/results.json"):
+                try:
                     result_obj = self.storage.pull(path + execution_info["start_time"] + "/results.json")
                     result_obj = json.loads(result_obj.decode('utf-8'))
-                else:
+                except FileNotFoundError:
                     result_obj = None
 
-                if self.storage.exists(path + execution_info["start_time"] + "/log.txt"):
+                try:
                     log = self.storage.pull(path + execution_info["start_time"] + "/log.txt").decode('utf-8')
-                else:
+                except FileNotFoundError:
                     log = []
 
                 results.append({
