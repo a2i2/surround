@@ -3,7 +3,8 @@ import os
 import json
 import zipfile
 from io import BytesIO
-from .util import get_surround_config, get_driver_type_from_url
+from .util import get_surround_config
+from .drivers import get_driver_type_from_url
 
 class ExperimentReader:
     """

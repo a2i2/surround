@@ -5,7 +5,8 @@ import zipfile
 import logging
 import datetime
 
-from .util import hash_zip, get_driver_type_from_url, get_surround_config
+from .util import hash_zip, get_surround_config
+from .drivers import get_driver_type_from_url
 from .log_stream_handler import LogStreamHandler
 
 DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S-%f"

@@ -1,4 +1,5 @@
 import os
+import re
 import hashlib
 import zipfile
 import logging
@@ -6,20 +7,6 @@ import logging
 from pathlib import Path
 from ..config import Config
 from ..configuration import cli as config_cli
-from .file_storage_driver import FileStorageDriver
-
-def get_driver_type_from_url(url):
-    """
-    Return the storage driver type accoriding to the URL provided
-
-    :param url: the url to determine type from
-    :type url: str
-    :returns: the driver type
-    :rtype: type
-    """
-
-    return FileStorageDriver
-
 
 def get_surround_config():
     config = Config(auto_load=False)
@@ -79,3 +66,26 @@ def hash_zip(path, skip_files=None):
                     sha1.update(data)
 
     return sha1.hexdigest()
+
+def normalize_path(path):
+    path = path.replace('\\', '/')
+
+    # If not a file path, add / on the end (if there isn't one already)
+    if not re.match(r'^[A-Za-z0-9_\-/]+\.[A-Za-z0-9_\-/]+$', path):
+        if path[-1] != '/':
+            path += '/'
+
+    return path
+
+def join_path(self, path, *paths):
+    path = normalize_path(path)
+
+    for p in paths:
+        append_path = normalize_path(p)
+
+        if append_path[0] == "/":
+            append_path = append_path[1:]
+
+        path += append_path
+
+    return path
