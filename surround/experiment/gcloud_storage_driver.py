@@ -112,8 +112,7 @@ class GCloudStorageDriver(StorageDriver):
         return file_exists
 
     def get_files(self, base_url=None):
-        if base_url:
-            base_url = normalize_path(base_url)
+        base_url = normalize_path(base_url) if base_url else ''
 
         blobs = self.client.list_blobs(self.bucket, prefix=base_url)
         blobs = [blob.name[len(base_url):] for blob in blobs]
