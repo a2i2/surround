@@ -14,28 +14,28 @@ class ViewLogs(tornado.web.RequestHandler):
             self.redirect("./", permanent=True)
 
         projects = self.experiment_reader.get_projects()
-        project = self.experiment_reader.get_project(project_name)
+        project = [proj for proj in projects if proj['project_name'] == project_name][0]
         experiment = self.experiment_reader.get_experiment(project_name, start_time)
 
-        log_files = self.experiment_reader.get_experiment_files(project_name, start_time, base_url="logs")
-        if not log_files:
-            log_files = []
-
         logs = []
-        for log_file in log_files:
-            timestamp = log_file[:26]
-            log = self.experiment_reader.pull_experiment_file(project_name, start_time, "logs/%s" % log_file)
+        for log in experiment['logs']:
+            match = re.compile(r"^([0-9\- ]+):([A-Z]+):([a-z_\.]+):(.*)", re.DOTALL).match(log)
 
-            log = re.compile(r"^([A-Z]+):([a-z_\.]+):(.*)", re.DOTALL).match(log.decode('utf-8'))
-            level = log.group(1)
-            package = log.group(2)
-            msg = log.group(3)
+            # If fails to match regex, add to previous message
+            if not match and logs:
+                logs[-1]['message'] += "<br />" + log
+                continue
+
+            timestamp = match.group(1)
+            level = match.group(2)
+            package = match.group(3)
+            msg = match.group(4)
 
             logs.append({
                 'timestamp': timestamp,
                 'level': level,
                 'package': package,
-                'message': msg
+                'message': msg.replace('\n', '<br />')
             })
 
         self.render(os.path.join(os.path.dirname(__file__), "view_logs.html"), projects=projects, project=project, experiment=experiment, logs=logs)

@@ -14,8 +14,6 @@ class ExperimentReader:
             project.json
             experiments/
                 YYYY-MM-DDThh-mm-ss-mmmm/
-                    logs/
-                        ...
                     output/
                         ...
                     code.zip
@@ -149,10 +147,11 @@ class ExperimentReader:
 
     def pull_experiment_file(self, project_name, experiment_date, path):
         path = "experimentation/%s/experiments/%s/%s" % (project_name, experiment_date, path)
-        if not self.storage.exists(path):
-            return None
 
-        return self.storage.pull(path)
+        try:
+            return self.storage.pull(path)
+        except FileNotFoundError:
+            return None
 
     def pull_cache_file(self, project_name, path):
         path = "experimentation/%s/cache/%s" % (project_name, path)

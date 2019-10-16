@@ -12,13 +12,7 @@ class LogStreamHandler(Handler):
 
     def emit(self, record):
         msg = self.format(record)
-
-        # Push a new text file to the logs folder in the experiment folder
-        path = "experimentation/%s/experiments/%s/logs/%s_%i.txt" % (
-            self.experiment['project_name'],
-            self.experiment['time_started'],
-            datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f"),
-            self.count)
+        msg = "%s:%s" % (datetime.now().strftime("%Y-%m-%d %H-%M-%S-%f"), msg)
 
         # Append the log to a text file in the root of the project
         with open(os.path.join(self.experiment['project_root'], "log.txt"), "a+") as f:
@@ -28,8 +22,10 @@ class LogStreamHandler(Handler):
         root_logger = getLogger()
         root_logger.removeHandler(self)
 
-        self.storage.push(path, bytes_data=msg.encode('utf-8'))
-        self.count += 1
+        # Push the log file to experiment storage
+        self.storage.push(
+            "experimentation/%s/experiments/%s/log.txt" % (self.experiment['project_name'], self.experiment['time_started']),
+            local_path=os.path.join(self.experiment['project_root'], "log.txt"), override_ok=True)
 
         # Add us back to the root logger
         root_logger.addHandler(self)

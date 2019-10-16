@@ -19,8 +19,6 @@ class ExperimentWriter:
             project.json
             experiments/
                 YYYY-MM-DDThh-mm-ss-mmmm/
-                    logs/
-                        ...
                     output/
                         ...
                     code.zip
@@ -158,7 +156,7 @@ class ExperimentWriter:
 
         # Push the logs captured to the experiment folder
         if os.path.exists(os.path.join(project_root, 'log.txt')):
-            self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'))
+            self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'), override_ok=True)
         else:
             self.storage.push(path + "log.txt", bytes_data=" ".encode('utf-8'))
 

@@ -97,7 +97,7 @@
                         <td>{{log['timestamp']}}</td>
                         <td>{{log['level']}}</td>
                         <td>{{log['package']}}</td>
-                        <td>{{log['message']}}</td>
+                        <td>{% raw log['message'] %}</td>
                     </tr>
                     {% end %}
 
