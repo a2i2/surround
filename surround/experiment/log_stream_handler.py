@@ -1,5 +1,5 @@
 import os
-from logging import Handler, Formatter
+from logging import Handler, Formatter, getLogger
 from datetime import datetime
 
 class LogStreamHandler(Handler):
@@ -24,5 +24,12 @@ class LogStreamHandler(Handler):
         with open(os.path.join(self.experiment['project_root'], "log.txt"), "a+") as f:
             f.write("%s\n" % msg)
 
+        # Remove us from the logger (so we don't capture logs from the push operation)
+        root_logger = getLogger()
+        root_logger.removeHandler(self)
+
         self.storage.push(path, bytes_data=msg.encode('utf-8'))
         self.count += 1
+
+        # Add us back to the root logger
+        root_logger.addHandler(self)
