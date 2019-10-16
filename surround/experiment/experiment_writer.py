@@ -142,7 +142,7 @@ class ExperimentWriter:
 
         # Setup logging to go to both the console and file
         root_log = logging.getLogger()
-        root_log.setLevel(logging.DEBUG)
+        root_log.setLevel(logging.INFO)
         root_log.addHandler(self.current_experiment['log_file_handler'])
 
     def stop_experiment(self, metrics=None):
