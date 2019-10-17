@@ -10,6 +10,7 @@ from .delete import Delete
 from .view_logs import ViewLogs
 from .edit_notes import EditNotes
 from .download import Download
+from .getter_experiment import GetterExperiment
 
 class ExperimentApp(tornado.web.Application):
     def __init__(self, storage_url=None):
@@ -24,7 +25,8 @@ class ExperimentApp(tornado.web.Application):
             (r'/delete', Delete, {'experiment_reader': reader, 'experiment_writer': writer}),
             (r'/notes', EditNotes, {'experiment_reader': reader, 'experiment_writer': writer}),
             (r'/download', Download, {'experiment_reader': reader}),
-            (r'/(favicon.ico)', tornado.web.StaticFileHandler, {"path": os.path.dirname(__file__)})
+            (r'/(favicon.ico|[a-z_]+\.js)', tornado.web.StaticFileHandler, {"path": os.path.dirname(__file__)}),
+            (r'/getter/experiment', GetterExperiment, {'experiment_reader': reader})
         ]
 
         tornado.web.Application.__init__(self, handlers)

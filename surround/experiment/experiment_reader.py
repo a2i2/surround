@@ -65,6 +65,19 @@ class ExperimentReader:
 
         return project_meta
 
+    def list_projects(self):
+        files = self.storage.get_files("experimentation")
+        projects = {re.search(r"^([a-z_]+)[/\\]{1,2}", f).group(1) for f in files}
+
+        return list(projects)
+
+    def list_experiments(self, project_name):
+        path = "experimentation/%s/experiments/" % project_name
+        files = self.storage.get_files(base_url=path)
+        experiments = {re.search(r"^([0-9\-T]+)[/\\]{1,2}", f).group(1) for f in files}
+
+        return list(experiments)
+
     def get_experiments(self, project_name):
         results = []
         path = "experimentation/%s/experiments/" % project_name

@@ -7,5 +7,6 @@ class ProjectExplorer(tornado.web.RequestHandler):
 
     def get(self):
         projects = self.experiment_reader.get_projects()
+        project_names = [proj['project_name'] for proj in projects]
 
-        self.render(os.path.join(os.path.dirname(__file__), "project_explorer.html"), projects=projects)
+        self.render(os.path.join(os.path.dirname(__file__), "project_explorer.html"), project_names=project_names, projects=projects)

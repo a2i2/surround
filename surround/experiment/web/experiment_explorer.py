@@ -11,17 +11,10 @@ class ExperimentExplorer(tornado.web.RequestHandler):
         if not project_name:
             self.redirect("./", permanent=True)
 
-        projects = self.experiment_reader.get_projects()
-        project = [proj for proj in projects if proj['project_name'] == project_name][0]
-        experiments = self.experiment_reader.get_experiments(project_name)
-        experiments = sorted(experiments, key=lambda x: x['execution_info']['start_time'], reverse=True)
+        projects = self.experiment_reader.list_projects()
+        project = self.experiment_reader.get_project(project_name)
 
-        metric_names = []
-        for exp in experiments:
-            if exp["results"]:
-                metrics = exp["results"]["metrics"]
-                metric_names.extend(metrics.keys())
+        experiments = self.experiment_reader.list_experiments(project_name)
+        experiments = sorted(experiments, reverse=True)
 
-        metric_names = list({key for key in metric_names})
-
-        self.render(os.path.join(os.path.dirname(__file__), "experiment_explorer.html"), projects=projects, project=project, experiments=experiments, metric_names=metric_names)
+        self.render(os.path.join(os.path.dirname(__file__), "experiment_explorer.html"), project_names=projects, project=project, experiments=experiments)
