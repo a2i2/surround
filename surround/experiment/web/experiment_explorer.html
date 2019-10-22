@@ -76,6 +76,30 @@
                     {% end %}
                 </tbody>
             </table>
+            {% if len(pages) > 1 %}
+                <hr class="hr" />
+                <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                    {% if page - 1 > 0 %}
+                        <a class="pagination-previous" href="./experiment?project_name={{project['project_name']}}&page={{page - 1}}">Previous</a>
+                    {% end %}
+                    {% if page + 1 <= pages[-1] %}
+                        <a class="pagination-next" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">Next page</a>
+                    {% end %}
+                    <ul class="pagination-list">
+                        <li><a class="pagination-link" aria-label="Goto page {{pages[0]}}" href="./experiment?project_name={{project['project_name']}}">{{pages[0]}}</a></li>
+                        <li><span class="pagination-ellipsis">&hellip;</span></li>
+                        {% if page - 1 > 0 %}
+                            <li><a class="pagination-link" aria-label="Goto page {{page - 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 1}}">{{page - 1}}</a></li>
+                        {% end %}
+                        <li><a class="pagination-link is-current" aria-label="Page {{page}}" aria-current="page">{{page}}</a></li>
+                        {% if page + 1 <= pages[-1] %}
+                            <li><a class="pagination-link" aria-label="Goto page {{page + 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">{{page + 1}}</a></li>
+                        {% end %}
+                        <li><span class="pagination-ellipsis">&hellip;</span></li>
+                        <li><a class="pagination-link" aria-label="Goto page {{pages[-1]}}" href="./experiment?project_name={{project['project_name']}}&page={{pages[-1]}}">{{pages[-1]}}</a></li>
+                    </ul>
+                </nav>
+            {% end %}
         </div>
 
         <div id="deleteAreYouSure" class="modal">
