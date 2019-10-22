@@ -6,6 +6,7 @@ LOGGER = logging.getLogger(__name__)
 class StorageDriver(ABC):
     def __init__(self, url):
         self.url = url
+        self.is_cloud = False
 
     @abstractmethod
     def pull(self, remote_path, local_path=None, override_ok=False):

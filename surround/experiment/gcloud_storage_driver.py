@@ -11,6 +11,7 @@ from .util import get_surround_config, join_path, normalize_path
 class GCloudStorageDriver(StorageDriver):
     def __init__(self, url):
         super().__init__(url)
+        self.is_cloud = True
 
         config = get_surround_config()
         json_path = None
