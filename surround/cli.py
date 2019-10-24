@@ -11,6 +11,7 @@ from .remote import cli as remote_cli
 from .split import cli as split_cli
 from .visualise import cli as visualise_cli
 from .data.cli import cli as data_cli
+from .configuration import cli as config_cli
 from .linter import Linter
 from .project import PROJECTS
 
@@ -293,7 +294,7 @@ def run_locally(args, extra_args):
 
         if extra_args:
             run_args.append("--args")
-            run_args.append(" ".join(extra_args))
+            run_args.append(" ".join([arg if " " not in arg else "\"%s\"" % arg for arg in extra_args]))
     else:
         # No arguments provided, so list the tasks available
         print("Project tasks:")
@@ -348,7 +349,7 @@ def parse_init_args(args):
     else:
         print("error: permission denied")
 
-def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, data_parser, tool, extra_args):
+def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, data_parser, config_parser, tool, extra_args):
     """
     Executes the tool/sub-command requested by the user via the CLI passing parsed arguments.
 
@@ -374,6 +375,8 @@ def parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, 
         data_cli.execute_data_tool(data_parser, parsed_args)
     elif tool == "store":
         remote_cli.parse_store_args(remote_parser, parsed_args)
+    elif tool == "config":
+        config_cli.execute_tool(config_parser, parsed_args)
     else:
         parse_init_args(parsed_args)
 
@@ -422,13 +425,14 @@ def execute_cli():
 
     remote_parser = remote_cli.add_store_parser(sub_parser)
 
+    config_parser = sub_parser.add_parser('config', parents=[config_cli.get_parser()], add_help=False, help="Configure global/local configuration properties")
     split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
     visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
     data_parser = sub_parser.add_parser('data', parents=[data_cli.get_data_parser()], help="Surround Data Container Tool", add_help=False)
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
-    tools = ["init", "lint", "run", "store", "split", "viz", "data"]
+    tools = ["config", "init", "lint", "run", "store", "split", "viz", "data"]
     try:
         if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
             parser.print_help()
@@ -440,7 +444,7 @@ def execute_cli():
         else:
             tool = sys.argv[1]
             parsed_args, extra_args = parser.parse_known_args()
-            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, data_parser, tool, extra_args)
+            parse_tool_args(parsed_args, remote_parser, split_parser, visualise_parser, data_parser, config_parser, tool, extra_args)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
 

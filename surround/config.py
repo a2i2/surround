@@ -7,6 +7,7 @@ from pkg_resources import resource_stream
 
 import yaml
 
+from .util import generate_docker_volume_path
 from .project import PROJECTS
 
 ENV_VAR_PREFIX = "SURROUND_"
@@ -77,14 +78,7 @@ class Config(Mapping):
         if project_root:
             # Resolve absolute path
             project_root = str(Path(project_root).resolve())
-            volume_path = project_root
-
-            # If the system has a drive letter, set volume_path to /c/rest/of/path
-            split_path = os.path.splitdrive(project_root)
-            if split_path[0] != '':
-                drive_letter = split_path[0][0].lower()
-                path = split_path[1].replace('\\', '/')
-                volume_path = '/' + drive_letter + path
+            volume_path = generate_docker_volume_path(project_root)
 
             # Attempt to find package path by looking for config.yaml
             if not package_path:
@@ -164,8 +158,18 @@ class Config(Mapping):
         if not isinstance(path, str):
             raise TypeError("path should be a string")
         if not "." in path:
-            return self._storage[path]
+            return self._storage[path] if path in self._storage else None
         return self.__iterate_over_dict(self._storage, path.split("."))
+
+    def get_dict(self):
+        """
+        Returns the configuration data in a dictionary
+
+        :returns: dictionary of the configuration data
+        :rtype: dict
+        """
+
+        return self._storage
 
     def __find_package_path(self, project_root):
         """
