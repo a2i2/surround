@@ -4,3 +4,4 @@ pandas==0.25.2
 numpy==1.17.3
 tornado==6.0.2
 google-cloud-storage==1.20.0
+pylint==2.4.3
