@@ -43,5 +43,15 @@ class Linter():
         if extra_args:
             args.extend(extra_args)
 
+        disable_msgs = [
+            'missing-class-docstring',
+            'missing-function-docstring',
+            'abstract-method',
+            'attribute-defined-outside-init'
+        ]
+
+        for msg in disable_msgs:
+            args.append('--disable=%s' % msg)
+
         result = Run(args, do_exit=False)
         return result.linter.msg_status == 0
