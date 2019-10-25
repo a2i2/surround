@@ -1,3 +1,7 @@
+"""
+This module is responsible for serving the pipeline via HTTP endpoints.
+"""
+
 import json
 import logging
 import tornado.httpserver
@@ -5,7 +9,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from surround import Runner, RunMode
-from stages import AssemblerState
+from .stages import AssemblerState
 
 logging.basicConfig(level=logging.INFO)
 
@@ -56,4 +60,4 @@ class InfoHandler(tornado.web.RequestHandler):
         self.assembler = assembler
 
     def get(self):
-      self.write({{'version': '0.0.1'}})
+        self.write({{'version': '0.0.1'}})

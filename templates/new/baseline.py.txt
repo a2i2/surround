@@ -1,3 +1,7 @@
+"""
+This module defines the baseline estimator in the pipeline.
+"""
+
 import logging
 from surround import Estimator
 

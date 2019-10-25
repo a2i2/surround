@@ -1,3 +1,7 @@
+"""
+This module defines the tasks that can be executed using `surround run [task name]`
+"""
+
 import os
 import sys
 import subprocess
@@ -46,15 +50,35 @@ def task_remove():
 
 def task_dev():
     """Run the main task for the project"""
+    cmd = [
+        "docker",
+        "run",
+        "--volume",
+        "\"%s/\":/app" % CONFIG["volume_path"],
+        "%s" % IMAGE,
+        "python3 -m %s %s" % (PACKAGE_PATH, "%(args)s")
+    ]
     return {{
-        'actions': ["docker run --volume \"%s/\":/app %s python3 -m %s %s" % (CONFIG["volume_path"], IMAGE, PACKAGE_PATH, "%(args)s")],
+        'actions': [" ".join(cmd)],
         'params': PARAMS
     }}
 
 def task_interactive():
     """Run the Docker container in interactive mode"""
     def run():
-        process = subprocess.Popen(['docker', 'run', '-it', '--rm', '-w', '/app', '--volume', '%s/:/app' % CONFIG['volume_path'], IMAGE, 'bash'], encoding='utf-8')
+        cmd = [
+            'docker',
+            'run',
+            '-it',
+            '--rm',
+            '-w',
+            '/app',
+            '--volume',
+            '%s/:/app' % CONFIG['volume_path'],
+            IMAGE,
+            'bash'
+        ]
+        process = subprocess.Popen(cmd, encoding='utf-8')
         process.wait()
 
     return {{
@@ -79,19 +103,29 @@ def task_train():
     # Inject user's name and email into the env variables of the container
     user_name = global_config.get_path("user.name")
     user_email = global_config.get_path("user.email")
-    experiment_args = "-e \"SURROUND_USER_NAME=%s\" -e \"SURROUND_USER_EMAIL=%s\"" % (user_name, user_email)
+    experiment_args = "-e \"SURROUND_USER_NAME=%s\" " % user_name
+    experiment_args += "-e \"SURROUND_USER_EMAIL=%s\"" % user_email
 
     experiment_path = os.path.join(str(Path.home()), ".experiments")
     experiment_volume_path = generate_docker_volume_path(experiment_path)
 
     # Ensure experiments will work if using a local storage location (not in the cloud)
     if os.path.join(experiment_path, "local") == global_config.get_path("experiment.url"):
-        experiment_args += " --volume \"%s\":/experiments -e \"SURROUND_EXPERIMENT_URL=/experiments/local\"" % experiment_volume_path
+        experiment_args += " --volume \"%s\":/experiments " % experiment_volume_path
+        experiment_args += "-e \"SURROUND_EXPERIMENT_URL=/experiments/local\""
     else:
         experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % global_config.get_path("experiment.url")
 
+    cmd = [
+        "docker run %s" % experiment_args,
+        "--volume \"%s\":/app/output" % output_path,
+        "--volume \"%s\":/app/input" % data_path,
+        IMAGE,
+        "python3 -m {project_name} --mode train --experiment %(args)s"
+    ]
+
     return {{
-        'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
+        'actions': [" ".join(cmd)],
         'params': PARAMS
     }}
 
@@ -105,58 +139,110 @@ def task_batch():
     # Inject user's name and email into the env variables of the container
     user_name = global_config.get_path("user.name")
     user_email = global_config.get_path("user.email")
-    experiment_args = "-e \"SURROUND_USER_NAME=%s\" -e \"SURROUND_USER_EMAIL=%s\"" % (user_name, user_email)
+    experiment_args = "-e \"SURROUND_USER_NAME=%s\" " % user_name
+    experiment_args += "-e \"SURROUND_USER_EMAIL=%s\"" % user_email
 
     experiment_path = os.path.join(str(Path.home()), ".experiments")
     experiment_volume_path = generate_docker_volume_path(experiment_path)
 
     # Ensure experiments will work if using a local storage location (not in the cloud)
     if os.path.join(experiment_path, "local") == global_config.get_path("experiment.url"):
-        experiment_args += " --volume \"%s\":/experiments -e \"SURROUND_EXPERIMENT_URL=/experiments/local\"" % experiment_volume_path
+        experiment_args += " --volume \"%s\":/experiments " % experiment_volume_path
+        experiment_args += "-e \"SURROUND_EXPERIMENT_URL=/experiments/local\""
     else:
         experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % global_config.get_path("experiment.url")
 
+    cmd = [
+        "docker run %s" % experiment_args,
+        "--volume \"%s\":/app/output" % output_path,
+        "--volume \"%s\":/app/input" % data_path,
+        IMAGE,
+        "python3 -m {project_name} --mode batch %(args)s"
+    ]
+
     return {{
-        'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
+        'actions': [" ".join(cmd)],
         'params': PARAMS
     }}
 
 def task_train_local():
     """Run training mode locally"""
+    cmd = [
+        sys.executable,
+        "-m %s" % PACKAGE_PATH,
+        "--mode train",
+        "%(args)s"
+    ]
+
     return {{
         'basename': 'trainLocal',
-        'actions': ["%s -m %s --mode train %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'actions': [" ".join(cmd)],
         'params': PARAMS
     }}
 
 def task_batch_local():
     """Run batch mode locally"""
+    cmd = [
+        sys.executable,
+        "-m %s" % PACKAGE_PATH,
+        "--mode batch",
+        "%(args)s"
+    ]
+
     return {{
         'basename': 'batchLocal',
-        'actions': ["%s -m %s --mode batch %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'actions': [" ".join(cmd)],
         'params': PARAMS
     }}
 
 def task_jupyter():
-    command = "pip install -r /app/requirements.txt; mkdir /etc/ipython; echo \"c.InteractiveShellApp.extensions.append('autoreload')\nc.InteractiveShellApp.exec_lines = ['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']\" > /etc/ipython/ipython_config.py; /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
-    
+    # Allow for auto reload to be enabled and import modules from project package
+    ipython_config = "c.InteractiveShellApp.extensions.append('autoreload')\n"
+    ipython_config += "c.InteractiveShellApp.exec_lines = "
+    ipython_config += "['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']"
+
+    # Build the command for running jupyter
+    command = [
+        "pip install -r /app/requirements.txt",
+        "mkdir /etc/ipython",
+        "echo \"%s\" > /etc/ipython/ipython_config.py" % ipython_config,
+        "/usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
+    ]
+    command = "; ".join(command)
+
     def run_command():
-        process = subprocess.Popen([
-            "docker", 
-            "run",
-            "--rm",
-            "--name", "{project_name}_surround_notebook",
-            "--volume", "%s:/app" % CONFIG['volume_path'], 
-            "-p", "55910:8888",
-            "--user", "root",
-            "-w", "/app",
-            "jupyter/base-notebook:307ad2bb5fce", 
-            "bash",  "-c", command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+        process = subprocess.Popen(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "--name",
+                "{project_name}_surround_notebook",
+                "--volume",
+                "%s:/app" % CONFIG['volume_path'],
+                "-p",
+                "55910:8888",
+                "--user",
+                "root",
+                "-w",
+                "/app",
+                "jupyter/base-notebook:307ad2bb5fce",
+                "bash",
+                "-c",
+                command
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding='utf-8')
 
         print("Starting jupyter notbook server...\n")
-        
+
         # Get the IP address of the container, otherwise use localhost
-        ip_process = subprocess.Popen(['docker-machine', 'ip'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+        ip_process = subprocess.Popen(
+            ['docker-machine', 'ip'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding='utf-8')
         ip_process.wait()
 
         ip_output = ip_process.stdout.readline().rstrip()
@@ -168,14 +254,22 @@ def task_jupyter():
 
         # Wait for the notebook server to be up before loading browser
         while True:
-            line = process.stderr.readline().rstrip() 
+            line = process.stderr.readline().rstrip()
             if line and 'Serving notebooks from local directory' in line:
                 break
-            elif process.poll():
+
+            if process.poll():
                 print("Failed to start the server, check if its not running somewhere else!")
 
                 # Stop any containers that might be running
-                process = subprocess.Popen(['docker', 'stop', '{project_name}_surround_notebook'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process = subprocess.Popen(
+                    [
+                        'docker',
+                        'stop',
+                        '{project_name}_surround_notebook'
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
                 process.wait()
                 return
 
@@ -191,9 +285,16 @@ def task_jupyter():
             pass
         finally:
             print("Closing server...")
-            process = subprocess.Popen(['docker', 'stop', '{project_name}_surround_notebook'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(
+                [
+                    'docker',
+                    'stop',
+                    '{project_name}_surround_notebook'
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
             process.wait()
-    
+
     return {{
         'actions': [run_command]
     }}
