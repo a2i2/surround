@@ -37,7 +37,10 @@ class Linter():
         :rtype: (list of error strings, list of warning strings)
         """
 
+        ignore_dirs = ['scripts', 'spikes', 'notebooks']
         args = [str(p) for p in Path(project_root).glob("**/*.py")]
+        args = [p for p in args if os.path.basename(os.path.dirname(p)) not in ignore_dirs]
+
         if extra_args:
             args.extend(extra_args)
 
