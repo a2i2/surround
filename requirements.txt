@@ -1,6 +1,5 @@
 pyaml==17.12.1
 doit==0.31.1
 pandas==0.24.2
-scikit-learn==0.21.2
 numpy==1.16.4
 tornado==6.0.2
