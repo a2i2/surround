@@ -244,7 +244,7 @@ def parse_lint_args(parser, args, extra_args):
     if args.list:
         linter.dump_checks()
     elif remote_cli.get_project_root(os.path.abspath(args.path)):
-        linter.check_project(PROJECTS, args.path, extra_args, verbose=True)
+        linter.check_project(args.path, extra_args, verbose=True)
     else:
         print("error: .surround does not exist")
 

@@ -27,12 +27,10 @@ class Linter():
         except SystemExit:
             pass
 
-    def check_project(self, project, project_root=os.curdir, extra_args=None, verbose=False):
+    def check_project(self, project_root=os.curdir, extra_args=None, verbose=False):
         """
         Runs the linter against the project specified, returning zero on success
 
-        :param project: expected file structure of the project
-        :type project: dict
         :param project_root: path to the root of the project (default: current directory)
         :type project_root: str
         :return: errors and warnings found (if any)
