@@ -94,7 +94,8 @@ class State(Frozen):
         is added during pipeline execution.
     """
 
-    stage_metadata = []
-    execution_time = None
-    errors = []
-    warnings = []
+    def __init__(self):
+        self.stage_metadata = []
+        self.execution_time = None
+        self.errors = []
+        self.warnings = []
