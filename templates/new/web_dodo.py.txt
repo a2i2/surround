@@ -89,7 +89,7 @@ def task_train():
         experiment_args += " --volume \"%s\":/experiments -e \"SURROUND_EXPERIMENT_URL=/experiments/local\"" % experiment_volume_path
 
     return {{
-        'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train --experiment --runner 1 %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
+        'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train  --runner 1 %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -113,7 +113,7 @@ def task_batch():
         experiment_args += " --volume \"%s\":/experiments -e \"SURROUND_EXPERIMENT_URL=/experiments/local\"" % experiment_volume_path
 
     return {{
-        'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch --experiment --runner 1 %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
+        'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch --runner 1 %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -121,7 +121,7 @@ def task_train_local():
     """Run training mode locally"""
     return {{
         'basename': 'trainLocal',
-        'actions': ["%s -m %s --mode train --experiment --runner 1 %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'actions': ["%s -m %s --mode train --runner 1 %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 
@@ -129,7 +129,7 @@ def task_batch_local():
     """Run batch mode locally"""
     return {{
         'basename': 'batchLocal',
-        'actions': ["%s -m %s --mode batch --experiment --runner 1 %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
+        'actions': ["%s -m %s --mode batch --runner 1 %s" % (sys.executable, PACKAGE_PATH, "%(args)s")],
         'params': PARAMS
     }}
 

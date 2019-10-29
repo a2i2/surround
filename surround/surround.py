@@ -1,15 +1,26 @@
 import logging
 
 from .runners import RunMode
+from .experiment import ExperimentWriter
 
 LOGGER = logging.getLogger(__name__)
 
 class Surround:
-    def __init__(self, runners, assemblies):
+    def __init__(self, runners, assemblies, project_name, project_description, project_root):
         self.runners = runners
         self.assemblies = assemblies
+        self.project_name = project_name
+        self.project_root = project_root
 
-    def run(self, runner_key, assembler_key, mode):
+        # Create a project in the experiment storage
+        self.writer = ExperimentWriter()
+        self.writer.write_project(project_name, project_description)
+
+    def run(self, runner_key, assembler_key, mode, is_experiment=True, args=None):
+        if is_experiment:
+            notes = [args.note] if args and args.note else []
+            self.writer.start_experiment(self.project_name, self.project_root, vars(args), notes)
+
         runner = self.__get_runner(runner_key)
 
         if not runner:
@@ -30,7 +41,10 @@ class Surround:
         runner.set_assembler(assembler)
         runner.run(mode)
 
-        return runner
+        if is_experiment:
+            self.writer.stop_experiment(metrics=runner.assembler.state.metrics)
+
+        return runner.assembler.state, runner, runner.assembler
 
     def show_info(self):
         print("Available assemblies:")
