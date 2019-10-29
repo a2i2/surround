@@ -24,6 +24,7 @@ class HelloStage(Estimator):
 # pylint: disable=too-many-instance-attributes
 class AssemblerState(State):
     def __init__(self):
+        super().__init__()
         self.errors = []
         self.text = None
         self.config_value = None

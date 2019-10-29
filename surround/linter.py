@@ -224,6 +224,7 @@ class ProjectData(State):
         :type project_name: str
         """
 
+        super().__init__()
         self.project_structure = project_structure
         self.project_root = project_root
         self.project_name = project_name
