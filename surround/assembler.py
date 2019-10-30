@@ -7,7 +7,7 @@ import logging
 from abc import ABC
 from datetime import datetime
 
-from .config import has_config
+from .config import Config, has_config
 from .stage import Filter, Estimator, Validator
 from .visualiser import Visualiser
 
