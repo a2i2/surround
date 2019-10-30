@@ -5,7 +5,7 @@ Runners and assemblies are defined in here.
 
 import os
 import argparse
-from surround import Surround, Assembler, Config
+from surround import Surround, Assembler, has_config
 from .stages import Baseline, InputValidator, ReportGenerator
 from .file_system_runner import FileSystemRunner
 
@@ -20,8 +20,8 @@ ASSEMBLIES = [
         .set_visualiser(ReportGenerator())
 ]
 
-def main():
-    config = Config(auto_load=True)
+@has_config
+def main(config=None):
     default_runner = config.get_path('runner.default')
     default_assembler = config.get_path('assembler.default')
 
