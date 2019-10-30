@@ -1,5 +1,6 @@
 import ast
 import os
+import functools
 
 from pathlib import Path
 from collections.abc import Mapping
@@ -50,6 +51,19 @@ class Config(Mapping):
 
         SURRROUND_PREDICT_DEBUG=False
     """
+
+    __instance = None
+
+    @staticmethod
+    def instance():
+        """
+        Static method which returns the a singleton instance of Config.
+        """
+
+        if not Config.__instance:
+            Config.__instance = Config(auto_load=True)
+
+        return Config.__instance
 
     def __init__(self, project_root=None, package_path=None, auto_load=False):
         """
@@ -373,3 +387,16 @@ class Config(Mapping):
         """
 
         return len(self._storage)
+
+def has_config(func):
+    """
+    Decorator that injects the singleton config instance into the arguments of the
+    function.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        kwargs["config"] = Config.instance()
+        return func(*args, **kwargs)
+
+    return wrapper
