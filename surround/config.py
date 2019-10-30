@@ -388,15 +388,31 @@ class Config(Mapping):
 
         return len(self._storage)
 
-def has_config(func):
+def has_config(func=None, name="config"):
     """
-    Decorator that injects the singleton config instance into the arguments of the
-    function.
+    Decorator that injects the singleton config instance into the arguments of the function.
+    e.g.
+    ```
+        @has_config
+        def some_func(config):
+            value = config.get_path("some.config")
+            ...
+
+        @has_config(name="global_config")
+        def other_func(global_config, local_config):
+            value = config.get_path("some.config")
+    ```
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        kwargs["config"] = Config.instance()
+    def function_wrapper(*args, **kwargs):
+        kwargs[name] = Config.instance()
         return func(*args, **kwargs)
 
-    return wrapper
+    if func:
+        return function_wrapper
+
+    def recursive_wrapper(func):
+        return has_config(func, name)
+
+    return recursive_wrapper
