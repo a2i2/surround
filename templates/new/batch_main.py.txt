@@ -15,9 +15,7 @@ RUNNERS = [
 
 ASSEMBLIES = [
     Assembler("baseline")
-        .set_validator(InputValidator())
-        .set_estimator(Baseline())
-        .set_visualiser(ReportGenerator())
+        .set_stages([InputValidator(), Baseline()])
 ]
 
 @has_config

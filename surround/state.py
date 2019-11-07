@@ -96,6 +96,6 @@ class State(Frozen):
 
     def __init__(self):
         self.stage_metadata = []
-        self.execution_time = None
+        self.execution_time = []
         self.errors = []
         self.warnings = []

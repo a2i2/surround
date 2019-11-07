@@ -151,8 +151,7 @@ And where the assembler is created, make sure it looks like so::
 
     assemblies = [
         Assembler("baseline")
-            .set_validator(InputValidator())
-            .set_estimator(MakeUpperCase())
+            .set_stages([InputValidator(), MakeUpperCase()])
     ]
 
 That's it for the pipeline! 
