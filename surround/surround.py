@@ -33,10 +33,12 @@ class Surround:
             LOGGER.error("Failed to find assembler '%s'", assembler_key)
             return
 
-        if mode == "batch":
+        if mode == "train":
+            mode = RunMode.TRAIN
+        elif mode == "batch":
             mode = RunMode.BATCH_PREDICT
         else:
-            mode = RunMode.TRAIN
+            mode = RunMode.PREDICT
 
         runner.set_assembler(assembler)
         runner.run(mode)

@@ -3,13 +3,11 @@
 import sys
 import os
 import logging
-
 from abc import ABC
 from datetime import datetime
 
-
 from .config import Config, has_config
-from .visualiser import Visualiser
+from .run_modes import RunMode
 from .stage import Estimator, Stage, Filter, Validator
 
 LOGGER = logging.getLogger(__name__)
@@ -67,8 +65,9 @@ class Assembler(ABC):
         self.stages = None
         self.batch_mode = False
         self.finaliser = None
+        self.metrics = None
 
-    def init_assembler(self, batch_mode=False):
+    def init_assembler(self):
         """
         Initializes the assembler and all of it's stages.
 
@@ -83,7 +82,6 @@ class Assembler(ABC):
         :rtype: bool
         """
 
-        self.batch_mode = batch_mode
         try:
             if self.stages:
                 for stage in self.stages:
@@ -91,13 +89,14 @@ class Assembler(ABC):
 
             if self.finaliser:
                 self.finaliser.initialise(self.config)
+
         except Exception:
             LOGGER.exception("Failed initiating Assembler")
             return False
 
         return True
 
-    def run(self, state=None, is_training=False):
+    def run(self, state=None, mode=RunMode.PREDICT):
         """
         Run the pipeline using the input data provided.
 
@@ -115,6 +114,7 @@ class Assembler(ABC):
         :param is_training: Run the pipeline in training mode or not
         :type is_training: bool
         """
+        is_training = mode == RunMode.TRAIN
 
         LOGGER.info("Starting '%s'", self.assembler_name)
 
@@ -150,6 +150,9 @@ class Assembler(ABC):
             _run_stage_safe(stage)
             if state.errors:
                 break
+
+        if self.metrics and not mode == RunMode.PREDICT:
+            _run_stage_safe(self.metrics)
 
         if self.finaliser:
             _run_stage_safe(self.finaliser)
@@ -233,5 +236,14 @@ class Assembler(ABC):
         if not finaliser and not isinstance(finaliser, Filter):
             raise TypeError("finaliser should be of class Filter")
         self.finaliser = finaliser
+
+        return self
+
+    def set_metrics(self, metrics):
+
+        if not metrics and not isinstance(metrics, Stage):
+            raise TypeError("metrics should be of the Stage class")
+
+        self.metrics = metrics
 
         return self

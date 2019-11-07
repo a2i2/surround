@@ -11,6 +11,11 @@ logging.basicConfig(level=logging.INFO)
 class FileSystemRunner(Runner):
 
     def load_data(self, mode, config):
-        # Load data to be processed
-        raw_data = "TODO: Load raw data here"
+        raw_data = "Prepare data here"
+        if mode == RunMode.BATCH_PREDICT:
+            pass
+        elif mode == RunMode.TRAIN:
+            pass
+        else:
+            pass # Predict
         return AssemblerState(raw_data)
