@@ -8,6 +8,11 @@ import subprocess
 
 from pathlib import Path
 
+from google.oauth2 import service_account
+from googleapiclient import discovery
+from googleapiclient.errors import HttpError
+from datetime import datetime
+
 from surround import Config
 from surround.util import generate_docker_volume_path
 from surround.experiment.util import get_surround_config
@@ -205,6 +210,293 @@ def task_build_jupyter():
         'task_dep': ['build'],
         'params': PARAMS
     }}
+
+def compute_docker_login():
+    """Login to the Google Cloud Container Registry with Docker"""
+
+    if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
+        print("You have not provided any Google Cloud credentials!")
+        print("Please set the GOOGLE_APPLICATION_CREDENTIALS env variable to a path to the credentials file")
+        return False
+
+    with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'rb') as f:
+        process = subprocess.Popen(['docker', 'login', '-u', '_json_key', '--password-stdin', 'https://gcr.io'], stdin=f)
+        return process.wait() == 0
+
+def compute_get_credentials():
+    """Returns the Google Cloud service account"""
+    
+    if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
+        print("You have not provided any Google Cloud credentials!")
+        print("Please set the GOOGLE_APPLICATION_CREDENTIALS env variable to a path to the credentials file")
+
+        return None
+
+    # Load service account from credentials json
+    credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+    credentials = service_account.Credentials.from_service_account_file(
+        credentials,
+        scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+
+    return credentials
+
+def compute_docker_build_cmd(dockerfile, is_gpu=False):
+    """Constructs the build command and returns it and the image URI"""
+
+    # Get configuration from global/local config
+    global_config = get_surround_config()
+    user_name = global_config.get_path("user.name")
+    user_email = global_config.get_path("user.email")
+    experiment_url = global_config.get_path("experiment.url")
+    
+    credentials = compute_get_credentials()
+    if not credentials:
+        # Fail task since we have no credentials
+        return "", lambda: False
+
+    # Copy the credentials file to the root of the project
+    with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "rb") as cf:
+        with open("credentials.json", "wb+") as tf:
+            tf.write(cf.read())
+
+    # Construct image uri
+    image_uri = "gcr.io/%s/%s" % (credentials.project_id, IMAGE if not is_gpu else "%s-gpu" % IMAGE)
+
+    # Construct build command (and clean-up)
+    build_cmd = "docker build -f %s " % dockerfile
+    build_cmd += "--build-arg \"EXPERIMENT_URL=%s\" " % experiment_url
+    build_cmd += "--build-arg \"USER_NAME=%s\" " % user_name
+    build_cmd += "--build-arg \"USER_EMAIL=%s\" " % user_email
+    build_cmd += "-t %s " % image_uri
+    build_cmd += "./"
+
+    return image_uri, build_cmd
+
+def task_compute_build():
+    """Build compute image and push to Google Cloud (Container Registry)"""
+
+    # Construct build command
+    image_uri, build_cmd = compute_docker_build_cmd("Dockerfile-compute")
+    
+    # Construct push command
+    push_cmd = "docker push %s" % image_uri
+
+    return {{
+        'basename': 'buildCompute',
+        'actions': [compute_docker_login, build_cmd, 'rm credentials.json', push_cmd]
+    }}
+
+def task_compute_build_gpu():
+    """Build GPU compute image and push to Google Cloud (Container Registry)"""
+
+    # Construct build command
+    image_uri, build_cmd = compute_docker_build_cmd("Dockerfile-compute-gpu", True)
+    
+    # Construct push command
+    push_cmd = "docker push %s" % image_uri
+
+    return {{
+        'basename': 'buildComputeGPU',
+        'actions': [compute_docker_login, build_cmd, 'rm credentials.json', push_cmd]
+    }}
+
+def compute_check_image(is_gpu=False):
+    """Checks whether there has been an image build for compute"""
+
+    image_name = IMAGE if not is_gpu else ("%s-gpu" % IMAGE)
+    process = subprocess.Popen(['docker', 'images', '-q', '-f', 'reference=gcr.io/*/%s' % image_name], stdout=subprocess.PIPE)
+    process.wait()
+
+    if not process.stdout.read():
+        print("No compute image found!")
+        print("Make sure you run the following before deploying to the cloud!")
+        print("$ surroud run buildCompute")
+        return False
+
+def compute_deploy_job(mode="batch", is_gpu=False):
+    """Deploys a compute job to Google Cloud (AI Platform)"""
+
+    credentials = compute_get_credentials()
+    if not credentials:
+        return False
+
+    # python api for AI Platform
+    cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+
+    # get current time stamp
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Generate configuration
+    project_id = 'projects/%s' % credentials.project_id
+    job_name = '{project_name}_%s_%s_%s' % (mode, ("gpu" if is_gpu else "cpu"), now)
+    image_name = IMAGE if not is_gpu else ("%s-gpu" % IMAGE)
+    image_uri = "gcr.io/%s/%s" % (credentials.project_id, image_name)
+    
+    # Only run as experiment if using cloud storage for experiments
+    global_config = get_surround_config()
+    run_as_experiment = not os.path.exists(global_config.get_path("experiment.url"))
+
+    training_input = {{
+        "scaleTier": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["scale-tier"],
+        "masterConfig": {{
+            "imageUri": image_uri
+        }},
+        "args": ['--mode=%s' % mode, '--experiment' if run_as_experiment else "--no-experiment"],
+        "region": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["region"]
+    }}
+
+    job_spec = {{
+        'jobId': job_name,
+        'trainingInput': training_input
+    }}
+
+    # Request for creating job
+    request = cloud_ml.projects().jobs().create(body=job_spec, parent=project_id)
+
+    try:
+        # execute request
+        job = request.execute()
+
+        print("Job deployed to cloud successfully!\n")
+        print("Job ID:     %s" % job['jobId'])
+        print("Status:     %s\n" % job['state'])
+        print("To check the status, run:")
+        print("$ surround run statusCompute %s" % job['jobId'])
+    except HttpError as err:
+        print("Failed to deploy job to the cloud!")
+        print("Reason: %s" % err._get_reason())
+
+def task_compute_batch():
+    """Submit a batch-predict compute job to Google Cloud (AI Platform)"""
+    
+    return {{
+        'basename': 'batchCompute',
+        'actions': [lambda: compute_check_image(), lambda: compute_deploy_job()]
+    }}
+
+def task_compute_train():
+    """Submit a training compute job to Google Cloud (AI Platform)"""
+
+    return {{
+        'basename': 'trainCompute',
+        'actions': [lambda: compute_check_image(), lambda: compute_deploy_job(mode="train")]
+    }}
+
+def task_compute_batch_gpu():
+    """Submit a batch-predict GPU compute job to Google Cloud (AI Platform)"""
+
+    return {{
+        'basename': 'batchComputeGPU',
+        'actions': [lambda: compute_check_image(True), lambda: compute_deploy_job(is_gpu=True)]
+    }}
+
+def task_compute_train_gpu():
+    """Submit a training GPU compute job to Google Cloud (AI Platform)"""
+
+    return {{
+        'basename': 'trainComputeGPU',
+        'actions': [lambda: compute_check_image(True), lambda: compute_deploy_job(mode="train", is_gpu=True)]
+    }}
+
+def task_compute_list():
+    """List compute jobs history from Google Cloud (AI Platform)"""
+
+    def print_jobs():
+        """Gets and prints the jobs from Google Cloud"""
+
+        # Get the credentials file from the environment
+        credentials = compute_get_credentials()
+        if not credentials:
+            return False
+
+        project_id = 'projects/%s' % credentials.project_id
+
+        # python api for AI Platform
+        cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+        request = cloud_ml.projects().jobs().list(parent=project_id)
+        response = request.execute()
+
+        for job in [j for j in response['jobs'] if re.search(r'^{project_name}_(train|batch)_(cpu|gpu)', j['jobId'])]:
+            print("Job ID:     %s" % job['jobId'])
+            print("Status:     %s" % job['state'])
+            print("Scale Tier: %s" % (job['trainingInput']['scaleTier'] if 'scaleTier' in job['trainingInput'] else "BASIC"))
+            print("Arguments:  %s\n" % job['trainingInput']['args'])
+
+    return {{
+        'basename': 'listCompute',
+        'actions': [print_jobs]
+    }}
+
+def task_compute_status():
+    """Retrieve the status of a single compute job from Google Cloud (AI Platform)"""
+    
+    def show_status(args):
+        """Shows the status of the job"""
+
+        # Get the credentials file from the environment
+        credentials = compute_get_credentials()
+        if not credentials:
+            return False
+
+        job_id = 'projects/%s/jobs/%s' % (credentials.project_id, args)
+
+        # Python API for AI Platform
+        cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+
+        try:
+            request = cloud_ml.projects().jobs().get(name=job_id)
+            response = request.execute()
+
+            print("Job ID:     %s" % response['jobId'])
+            print("Status:     %s" % response['state'])
+            print("Scale Tier: %s" % (response['trainingInput']['scaleTier'] if 'scaleTier' in response['trainingInput'] else "BASIC"))
+            print("Arguments:  %s" % response['trainingInput']['args'])
+        except HttpError:
+            print("Failed to get the status of the job!")
+
+    return {{
+        'basename': 'statusCompute',
+        'actions': [show_status],
+        'params': PARAMS
+    }}
+
+def task_compute_kill():
+    """Kills a running compute job on Google Cloud (AI Platform)"""
+
+    def kill(args):
+        # Get the credentials file from the environment
+        credentials = compute_get_credentials()
+        if not credentials:
+            return False
+
+        job_id = 'projects/%s/jobs/%s' % (credentials.project_id, args)
+
+        # Python API for AI Platform
+        cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+
+        try:
+            request = cloud_ml.projects().jobs().cancel(name=job_id)
+            request.execute()
+            
+            print("Sent the kill request!\n")
+            print("Check the status using:")
+            print("$ surround run statusCompute %s" % args)
+        except HttpError:
+            print("Failed to send cancel job request!")
+            print("Check the job ID and whether it is still running or not")
+
+    return {{
+        'basename': 'killCompute',
+        'actions': [kill],
+        'params': PARAMS
+    }}
+
+def task_jupyter():
+    # Allow for auto reload to be enabled and import modules from project package
+    ipython_config = "c.InteractiveShellApp.extensions.append('autoreload')\n"
+    ipython_config += "c.InteractiveShellApp.exec_lines = "
+    ipython_config += "['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']"
 
 def task_jupyter():
     """Run a Jupyter Lab notebook"""

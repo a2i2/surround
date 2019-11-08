@@ -12,6 +12,7 @@ PROJECTS = {
         ],
         "files": [
             ("requirements.txt", "surround=={version}"),
+            ("requirements-gpu.txt", "surround=={version}"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
         "templates" : [
@@ -34,6 +35,8 @@ PROJECTS = {
             ("dodo.py", "web_dodo.py.txt", False, True),
             ("Dockerfile", "Dockerfile.txt", False, False),
             ("Dockerfile.Notebook", "Dockerfile.Notebook.txt", False, False),
+            ("Dockerfile-compute", "Dockerfile-compute.txt", False, False),
+            ("Dockerfile-compute-gpu", "Dockerfile-compute-gpu.txt", False, False),
             ("{project_name}/config.yaml", "config.yaml.txt", False, False),
             (".gitignore", ".gitignore.txt", False, False)
         ]

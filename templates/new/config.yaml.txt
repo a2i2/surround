@@ -1,5 +1,13 @@
 image: {project_name}
 version: latest
 
+compute:
+  cpu:
+    scale-tier: BASIC
+    region: us-east1
+  gpu:
+    scale-tier: BASIC_GPU
+    region: us-east1
+
 assembler:
   default: baseline
