@@ -358,7 +358,7 @@ def compute_check_image(is_gpu=False):
     if not process.stdout.read():
         print("No compute image found!")
         print("Make sure you run the following before deploying to the cloud!")
-        print("$ surroud run buildCompute")
+        print("$ surround run %s" % ("buildComputeGPU" if is_gpu else "buildCompute"))
         return False
 
 def compute_deploy_job(mode="batch", is_gpu=False):
