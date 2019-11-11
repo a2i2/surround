@@ -389,7 +389,7 @@ def compute_deploy_job(mode="batch", is_gpu=False):
         "masterConfig": {{
             "imageUri": image_uri
         }},
-        "args": ['--mode=%s' % mode, '--experiment' if run_as_experiment else "--no-experiment"],
+        "args": ['--mode=%s' % mode, '--runner=1', '--experiment' if run_as_experiment else "--no-experiment"],
         "region": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["region"]
     }}
 
