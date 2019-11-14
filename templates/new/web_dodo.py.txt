@@ -393,8 +393,8 @@ def compute_deploy_job(mode="batch", is_gpu=False):
         return False
 
     cloud_ml = compute_get_ml_client(credentials)
-        if not cloud_ml:
-            return False
+    if not cloud_ml:
+        return False
 
     # get current time stamp
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
