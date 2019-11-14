@@ -25,9 +25,6 @@ jobs:
 
             # Install requirements
             sudo pip3 install pylint==2.3.0
-            sudo pip3 install Flask==1.0.2
-            sudo pip3 install gunicorn==19.9.0
-            sudo pip3 install tornado==6.0.1
 
             # Run pylint tests
             pylint setup.py
