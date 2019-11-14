@@ -2,7 +2,7 @@ import os
 import argparse
 from surround import Surround, Assembler, Config
 from surround.experiment import ExperimentWriter
-from stages import Baseline, InputValidator
+from stages import Baseline, InputValidator, ReportGenerator
 from file_system_runner import FileSystemRunner
 
 runners = [
@@ -13,6 +13,7 @@ assemblies = [
     Assembler("baseline")
         .set_validator(InputValidator())
         .set_estimator(Baseline())
+        .set_visualiser(ReportGenerator())
 ]
 
 def main():

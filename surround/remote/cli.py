@@ -205,7 +205,7 @@ def print_remote_info(parsed_args, remotes):
     else:
         print("info: no remote found")
 
-def parse_store_args(remote_parser, parsed_args):
+def parse_store_args(remote_parser, parsed_args, extra_args):
     """
     Executes the main "store" command, which in-turn executes one of the sub-commands
     or shows help if no sub-command is specified.
@@ -221,9 +221,9 @@ def parse_store_args(remote_parser, parsed_args):
     elif parsed_args.sub_command == "pull":
         parse_pull_args(parsed_args)
     elif parsed_args.sub_command == "push":
-        parse_push_args(parsed_args)
+        parse_push_args(remote_parser, parsed_args, extra_args)
     elif parsed_args.sub_command == "list":
-        parse_list_args(parsed_args)
+        parse_list_args(remote_parser, parsed_args, extra_args)
     else:
         remote_parser.print_help()
 
@@ -290,7 +290,7 @@ def parse_pull_args(parsed_args):
     else:
         print("error: not a surround project")
 
-def parse_push_args(parsed_args):
+def parse_push_args(parser, parsed_args, extra_args):
     """
     Executes the "push" sub-command which pushes a file to a specified remote.
 
@@ -319,7 +319,7 @@ def parse_push_args(parsed_args):
     else:
         print("error: not a surround project")
 
-def parse_list_args(parsed_args):
+def parse_list_args(parser, parsed_args, extra_args):
     """
     Executes the "list" sub-command which lists all the files in a specified remote.
 

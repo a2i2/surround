@@ -97,7 +97,7 @@ def get_visualise_parser():
 
     return parser
 
-def execute_visualise_tool(parser, args):
+def execute_visualise_tool(parser, args, extra_args):
     """
     Execute the visualiser tool using the arguments parsed from the user.
 
@@ -180,7 +180,7 @@ def main():
     parser = get_visualise_parser()
     args = parser.parse_args()
 
-    execute_visualise_tool(parser, args)
+    execute_visualise_tool(parser, args, [])
 
 def export_incorrect_results(dir_path, file_contents, sep, ground_truth_columns, prediction_columns):
     """

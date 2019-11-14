@@ -1,3 +1,4 @@
 include surround/*.yaml
 include surround/visualise/*.html.txt
+include surround/experiment/web/*.html
 graft templates
