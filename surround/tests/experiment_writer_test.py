@@ -43,6 +43,21 @@ class ExperimentWriterTest(unittest.TestCase):
 
         self.assertFalse(os.path.exists("temp_experiment_storage/experimentation/temp_project"))
 
+    def test_remove_experiment(self):
+        writer = ExperimentWriter("temp_experiment_storage")
+
+        writer.write_project("temp_project", "test_description")
+        writer.start_experiment("temp_project", "temp_project", args={"mode": "batch"}, notes=["some", "notes"])
+        writer.stop_experiment()
+
+        folder_name = os.listdir("temp_experiment_storage/experimentation/temp_project/experiments")
+        self.assertGreater(len(folder_name), 0)
+
+        folder_name = folder_name[0]
+        writer.remove_experiment("temp_project", folder_name)
+
+        self.assertFalse(os.path.exists("temp_experiment_storage/experimentation/temp_project/experiments/%s" % folder_name))
+
     def test_start_experiment(self):
         writer = ExperimentWriter("temp_experiment_storage")
         writer.write_project("temp_project", "test_description")

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>View Logs | Surround Experimentation</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+        <link rel="shortcut icon" href="./favicon.ico" />        
         <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 
         <script>
@@ -73,14 +74,12 @@
                     </div>
                 <div class="level-right">
                     <div class="level-item">
-                        <label class="label" for="searchBar">Search: </label>
+                        <p class="control has-icons-left">
+                            <input type="text" class="input is-info" style="width: 300px" id="searchBar" placeholder="Search by message" oninput="searchLog()" />
+                            <span class="icon is-left"><i class="fas fa-search"></i></span>
+                        </p>
                     </div>
-                    <div class="level-item">
-                        <input type="text" class="input is-info" style="width: 300px" id="searchBar" placeholder="Search by message" oninput="searchLog()" />
-                    </div>
-      
                 </div>
-
             </div>
 
             <table id="logs" class="table is-hoverable is-fullwidth" style="table-layout: fixed">

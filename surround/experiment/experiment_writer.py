@@ -64,6 +64,15 @@ class ExperimentWriter:
         if self.storage.exists('experimentation/' + project_name):
             self.storage.delete('experimentation/' + project_name)
 
+    def remove_experiment(self, project_name, experiment):
+        if self.storage.exists('experimentation/%s/experiments/%s' % (project_name, experiment)):
+            self.storage.delete('experimentation/%s/experiments/%s' % (project_name, experiment))
+
+    def push_experiment_file(self, project_name, experiment, path, bytes_data):
+        if self.storage.exists('experimentation/%s/experiments/%s' % (project_name, experiment)):
+            path = 'experimentation/%s/experiments/%s/%s' % (project_name, experiment, path)
+            self.storage.push(path, bytes_data=bytes_data, override_ok=True)
+
     def start_experiment(self, project_name, project_root, args=None, notes=None):
         if self.current_experiment:
             raise Exception("There is already an experiment in progress!")

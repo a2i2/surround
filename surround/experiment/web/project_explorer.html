@@ -5,7 +5,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Project Explorer | Surround Experimentation</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+        <link rel="shortcut icon" href="./favicon.ico" />
         <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+
+        <script>
+            function deleteProject(projectName) {
+                let deleteLink = document.getElementById("deleteLink");
+
+                // Set the delete button to link to /delete?project_name=...
+                deleteLink.setAttribute("href", "./delete?project_name=" + projectName);
+
+                // Show the dialog with the delete button
+                showDeleteAreYouSure();
+            }
+
+            function showDeleteAreYouSure() {
+                let dialog = document.getElementById("deleteAreYouSure");
+
+                if (!dialog.classList.contains("is-active"))
+                    dialog.classList.add("is-active");
+            }
+
+            function hideDeleteAreYouSure() {
+                let dialog = document.getElementById("deleteAreYouSure");
+                if (dialog.classList.contains("is-active"))
+                    dialog.classList.remove("is-active");
+            }
+        </script>
     </head>
     <body>
         {% include menu.html %}
@@ -19,6 +45,7 @@
                         <th>Project Name</th>
                         <th>Description</th>
                         <th>Last updated</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,10 +54,36 @@
                             <td><a href="./experiment?project_name={{project['project_name']}}">{{project['project_name']}}</a></td>
                             <td>{{project['project_description']}}</td>
                             <td>{{project['last_time_updated']}}</td>
+                            <td>
+                                <a class="button is-danger" onclick="deleteProject('{{project['project_name']}}')">
+                                    <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                                    <span>Delete</span>
+                                </a>
+                            </td>
                         </tr>
                     {% end %}
                 </tbody>
             </table>
+        </div>
+
+        <div id="deleteAreYouSure" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Are you sure?</p>
+                    <button class="delete" aria-label="close" onclick="hideDeleteAreYouSure()"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p>This will delete <strong>all</strong> of the experiments from the experiment storage!<br />This <strong>cannot</strong> be undone!</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <a class="button is-danger" id="deleteLink" onclick="hideDeleteAreYouSure()" href=".">
+                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                        <span>Yes, delete!</span>
+                    </a>
+                    <a class="button" onclick="hideDeleteAreYouSure()">Wait stop, go back</a>
+                </footer>
+            </div>
         </div>
     </body>
 </html>

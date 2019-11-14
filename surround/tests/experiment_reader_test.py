@@ -1,9 +1,12 @@
 import os
+import re
 import unittest
 import shutil
 import subprocess
 import logging
 import zipfile
+
+from io import BytesIO
 
 from ..experiment.file_storage_driver import FileStorageDriver
 from ..experiment.experiment_reader import ExperimentReader
@@ -185,3 +188,60 @@ class ExperimentReaderTest(unittest.TestCase):
             model_file = f.read("models/test.model")
             model_file = model_file.decode('utf-8')
             self.assertEqual("WEIGHTS", model_file)
+
+    def test_pull_model(self):
+        reader = ExperimentReader(storage_url="temporary/experiments", storage_driver=FileStorageDriver)
+
+        cache_files = reader.get_project_cache("test_project")
+        self.assertGreater(len(cache_files), 0)
+        self.assertRegex(cache_files[0], r"^model.+-(.+)\.zip$")
+
+        expected_file = reader.pull_cache_file("test_project", cache_files[0])
+
+        model_hash = re.match(r"^model.+-(.+)\.zip$", cache_files[0]).group(1)
+        pulled_file = reader.pull_model("test_project", model_hash)
+
+        self.assertIsNotNone(pulled_file)
+        self.assertEqual(expected_file, pulled_file)
+
+    def test_replicate_file(self):
+        reader = ExperimentReader(storage_url="temporary/experiments", storage_driver=FileStorageDriver)
+
+        output = reader.replicate("test_project", self.folder_names[0], file_path="temporary/replication")
+        self.assertEqual(output, "temporary/replication")
+
+        expected_files = [
+            '.surround',
+            'models/test.model',
+            'test_project/',
+            'test_project/stages/baseline.py',
+            'dodo.py',
+        ]
+
+        self.assertTrue(os.path.exists("temporary/replication"))
+
+        for expected in expected_files:
+            self.assertTrue(os.path.exists(os.path.join("temporary/replication", expected)))
+
+        with open("temporary/replication/models/test.model", "r") as f:
+            self.assertEqual("WEIGHTS", f.read())
+
+    def test_replicate_zip(self):
+        reader = ExperimentReader(storage_url="temporary/experiments", storage_driver=FileStorageDriver)
+
+        output_zip = reader.replicate("test_project", self.folder_names[0])
+        output_zip = BytesIO(output_zip)
+
+        self.assertIsNotNone(output_zip)
+
+        expected_files = [
+            '.surround/config.yaml',
+            'models/test.model',
+            'test_project/__main__.py',
+            'test_project/stages/baseline.py',
+            'dodo.py',
+        ]
+
+        with zipfile.ZipFile(output_zip, "r") as f:
+            for expected in expected_files:
+                self.assertIn(expected, f.namelist())
