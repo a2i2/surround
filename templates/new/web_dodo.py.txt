@@ -378,7 +378,7 @@ def compute_get_ml_client(credentials):
 
         break
 
-    if not cloud_ml
+    if not cloud_ml:
         print("Failed to create ML client, try again later!")
 
     return cloud_ml
@@ -392,7 +392,7 @@ def compute_deploy_job(mode="batch", is_gpu=False):
 
     cloud_ml = compute_get_ml_client(credentials)
         if not cloud_ml:
-            return false
+            return False
 
     # get current time stamp
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -482,7 +482,7 @@ def task_compute_list():
 
         cloud_ml = compute_get_ml_client(credentials)
         if not cloud_ml:
-            return false
+            return False
 
         project_id = 'projects/%s' % credentials.project_id
         request = cloud_ml.projects().jobs().list(parent=project_id)
@@ -514,7 +514,7 @@ def task_compute_status():
 
         cloud_ml = compute_get_ml_client(credentials)
         if not cloud_ml:
-            return false
+            return False
 
         try:
             request = cloud_ml.projects().jobs().get(name=job_id)
@@ -546,7 +546,7 @@ def task_compute_kill():
 
         cloud_ml = compute_get_ml_client(credentials)
         if not cloud_ml:
-            return false
+            return False
 
         try:
             request = cloud_ml.projects().jobs().cancel(name=job_id)
