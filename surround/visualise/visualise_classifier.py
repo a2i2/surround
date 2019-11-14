@@ -254,6 +254,12 @@ def calculate_classifier_metrics(y_true, y_pred):
     """
 
     classes = list(set(y_true).union(set(y_pred)))
+
+    # Ensure all values are strings
+    classes = [str(c) for c in classes]
+    y_true = [str(y) for y in y_true]
+    y_pred = [str(y) for y in y_pred]
+
     report_dict = classification_report(y_true, y_pred, classes)
     accuracy = report_dict["accuracy"]
 
@@ -267,7 +273,6 @@ def calculate_classifier_metrics(y_true, y_pred):
     conf_matrix = calculate_confusion_matrix(y_true, y_pred, classes)
     normal_conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
     normal_conf_matrix = np.nan_to_num(normal_conf_matrix)
-    classes = [str(c) if not isinstance(c, str) else c for c in classes]
 
     cohen_kappa = calculate_cohen_kappa(conf_matrix)
 
