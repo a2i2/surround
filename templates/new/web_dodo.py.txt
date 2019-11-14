@@ -5,6 +5,10 @@ This module defines the tasks that can be executed using `surround run [task nam
 import os
 import sys
 import subprocess
+import re
+import webbrowser
+import logging
+import ssl
 
 from pathlib import Path
 
@@ -361,6 +365,24 @@ def compute_check_image(is_gpu=False):
         print("$ surround run %s" % ("buildComputeGPU" if is_gpu else "buildCompute"))
         return False
 
+def compute_get_ml_client(credentials):
+    count = 0
+    cloud_ml = None
+    while count < 5:
+        try:
+            # python api for AI Platform
+            cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+        except ssl.SSLEOFError:
+            count += 1
+            continue
+
+        break
+
+    if not cloud_ml
+        print("Failed to create ML client, try again later!")
+
+    return cloud_ml
+
 def compute_deploy_job(mode="batch", is_gpu=False):
     """Deploys a compute job to Google Cloud (AI Platform)"""
 
@@ -368,8 +390,9 @@ def compute_deploy_job(mode="batch", is_gpu=False):
     if not credentials:
         return False
 
-    # python api for AI Platform
-    cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+    cloud_ml = compute_get_ml_client(credentials)
+        if not cloud_ml:
+            return false
 
     # get current time stamp
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -457,10 +480,11 @@ def task_compute_list():
         if not credentials:
             return False
 
-        project_id = 'projects/%s' % credentials.project_id
+        cloud_ml = compute_get_ml_client(credentials)
+        if not cloud_ml:
+            return false
 
-        # python api for AI Platform
-        cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+        project_id = 'projects/%s' % credentials.project_id
         request = cloud_ml.projects().jobs().list(parent=project_id)
         response = request.execute()
 
@@ -488,8 +512,9 @@ def task_compute_status():
 
         job_id = 'projects/%s/jobs/%s' % (credentials.project_id, args)
 
-        # Python API for AI Platform
-        cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+        cloud_ml = compute_get_ml_client(credentials)
+        if not cloud_ml:
+            return false
 
         try:
             request = cloud_ml.projects().jobs().get(name=job_id)
@@ -519,8 +544,9 @@ def task_compute_kill():
 
         job_id = 'projects/%s/jobs/%s' % (credentials.project_id, args)
 
-        # Python API for AI Platform
-        cloud_ml = discovery.build('ml', 'v1', credentials=credentials)
+        cloud_ml = compute_get_ml_client(credentials)
+        if not cloud_ml:
+            return false
 
         try:
             request = cloud_ml.projects().jobs().cancel(name=job_id)
