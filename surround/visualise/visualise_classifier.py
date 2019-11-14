@@ -171,6 +171,9 @@ class VisualiseClassifier(Visualiser):
 
         print("============[End of visualisation]===================")
 
+def safe_div(a, b):
+    return a / b if b else 0
+
 def classification_report(y_true, y_pred, classes):
     results = {}
 
@@ -179,11 +182,11 @@ def classification_report(y_true, y_pred, classes):
         fp = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt != yp and yp == name])
         fn = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt != yp and yt == name])
 
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-        f1_score = (2 * tp) / (2 * tp + fp + fn)
+        precision = safe_div(tp, (tp + fp))
+        recall = safe_div(tp, tp + fn)
+        f1_score = safe_div(2 * tp, 2 * tp + fp + fn)
         support = len([p for p in y_true if p == name])
-        accuracy = tp / (fp + fn + tp)
+        accuracy = safe_div(tp, fp + fn + tp)
 
         results[name] = {
             "precision": precision,
@@ -194,7 +197,7 @@ def classification_report(y_true, y_pred, classes):
         }
 
     total_tp_plus_tn = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt == yp])
-    results["accuracy"] = total_tp_plus_tn / len(y_true)
+    results["accuracy"] = safe_div(total_tp_plus_tn, len(y_true))
 
     results["macro avg"] = {
         "precision": np.mean([results[name]["precision"] for name in classes]),
@@ -228,14 +231,14 @@ def calculate_cohen_kappa(confusion_matrix):
     n_classes = confusion_matrix.shape[0]
     sum0 = np.sum(confusion_matrix, axis=0)
     sum1 = np.sum(confusion_matrix, axis=1)
-    expected = np.outer(sum0, sum1) / np.sum(sum0)
+    expected = safe_div(np.outer(sum0, sum1), np.sum(sum0))
 
     w_mat = np.ones([n_classes, n_classes], dtype=np.int)
 
     # pylint: disable=unsupported-assignment-operation
     w_mat.flat[:: n_classes + 1] = 0
 
-    k = np.sum(w_mat * confusion_matrix) / np.sum(w_mat * expected)
+    k = safe_div(np.sum(w_mat * confusion_matrix), np.sum(w_mat * expected))
     return 1 - k
 
 def calculate_classifier_metrics(y_true, y_pred):
