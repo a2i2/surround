@@ -366,6 +366,8 @@ def compute_check_image(is_gpu=False):
         return False
 
 def compute_get_ml_client(credentials):
+    """Gets the ML API client from Google using the credentials. Tries multiple times due to random Google bug"""
+
     count = 0
     cloud_ml = None
     while count < 5:
