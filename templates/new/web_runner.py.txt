@@ -39,20 +39,16 @@ class Application(tornado.web.Application):
 class EstimateHandler(tornado.web.RequestHandler):
     def initialize(self, assembler):
         self.assembler = assembler
-        self.data = AssemblerState()
 
     def post(self):
         req_data = json.loads(self.request.body)
 
-        # Clean output_data on every request
-        self.data.output_data = ""
-
-        # Prepare input_date for the assembler
-        self.data.input_data = req_data["message"]
+        # Prepare input_data for the assembler
+        data = AssemblerState(req_data["message"])
 
         # Execute assembler
-        self.assembler.run(self.data)
-        logging.info("Message: %s", self.data.output_data)
+        self.assembler.run(data)
+        logging.info("Message: %s", data.output_data)
 
 
 class InfoHandler(tornado.web.RequestHandler):

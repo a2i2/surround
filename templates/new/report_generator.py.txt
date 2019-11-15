@@ -1,3 +1,9 @@
+"""
+This module generates the HTML report which uses the
+template in the templates folder. This report can then
+be viewed in the experimentation web application.
+"""
+
 import os
 import surround
 import tornado.template
@@ -11,7 +17,11 @@ class ReportGenerator(surround.Visualiser):
         self.global_config = get_surround_config()
 
     def visualise(self, state, config):
-        results_page = self.results_template.generate(config=config, state=state, global_config=self.global_config, surround_version=surround.__version__)
+        results_page = self.results_template.generate(
+            config=config,
+            state=state,
+            global_config=self.global_config,
+            surround_version=surround.__version__)
 
-        with open(os.path.join(config["output_path"], "results.html"), "wb+") as f:
-            f.write(results_page)
+        with open(os.path.join(config["output_path"], "results.html"), "wb+") as out:
+            out.write(results_page)
