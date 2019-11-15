@@ -23,7 +23,7 @@ ASSEMBLIES = [
 ]
 
 @has_config
-def main(config):
+def main(config=None):
     default_runner = config.get_path('runner.default')
     default_assembler = config.get_path('assembler.default')
 
