@@ -103,7 +103,7 @@ class ExperimentReaderTest(unittest.TestCase):
         self.assertIn("results", exp)
 
         self.assertEqual(exp["execution_info"]["start_time"], self.folder_names[0])
-        self.assertEqual(exp["logs"][0], "INFO:root:test_log")
+        self.assertIn("INFO:root:test_log", exp["logs"][0])
         self.assertEqual(exp["results"]["start_time"], self.folder_names[0])
 
     def test_get_experiments(self):
@@ -113,7 +113,7 @@ class ExperimentReaderTest(unittest.TestCase):
 
         for exp in exps:
             self.assertIn(exp['execution_info']['start_time'], self.folder_names + self.folder_names_2)
-            self.assertEqual(exp["logs"][0], "INFO:root:test_log")
+            self.assertIn("INFO:root:test_log", exp["logs"][0])
             self.assertIn(exp['results']['start_time'], self.folder_names + self.folder_names_2)
 
     def test_has_experiment(self):
@@ -164,13 +164,13 @@ class ExperimentReaderTest(unittest.TestCase):
         self.assertIsNotNone(log)
 
         log = log.decode('utf-8')
-        self.assertEqual("INFO:root:test_log", log.rstrip())
+        self.assertIn("INFO:root:test_log", log.rstrip())
 
         log = reader.pull_experiment_file("test_project_two", self.folder_names_2[0], "log.txt")
         self.assertIsNotNone(log)
 
         log = log.decode('utf-8')
-        self.assertEqual("INFO:root:test_log", log.rstrip())
+        self.assertIn("INFO:root:test_log", log.rstrip())
 
     def test_pull_cache_files(self):
         reader = ExperimentReader(storage_url="temporary/experiments", storage_driver=FileStorageDriver)

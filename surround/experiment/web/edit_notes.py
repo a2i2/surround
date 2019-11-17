@@ -11,14 +11,16 @@ class EditNotes(tornado.web.RequestHandler):
         project_name = self.get_argument("project_name", default=None)
         experiment = self.get_argument("experiment", default=None)
 
-        if not project_name or not experiment or not self.reader.has_experiment(project_name, experiment):
-            self.set_status(404)
+        if not project_name or not experiment:
+            self.set_status(400)
             return
 
-        exec_info = self.reader.pull_experiment_file(project_name, experiment, "execution_info.json")
-        exec_info = json.loads(exec_info.decode('utf-8'))
-
-        self.write("\n".join(exec_info["notes"]))
+        try:
+            exec_info = self.reader.pull_experiment_file(project_name, experiment, "execution_info.json")
+            exec_info = json.loads(exec_info.decode('utf-8'))
+            self.write("\n".join(exec_info["notes"]))
+        except FileNotFoundError:
+            self.set_status(404)
 
     def post(self):
         data = tornado.escape.json_decode(self.request.body)
@@ -27,12 +29,11 @@ class EditNotes(tornado.web.RequestHandler):
             self.set_status(400)
             return
 
-        if not self.reader.has_experiment(data['projectName'], data['experiment']):
+        try:
+            exec_info = self.reader.pull_experiment_file(data['projectName'], data['experiment'], "execution_info.json")
+            exec_info = json.loads(exec_info.decode('utf-8'))
+            exec_info['notes'] = data['notes']
+
+            self.writer.push_experiment_file(data['projectName'], data['experiment'], "execution_info.json", json.dumps(exec_info, indent=4).encode('utf-8'))
+        except FileNotFoundError:
             self.set_status(404)
-            return
-
-        exec_info = self.reader.pull_experiment_file(data['projectName'], data['experiment'], "execution_info.json")
-        exec_info = json.loads(exec_info.decode('utf-8'))
-        exec_info['notes'] = data['notes']
-
-        self.writer.push_experiment_file(data['projectName'], data['experiment'], "execution_info.json", json.dumps(exec_info, indent=4).encode('utf-8'))

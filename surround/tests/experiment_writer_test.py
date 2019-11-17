@@ -193,22 +193,12 @@ class ExperimentWriterTest(unittest.TestCase):
         path = os.path.join(path, os.listdir(path)[0])
 
         self.assertTrue(os.path.exists(os.path.join(path, "log.txt")), msg=str(os.listdir(path)))
-        self.assertTrue(os.path.exists(os.path.join(path, "logs")))
 
         # Check log.txt has all the expected logs, formatted correctly
         with open(os.path.join(path, "log.txt"), "r") as f:
             log = f.read()
             for exp_log in expected_logs:
                 self.assertIn("INFO:test_logger:%s" % exp_log, log)
-
-        # Check log/ has a file for each log and the contents are correct
-        log_files = os.listdir(os.path.join(path, "logs"))
-        self.assertEqual(len(expected_logs), len(log_files))
-        log_files = sorted(log_files)
-
-        for i, exp_log in enumerate(expected_logs):
-            with open(os.path.join(path, "logs", log_files[i]), "r") as f:
-                self.assertEqual("INFO:test_logger:%s" % exp_log, f.read())
 
     def test_output_capture(self):
         writer = ExperimentWriter("temp_experiment_storage")

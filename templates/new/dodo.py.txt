@@ -87,6 +87,8 @@ def task_train():
     # Ensure experiments will work if using a local storage location (not in the cloud)
     if os.path.join(experiment_path, "local") == global_config.get_path("experiment.url"):
         experiment_args += " --volume \"%s\":/experiments -e \"SURROUND_EXPERIMENT_URL=/experiments/local\"" % experiment_volume_path
+    else:
+        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % global_config.get_path("experiment.url")
 
     return {{
         'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode train --experiment %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],
@@ -111,6 +113,8 @@ def task_batch():
     # Ensure experiments will work if using a local storage location (not in the cloud)
     if os.path.join(experiment_path, "local") == global_config.get_path("experiment.url"):
         experiment_args += " --volume \"%s\":/experiments -e \"SURROUND_EXPERIMENT_URL=/experiments/local\"" % experiment_volume_path
+    else:
+        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % global_config.get_path("experiment.url")
 
     return {{
         'actions': ["docker run %s --volume \"%s\":/app/output --volume \"%s\":/app/input %s python3 -m {project_name} --mode batch --experiment %s" % (experiment_args, output_path, data_path, IMAGE, "%(args)s")],

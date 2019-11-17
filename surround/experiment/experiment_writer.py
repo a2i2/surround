@@ -5,7 +5,8 @@ import zipfile
 import logging
 import datetime
 
-from .util import hash_zip, get_driver_type_from_url, get_surround_config
+from .util import hash_zip, get_surround_config
+from .drivers import get_driver_type_from_url
 from .log_stream_handler import LogStreamHandler
 
 DATETIME_FORMAT_STR = "%Y-%m-%dT%H-%M-%S-%f"
@@ -18,8 +19,6 @@ class ExperimentWriter:
             project.json
             experiments/
                 YYYY-MM-DDThh-mm-ss-mmmm/
-                    logs/
-                        ...
                     output/
                         ...
                     code.zip
@@ -141,7 +140,7 @@ class ExperimentWriter:
 
         # Setup logging to go to both the console and file
         root_log = logging.getLogger()
-        root_log.setLevel(logging.DEBUG)
+        root_log.setLevel(logging.INFO)
         root_log.addHandler(self.current_experiment['log_file_handler'])
 
     def stop_experiment(self, metrics=None):
@@ -157,7 +156,7 @@ class ExperimentWriter:
 
         # Push the logs captured to the experiment folder
         if os.path.exists(os.path.join(project_root, 'log.txt')):
-            self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'))
+            self.storage.push(path + "log.txt", os.path.join(project_root, 'log.txt'), override_ok=True)
         else:
             self.storage.push(path + "log.txt", bytes_data=" ".encode('utf-8'))
 

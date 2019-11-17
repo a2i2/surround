@@ -3,7 +3,8 @@ import os
 import json
 import zipfile
 from io import BytesIO
-from .util import get_surround_config, get_driver_type_from_url
+from .util import get_surround_config
+from .drivers import get_driver_type_from_url
 
 class ExperimentReader:
     """
@@ -13,8 +14,6 @@ class ExperimentReader:
             project.json
             experiments/
                 YYYY-MM-DDThh-mm-ss-mmmm/
-                    logs/
-                        ...
                     output/
                         ...
                     code.zip
@@ -66,14 +65,25 @@ class ExperimentReader:
 
         return project_meta
 
-    def get_experiments(self, project_name):
-        if not self.has_project(project_name):
-            return None
+    def list_projects(self):
+        files = self.storage.get_files("experimentation")
+        projects = {re.search(r"^([a-z_]+)[/\\]{1,2}", f).group(1) for f in files}
 
+        return list(projects)
+
+    def list_experiments(self, project_name):
+        path = "experimentation/%s/experiments/" % project_name
+        files = self.storage.get_files(base_url=path)
+        experiments = {re.search(r"^([0-9\-T]+)[/\\]{1,2}", f).group(1) for f in files}
+
+        return list(experiments)
+
+    def get_experiments(self, project_name):
         results = []
         path = "experimentation/%s/experiments/" % project_name
-        if self.storage.exists(path):
-            experiment_files = self.storage.get_files(base_url=path)
+        experiment_files = self.storage.get_files(base_url=path)
+
+        if experiment_files:
             execution_files = [f for f in experiment_files if re.match(r"^[T0-9\-]+[/\\]{1,2}execution_info.json$", f)]
 
             execution_infos = []
@@ -83,15 +93,15 @@ class ExperimentReader:
                 execution_infos.append(info_obj)
 
             for execution_info in execution_infos:
-                if self.storage.exists(path + execution_info["start_time"] + "/results.json"):
+                try:
                     result_obj = self.storage.pull(path + execution_info["start_time"] + "/results.json")
                     result_obj = json.loads(result_obj.decode('utf-8'))
-                else:
+                except FileNotFoundError:
                     result_obj = None
 
-                if self.storage.exists(path + execution_info["start_time"] + "/log.txt"):
+                try:
                     log = self.storage.pull(path + execution_info["start_time"] + "/log.txt").decode('utf-8')
-                else:
+                except FileNotFoundError:
                     log = []
 
                 results.append({
@@ -150,10 +160,11 @@ class ExperimentReader:
 
     def pull_experiment_file(self, project_name, experiment_date, path):
         path = "experimentation/%s/experiments/%s/%s" % (project_name, experiment_date, path)
-        if not self.storage.exists(path):
-            return None
 
-        return self.storage.pull(path)
+        try:
+            return self.storage.pull(path)
+        except FileNotFoundError:
+            return None
 
     def pull_cache_file(self, project_name, path):
         path = "experimentation/%s/cache/%s" % (project_name, path)

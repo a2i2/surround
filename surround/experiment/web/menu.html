@@ -24,9 +24,9 @@
                 </a>
         
                 <div class="navbar-dropdown">
-                    {% for p in projects %}
-                        <a class="navbar-item" href="./experiment?project_name={{p['project_name']}}">
-                            {{p['project_name']}}
+                    {% for project_name in project_names %}
+                        <a class="navbar-item" href="./experiment?project_name={{project_name}}">
+                            {{project_name}}
                         </a>
                     {% end %}
                 </div>
