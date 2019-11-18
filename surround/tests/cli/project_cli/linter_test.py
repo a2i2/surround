@@ -28,6 +28,7 @@ class LinterTest(unittest.TestCase):
 
         # Linter should be able to locate .surround folder if project valid
         self.assertNotIn(".surround does not exist", output, "Current directory not a Surround project")
+        self.assertIn("Your code has been rated at 10.00/10", output, "The generated code is not lint error free!")
 
     def test_lint_invalid_project(self):
         """
