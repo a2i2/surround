@@ -114,7 +114,8 @@ def task_train():
         experiment_args += " --volume \"%s\":/experiments " % experiment_volume_path
         experiment_args += "-e \"SURROUND_EXPERIMENT_URL=/experiments/local\""
     else:
-        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % global_config.get_path("experiment.url")
+        current_url = global_config.get_path("experiment.url")
+        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % current_url
 
     cmd = [
         "docker run %s" % experiment_args,
@@ -150,7 +151,8 @@ def task_batch():
         experiment_args += " --volume \"%s\":/experiments " % experiment_volume_path
         experiment_args += "-e \"SURROUND_EXPERIMENT_URL=/experiments/local\""
     else:
-        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % global_config.get_path("experiment.url")
+        current_url = global_config.get_path("experiment.url")
+        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % current_url
 
     cmd = [
         "docker run %s" % experiment_args,
