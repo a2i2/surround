@@ -5,9 +5,9 @@ be viewed in the experimentation web application.
 """
 
 import os
-import surround
 import tornado.template
 
+import surround
 from surround.experiment.util import get_surround_config
 
 class ReportGenerator(surround.Visualiser):
