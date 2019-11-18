@@ -6,7 +6,6 @@ Runners and ASSEMBLIES are defined in here.
 import os
 import argparse
 from surround import Surround, Assembler, Config
-from surround.experiment import ExperimentWriter
 from .stages import Baseline, InputValidator, ReportGenerator
 from .file_system_runner import FileSystemRunner
 from .web_runner import WebRunner
@@ -57,7 +56,13 @@ def main():
 
     args = parser.parse_args()
 
-    surround = Surround(runners, assemblies, "{project_name}", "{project_description}", os.path.dirname(os.path.dirname(__file__)))
+    surround = Surround(
+        RUNNERS,
+        ASSEMBLIES,
+        "{project_name}",
+        "{project_description}",
+        os.path.dirname(os.path.dirname(__file__))
+    )
 
     if args.status:
         surround.show_info()
