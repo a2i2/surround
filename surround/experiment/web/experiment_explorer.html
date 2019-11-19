@@ -86,17 +86,55 @@
                         <a class="pagination-next" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">Next page</a>
                     {% end %}
                     <ul class="pagination-list">
-                        <li><a class="pagination-link" aria-label="Goto page {{pages[0]}}" href="./experiment?project_name={{project['project_name']}}">{{pages[0]}}</a></li>
-                        <li><span class="pagination-ellipsis">&hellip;</span></li>
-                        {% if page - 1 > 0 %}
-                            <li><a class="pagination-link" aria-label="Goto page {{page - 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 1}}">{{page - 1}}</a></li>
+                        <li><a class="pagination-link {{'is-current' if page == pages[0] else ''}}" aria-label="Goto page {{pages[0]}}" href="./experiment?project_name={{project['project_name']}}">{{pages[0]}}</a></li>
+                        {% if len(pages) > 2 %}
+                            <li><span class="pagination-ellipsis">&hellip;</span></li>
+                            {% if page == pages[0] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page + 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">{{page + 1}}</a></li>
+                                {% if page + 2 in pages and page + 2 != pages[-1] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page + 2}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 2}}">{{page + 2}}</a></li>
+                                {% end %}
+                                {% if page + 3 in pages and page + 3 != pages[-1] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page + 3}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 3}}">{{page + 3}}</a></li>
+                                {% end %}
+                            {% elif page == pages[0] + 1 %}
+                                <li><a class="pagination-link is-current" aria-label="Goto page {{page}}" href="./experiment?project_name={{project['project_name']}}&page={{page}}">{{page}}</a></li>
+                                {% if page + 1 in pages and page + 1 != pages[-1] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page + 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">{{page + 1}}</a></li>
+                                {% end %}
+                                {% if page + 2 in pages and page + 2 != pages[-1] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page + 2}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 2}}">{{page + 2}}</a></li>
+                                {% end %}
+                            {% elif page == pages[-1] %}
+                                {% if page - 3 in pages and page - 3 != pages[0] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page - 3}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 3}}">{{page - 3}}</a></li>
+                                {% end %}
+                                {% if page - 2 in pages and page - 2 != pages[0] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page - 2}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 2}}">{{page - 2}}</a></li>
+                                {% end %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page - 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 1}}">{{page - 1}}</a></li>
+                            {% elif page == pages[-2] %}
+                                {% if page - 2 in pages and page - 2 != pages[0] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page - 2}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 2}}">{{page - 2}}</a></li>
+                                {% end %}
+                                {% if page - 1 in pages and page - 1 != pages[0] %}
+                                <li><a class="pagination-link" aria-label="Goto page {{page - 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 1}}">{{page - 1}}</a></li>
+                                {% end %}
+                                <li><a class="pagination-link is-current" aria-label="Goto page {{page}}" href="./experiment?project_name={{project['project_name']}}&page={{page}}">{{page}}</a></li>
+                            {% else %}
+                                {% if page - 1 > 0 %}
+                                    <li><a class="pagination-link" aria-label="Goto page {{page - 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page - 1}}">{{page - 1}}</a></li>
+                                {% end %}
+                                {% if page != pages[0] %}
+                                    <li><a class="pagination-link is-current" aria-label="Page {{page}}" aria-current="page">{{page}}</a></li>
+                                {% end %}
+                                {% if page + 1 <= pages[-1] %}
+                                    <li><a class="pagination-link" aria-label="Goto page {{page + 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">{{page + 1}}</a></li>
+                                {% end %}
+                            {% end %}
+                            <li><span class="pagination-ellipsis">&hellip;</span></li>
                         {% end %}
-                        <li><a class="pagination-link is-current" aria-label="Page {{page}}" aria-current="page">{{page}}</a></li>
-                        {% if page + 1 <= pages[-1] %}
-                            <li><a class="pagination-link" aria-label="Goto page {{page + 1}}" href="./experiment?project_name={{project['project_name']}}&page={{page + 1}}">{{page + 1}}</a></li>
-                        {% end %}
-                        <li><span class="pagination-ellipsis">&hellip;</span></li>
-                        <li><a class="pagination-link" aria-label="Goto page {{pages[-1]}}" href="./experiment?project_name={{project['project_name']}}&page={{pages[-1]}}">{{pages[-1]}}</a></li>
+                        <li><a class="pagination-link {{'is-current' if page == pages[-1] else ''}}" aria-label="Goto page {{pages[-1]}}" href="./experiment?project_name={{project['project_name']}}&page={{pages[-1]}}">{{pages[-1]}}</a></li>
                     </ul>
                 </nav>
             {% end %}
