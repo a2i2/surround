@@ -50,7 +50,8 @@ def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, 
         if answer == "" and required:
             print('This field is required!\n')
             continue
-        elif answer == "" and not required:
+
+        if answer == "" and not required:
             print()
             return default
 

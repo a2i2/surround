@@ -40,7 +40,7 @@ class CreateDataContainerTest(unittest.TestCase):
         std_input += "Test group description\n"
         std_input += "1\n"
 
-        process = subprocess.run(['surround', 'data', 'create', '-d', 'temp', '-o', 'temp.data.zip'], input=std_input, encoding='ascii')
+        process = subprocess.run(['surround', 'data', 'create', '-d', 'temp', '-o', 'temp.data.zip'], input=std_input, encoding='ascii', check=True)
 
         self.assertEqual(process.returncode, 0)
         self.assertTrue(os.path.exists("temp.data.zip"))
