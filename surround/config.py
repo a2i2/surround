@@ -388,7 +388,7 @@ class Config(Mapping):
 
         return len(self._storage)
 
-def has_config(func=None, name="config"):
+def has_config(func=None, name="config", filename=None):
     """
     Decorator that injects the singleton config instance into the arguments of the function.
     e.g.
@@ -399,20 +399,28 @@ def has_config(func=None, name="config"):
             ...
 
         @has_config(name="global_config")
-        def other_func(global_config, local_config):
+        def other_func(global_config, new_config):
             value = config.get_path("some.config")
+
+        @has_config(filename="override.yaml")
+        def some_func(config):
+            value = config.get_path("override.value")
     ```
     """
 
     @functools.wraps(func)
     def function_wrapper(*args, **kwargs):
-        kwargs[name] = Config.instance()
+        config = Config.instance()
+        if filename:
+            path = os.path.join(config["package_path"], filename)
+            config.read_config_files([path])
+        kwargs[name] = config
         return func(*args, **kwargs)
 
     if func:
         return function_wrapper
 
     def recursive_wrapper(func):
-        return has_config(func, name)
+        return has_config(func, name, filename)
 
     return recursive_wrapper
