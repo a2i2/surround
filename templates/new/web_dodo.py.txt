@@ -28,6 +28,9 @@ IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 IMAGE_JUPYTER = "%s/%s-jupyter:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 DOCKER_JUPYTER = "Dockerfile.Notebook"
 
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger(__name__)
+
 PARAMS = [
     {{
         'name': 'args',
