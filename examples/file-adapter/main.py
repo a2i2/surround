@@ -13,8 +13,7 @@ class MainRunner(Runner):
         input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
 
         with open(input_path) as csv_file:
-            state.rows = csv.DictReader(csv_file, delimiter=',', quotechar='"')
-            state.rows = [row for row in state.rows]
+            state.rows = list(csv.DictReader(csv_file, delimiter=',', quotechar='"'))
 
         return state
 
