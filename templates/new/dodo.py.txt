@@ -2,12 +2,13 @@
 This module defines the tasks that can be executed using `surround run [task name]`
 """
 
+# pylint: disable=surround-avoid-print
+
 import os
 import sys
 import subprocess
 import re
 import webbrowser
-import logging
 import ssl
 
 from pathlib import Path
@@ -27,9 +28,6 @@ PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 IMAGE_JUPYTER = "%s/%s-jupyter:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 DOCKER_JUPYTER = "Dockerfile.Notebook"
-
-logging.basicConfig(level=logging.INFO)
-LOGGER = logging.getLogger(__name__)
 
 PARAMS = [
     {{
@@ -222,8 +220,8 @@ def compute_docker_login():
     """Login to the Google Cloud Container Registry with Docker"""
 
     if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-        LOGGER.info("You have not provided any Google Cloud credentials!")
-        LOGGER.info("Set GOOGLE_APPLICATION_CREDENTIALS env var to the credentials file location")
+        print("You have not provided any Google Cloud credentials!")
+        print("Set GOOGLE_APPLICATION_CREDENTIALS env var to the credentials file location")
         return False
 
     with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'rb') as cred_file:
@@ -242,8 +240,8 @@ def compute_get_credentials():
     """Returns the Google Cloud service account"""
 
     if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-        LOGGER.info("You have not provided any Google Cloud credentials!")
-        LOGGER.info("Set GOOGLE_APPLICATION_CREDENTIALS env var to the credentials file location")
+        print("You have not provided any Google Cloud credentials!")
+        print("Set GOOGLE_APPLICATION_CREDENTIALS env var to the credentials file location")
 
         return None
 
@@ -331,9 +329,9 @@ def compute_check_image(is_gpu=False):
     process.wait()
 
     if not process.stdout.read():
-        LOGGER.info("No compute image found!")
-        LOGGER.info("Make sure you run the following before deploying to the cloud!")
-        LOGGER.info("$ surround run %s", "buildComputeGPU" if is_gpu else "buildCompute")
+        print("No compute image found!")
+        print("Make sure you run the following before deploying to the cloud!")
+        print("$ surround run", "buildComputeGPU" if is_gpu else "buildCompute")
         return False
 
     return True
@@ -355,7 +353,7 @@ def compute_get_ml_client(credentials):
         break
 
     if not cloud_ml:
-        LOGGER.info("Failed to create ML client, try again later!")
+        print("Failed to create ML client, try again later!")
 
     return cloud_ml
 
@@ -408,15 +406,15 @@ def compute_deploy_job(mode="batch", is_gpu=False):
         # execute request
         job = request.execute()
 
-        LOGGER.info("Job deployed to cloud successfully!\n")
-        LOGGER.info("Job ID:     %s", job['jobId'])
-        LOGGER.info("Status:     %s\n", job['state'])
-        LOGGER.info("To check the status, run:")
-        LOGGER.info("$ surround run statusCompute %s", job['jobId'])
+        print("Job deployed to cloud successfully!\n")
+        print("Job ID:     %s" % job['jobId'])
+        print("Status:     %s\n" % job['state'])
+        print("To check the status, run:")
+        print("$ surround run statusCompute %s" % job['jobId'])
     except HttpError as err:
-        LOGGER.info("Failed to deploy job to the cloud!")
+        print("Failed to deploy job to the cloud!")
         # pylint: disable=protected-access
-        LOGGER.info("Reason: %s", err._get_reason())
+        print("Reason: %s" % err._get_reason())
 
     return True
 
@@ -482,10 +480,10 @@ def task_compute_list():
             if 'scaleTier' in job['trainingInput']:
                 scale_tier = job['trainingInput']['scaleTier']
 
-            LOGGER.info("Job ID:     %s", job['jobId'])
-            LOGGER.info("Status:     %s", job['state'])
-            LOGGER.info("Scale Tier: %s", scale_tier)
-            LOGGER.info("Arguments:  %s\n", job['trainingInput']['args'])
+            print("Job ID:     %s" % job['jobId'])
+            print("Status:     %s" % job['state'])
+            print("Scale Tier: %s" % scale_tier)
+            print("Arguments:  %s\n" % job['trainingInput']['args'])
 
         return True
 
@@ -520,12 +518,12 @@ def task_compute_status():
             if 'scaleTier' in response['trainingInput']:
                 scale_tier = response['trainingInput']['scaleTier']
 
-            LOGGER.info("Job ID:     %s", response['jobId'])
-            LOGGER.info("Status:     %s", response['state'])
-            LOGGER.info("Scale Tier: %s", scale_tier)
-            LOGGER.info("Arguments:  %s", response['trainingInput']['args'])
+            print("Job ID:     %s" % response['jobId'])
+            print("Status:     %s" % response['state'])
+            print("Scale Tier: %s" % scale_tier)
+            print("Arguments:  %s" % response['trainingInput']['args'])
         except HttpError:
-            LOGGER.info("Failed to get the status of the job!")
+            print("Failed to get the status of the job!")
 
         return True
 
@@ -555,12 +553,12 @@ def task_compute_kill():
             request = cloud_ml.projects().jobs().cancel(name=job_id)
             request.execute()
 
-            LOGGER.info("Sent the kill request!\n")
-            LOGGER.info("Check the status using:")
-            LOGGER.info("$ surround run statusCompute %s", args)
+            print("Sent the kill request!\n")
+            print("Check the status using:")
+            print("$ surround run statusCompute %s" % args)
         except HttpError:
-            LOGGER.info("Failed to send cancel job request!")
-            LOGGER.info("Check the job ID and whether it is still running or not")
+            print("Failed to send cancel job request!")
+            print("Check the job ID and whether it is still running or not")
 
         return True
 
