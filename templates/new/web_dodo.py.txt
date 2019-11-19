@@ -11,11 +11,11 @@ import logging
 import ssl
 
 from pathlib import Path
+from datetime import datetime
 
 from google.oauth2 import service_account
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
-from datetime import datetime
 
 from surround import Config
 from surround.util import generate_docker_volume_path
@@ -266,20 +266,28 @@ def compute_docker_login():
     """Login to the Google Cloud Container Registry with Docker"""
 
     if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-        print("You have not provided any Google Cloud credentials!")
-        print("Please set the GOOGLE_APPLICATION_CREDENTIALS env variable to a path to the credentials file")
+        LOGGER.info("You have not provided any Google Cloud credentials!")
+        LOGGER.info("Set GOOGLE_APPLICATION_CREDENTIALS env var to the credentials file location")
         return False
 
-    with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'rb') as f:
-        process = subprocess.Popen(['docker', 'login', '-u', '_json_key', '--password-stdin', 'https://gcr.io'], stdin=f)
+    with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'rb') as cred_file:
+        process = subprocess.Popen(
+            [
+                'docker',
+                'login',
+                '-u',
+                '_json_key',
+                '--password-stdin',
+                'https://gcr.io'
+            ], stdin=cred_file)
         return process.wait() == 0
 
 def compute_get_credentials():
     """Returns the Google Cloud service account"""
-    
+
     if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
-        print("You have not provided any Google Cloud credentials!")
-        print("Please set the GOOGLE_APPLICATION_CREDENTIALS env variable to a path to the credentials file")
+        LOGGER.info("You have not provided any Google Cloud credentials!")
+        LOGGER.info("Set GOOGLE_APPLICATION_CREDENTIALS env var to the credentials file location")
 
         return None
 
@@ -300,16 +308,16 @@ def compute_docker_build_cmd(dockerfile, is_gpu=False):
     user_name = global_config.get_path("user.name")
     user_email = global_config.get_path("user.email")
     experiment_url = global_config.get_path("experiment.url")
-    
+
     credentials = compute_get_credentials()
     if not credentials:
         # Fail task since we have no credentials
         return "", lambda: False
 
     # Copy the credentials file to the root of the project
-    with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "rb") as cf:
-        with open("credentials.json", "wb+") as tf:
-            tf.write(cf.read())
+    with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "rb") as cred_file:
+        with open("credentials.json", "wb+") as output:
+            output.write(cred_file.read())
 
     # Construct image uri
     image_uri = "gcr.io/%s/%s" % (credentials.project_id, IMAGE if not is_gpu else "%s-gpu" % IMAGE)
@@ -329,7 +337,7 @@ def task_compute_build():
 
     # Construct build command
     image_uri, build_cmd = compute_docker_build_cmd("Dockerfile-compute")
-    
+
     # Construct push command
     push_cmd = "docker push %s" % image_uri
 
@@ -343,7 +351,7 @@ def task_compute_build_gpu():
 
     # Construct build command
     image_uri, build_cmd = compute_docker_build_cmd("Dockerfile-compute-gpu", True)
-    
+
     # Construct push command
     push_cmd = "docker push %s" % image_uri
 
@@ -356,17 +364,27 @@ def compute_check_image(is_gpu=False):
     """Checks whether there has been an image build for compute"""
 
     image_name = IMAGE if not is_gpu else ("%s-gpu" % IMAGE)
-    process = subprocess.Popen(['docker', 'images', '-q', '-f', 'reference=gcr.io/*/%s' % image_name], stdout=subprocess.PIPE)
+    process = subprocess.Popen(
+        [
+            'docker',
+            'images',
+            '-q',
+            '-f',
+            'reference=gcr.io/*/%s' % image_name
+        ], stdout=subprocess.PIPE)
     process.wait()
 
     if not process.stdout.read():
-        print("No compute image found!")
-        print("Make sure you run the following before deploying to the cloud!")
-        print("$ surround run %s" % ("buildComputeGPU" if is_gpu else "buildCompute"))
+        LOGGER.info("No compute image found!")
+        LOGGER.info("Make sure you run the following before deploying to the cloud!")
+        LOGGER.info("$ surround run %s", "buildComputeGPU" if is_gpu else "buildCompute")
         return False
 
+    return True
+
 def compute_get_ml_client(credentials):
-    """Gets the ML API client from Google using the credentials. Tries multiple times due to random Google bug"""
+    """Gets the ML API client from Google using the credentials.
+    Tries multiple times due to random Google bug"""
 
     count = 0
     cloud_ml = None
@@ -381,7 +399,7 @@ def compute_get_ml_client(credentials):
         break
 
     if not cloud_ml:
-        print("Failed to create ML client, try again later!")
+        LOGGER.info("Failed to create ML client, try again later!")
 
     return cloud_ml
 
@@ -404,47 +422,53 @@ def compute_deploy_job(mode="batch", is_gpu=False):
     job_name = '{project_name}_%s_%s_%s' % (mode, ("gpu" if is_gpu else "cpu"), now)
     image_name = IMAGE if not is_gpu else ("%s-gpu" % IMAGE)
     image_uri = "gcr.io/%s/%s" % (credentials.project_id, image_name)
-    
+
     # Only run as experiment if using cloud storage for experiments
     global_config = get_surround_config()
     run_as_experiment = not os.path.exists(global_config.get_path("experiment.url"))
 
-    training_input = {{
-        "scaleTier": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["scale-tier"],
-        "masterConfig": {{
-            "imageUri": image_uri
-        }},
-        "args": ['--mode=%s' % mode, '--runner=1', '--experiment' if run_as_experiment else "--no-experiment"],
-        "region": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["region"]
-    }}
-
     job_spec = {{
         'jobId': job_name,
-        'trainingInput': training_input
+        'trainingInput': {{
+            "scaleTier": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["scale-tier"],
+            "masterConfig": {{
+                "imageUri": image_uri
+            }},
+            "args": [
+                '--mode=%s' % mode,
+                '--runner=1',
+                '' if run_as_experiment else "--no-experiment"
+            ],
+            "region": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["region"]
+        }}
     }}
 
     # Request for creating job
+    # pylint: disable=no-member
     request = cloud_ml.projects().jobs().create(body=job_spec, parent=project_id)
 
     try:
         # execute request
         job = request.execute()
 
-        print("Job deployed to cloud successfully!\n")
-        print("Job ID:     %s" % job['jobId'])
-        print("Status:     %s\n" % job['state'])
-        print("To check the status, run:")
-        print("$ surround run statusCompute %s" % job['jobId'])
+        LOGGER.info("Job deployed to cloud successfully!\n")
+        LOGGER.info("Job ID:     %s", job['jobId'])
+        LOGGER.info("Status:     %s\n", job['state'])
+        LOGGER.info("To check the status, run:")
+        LOGGER.info("$ surround run statusCompute %s", job['jobId'])
     except HttpError as err:
-        print("Failed to deploy job to the cloud!")
-        print("Reason: %s" % err._get_reason())
+        LOGGER.info("Failed to deploy job to the cloud!")
+        # pylint: disable=protected-access
+        LOGGER.info("Reason: %s", err._get_reason())
+
+    return True
 
 def task_compute_batch():
     """Submit a batch-predict compute job to Google Cloud (AI Platform)"""
-    
+
     return {{
         'basename': 'batchCompute',
-        'actions': [lambda: compute_check_image(), lambda: compute_deploy_job()]
+        'actions': [compute_check_image, compute_deploy_job]
     }}
 
 def task_compute_train():
@@ -452,7 +476,7 @@ def task_compute_train():
 
     return {{
         'basename': 'trainCompute',
-        'actions': [lambda: compute_check_image(), lambda: compute_deploy_job(mode="train")]
+        'actions': [compute_check_image, lambda: compute_deploy_job(mode="train")]
     }}
 
 def task_compute_batch_gpu():
@@ -468,7 +492,10 @@ def task_compute_train_gpu():
 
     return {{
         'basename': 'trainComputeGPU',
-        'actions': [lambda: compute_check_image(True), lambda: compute_deploy_job(mode="train", is_gpu=True)]
+        'actions': [
+            lambda: compute_check_image(True),
+            lambda: compute_deploy_job(mode="train", is_gpu=True)
+        ]
     }}
 
 def task_compute_list():
@@ -487,14 +514,22 @@ def task_compute_list():
             return False
 
         project_id = 'projects/%s' % credentials.project_id
+        # pylint: disable=no-member
         request = cloud_ml.projects().jobs().list(parent=project_id)
         response = request.execute()
 
-        for job in [j for j in response['jobs'] if re.search(r'^{project_name}_(train|batch)_(cpu|gpu)', j['jobId'])]:
-            print("Job ID:     %s" % job['jobId'])
-            print("Status:     %s" % job['state'])
-            print("Scale Tier: %s" % (job['trainingInput']['scaleTier'] if 'scaleTier' in job['trainingInput'] else "BASIC"))
-            print("Arguments:  %s\n" % job['trainingInput']['args'])
+        pattern = r'^{project_name}_(train|batch)_(cpu|gpu)'
+        for job in [j for j in response['jobs'] if re.search(pattern, j['jobId'])]:
+            scale_tier = "BASIC"
+            if 'scaleTier' in job['trainingInput']:
+                scale_tier = job['trainingInput']['scaleTier']
+
+            LOGGER.info("Job ID:     %s", job['jobId'])
+            LOGGER.info("Status:     %s", job['state'])
+            LOGGER.info("Scale Tier: %s", scale_tier)
+            LOGGER.info("Arguments:  %s\n", job['trainingInput']['args'])
+
+        return True
 
     return {{
         'basename': 'listCompute',
@@ -503,7 +538,7 @@ def task_compute_list():
 
 def task_compute_status():
     """Retrieve the status of a single compute job from Google Cloud (AI Platform)"""
-    
+
     def show_status(args):
         """Shows the status of the job"""
 
@@ -519,15 +554,22 @@ def task_compute_status():
             return False
 
         try:
+            # pylint: disable=no-member
             request = cloud_ml.projects().jobs().get(name=job_id)
             response = request.execute()
 
-            print("Job ID:     %s" % response['jobId'])
-            print("Status:     %s" % response['state'])
-            print("Scale Tier: %s" % (response['trainingInput']['scaleTier'] if 'scaleTier' in response['trainingInput'] else "BASIC"))
-            print("Arguments:  %s" % response['trainingInput']['args'])
+            scale_tier = "BASIC"
+            if 'scaleTier' in response['trainingInput']:
+                scale_tier = response['trainingInput']['scaleTier']
+
+            LOGGER.info("Job ID:     %s", response['jobId'])
+            LOGGER.info("Status:     %s", response['state'])
+            LOGGER.info("Scale Tier: %s", scale_tier)
+            LOGGER.info("Arguments:  %s", response['trainingInput']['args'])
         except HttpError:
-            print("Failed to get the status of the job!")
+            LOGGER.info("Failed to get the status of the job!")
+
+        return True
 
     return {{
         'basename': 'statusCompute',
@@ -551,15 +593,18 @@ def task_compute_kill():
             return False
 
         try:
+            # pylint: disable=no-member
             request = cloud_ml.projects().jobs().cancel(name=job_id)
             request.execute()
-            
-            print("Sent the kill request!\n")
-            print("Check the status using:")
-            print("$ surround run statusCompute %s" % args)
+
+            LOGGER.info("Sent the kill request!\n")
+            LOGGER.info("Check the status using:")
+            LOGGER.info("$ surround run statusCompute %s", args)
         except HttpError:
-            print("Failed to send cancel job request!")
-            print("Check the job ID and whether it is still running or not")
+            LOGGER.info("Failed to send cancel job request!")
+            LOGGER.info("Check the job ID and whether it is still running or not")
+
+        return True
 
     return {{
         'basename': 'killCompute',
