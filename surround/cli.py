@@ -242,13 +242,11 @@ def parse_lint_args(parser, args, extra_args):
 
     linter = Linter()
     if args.list:
-        print(linter.dump_checks())
+        linter.dump_checks()
+    elif remote_cli.get_project_root(os.path.abspath(args.path)):
+        linter.check_project(args.path, extra_args, verbose=True)
     else:
-        errors, warnings = linter.check_project(PROJECTS, args.path)
-        for e in errors + warnings:
-            print(e)
-        if not errors and not warnings:
-            print("All checks passed")
+        print("error: .surround does not exist")
 
 def parse_run_args(parser, args, extra_args):
     """

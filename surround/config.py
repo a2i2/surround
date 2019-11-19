@@ -214,7 +214,7 @@ class Config(Mapping):
             parent_directory = os.path.dirname(current_directory)
             if current_directory in (home, parent_directory):
                 break
-            elif ".surround" in list_:
+            if ".surround" in list_:
                 return current_directory
             current_directory = parent_directory
 

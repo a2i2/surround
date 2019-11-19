@@ -1,6 +1,10 @@
+"""
+This module is responsible for loading the data and running the pipeline.
+"""
+
 import logging
-from surround import Runner, RunMode
-from stages import AssemblerState
+from surround import Runner
+from .stages import AssemblerState
 
 logging.basicConfig(level=logging.INFO)
 

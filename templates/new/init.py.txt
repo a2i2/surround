@@ -1,3 +1,7 @@
+"""
+This file is required for the project to be considered a python package.
+"""
+
 import os
 import sys
 

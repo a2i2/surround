@@ -11,7 +11,7 @@ __date__ = '2019/03/04'
 class AddTest(unittest.TestCase):
 
     def test_rejecting_path(self):
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertIn("info: project created at", process.stdout)
         self.assertIn("temp", process.stdout)
 
@@ -25,7 +25,7 @@ class AddTest(unittest.TestCase):
         os.chdir("../")
         self.assertEqual(result, "error: no remote named data")
 
-        process = subprocess.run(['surround', 'store', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        process = subprocess.run(['surround', 'store', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp', check=True)
 
         os.chdir("temp")
         result = local_remote.add('data', 'temp.jpg')
@@ -33,14 +33,14 @@ class AddTest(unittest.TestCase):
         self.assertEqual(result, "error: temp.jpg not found.")
 
     def test_happy_path(self):
-        process = subprocess.run(['surround', 'init', os.getcwd(), '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE)
+        process = subprocess.run(['surround', 'init', os.getcwd(), '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertIn("info: project created at", process.stdout)
         self.assertIn("temp", process.stdout)
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
 
-        process = subprocess.run(['surround', 'store', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp')
+        process = subprocess.run(['surround', 'store', 'remote', '-a', '-n', 'data', '-u', os.getcwd()], encoding='utf-8', stdout=subprocess.PIPE, cwd='temp', check=True)
 
         local_remote = Local()
 
