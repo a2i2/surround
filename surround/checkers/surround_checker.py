@@ -8,7 +8,7 @@ class SurroundChecker(checkers.BaseChecker):
     name = 'surround-convention'
 
     msgs = {
-        'CS001': (
+        'C0001': (
             "Use of print instead of logging statements",
             'surround-avoid-print',
             'Used when a script uses print instead of a logging statement',
