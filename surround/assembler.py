@@ -7,7 +7,7 @@ import logging
 from abc import ABC
 from datetime import datetime
 
-from .config import Config
+from .config import Config, has_config
 from .stage import Filter, Estimator, Validator
 from .visualiser import Visualiser
 
@@ -57,7 +57,8 @@ class Assembler(ABC):
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, assembler_name=""):
+    @has_config
+    def __init__(self, assembler_name="", config=None):
         """
         Constructor for an Assembler pipeline:
 
@@ -66,7 +67,7 @@ class Assembler(ABC):
         """
 
         self.assembler_name = assembler_name
-        self.config = Config(auto_load=True)
+        self.config = config
         self.stages = None
         self.estimator = None
         self.validator = None

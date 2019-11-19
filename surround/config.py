@@ -1,5 +1,6 @@
 import ast
 import os
+import functools
 
 from pathlib import Path
 from collections.abc import Mapping
@@ -50,6 +51,19 @@ class Config(Mapping):
 
         SURRROUND_PREDICT_DEBUG=False
     """
+
+    __instance = None
+
+    @staticmethod
+    def instance():
+        """
+        Static method which returns the a singleton instance of Config.
+        """
+
+        if not Config.__instance:
+            Config.__instance = Config(auto_load=True)
+
+        return Config.__instance
 
     def __init__(self, project_root=None, package_path=None, auto_load=False):
         """
@@ -373,3 +387,40 @@ class Config(Mapping):
         """
 
         return len(self._storage)
+
+def has_config(func=None, name="config", filename=None):
+    """
+    Decorator that injects the singleton config instance into the arguments of the function.
+    e.g.
+    ```
+        @has_config
+        def some_func(config):
+            value = config.get_path("some.config")
+            ...
+
+        @has_config(name="global_config")
+        def other_func(global_config, new_config):
+            value = config.get_path("some.config")
+
+        @has_config(filename="override.yaml")
+        def some_func(config):
+            value = config.get_path("override.value")
+    ```
+    """
+
+    @functools.wraps(func)
+    def function_wrapper(*args, **kwargs):
+        config = Config.instance()
+        if filename:
+            path = os.path.join(config.get_path("package_path"), filename)
+            config.read_config_files([path])
+        kwargs[name] = config
+        return func(*args, **kwargs)
+
+    if func:
+        return function_wrapper
+
+    def recursive_wrapper(func):
+        return has_config(func, name, filename)
+
+    return recursive_wrapper
