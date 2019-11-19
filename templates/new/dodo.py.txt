@@ -391,12 +391,14 @@ def compute_deploy_job(mode="batch", is_gpu=False):
                 "imageUri": image_uri
             }},
             "args": [
-                '--mode=%s' % mode,
-                '' if run_as_experiment else "--no-experiment"
+                '--mode=%s' % mode
             ],
             "region": CONFIG["compute"]["gpu" if is_gpu else "cpu"]["region"]
         }}
     }}
+
+    if not run_as_experiment:
+        job_spec['trainingInput']['args'].append('--no-experiment')
 
     # Request for creating job
     # pylint: disable=no-member
