@@ -412,7 +412,7 @@ def has_config(func=None, name="config", filename=None):
     def function_wrapper(*args, **kwargs):
         config = Config.instance()
         if filename:
-            path = os.path.join(config["package_path"], filename)
+            path = os.path.join(config.get_path("package_path"), filename)
             config.read_config_files([path])
         kwargs[name] = config
         return func(*args, **kwargs)
