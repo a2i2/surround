@@ -200,6 +200,8 @@ def task_batch_local():
     }}
 
 def task_jupyter():
+    """Run a Jupyter Lab server and open in a browser"""
+
     # Allow for auto reload to be enabled and import modules from project package
     ipython_config = "c.InteractiveShellApp.extensions.append('autoreload')\n"
     ipython_config += "c.InteractiveShellApp.exec_lines = "
@@ -278,9 +280,9 @@ def task_jupyter():
                 return
 
         # Open the browser automatically
-        webbrowser.open('http://%s:55910/tree' % host, new=2)
+        webbrowser.open('http://%s:55910/lab' % host, new=2)
 
-        LOGGER.info("Notebook URL: http://%s:55910/tree\n", host)
+        LOGGER.info("Notebook URL: http://%s:55910/lab\n", host)
         LOGGER.info("Use CTRL+C to stop the server.")
 
         try:
