@@ -7,7 +7,7 @@
    "outputs": [],
    "source": [
     "# Example importing code from the Surround project\n",
-    "from {project_name}.stages import Main"
+    "from {project_name}.stages import Baseline"
    ]
   }}
  ],
