@@ -244,18 +244,21 @@ def task_jupyter():
         LOGGER.info("Starting jupyter notbook server...\n")
 
         # Get the IP address of the container, otherwise use localhost
-        ip_process = subprocess.Popen(
-            ['docker-machine', 'ip'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            encoding='utf-8')
-        ip_process.wait()
+        try:
+            ip_process = subprocess.Popen(
+                ['docker-machine', 'ip'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                encoding='utf-8')
+            ip_process.wait()
 
-        ip_output = ip_process.stdout.readline().rstrip()
+            ip_output = ip_process.stdout.readline().rstrip()
 
-        if re.match(r"^(\d{{1,3}}\.){{3}}\d{{1,3}}$", ip_output):
-            host = ip_output
-        else:
+            if re.match(r"^(\d{{1,3}}\.){{3}}\d{{1,3}}$", ip_output):
+                host = ip_output
+            else:
+                host = "localhost"
+        except Exception:
             host = "localhost"
 
         # Wait for the notebook server to be up before loading browser
