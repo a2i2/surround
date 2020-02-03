@@ -306,7 +306,7 @@ def task_jupyter():
                 host = ip_output
             else:
                 host = "localhost"
-        except Exception:
+        except FileNotFoundError:
             host = "localhost"
 
         # Wait for the notebook server to be up before loading browser
