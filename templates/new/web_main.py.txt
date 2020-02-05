@@ -52,7 +52,8 @@ def main(config=None):
         ASSEMBLIES,
         "{project_name}",
         "{project_description}",
-        os.path.dirname(os.path.dirname(__file__))
+        os.path.dirname(os.path.dirname(__file__)),
+        args.experiment
     )
 
     if args.status:
