@@ -46,8 +46,31 @@ def task_status():
 
 def task_build():
     """Build the Docker image for the current project"""
+
+    def get_credentials():
+        global_config = get_surround_config()
+
+        experiment_url = global_config.get_path("experiment.url")
+        if experiment_url and "gs://" in global_config.get_path("experiment.url")[:5]:
+            if "GOOGLE_APPLICATION_CREDENTIALS" not in os.environ:
+                print("WARNING: No Google Cloud credentials were found! Experiments will not work!")
+            else:
+                # Copy credentials into root directory of project
+                with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "rb") as f:
+                    with open("credentials.json", "wb") as output:
+                        output.write(f.read())
+
+        return True
+
+    def remove_credentials():
+        if os.path.exists("credentials.json"):
+            os.remove("credentials.json")
+
+        return True
+
     return {{
-        'actions': ['docker build --tag=%s .' % IMAGE],
+        'actions': [get_credentials, 'docker build --tag=%s .' % IMAGE],
+        'teardown': [remove_credentials],
         'params': PARAMS
     }}
 
