@@ -56,9 +56,9 @@ def task_build():
                 print("WARNING: No Google Cloud credentials were found! Experiments will not work!")
             else:
                 # Copy credentials into root directory of project
-                with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "rb") as f:
+                with open(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], "rb") as cred:
                     with open("credentials.json", "wb") as output:
-                        output.write(f.read())
+                        output.write(cred.read())
 
         return True
 
