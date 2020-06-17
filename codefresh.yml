@@ -1,0 +1,74 @@
+# More examples of Codefresh YAML can be found at
+# https://codefresh.io/docs/docs/yaml-examples/examples/
+
+version: "1.0"
+# Stages can help you organize your steps in stages
+stages:
+  - "clone"
+  - "test"
+  - "release"
+
+steps:
+  clone:
+    title: "Cloning repository"
+    type: "git-clone"
+    repo: "a2i2/surround"
+    # CF_BRANCH value is auto set when pipeline is triggered
+    # Learn more at codefresh.io/docs/docs/codefresh-yaml/variables/
+    revision: "${{CF_BRANCH}}"
+    git: "github"
+    stage: "clone"
+
+  test:
+    title: "Run Python tests"
+    type: "freestyle" # Run any command
+    image: "python:${{PYTHON_VERSION}}" # The image in which command will be executed
+    working_directory: "${{clone}}" # Running command where code cloned
+    commands:
+      # Install sudo
+      - apt-get update && apt-get install sudo -y
+
+      # Install surround
+      - sudo python setup.py install
+
+      # Run tests
+      - sudo python setup.py test
+
+      # Run pylint tests
+      - pylint setup.py
+      - find surround/ -iname "*.py" | xargs pylint
+      - find examples/ -iname "*.py" | xargs pylint
+
+      # Run examples
+      - ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
+    stage: "test"
+
+  release:
+    title: "Release to Pypi"
+    type: "freestyle" # Run any command
+    image: "python:${{PYTHON_VERSION}}" # The image in which command will be executed
+    working_directory: "${{clone}}" # Running command where code cloned
+    commands:
+      # Install sudo
+      - apt-get update && apt-get install sudo -y
+
+      # Install required packages
+      - python -m pip install --user --upgrade setuptools wheel twine
+
+      # Setup Pypi config
+      - echo -e "[pypi]" >> ~/.pypirc
+      - echo -e "repository:https://upload.pypi.org/legacy/" >> ~/.pypirc
+      - echo -e "username:${{PYPI_USERNAME}}" >> ~/.pypirc
+      - echo -e "password:${{PYPI_PASSWORD}}" >> ~/.pypirc
+
+      # Build package
+      - VERSION_TAG=$(git tag -l --points-at HEAD) python setup.py sdist bdist_wheel
+
+      # Upload package for distribution
+      - python -m twine upload --repository pypi dist/*
+    when:
+      branch:
+        only:
+          - master
+          - /v([0-9]+)\.([0-9]+)\.([0-9]+)?$/
+    stage: "release"
