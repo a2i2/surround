@@ -6,7 +6,6 @@ version: "1.0"
 stages:
   - "clone"
   - "test"
-  - "approval"
   - "release"
 
 steps:
@@ -53,7 +52,7 @@ steps:
         only:
           - master
           - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
-    stage: "approval"
+    stage: "release"
 
   release:
     title: "Release to Pypi"
