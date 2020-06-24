@@ -56,10 +56,10 @@ steps:
       - python -m pip install --user --upgrade setuptools wheel twine
 
       # Setup Pypi config
-      - echo -e "[pypi]" >> ~/.pypirc
-      - echo -e "repository:https://upload.pypi.org/legacy/" >> ~/.pypirc
-      - echo -e "username:${{PYPI_USERNAME}}" >> ~/.pypirc
-      - echo -e "password:${{PYPI_PASSWORD}}" >> ~/.pypirc
+      - echo "[pypi]" > ~/.pypirc
+      - echo "repository=https://upload.pypi.org/legacy/" >> ~/.pypirc
+      - echo "username=${{PYPI_USERNAME}}" >> ~/.pypirc
+      - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
 
       # Build package
       - VERSION_TAG=$(git tag -l --points-at HEAD) python setup.py sdist bdist_wheel
@@ -70,5 +70,5 @@ steps:
       branch:
         only:
           - master
-          - /v([0-9]+)\.([0-9]+)\.([0-9]+)?$/
+          - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
     stage: "release"
