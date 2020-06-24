@@ -22,17 +22,14 @@ steps:
   test:
     title: "Run Python tests"
     type: "freestyle" # Run any command
-    image: "python:${{PYTHON_VERSION}}" # The image in which command will be executed
+    image: "python:3.6.10" # The image in which command will be executed
     working_directory: "${{clone}}" # Running command where code cloned
     commands:
-      # Install sudo
-      - apt-get update && apt-get install sudo -y
-
       # Install surround
-      - sudo python setup.py install
+      - python3 setup.py install
 
       # Run tests
-      - sudo python setup.py test
+      - python3 setup.py test
 
       # Run pylint tests
       - pylint setup.py
@@ -40,20 +37,17 @@ steps:
       - find examples/ -iname "*.py" | xargs pylint
 
       # Run examples
-      - ls examples/ | xargs -n 1 -I '{}' python examples/'{}'/main.py
+      - ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
     stage: "test"
 
   release:
     title: "Release to Pypi"
     type: "freestyle" # Run any command
-    image: "python:${{PYTHON_VERSION}}" # The image in which command will be executed
+    image: "python:3.6.10" # The image in which command will be executed
     working_directory: "${{clone}}" # Running command where code cloned
     commands:
-      # Install sudo
-      - apt-get update && apt-get install sudo -y
-
       # Install required packages
-      - python -m pip install --user --upgrade setuptools wheel twine
+      - python3 -m pip install --user --upgrade setuptools wheel twine
 
       # Setup Pypi config
       - echo "[pypi]" > ~/.pypirc
@@ -62,10 +56,10 @@ steps:
       - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
 
       # Build package
-      - VERSION_TAG=$(git tag -l --points-at HEAD) python setup.py sdist bdist_wheel
+      - VERSION_TAG=$(git tag -l --points-at HEAD) python3 setup.py sdist bdist_wheel
 
       # Upload package for distribution
-      - python -m twine upload --repository pypi dist/*
+      - python3 -m twine upload --repository pypi dist/*
     when:
       branch:
         only:
