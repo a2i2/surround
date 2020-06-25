@@ -1,4 +1,4 @@
-from surround import Validator, Estimator, State
+from surround import Estimator, State, Stage
 
 
 class AssemblyState(State):
@@ -6,8 +6,8 @@ class AssemblyState(State):
     output_data = ""
     lines = []
 
-class InputValidator(Validator):
-    def validate(self, state, config):
+class InputValidator(Stage):
+    def operate(self, state, config):
         if not state.input_data:
             raise ValueError("'input_data' is None")
 

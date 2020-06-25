@@ -16,7 +16,7 @@ TODO: Add a flag that describes each aspect of the generated report in human rea
 import numpy as np
 
 from ..state import State
-from ..visualiser import Visualiser
+from ..stage import Stage
 
 class VisualiseClassifierData(State):
     """
@@ -27,7 +27,7 @@ class VisualiseClassifierData(State):
     y_pred = []
     visualise_output = {}
 
-class VisualiseClassifier(Visualiser):
+class VisualiseClassifier(Stage):
     """
     Classification visualiser stage. Generates metrics based on a column of ground truth values
     and predicted values to help you evaluate the performance of the estimator.
@@ -36,7 +36,7 @@ class VisualiseClassifier(Visualiser):
             Where the ``visualise_output`` field must be a dictionary and the other two lists of values.
     """
 
-    def validate(self, state, config):
+    def validate(self, state):
         """
         Validate the data given to the visualiser. Checks whether we have the required fields
         to perform visualisation.
@@ -119,8 +119,7 @@ class VisualiseClassifier(Visualiser):
 
         return result
 
-    # pylint: disable=too-many-locals
-    def visualise(self, surround_data, config):
+    def operate(self, surround_data, config):
         """
         Visualises the classifier data, calculating metrics such as accuracy, precision, cohen_kappa,
         f1-score and a confusion matrix. Prints the results to the terminal.
@@ -131,7 +130,7 @@ class VisualiseClassifier(Visualiser):
         :type config: :class:`surround.Config`
         """
 
-        if not self.validate(surround_data, config):
+        if not self.validate(surround_data):
             for error in surround_data.errors:
                 print("ERROR: " + error)
             return

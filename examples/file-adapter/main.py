@@ -2,7 +2,7 @@ import logging
 import os
 import csv
 
-from surround import Estimator, State, Assembler, Validator, Config, Runner, RunMode
+from surround import Estimator, State, Assembler, Stage, Config, Runner, RunMode
 
 prefix = ""
 
@@ -32,8 +32,8 @@ class MainRunner(Runner):
         logging.info("File written to %s", output_path)
 
 
-class CSVValidator(Validator):
-    def validate(self, state, config):
+class CSVValidator(Stage):
+    def operate(self, state, config):
         if not state.rows:
             raise ValueError("'rows' is empty")
 
@@ -69,6 +69,6 @@ if __name__ == "__main__":
 
     app_config = Config()
     app_config.read_config_files([prefix + "config.yaml"])
-    assembler = Assembler("Loader example").set_validator(CSVValidator()).set_estimator(ProcessCSV()).set_config(app_config)
+    assembler = Assembler("Loader example").set_stages([CSVValidator(), ProcessCSV()]).set_config(app_config)
 
     MainRunner(assembler).run()

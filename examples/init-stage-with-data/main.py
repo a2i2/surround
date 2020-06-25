@@ -1,7 +1,7 @@
 import logging
 import os
 
-from surround import Estimator, State, Assembler, Config, Validator
+from surround import Estimator, State, Assembler, Config, Stage
 
 prefix = ""
 
@@ -24,8 +24,8 @@ class AssemblerState(State):
     text = None
 
 
-class InputValidator(Validator):
-    def validate(self, state, config):
+class InputValidator(Stage):
+    def operate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     app_config.read_config_files([prefix + "config.yaml"])
 
     data = AssemblerState()
-    assembler = Assembler("Init state example").set_validator(InputValidator()).set_estimator(HelloWorld()).set_config(app_config)
+    assembler = Assembler("Init state example").set_stages([InputValidator(), HelloWorld()]).set_config(app_config)
     assembler.init_assembler()
     assembler.run(data)
 

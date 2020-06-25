@@ -68,19 +68,12 @@ class State(Frozen):
             def __init__(self, input_data)
                 self.input_data = input_data
 
-        class ValidationStage(Validator):
-            def operate(self, data, config):
-                if not isinstance(data.input_data, str):
-                    data.errors.append('not correct input format!')
-                elif len(data.input_data) == 0:
-                    data.warnings.append('input is empty')
 
         class Predict(Estimator):
             # Do prediction here
 
         pipeline = Assembler("Example")
-                    .set_validator(ValidationStage())
-                    .set_estimator(Predict())
+                    .set_stages([Predict()])
         pipeline.init_assembler()
 
         data = PipelineData("received data")
@@ -99,3 +92,4 @@ class State(Frozen):
         self.execution_time = []
         self.errors = []
         self.warnings = []
+        self.metrics = {}

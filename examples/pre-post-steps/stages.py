@@ -1,7 +1,7 @@
-from surround import Filter, Estimator, State, Validator
+from surround import Stage, Estimator, State
 
 
-class AddHello(Filter):
+class AddHello(Stage):
     def operate(self, state, config):
         state.text = "hello"
 
@@ -14,7 +14,7 @@ class AddWorld(Estimator):
         print("No training implemented")
 
 
-class AddSurround(Filter):
+class AddSurround(Stage):
     def operate(self, state, config):
         state.text += ", Surround"
 
@@ -23,7 +23,7 @@ class AssemblerState(State):
     text = None
 
 
-class InputValidator(Validator):
-    def validate(self, state, config):
+class InputValidator(Stage):
+    def operate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")

@@ -145,7 +145,7 @@ def execute_visualise_tool(parser, args, extra_args):
         print("Predict column label: %s" % prediction_columns[i])
 
         # Run the visualiser / display results in the terminal
-        visualiser.visualise(data, config)
+        visualiser.operate(data, config)
 
         print()
 

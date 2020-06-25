@@ -1,7 +1,6 @@
 import unittest
 import os
-from surround import Assembler, Estimator, State, Config, Validator, Filter
-
+from surround import Assembler, Estimator, State, Config, Stage
 
 test_text = "hello"
 
@@ -37,8 +36,8 @@ class AssemblerState(State):
         self.estimator_throw = False
         self.estimator_add_error = False
 
-class InputValidator(Validator):
-    def validate(self, state, config):
+class InputValidator(Stage):
+    def operate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
 
@@ -51,7 +50,7 @@ class InputValidator(Validator):
         if state.validator_add_error:
             state.errors.append("Error!!")
 
-class BadFilter(Filter):
+class BadFilter(Stage):
     def initialise(self, config):
         raise Exception("This will fail always")
 
@@ -61,11 +60,11 @@ class BadFilter(Filter):
         else:
             raise Exception("This will fail always")
 
-class PostFilter(Filter):
+class PostFilter(Stage):
     def operate(self, state, config):
         state.post_filter_ran = True
 
-class TestFinalStage(Filter):
+class TestFinalStage(Stage):
     def operate(self, state, config):
         state.final_ran = True
 

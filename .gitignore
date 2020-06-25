@@ -54,3 +54,5 @@ venv.bak/
 
 # Doit files
 .doit*
+
+.idea

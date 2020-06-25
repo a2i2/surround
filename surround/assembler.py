@@ -1,14 +1,14 @@
 # assembler.py
 
-import sys
-import os
 import logging
+import os
+import sys
 from abc import ABC
 from datetime import datetime
 
 from .config import Config, has_config
 from .run_modes import RunMode
-from .stage import Estimator, Stage, Filter, Validator
+from .stage import Stage, Estimator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -65,35 +65,40 @@ class Assembler(ABC):
         self.stages = None
         self.batch_mode = False
         self.finaliser = None
+        self.state = None
         self.metrics = None
 
     def init_assembler(self):
+
         """
         Initializes the assembler and all of it's stages.
 
         Calls the :meth:`surround.stage.Stage.initialise` method of all stages and the estimator.
 
-        .. note:: Should be called after :meth:`surround.assembler.Assembler.set_estimator` and
-                :meth:`surround.assembler.Assembler.set_config`.
+        .. note:: Should be called after :meth:`surround.assembler.Assembler.set_config`.
 
-        :param batch_mode: Whether batch mode should be used
-        :type batch_mode: bool
         :returns: whether the initialisation was successful
         :rtype: bool
         """
 
         try:
             if self.stages:
+                estimator_count = 0
                 for stage in self.stages:
                     stage.initialise(self.config)
+                    if isinstance(stage, Estimator):
+                        estimator_count += 1
+                    if estimator_count > 1:
+                        raise ValueError("Stages can only have one Estimator class")
 
             if self.finaliser:
                 self.finaliser.initialise(self.config)
 
-        except Exception:
-            LOGGER.exception("Failed initiating Assembler")
+        except Exception as e:
+            if self.config.get_path("surround.surface_exceptions"):
+                raise e
+            LOGGER.exception(e)
             return False
-
         return True
 
     def run(self, state=None, mode=RunMode.PREDICT):
@@ -103,7 +108,7 @@ class Assembler(ABC):
         If ``is_training`` is set to ``True`` then when it gets to the execution of the estimator,
         it will use the :meth:`surround.stage.Estimator.fit` method instead.
 
-        If ``surround.enable_stage_output_dump`` is enabled in the Config instance then each filter and
+        If ``surround.enable_stage_output_dump`` is enabled in the Config instance then each stage and
         estimator's :meth:`surround.stage.Stage.dump_output` method will be called.
 
         This method doesn't return anything, instead results should be stored in the ``state``
@@ -127,20 +132,28 @@ class Assembler(ABC):
 
         state.freeze()
 
+        has_estimator = [s for s in self.stages if isinstance(s, Estimator)]
+        if is_training and not has_estimator:
+            raise ValueError("No Estimator class added to stages.")
+
         def _run_stage_safe(a_stage):
             start_time = datetime.now()
             try:
                 if isinstance(a_stage, Estimator):
-                    a_stage.fit(state, self.config) if is_training else a_stage.estimate(state, self.config)
-                elif isinstance(a_stage, Validator):
-                    a_stage.validate(state, self.config)
+                    if is_training:
+                        a_stage.fit(state, self.config)
+                    else:
+                        a_stage.estimate(state, self.config)
                 else:
                     a_stage.operate(state, self.config)
+
+                if self.config["surround"]["enable_stage_output_dump"]:
+                    a_stage.dump_output(state, self.config)
+
             except Exception as e:
                 if self.config.get_path("surround.surface_exceptions"):
                     raise e
-                else:
-                    state.errors.append(str(e))
+                state.errors.append(str(e))
                 LOGGER.exception(e)
             execution_time = datetime.now() - start_time
             state.execution_time.append(str(execution_time))
@@ -151,7 +164,7 @@ class Assembler(ABC):
             if state.errors:
                 break
 
-        if self.metrics and not mode == RunMode.PREDICT:
+        if self.metrics and mode != RunMode.PREDICT:
             _run_stage_safe(self.metrics)
 
         if self.finaliser:
@@ -229,12 +242,12 @@ class Assembler(ABC):
         This will be executed even when the pipeline fails or throws an error.
 
         :param finaliser: the final stage instance
-        :type finaliser: :class:`surround.stage.Filter`
+        :type finaliser: :class:`surround.stage.Stage`
         """
 
-        # finaliser must be a type of filter
-        if not finaliser and not isinstance(finaliser, Filter):
-            raise TypeError("finaliser should be of class Filter")
+        # finaliser must be a type of Stage
+        if not finaliser and not isinstance(finaliser, Stage):
+            raise TypeError("finaliser should be of class Stage")
         self.finaliser = finaliser
 
         return self
