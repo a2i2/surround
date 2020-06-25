@@ -97,7 +97,7 @@ To see a full list of the available tasks just run the following command:
 $ surround run
 ```
 
-For more information on different run modes and when/how they should be used see both our [About](https://surround.readthedocs.io/about.html) and [Getting Started](https://surround.readthedocs.io/getting-started.html) pages.
+For more information on different run modes and when/how they should be used see both our [About](https://surround.readthedocs.io/en/latest/about/) and [Getting Started](https://surround.readthedocs.io/en/latest/getting-started/#) pages.
 
 ## Surround pipeline architecture
 The following diagram describes how data flows through a Surround pipeline depending on the mode used when running.
