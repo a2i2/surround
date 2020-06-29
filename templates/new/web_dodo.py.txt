@@ -248,6 +248,7 @@ def task_web_local():
 
 
 def task_jupyter():
+    """Run a Jupyter notebook in the Docker container"""
     # Allow for auto reload to be enabled and import modules from project package
     ipython_config = "c.InteractiveShellApp.extensions.append('autoreload')\n"
     ipython_config += "c.InteractiveShellApp.exec_lines = "
