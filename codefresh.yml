@@ -1,0 +1,67 @@
+# More examples of Codefresh YAML can be found at
+# https://codefresh.io/docs/docs/yaml-examples/examples/
+
+version: "1.0"
+# Stages can help you organize your steps in stages
+stages:
+  - "clone"
+  - "test"
+  - "release"
+
+steps:
+  clone:
+    title: "Cloning repository"
+    type: "git-clone"
+    repo: "a2i2/surround"
+    # CF_BRANCH value is auto set when pipeline is triggered
+    # Learn more at codefresh.io/docs/docs/codefresh-yaml/variables/
+    revision: "${{CF_BRANCH}}"
+    git: "github"
+    stage: "clone"
+
+  test:
+    title: "Run Python tests"
+    type: "freestyle" # Run any command
+    image: "python:3.6.10" # The image in which command will be executed
+    working_directory: "${{clone}}" # Running command where code cloned
+    commands:
+      # Install surround
+      - python3 setup.py install
+
+      # Run tests
+      - python3 setup.py test
+
+      # Run pylint tests
+      - pylint setup.py
+      - find surround/ -iname "*.py" | xargs pylint
+      - find examples/ -iname "*.py" | xargs pylint
+
+      # Run examples
+      - ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
+    stage: "test"
+
+  release:
+    title: "Release to Pypi"
+    type: "freestyle" # Run any command
+    image: "python:3.6.10" # The image in which command will be executed
+    working_directory: "${{clone}}" # Running command where code cloned
+    commands:
+      # Install required packages
+      - python3 -m pip install --user --upgrade setuptools wheel twine
+
+      # Setup Pypi config
+      - echo "[pypi]" > ~/.pypirc
+      - echo "repository=https://upload.pypi.org/legacy/" >> ~/.pypirc
+      - echo "username=${{PYPI_USERNAME}}" >> ~/.pypirc
+      - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
+
+      # Build package
+      - VERSION_TAG=$(git tag -l --points-at HEAD) python3 setup.py sdist bdist_wheel
+
+      # Upload package for distribution
+      - python3 -m twine upload --repository pypi dist/*
+    when:
+      branch:
+        only:
+          - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
+    stage: "release"
