@@ -18,7 +18,7 @@ class WebRunner(Runner):
     def load_data(self, mode, config):
         return None
 
-    def run(self, mode=RunMode.BATCH_PREDICT):
+    def run(self, mode=RunMode.PREDICT):
         # Setup web service
         self.assembler.init_assembler()
         self.application = Application(self.assembler)

@@ -10,13 +10,13 @@ import tornado.template
 import surround
 from surround.experiment.util import get_surround_config
 
-class ReportGenerator(surround.Visualiser):
+class ReportGenerator(surround.Stage):
     def initialise(self, config):
         loader = tornado.template.Loader(os.path.join(config["project_root"], "templates"))
         self.results_template = loader.load("results.html")
         self.global_config = get_surround_config()
 
-    def visualise(self, state, config):
+    def operate(self, state, config):
         results_page = self.results_template.generate(
             config=config,
             state=state,

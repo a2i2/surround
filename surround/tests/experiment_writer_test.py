@@ -8,6 +8,7 @@ import subprocess
 from ..experiment.experiment_writer import ExperimentWriter
 
 class ExperimentWriterTest(unittest.TestCase):
+
     def setUp(self):
         # Create a project
         process = subprocess.Popen(["surround", "init", "-p", "temp_project", "-d", "test_description", "-w", "no"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -15,7 +16,7 @@ class ExperimentWriterTest(unittest.TestCase):
         process.stdin.close()
         process.stdout.close()
         process.stderr.close()
-
+        os.makedirs(os.path.join("temp_project", "models"))
         with open("temp_project/input/test.txt", "w+") as f:
             f.write("TEST_DATA")
 

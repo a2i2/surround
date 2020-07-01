@@ -34,18 +34,6 @@ Assembler
     ^^^^^
     
     .. autoclass:: surround.stage.Stage
-        :members:      
-
-    Validator
-    ^^^^^^^^^
-
-    .. autoclass:: surround.stage.Validator
-        :members:
-
-    Filter
-    ^^^^^^
-
-    .. autoclass:: surround.stage.Filter
         :members:
 
     Estimator
@@ -53,12 +41,6 @@ Assembler
 
     .. autoclass:: surround.stage.Estimator
         :members:
-
-    Visualiser
-    ^^^^^^^^^^
-
-    .. autoclass:: surround.visualiser.Visualiser
-        :members: 
 
 Runner
 =======

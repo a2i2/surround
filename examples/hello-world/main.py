@@ -1,5 +1,5 @@
 import logging
-from surround import State, Validator, Estimator, Assembler
+from surround import State, Stage, Estimator, Assembler
 
 
 class HelloWorld(Estimator):
@@ -10,8 +10,8 @@ class HelloWorld(Estimator):
         print("No training implemented")
 
 
-class InputValidator(Validator):
-    def validate(self, state, config):
+class InputValidator(Stage):
+    def operate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
 
@@ -23,6 +23,6 @@ class AssemblerState(State):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = AssemblerState()
-    assembler = Assembler("Hello world example").set_validator(InputValidator()).set_estimator(HelloWorld())
+    assembler = Assembler("Hello world example").set_stages([InputValidator(), HelloWorld()])
     assembler.run(data)
     print("Text is '%s'" % data.text)

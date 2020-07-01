@@ -1,17 +1,11 @@
 import logging
-
 from abc import ABC, abstractmethod
-from enum import Enum
-
+from .run_modes import RunMode
 from .state import State
 from .assembler import Assembler
 
 LOGGER = logging.getLogger(__name__)
 
-class RunMode(Enum):
-    BATCH_PREDICT = 1
-    PREDICT = 2
-    TRAIN = 3
 
 class Runner(ABC):
     """
@@ -74,7 +68,7 @@ class Runner(ABC):
 
         return self
 
-    def run(self, mode=RunMode.BATCH_PREDICT):
+    def run(self, mode=RunMode.PREDICT):
         """
         Prepare data and execute the :class:`surround.assembler.Assembler`.
 
@@ -84,7 +78,7 @@ class Runner(ABC):
 
         if self.assembler:
             # Initialise the assembler
-            self.assembler.init_assembler(mode == RunMode.BATCH_PREDICT)
+            self.assembler.init_assembler()
 
             # Load the data to be fed into the assembler
             data = self.load_data(mode, self.assembler.config)
@@ -93,6 +87,6 @@ class Runner(ABC):
                 raise ValueError("load_data must return an instance of State!")
 
             # Run assembler
-            self.assembler.run(data, mode == RunMode.TRAIN)
+            self.assembler.run(data, mode)
         else:
             LOGGER.error("No assembler has been set to this runner!")

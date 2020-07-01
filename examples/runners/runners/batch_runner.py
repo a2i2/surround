@@ -5,7 +5,7 @@ from .stages import AssemblyState
 
 class BatchRunner(Runner):
     def load_data(self, mode, config):
-        path = os.path.dirname(__file__) + "/data/input.txt"
+        path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "input/data.txt")
         data = AssemblyState()
 
         with open(path, 'r') as f:
@@ -14,7 +14,7 @@ class BatchRunner(Runner):
         return data
 
     def run(self, mode=RunMode.BATCH_PREDICT):
-        self.assembler.init_assembler(mode == RunMode.BATCH_PREDICT)
+        self.assembler.init_assembler()
 
         data = self.load_data(mode, self.assembler.config)
 

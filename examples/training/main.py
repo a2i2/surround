@@ -1,5 +1,6 @@
 import logging
-from surround import State, Validator, Estimator, Assembler, Visualiser
+
+from surround import State, Estimator, Assembler, Stage, RunMode
 
 
 class HelloWorld(Estimator):
@@ -14,18 +15,12 @@ class HelloWorld(Estimator):
         state.training_message = "Training message"
 
 
-class InputValidator(Validator):
-    def validate(self, state, config):
-        if state.text:
-            raise ValueError("'text' is not None")
-
-
 class AssemblerState(State):
     training_message = None
     text = None
 
 
-class Formatter(Visualiser):
+class Formatter(Stage):
     def visualise(self, state, config):
         print("Visualiser result: %s" % state.training_message)
 
@@ -34,18 +29,17 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = AssemblerState()
     assembler = Assembler("Training example")
-    assembler.set_validator(InputValidator())
-    assembler.set_estimator(HelloWorld())
-    assembler.init_assembler(True)
-    assembler.set_visualiser(Formatter())
+    assembler.set_stages([HelloWorld(), Formatter()])
+    assembler.init_assembler()
+
 
     # Run assembler before training
-    assembler.run(data)
+    assembler.run(data, RunMode.TRAIN)
     print("Text before training is '%s'" % data.text)
     data.text = None    # Clear text to prevent validation raising error
 
     # Run training mode
-    assembler.run(data, True)
+    assembler.run(data)
 
     # Run assembler after training
     assembler.run(data)

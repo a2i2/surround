@@ -28,9 +28,11 @@ class ExperimentReaderTest(unittest.TestCase):
         process.stdout.close()
         process.stderr.close()
 
+        os.makedirs(os.path.join("temporary", "test_project", "models"))
         with open("temporary/test_project/models/test.model", "w+") as f:
             f.write("WEIGHTS")
 
+        os.makedirs(os.path.join("temporary", "test_project_two", "models"))
         with open("temporary/test_project_two/models/test.model", "w+") as f:
             f.write("WEIGHTS")
 

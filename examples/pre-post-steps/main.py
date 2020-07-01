@@ -5,8 +5,7 @@ if __name__ == "__main__":
     data = AssemblerState()
 
     assembler = Assembler("Pre Post Example")
-    assembler.set_validator(InputValidator())
-    assembler.set_estimator(AddWorld(), [AddHello()], [AddSurround()])
+    assembler.set_stages([InputValidator(), AddHello(), AddWorld(), AddSurround()])
     assembler.run(data)
 
     print("Text is '%s'" % data.text)

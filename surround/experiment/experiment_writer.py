@@ -219,10 +219,7 @@ class ExperimentWriter:
         project_root = os.path.abspath(project_root)
         models_path = os.path.join(project_root, "models")
 
-        if not os.path.exists(models_path):
-            raise Exception("Cannot package models folder for experiment since it doesn't exist!")
-
-        if not os.listdir(models_path):
+        if not os.path.exists(models_path) or not os.listdir(models_path):
             return None
 
         with zipfile.ZipFile(export_path, "w", zipfile.ZIP_DEFLATED) as package:
