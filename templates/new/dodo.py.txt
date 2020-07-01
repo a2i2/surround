@@ -16,7 +16,7 @@ from surround.util import generate_docker_volume_path
 from surround.experiment.util import get_surround_config
 
 CONFIG = Config(os.path.dirname(__file__))
-DOIT_CONFIG = {{'verbosity':2}}
+DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 LOGGER = logging.getLogger(__name__)
@@ -200,6 +200,7 @@ def task_batch_local():
     }}
 
 def task_jupyter():
+    """Run a Jupyter notebook in the Docker container"""
     # Allow for auto reload to be enabled and import modules from project package
     ipython_config = "c.InteractiveShellApp.extensions.append('autoreload')\n"
     ipython_config += "c.InteractiveShellApp.exec_lines = "
