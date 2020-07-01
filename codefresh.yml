@@ -40,20 +40,6 @@ steps:
       - ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
     stage: "test"
 
-  approval:
-    title: "Pending Approval"
-    type: pending-approval
-    description: "Please approve the release to Pypi."
-    timeout:
-      duration: 2
-      finalState: approved
-    when:
-      branch:
-        only:
-          - master
-          - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
-    stage: "release"
-
   release:
     title: "Release to Pypi"
     type: "freestyle" # Run any command
@@ -77,6 +63,5 @@ steps:
     when:
       branch:
         only:
-          - master
           - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
     stage: "release"
