@@ -36,5 +36,6 @@ setup(name='surround',
               'surround=surround.cli:main',
           ],
       },
+      license="BSD-3-Clause License",
       zip_safe=False,
       install_requires=INSTALL_REQUIRES)
