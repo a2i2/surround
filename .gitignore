@@ -52,7 +52,4 @@ venv.bak/
 # Sphinx generated files
 /docs/build
 
-# Doit files
-.doit*
-
 .idea
