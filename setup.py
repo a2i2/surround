@@ -20,13 +20,7 @@ setup(name='surround',
       packages=[
           'surround',
           'templates',
-          'surround.remote',
-          'surround.split',
-          'surround.visualise',
           'surround.data',
-          'surround.configuration',
-          'surround.experiment',
-          'surround.experiment.web',
           'surround.checkers'
       ],
       test_suite='surround.tests',
