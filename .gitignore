@@ -5,6 +5,8 @@ __pycache__/
 
 # Setuptools distribution folder.
 /dist/
+surround/dist/
+surround-cli/dist/
 
 # Distribution / packaging
 build/
