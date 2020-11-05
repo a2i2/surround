@@ -5,11 +5,13 @@ __pycache__/
 
 # Setuptools distribution folder.
 /dist/
-surround/dist/
+surround-lib/dist/
 surround-cli/dist/
 
 # Distribution / packaging
 build/
+surround-lib/build/
+surround-cli/build/
 
 ## Python egg metadata, regenerated from source files by setuptools.
 **/*.egg-info
