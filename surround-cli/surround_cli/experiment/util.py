@@ -5,7 +5,7 @@ import zipfile
 import logging
 
 from pathlib import Path
-from ..config import Config
+from surround.config import Config
 from ..configuration import cli as config_cli
 
 def get_surround_config():

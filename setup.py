@@ -20,22 +20,9 @@ setup(name='surround',
       packages=[
           'surround',
           'templates',
-          'surround.remote',
-          'surround.split',
-          'surround.visualise',
-          'surround.data',
-          'surround.data.cli',
-          'surround.configuration',
-          'surround.experiment',
-          'surround.experiment.web',
           'surround.checkers'
       ],
       test_suite='surround.tests',
-      entry_points={
-          'console_scripts': [
-              'surround=surround.cli:main',
-          ],
-      },
       license="BSD-3-Clause License",
       zip_safe=False,
       install_requires=INSTALL_REQUIRES)

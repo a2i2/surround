@@ -18,7 +18,15 @@ setup(name='surround-cli',
       author_email='scott.barnett@deakin.edu.au',
       include_package_data=True,
       packages=[
-          'surround_cli'
+          'surround_cli',
+          'surround_cli.remote',
+          'surround_cli.split',
+          'surround_cli.visualise',
+          'surround_cli.data',
+          'surround_cli.data.cli',
+          'surround_cli.configuration',
+          'surround_cli.experiment',
+          'surround_cli.experiment.web',
       ],
       entry_points={
           'console_scripts': [

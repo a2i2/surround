@@ -5,7 +5,7 @@ import datetime
 import pkg_resources
 import pandas as pd
 
-from ..config import Config
+from surround.config import Config
 from .visualise_classifier import VisualiseClassifier, VisualiseClassifierData
 
 def get_failed_set(y_true, y_pred):

@@ -1,11 +1,8 @@
 import os
 import argparse
-
 from pathlib import Path
-
 import yaml
-
-from ..config import Config
+from surround.config import Config
 
 REQUIRED_CONFIG = {
     "user.name": "Enter your name (user.name): ",

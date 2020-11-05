@@ -15,8 +15,8 @@ TODO: Add a flag that describes each aspect of the generated report in human rea
 
 import numpy as np
 
-from ..state import State
-from ..stage import Stage
+from surround.state import State
+from surround.stage import Stage
 
 class VisualiseClassifierData(State):
     """
