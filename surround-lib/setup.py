@@ -2,7 +2,6 @@
 Python package definition for Surround
 """
 import os
-
 from setuptools import setup
 
 # Collect version from repo tag
@@ -13,14 +12,12 @@ with open("requirements.txt") as f:
 setup(name='surround',
       version=VERSION,
       description='Surround is a framework for serving machine learning pipelines in Python.',
-      url='http://github.com/dstil/surround',
+      url='https://github.com/a2i2/surround',
       author='Scott Barnett',
       author_email='scott.barnett@deakin.edu.au',
       include_package_data=True,
       packages=[
-          'surround',
-          'templates',
-          'surround.checkers'
+          'surround'
       ],
       test_suite='surround.tests',
       license="BSD-3-Clause License",

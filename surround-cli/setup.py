@@ -19,6 +19,7 @@ setup(name='surround-cli',
       include_package_data=True,
       packages=[
           'surround_cli',
+          'surround_cli.checkers',
           'surround_cli.remote',
           'surround_cli.split',
           'surround_cli.visualise',
@@ -27,6 +28,7 @@ setup(name='surround-cli',
           'surround_cli.configuration',
           'surround_cli.experiment',
           'surround_cli.experiment.web',
+          'templates'
       ],
       entry_points={
           'console_scripts': [
