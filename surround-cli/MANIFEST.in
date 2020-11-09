@@ -1,3 +1,4 @@
+include VERSION
 include surround/visualise/*.html.txt
 include surround/experiment/web/*.html
 include surround/experiment/web/*.ico
