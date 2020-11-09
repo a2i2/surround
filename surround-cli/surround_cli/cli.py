@@ -7,6 +7,7 @@ import logging
 import subprocess
 import pkg_resources
 
+from surround.project import PROJECTS
 from .remote import cli as remote_cli
 from .split import cli as split_cli
 from .visualise import cli as visualise_cli
@@ -14,7 +15,6 @@ from .data.cli import cli as data_cli
 from .configuration import cli as config_cli
 from .experiment.web import cli as experiment_cli
 from .linter import Linter
-from .project import PROJECTS
 
 def process_directories(directories, project_dir, project_name):
     """
