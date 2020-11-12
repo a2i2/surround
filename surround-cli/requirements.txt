@@ -1,1 +1,6 @@
+numpy==1.17.3
+pandas==0.25.2
+doit==0.31.1
+tornado==6.0.2
+google-cloud-storage==1.20.0
 surround
