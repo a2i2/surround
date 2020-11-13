@@ -1,11 +1,12 @@
 """
 Python package definition for Surround
 """
-import os
 from setuptools import setup
 
-# Collect version from repo tag
-VERSION = os.getenv('VERSION_TAG')
+# Collect version from VERSION file
+with open('VERSION') as version_file:
+    VERSION = version_file.read().strip()
+
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().split("\n")
 
