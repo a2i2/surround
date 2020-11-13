@@ -13,7 +13,7 @@ from pathlib import Path
 
 from surround import Config
 from surround.util import generate_docker_volume_path
-from surround.experiment.util import get_surround_config
+from surround_cli.experiment.util import get_surround_config
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
