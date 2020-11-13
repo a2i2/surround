@@ -59,4 +59,10 @@ class InfoHandler(tornado.web.RequestHandler):
         self.assembler = assembler
 
     def get(self):
-        self.write({{'version': '0.0.1'}})
+        self.write({{'version': self.get_version()}})
+
+    def get_version(self):
+        with open('VERSION') as version_file:
+            VERSION = version_file.read().strip()
+
+        return VERSION
