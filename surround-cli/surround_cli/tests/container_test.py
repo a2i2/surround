@@ -2,8 +2,8 @@ import os
 import unittest
 import zipfile
 
-from surround.data import DataContainer
-from surround.data.container import MetadataNotFoundError
+from surround_cli.data import DataContainer
+from surround_cli.data.container import MetadataNotFoundError
 
 class TestDataContainer(unittest.TestCase):
     def setUp(self):

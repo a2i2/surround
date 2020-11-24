@@ -2,7 +2,7 @@ import unittest
 import os
 import yaml
 
-from surround.data import Metadata
+from surround_cli.data import Metadata
 
 class TestMetadata(unittest.TestCase):
     def setUp(self):

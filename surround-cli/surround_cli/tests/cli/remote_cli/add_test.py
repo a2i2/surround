@@ -3,7 +3,7 @@ import shutil
 import unittest
 import subprocess
 
-from surround.remote.local import Local
+from surround_cli.remote.local import Local
 
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/03/04'
@@ -45,7 +45,7 @@ class AddTest(unittest.TestCase):
         local_remote = Local()
 
         os.chdir("temp")
-        result = local_remote.add('data', os.path.join(os.getcwd(), '..', 'surround/remote/base.py'))
+        result = local_remote.add('data', os.path.join(os.getcwd(), '..', 'surround_cli/remote/base.py'))
         os.chdir("../")
 
         self.assertEqual(result, "info: file added successfully")

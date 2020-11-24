@@ -3,7 +3,7 @@ import shutil
 import unittest
 import subprocess
 
-from surround.data.container import DataContainer
+from surround_cli.data.container import DataContainer
 
 class CreateDataContainerTest(unittest.TestCase):
     def setUp(self):
