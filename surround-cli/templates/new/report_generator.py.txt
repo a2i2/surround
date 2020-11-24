@@ -8,7 +8,7 @@ import os
 import tornado.template
 
 import surround
-from surround.experiment.util import get_surround_config
+from surround_cli.experiment.util import get_surround_config
 
 class ReportGenerator(surround.Stage):
     def initialise(self, config):

@@ -10,6 +10,8 @@ class Surround:
         self.project_name = project_name
         self.project_root = project_root
 
+    # pylint: disable=fixme
+    # TODO: Add ability to run the experiment
     def run(self, runner_key, assembler_key, mode, args=None):
         runner = self.__get_runner(runner_key)
 
