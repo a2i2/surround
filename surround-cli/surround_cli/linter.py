@@ -52,7 +52,7 @@ class Linter():
             'attribute-defined-outside-init'
         ]
 
-        args.append("--load-plugins=surround.checkers.surround_checker")
+        args.append("--load-plugins=surround_cli.checkers.surround_checker")
 
         for msg in disable_msgs:
             args.append('--disable=%s' % msg)
