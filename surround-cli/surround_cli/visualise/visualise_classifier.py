@@ -119,7 +119,7 @@ class VisualiseClassifier(Stage):
 
         return result
 
-    def operate(self, surround_data, config):
+    def operate(self, state, config):
         """
         Visualises the classifier data, calculating metrics such as accuracy, precision, cohen_kappa,
         f1-score and a confusion matrix. Prints the results to the terminal.
@@ -130,18 +130,18 @@ class VisualiseClassifier(Stage):
         :type config: :class:`surround.Config`
         """
 
-        if not self.validate(surround_data):
-            for error in surround_data.errors:
+        if not self.validate(state):
+            for error in state.errors:
                 print("ERROR: " + error)
             return
 
         # Calculate metrics using the y_true and y_pred values
-        surround_data.visualise_output = calculate_classifier_metrics(surround_data.y_true, surround_data.y_pred)
+        state.visualise_output = calculate_classifier_metrics(state.y_true, state.y_pred)
 
-        report_dict = surround_data.visualise_output['report']
-        classes = surround_data.visualise_output['classes']
-        conf_matrix = surround_data.visualise_output['confusion_matrix']
-        norm_conf_matrix = surround_data.visualise_output['normalized_confusion_matrix']
+        report_dict = state.visualise_output['report']
+        classes = state.visualise_output['classes']
+        conf_matrix = state.visualise_output['confusion_matrix']
+        norm_conf_matrix = state.visualise_output['normalized_confusion_matrix']
 
         # Generate pretty tables for the console
         overall_metrics = self.generate_table_from_overall_report(report_dict)
@@ -150,8 +150,8 @@ class VisualiseClassifier(Stage):
         print("============[Classification Report]===================")
         print("Overall Metrics:")
         print(overall_metrics)
-        print("Accuracy: %s" % surround_data.visualise_output['accuracy_score'])
-        print("Cohen Kappa: %s" % surround_data.visualise_output['cohen_kappa_score'])
+        print("Accuracy: %s" % state.visualise_output['accuracy_score'])
+        print("Cohen Kappa: %s" % state.visualise_output['cohen_kappa_score'])
         print("==========================")
         print("Metrics per category:")
         print(per_category_table)
