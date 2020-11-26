@@ -6,13 +6,29 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Add `license` to setup.py
-
 ### Changed
 
 ### Fixed
 
 ### Limitation
+
+## [0.0.15] - 2020-11-26
+
+### Added
+
+- Added `license` to setup.py
+- Added docker file to the generated Surround projects for `Jupyter` support
+- Added support for creating a versioned output folder for each run that stores the log files.
+
+### Changed
+
+- Print available endpoints information to the console
+- Updated the generated notebook to load data from a runner
+
+### Fixed
+
+- Allow CI to trigger on forked repositories
+- Linting issue in generated project
 
 ## [0.0.14] - 2020-07-01
 
