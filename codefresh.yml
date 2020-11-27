@@ -50,7 +50,7 @@ steps:
         working_directory: "${{clone}}"
         commands:
           # Go inside the cli
-          - cd surround-cli
+          - cd surround_cli
 
           # Install surround
           - python3 setup.py install
