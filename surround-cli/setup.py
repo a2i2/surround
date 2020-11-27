@@ -10,6 +10,9 @@ with open('VERSION') as version_file:
 with open("requirements.txt") as f:
     INSTALL_REQUIRES = f.read().split("\n")
 
+with open("requirements-test.txt") as f:
+    TESTS_REQUIRES = f.read().split("\n")
+
 setup(name='surround-cli',
       version=VERSION,
       description='Command line interface for Surround',
@@ -37,4 +40,5 @@ setup(name='surround-cli',
       },
       license="BSD-3-Clause License",
       zip_safe=False,
-      install_requires=INSTALL_REQUIRES)
+      install_requires=INSTALL_REQUIRES,
+      tests_require=TESTS_REQUIRES)

@@ -38,6 +38,7 @@ steps:
           - python3 setup.py test
 
           # Run pylint tests
+          - pip install pylint==2.4.3
           - pylint setup.py
           - find surround/ -iname "*.py" | xargs pylint
         stage: "test"
@@ -58,6 +59,7 @@ steps:
           - python3 setup.py test
 
           # Run pylint tests
+          - pip install pylint==2.4.3
           - pylint setup.py
           - find surround_cli/ -iname "*.py" | xargs pylint
 
