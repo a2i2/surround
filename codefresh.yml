@@ -29,7 +29,7 @@ steps:
         working_directory: "${{clone}}"
         commands:
           # Go inside the surround library
-          - cd surround-lib
+          - cd surround
 
           # Install surround
           - python3 setup.py install
