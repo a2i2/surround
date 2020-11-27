@@ -13,7 +13,7 @@ with open("requirements.txt") as f:
 with open("requirements-test.txt") as f:
     TESTS_REQUIRES = f.read().split("\n")
 
-setup(name='surround-cli',
+setup(name='surround_cli',
       version=VERSION,
       description='Command line interface for Surround',
       url='https://github.com/a2i2/surround',
