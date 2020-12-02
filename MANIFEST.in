@@ -1,6 +1,0 @@
-include surround/*.yaml
-include surround/visualise/*.html.txt
-include surround/experiment/web/*.html
-include surround/experiment/web/*.ico
-include surround/experiment/web/*.js
-graft templates

@@ -10,6 +10,10 @@ from .stages import AssemblyState
 logging.basicConfig(level=logging.INFO)
 
 class WebRunner(Runner):
+
+    def load_data(self, mode, config):
+        return None
+
     def run(self, mode=RunMode.BATCH_PREDICT):
         self.assembler.init_assembler()
         self.application = Application(self.assembler)

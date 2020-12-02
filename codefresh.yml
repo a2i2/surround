@@ -12,7 +12,7 @@ steps:
   clone:
     title: "Cloning repository"
     type: "git-clone"
-    repo: "a2i2/surround"
+    repo: "${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}"
     # CF_BRANCH value is auto set when pipeline is triggered
     # Learn more at codefresh.io/docs/docs/codefresh-yaml/variables/
     revision: "${{CF_BRANCH}}"
@@ -20,48 +20,78 @@ steps:
     stage: "clone"
 
   test:
-    title: "Run Python tests"
-    type: "freestyle" # Run any command
-    image: "python:3.6.10" # The image in which command will be executed
-    working_directory: "${{clone}}" # Running command where code cloned
-    commands:
-      # Install surround
-      - python3 setup.py install
+    type: parallel
+    steps:
+      test_lib:
+        title: "Test Surround Library"
+        type: "freestyle" # Run any command
+        image: "python:3.6.10" # The image in which command will be executed
+        working_directory: "${{clone}}"
+        commands:
+          # Go inside the surround library
+          - cd surround
 
-      # Run tests
-      - python3 setup.py test
+          # Install surround
+          - python3 setup.py install
 
-      # Run pylint tests
-      - pylint setup.py
-      - find surround/ -iname "*.py" | xargs pylint
-      - find examples/ -iname "*.py" | xargs pylint
+          # Run tests
+          - python3 setup.py test
 
-      # Run examples
-      - ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
-    stage: "test"
+          # Run pylint tests
+          - pip install pylint==2.4.3
+          - pylint setup.py
+          - find surround/ -iname "*.py" | xargs pylint
+        stage: "test"
 
-  release:
-    title: "Release to Pypi"
-    type: "freestyle" # Run any command
-    image: "python:3.6.10" # The image in which command will be executed
-    working_directory: "${{clone}}" # Running command where code cloned
-    commands:
-      # Install required packages
-      - python3 -m pip install --user --upgrade setuptools wheel twine
+      test_cli:
+        title: "Test Surround CLI"
+        type: "freestyle" # Run any command
+        image: "python:3.6.10" # The image in which command will be executed
+        working_directory: "${{clone}}"
+        commands:
+          # Go inside the cli
+          - cd surround_cli
 
-      # Setup Pypi config
-      - echo "[pypi]" > ~/.pypirc
-      - echo "repository=https://upload.pypi.org/legacy/" >> ~/.pypirc
-      - echo "username=${{PYPI_USERNAME}}" >> ~/.pypirc
-      - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
+          # Install surround
+          - python3 setup.py install
 
-      # Build package
-      - VERSION_TAG=$(git tag -l --points-at HEAD) python3 setup.py sdist bdist_wheel
+          # Run tests
+          - python3 setup.py test
 
-      # Upload package for distribution
-      - python3 -m twine upload --repository pypi dist/*
-    when:
-      branch:
-        only:
-          - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
-    stage: "release"
+          # Run pylint tests
+          - pip install pylint==2.4.3
+          - pylint setup.py
+          - find surround_cli/ -iname "*.py" | xargs pylint
+
+          # Run examples
+          - cd ..
+          - find examples/ -iname "*.py" | xargs pylint
+          - ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
+        stage: "test"
+
+  # TODO: Release on VERSION change
+  # release:
+  #   title: "Release to Pypi"
+  #   type: "freestyle" # Run any command
+  #   image: "python:3.6.10" # The image in which command will be executed
+  #   working_directory: "${{clone}}" # Running command where code cloned
+  #   commands:
+  #     # Install required packages
+  #     - python3 -m pip install --user --upgrade setuptools wheel twine
+
+  #     # Setup Pypi config
+  #     - echo "[pypi]" > ~/.pypirc
+  #     - echo "repository=https://upload.pypi.org/legacy/" >> ~/.pypirc
+  #     - echo "username=${{PYPI_USERNAME}}" >> ~/.pypirc
+  #     - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
+
+  #     # Build package
+  #     - VERSION_TAG=$(git tag -l --points-at HEAD) python3 setup.py sdist bdist_wheel
+
+  #     # Upload package for distribution
+  #     - python3 -m twine upload --repository pypi dist/*
+  #   when:
+  #     branch:
+  #       only:
+  #         - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
+  #   stage: "release"

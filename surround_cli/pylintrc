@@ -1,0 +1,15 @@
+[DISABLE]
+
+disable = missing-docstring,
+    invalid-name,
+    too-few-public-methods,
+    broad-except,
+    no-self-use,
+    inconsistent-return-statements,
+    line-too-long,
+    duplicate-code,
+    abstract-method,
+    attribute-defined-outside-init,
+    relative-beyond-top-level,
+    unused-argument,
+    too-many-arguments
