@@ -6,7 +6,6 @@ version: "1.0"
 stages:
   - "clone"
   - "test"
-  - "release"
 
 steps:
   clone:
@@ -67,30 +66,3 @@ steps:
           - find examples/ -iname "*.py" | xargs pylint
           - ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
         stage: "test"
-
-  # TODO: Release on VERSION change
-  # release:
-  #   title: "Release to Pypi"
-  #   type: "freestyle" # Run any command
-  #   image: "python:3.6.10" # The image in which command will be executed
-  #   working_directory: "${{clone}}" # Running command where code cloned
-  #   commands:
-  #     # Install required packages
-  #     - python3 -m pip install --user --upgrade setuptools wheel twine
-
-  #     # Setup Pypi config
-  #     - echo "[pypi]" > ~/.pypirc
-  #     - echo "repository=https://upload.pypi.org/legacy/" >> ~/.pypirc
-  #     - echo "username=${{PYPI_USERNAME}}" >> ~/.pypirc
-  #     - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
-
-  #     # Build package
-  #     - VERSION_TAG=$(git tag -l --points-at HEAD) python3 setup.py sdist bdist_wheel
-
-  #     # Upload package for distribution
-  #     - python3 -m twine upload --repository pypi dist/*
-  #   when:
-  #     branch:
-  #       only:
-  #         - /([0-9]+)\.([0-9]+)\.([0-9]+)?$/
-  #   stage: "release"
