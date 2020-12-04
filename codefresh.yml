@@ -99,3 +99,32 @@ steps:
                 isMainRepo: '"${{CF_REPO_OWNER}}" == "a2i2"'
                 isReleaseBranch: 'match("${{CF_BRANCH}}", "/surround-v([0-9]+)\.([0-9]+)\.([0-9]+)?$", false) == true'
         stage: "release"
+
+      release_cli:
+        title: "Release surround cli to PYPI"
+        type: "freestyle"
+        image: "python:3.6.10" # The image in which command will be executed
+        working_directory: "${{clone}}" # Running command where code cloned
+        commands:
+          - cd surround_cli
+
+          # Install required packages
+          - python3 -m pip install --user --upgrade setuptools wheel twine
+
+          # Setup Pypi config
+          - echo "[pypi]" > ~/.pypirc
+          - echo "repository=https://upload.pypi.org/legacy/" >> ~/.pypirc
+          - echo "username=${{PYPI_USERNAME}}" >> ~/.pypirc
+          - echo "password=${{PYPI_PASSWORD}}" >> ~/.pypirc
+
+          # Build package
+          - python3 setup.py sdist bdist_wheel
+
+          # Upload package for distribution
+          - python3 -m twine upload --repository pypi dist/*
+        when:
+            condition:
+              all:
+                isMainRepo: '"${{CF_REPO_OWNER}}" == "a2i2"'
+                isReleaseBranch: 'match("${{CF_BRANCH}}", "/surround-cli-v([0-9]+)\.([0-9]+)\.([0-9]+)?$", false) == true'
+        stage: "release"
