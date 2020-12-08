@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file.
 
 ### Limitation
 
+## [0.1.0] - 2020-12-08
+
+### Changed
+
+- Split Surround library and CLI
+
 ## [0.0.15] - 2020-11-26
 
 ### Added
