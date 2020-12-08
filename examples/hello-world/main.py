@@ -1,5 +1,5 @@
 import logging
-from surround import State, Stage, Estimator, Assembler
+from surround import State, Stage, Estimator, Assembler, RunMode
 
 
 class HelloWorld(Estimator):
@@ -24,5 +24,5 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     data = AssemblerState()
     assembler = Assembler("Hello world example").set_stages([InputValidator(), HelloWorld()])
-    assembler.run(data)
+    assembler.run(data, mode=RunMode.PREDICT)
     print("Text is '%s'" % data.text)
