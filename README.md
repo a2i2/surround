@@ -22,11 +22,9 @@ from surround import State, Stage, Estimator, Assembler, RunMode
 
 class HelloWorld(Estimator):
     def estimate(self, state, config):
-        # executed if mode=RunMode.PREDICT
         state.text = "Hello world"
 
     def fit(self, state, config):
-        # executed if mode=RunMode.TRAIN
         print("No training implemented")
 
 class InputValidator(Stage):
