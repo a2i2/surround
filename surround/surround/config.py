@@ -2,6 +2,7 @@ import ast
 import os
 import functools
 
+from datetime import datetime
 from pathlib import Path
 from collections.abc import Mapping
 from pkg_resources import resource_stream
@@ -101,7 +102,9 @@ class Config(Mapping):
             self._storage["project_root"] = project_root
             self._storage["package_path"] = package_path
             self._storage["volume_path"] = volume_path
-            self._storage["output_path"] = os.path.join(project_root, "output")
+
+            now = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            self._storage["output_path"] = os.path.join(project_root, "output", str(now))
             self._storage["input_path"] = os.path.join(project_root, "input")
             self._storage["models_path"] = os.path.join(project_root, "models")
 
