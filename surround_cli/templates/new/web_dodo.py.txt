@@ -5,9 +5,6 @@ This module defines the tasks that can be executed using `surround run [task nam
 import os
 import sys
 import subprocess
-import re
-import webbrowser
-import logging
 
 from pathlib import Path
 
@@ -19,7 +16,8 @@ CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
-LOGGER = logging.getLogger(__name__)
+IMAGE_JUPYTER = "%s/%s-jupyter:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
+DOCKER_JUPYTER = "Dockerfile.Notebook"
 
 PARAMS = [
     {{
@@ -246,108 +244,28 @@ def task_web_local():
         'params': PARAMS
     }}
 
+def task_build_jupyter():
+    """Build the Docker image for a Jupyter Lab notebook"""
+    return {{
+        'basename': 'buildJupyter',
+        'actions': ['docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)],
+        'task_dep': ['build'],
+        'params': PARAMS
+    }}
 
 def task_jupyter():
-    """Run a Jupyter notebook in the Docker container"""
-    # Allow for auto reload to be enabled and import modules from project package
-    ipython_config = "c.InteractiveShellApp.extensions.append('autoreload')\n"
-    ipython_config += "c.InteractiveShellApp.exec_lines = "
-    ipython_config += "['%autoreload 2', 'import sys', 'sys.path.append(\\'../\\')']"
-
-    # Build the command for running jupyter
-    command = [
-        "pip install -r /app/requirements.txt",
-        "mkdir /etc/ipython",
-        "echo \"%s\" > /etc/ipython/ipython_config.py" % ipython_config,
-        "/usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
+    """Run a Jupyter Lab notebook"""
+    cmd = [
+        "docker",
+        "run",
+        "-itp",
+        "8888:8888",
+        '-w',
+        '/app',
+        "--volume",
+        "\"%s/\":/app" % CONFIG["volume_path"],
+        IMAGE_JUPYTER
     ]
-    command = "; ".join(command)
-
-    def run_command():
-        process = subprocess.Popen(
-            [
-                "docker",
-                "run",
-                "--rm",
-                "--name",
-                "{project_name}_surround_notebook",
-                "--volume",
-                "%s:/app" % CONFIG['volume_path'],
-                "-p",
-                "55910:8888",
-                "--user",
-                "root",
-                "-w",
-                "/app",
-                "jupyter/base-notebook:307ad2bb5fce",
-                "bash",
-                "-c",
-                command
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            encoding='utf-8')
-
-        LOGGER.info("Starting jupyter notbook server...\n")
-
-        # Get the IP address of the container, otherwise use localhost
-        ip_process = subprocess.Popen(
-            ['docker-machine', 'ip'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            encoding='utf-8')
-        ip_process.wait()
-
-        ip_output = ip_process.stdout.readline().rstrip()
-
-        if re.match(r"^(\d{{1,3}}\.){{3}}\d{{1,3}}$", ip_output):
-            host = ip_output
-        else:
-            host = "localhost"
-
-        # Wait for the notebook server to be up before loading browser
-        while True:
-            line = process.stderr.readline().rstrip()
-            if line and 'Serving notebooks from local directory' in line:
-                break
-
-            if process.poll():
-                LOGGER.error("Failed to start the server, please try again!")
-
-                # Stop any containers that might be running
-                process = subprocess.Popen(
-                    [
-                        'docker',
-                        'stop',
-                        '{project_name}_surround_notebook'
-                    ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
-                process.wait()
-                return
-
-        # Open the browser automatically
-        webbrowser.open('http://%s:55910/tree' % host, new=2)
-
-        LOGGER.info("Notebook URL: http://%s:55910/tree\n", host)
-        LOGGER.info("Use CTRL+C to stop the server.")
-
-        try:
-            process.wait()
-        except KeyboardInterrupt:
-            pass
-        finally:
-            LOGGER.info("Closing server...")
-            process = subprocess.Popen(
-                [
-                    'docker',
-                    'stop',
-                    '{project_name}_surround_notebook'
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            process.wait()
-
     return {{
-        'actions': [run_command]
+        'actions': [" ".join(cmd)],
     }}
