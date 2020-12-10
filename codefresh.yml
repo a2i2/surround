@@ -97,7 +97,7 @@ steps:
             condition:
               all:
                 isMainRepo: '"${{CF_REPO_OWNER}}" == "a2i2"'
-                isReleaseBranch: 'match("${{CF_BRANCH}}", "/surround-v([0-9]+)\.([0-9]+)\.([0-9]+)?$", false) == true'
+                isReleaseBranch: 'match("${{CF_BRANCH}}", "surround-v([0-9]+)\.([0-9]+)\.([0-9]+)?$", false) == true'
 
       release_cli:
         title: "Release surround cli to PYPI"
@@ -125,4 +125,4 @@ steps:
             condition:
               all:
                 isMainRepo: '"${{CF_REPO_OWNER}}" == "a2i2"'
-                isReleaseBranch: 'match("${{CF_BRANCH}}", "/surround-cli-v([0-9]+)\.([0-9]+)\.([0-9]+)?$", false) == true'
+                isReleaseBranch: 'match("${{CF_BRANCH}}", "surround-cli-v([0-9]+)\.([0-9]+)\.([0-9]+)?$", false) == true'
