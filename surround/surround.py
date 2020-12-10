@@ -6,18 +6,20 @@ from .experiment import ExperimentWriter
 LOGGER = logging.getLogger(__name__)
 
 class Surround:
-    def __init__(self, runners, assemblies, project_name, project_description, project_root):
+    def __init__(self, runners, assemblies, project_name, project_description, project_root, use_experiments):
         self.runners = runners
         self.assemblies = assemblies
         self.project_name = project_name
         self.project_root = project_root
+        self.use_experiments = use_experiments
 
-        # Create a project in the experiment storage
-        self.writer = ExperimentWriter()
-        self.writer.write_project(project_name, project_description)
+        if self.use_experiments:
+            # Create a project in the experiment storage
+            self.writer = ExperimentWriter()
+            self.writer.write_project(project_name, project_description)
 
-    def run(self, runner_key, assembler_key, mode, is_experiment=True, args=None):
-        if is_experiment:
+    def run(self, runner_key, assembler_key, mode, args=None):
+        if self.use_experiments:
             notes = [args.note] if args and args.note else []
             self.writer.start_experiment(self.project_name, self.project_root, vars(args), notes)
 
@@ -43,7 +45,7 @@ class Surround:
         runner.set_assembler(assembler)
         runner.run(mode)
 
-        if is_experiment:
+        if self.use_experiments:
             self.writer.stop_experiment(metrics=runner.assembler.state.metrics)
 
         return runner.assembler.state, runner, runner.assembler
