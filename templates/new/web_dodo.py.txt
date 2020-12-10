@@ -286,6 +286,23 @@ def task_build_jupyter():
         'params': PARAMS
     }}
 
+def task_jupyter():
+    """Run a Jupyter Lab notebook"""
+    cmd = [
+        "docker",
+        "run",
+        "-itp",
+        "8888:8888",
+        '-w',
+        '/app',
+        "--volume",
+        "\"%s/\":/app" % CONFIG["volume_path"],
+        IMAGE_JUPYTER
+    ]
+    return {{
+        'actions': [" ".join(cmd)],
+    }}
+
 def compute_docker_login():
     """Login to the Google Cloud Container Registry with Docker"""
 
@@ -636,21 +653,4 @@ def task_compute_kill():
         'basename': 'killCompute',
         'actions': [kill],
         'params': PARAMS
-    }}
-
-def task_jupyter():
-    """Run a Jupyter Lab notebook"""
-    cmd = [
-        "docker",
-        "run",
-        "-itp",
-        "8888:8888",
-        '-w',
-        '/app',
-        "--volume",
-        "\"%s/\":/app" % CONFIG["volume_path"],
-        IMAGE_JUPYTER
-    ]
-    return {{
-        'actions': [" ".join(cmd)],
     }}
