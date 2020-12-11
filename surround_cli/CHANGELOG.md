@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file.
 
 ### Limitation
 
+## [0.0.3] - 2020-12-11
+
+### Fixed
+
+- Added required directories to gitignore
+
 ## [0.0.2] - 2020-12-11
 
 ### Fixed
