@@ -6,28 +6,14 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Add `license` to setup.py
-
 ### Changed
 
 ### Fixed
 
 ### Limitation
 
-## [0.0.14] - 2020-07-01
-
-### Added
-
-- Migrate from CircleCI to Codefresh
-- Use sqlite3 for doit database
+## [0.0.1] - 2020-12-08
 
 ### Changed
 
-- Simplify the assembler
-- Add metrics to non predict pipelines
-- Disable experimentation by default
-- Add a description for the notebook task
-
-### Fixed
-
-- Update about and getting started link
+- Split Surround library and CLI
