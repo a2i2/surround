@@ -102,3 +102,6 @@ $RECYCLE.BIN/
 
 # Doit files
 .doit*
+
+# Credentials
+credentials.json

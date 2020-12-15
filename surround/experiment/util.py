@@ -12,7 +12,7 @@ def get_surround_config():
     config = Config(auto_load=False)
     local_config = Config(auto_load=True)
 
-    global_config_path = os.path.join(Path.home(), ".surround", "config.yaml")
+    global_config_path = os.path.join(str(Path.home()), ".surround", "config.yaml")
     local_config_path = None
 
     if local_config.get_path("project_root"):
