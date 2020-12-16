@@ -20,7 +20,6 @@ setup(name='surround',
       packages=[
           'surround'
       ],
-      test_suite='surround.tests',
       license="BSD-3-Clause License",
       zip_safe=False,
       install_requires=INSTALL_REQUIRES)
