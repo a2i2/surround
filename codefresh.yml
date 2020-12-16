@@ -32,16 +32,14 @@ steps:
           # Go inside the surround library
           - cd surround
 
-          # Install surround
-          - python3 setup.py install
+          # Remove generated tox directory
+          - rm -r .tox
 
-          # Run tests
-          - python3 setup.py test
+          # Install tox
+          - pip install tox==3.20.1
 
-          # Run pylint tests
-          - pip install pylint==2.4.3
-          - pylint setup.py
-          - find surround/ -iname "*.py" | xargs pylint
+          # Run tests through tox
+          - tox
 
       test_cli:
         title: "Test Surround CLI"
@@ -78,6 +76,9 @@ steps:
         working_directory: "${{clone}}" # Running command where code cloned
         commands:
           - cd surround
+
+          # Remove generated files from last release
+          - rm -r dist
 
           # Install required packages
           - python3 -m pip install --user --upgrade setuptools wheel twine
