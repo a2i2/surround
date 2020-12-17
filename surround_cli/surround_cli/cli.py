@@ -57,7 +57,7 @@ def process_files(files, project_dir, project_name, project_description, require
             actual_content += f'\nsurround_cli=={cli_version}'
 
         if require_web and afile == "requirements.txt":
-            actual_content += "\ntornado==6.0.2"
+            actual_content += "\ntornado==6.1.0"
 
         with open(file_path, 'w') as f:
             f.write(actual_content)
