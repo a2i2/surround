@@ -7,7 +7,6 @@ PROJECTS = {
             "notebooks",
             "{project_name}",
             "{project_name}/stages",
-            "templates",
             "tests",
         ],
         "files": [
@@ -27,8 +26,6 @@ PROJECTS = {
             ("{project_name}/__main__.py", "web_main.py.txt", False, True),
             ("{project_name}/__init__.py", "init.py.txt", False, False),
             ("notebooks/data_analysis.ipynb", "data_analysis.ipynb.txt", False, False),
-            ("templates/results.html", "results.html.txt", False, False),
-            ("templates/results.html", "results.html.txt", False, True),
             ("dodo.py", "dodo.py.txt", False, False),
             ("dodo.py", "web_dodo.py.txt", False, True),
             ("Dockerfile", "Dockerfile.txt", False, False),
