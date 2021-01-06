@@ -12,6 +12,14 @@ All notable changes to this project will be documented in this file.
 
 ### Limitation
 
+## [0.0.4] - 2021-01-07
+
+### Changed
+
+- Removed surround_cli dependency from generated project
+- Remove dependency on setup.py test as it is deprecated
+- Upgrade tornado version required by surround cli
+
 ## [0.0.3] - 2020-12-11
 
 ### Fixed
