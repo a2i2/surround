@@ -21,7 +21,6 @@ PROJECTS = {
             ("{project_name}/stages/assembler_state.py", "assembler_state.py.txt", False, False),
             ("{project_name}/stages/baseline.py", "baseline.py.txt", False, False),
             ("{project_name}/stages/input_validator.py", "input_validator.py.txt", False, False),
-            ("{project_name}/stages/report_generator.py", "report_generator.py.txt", False, False),
             ("{project_name}/file_system_runner.py", "file_system_runner.py.txt", False, False),
             ("{project_name}/web_runner.py", "web_runner.py.txt", False, True),
             ("{project_name}/__main__.py", "batch_main.py.txt", False, False),
