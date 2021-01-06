@@ -5,11 +5,7 @@ This module defines the tasks that can be executed using `surround run [task nam
 import os
 import sys
 import subprocess
-
-from pathlib import Path
-
 from surround import Config
-from surround.util import generate_docker_volume_path
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
