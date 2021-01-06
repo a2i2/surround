@@ -52,10 +52,6 @@ def process_files(files, project_dir, project_name, project_description, require
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        if afile == "requirements.txt":
-            cli_version = pkg_resources.get_distribution("surround_cli").version
-            actual_content += f'\nsurround_cli=={cli_version}'
-
         if require_web and afile == "requirements.txt":
             actual_content += "\ntornado==6.1.0"
 
