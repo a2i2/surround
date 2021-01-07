@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file.
 
 ### Limitation
 
+## [0.1.1] - 2021-01-06
+
+### Changed
+
+- Remove report generator from project
+
 ## [0.1.0] - 2020-12-08
 
 ### Changed
