@@ -26,8 +26,6 @@ setup(name='surround_cli',
           'surround_cli.data',
           'surround_cli.data.cli',
           'surround_cli.configuration',
-          'surround_cli.experiment',
-          'surround_cli.experiment.web',
           'templates'
       ],
       entry_points={
