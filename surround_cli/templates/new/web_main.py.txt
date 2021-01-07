@@ -43,7 +43,6 @@ def main(config=None):
         '--status',
         help="Display information about the project such as available RUNNERS and assemblers",
         action="store_true")
-    parser.add_argument('-n', '--note', help="Add a note to the experiment", type=str)
     parser.add_argument('--mode', help="Mode to run (predict, train, batch)", default="predict")
     args = parser.parse_args()
 
