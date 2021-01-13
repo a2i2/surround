@@ -95,7 +95,7 @@ class Assembler(ABC):
                 self.finaliser.initialise(self.config)
 
         except Exception as e:
-            if self.config.get_path("surround.surface_exceptions"):
+            if self.config.surround.surface_exceptions:
                 raise e
             LOGGER.exception(e)
             return False
@@ -147,11 +147,11 @@ class Assembler(ABC):
                 else:
                     a_stage.operate(state, self.config)
 
-                if self.config["surround"]["enable_stage_output_dump"]:
+                if self.config.surround.enable_stage_output_dump:
                     a_stage.dump_output(state, self.config)
 
             except Exception as e:
-                if self.config.get_path("surround.surface_exceptions"):
+                if self.config.surround.surface_exceptions:
                     raise e
                 state.errors.append(str(e))
                 LOGGER.exception(e)
@@ -215,8 +215,6 @@ class Assembler(ABC):
         :type config: :class:`surround.config.Config`
         """
 
-        if not config or not isinstance(config, Config):
-            raise TypeError("config should be of class Config")
         self.config = config
 
         return self
