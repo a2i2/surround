@@ -30,7 +30,7 @@ def get_project_root(current_directory: str = os.getcwd()) -> Optional[str]:
             return current_directory
         current_directory = parent_directory
 
-def find_package_path(project_root: str) -> Optional[str]:
+def find_package_path(project_root: str = get_project_root()) -> Optional[str]:
     """
     Attempts to find the projects package path by looking for the config.yaml file.
     This should only be used when the package name seems to be different from the root folder name.
@@ -96,20 +96,27 @@ def config(config_class=None, name="config", group=None):
 
     return recursive_wrapper
 
-def load_config(name="config", config_class=None):
+def load_config(name="config", config_class=BaseConfig, config_dir=None):
     """
     Loads the configuration instance using Hydra's Compose API.
     """
 
+    config_search_path = config_dir
+
     # Register Config class with Hydra.
-    cs = ConfigStore.instance()
-    cs.store(name=name, node=config_class)
+    if config_class:
+        cs = ConfigStore.instance()
+        cs.store(name=name, node=config_class)
 
-    # Get path to config script, search for overrides in the same folder.
-    classpath = sys.modules[config_class.__module__].__file__
+        # Get path to config script, search for overrides in the same folder.
+        classpath = sys.modules[config_class.__module__].__file__
+        config_search_path = os.path.dirname(classpath)
+    elif not config_search_path: 
+        # Try to get the project package if no search path provided.
+        config_search_path = find_package_path()
 
-    # Initialize hydra, adding the directory containing the config class to the search path.
-    with initialize_config_dir(config_dir=os.path.dirname(classpath)):
+    # Initialize hydra with the config search path.
+    with initialize_config_dir(config_dir=config_search_path):
         # Create an instance of the config class, with any overrides found.
         config = compose(config_name=name)
         return config

@@ -1,0 +1,4 @@
+image: testing
+version: latest
+
+assembler: baseline
