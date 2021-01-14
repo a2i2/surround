@@ -77,30 +77,56 @@ class BaseConfig:
     # Surround specific configuration.
     surround: SurroundConfig = SurroundConfig()
 
+def config(config_class=None, name="config", group=None):
+    """
+    Class decorator that registers the config class with Hydra's ConfigStore.
+    """
+
+    @functools.wraps(config_class)
+    def wrapper(config_class, name, group):
+        cs = ConfigStore.instance()
+        cs.store(name=name, node=config_class, group=group)
+        return config_class
+
+    if config_class:
+        return wrapper(config_class, name, group)
+
+    def recursive_wrapper(config_class):
+        return config(config_class, name, group)
+
+    return recursive_wrapper
+
+def load_config(name="config", config_class=None):
+    """
+    Loads the configuration instance using Hydra's Compose API.
+    """
+
+    # Register Config class with Hydra.
+    cs = ConfigStore.instance()
+    cs.store(name=name, node=config_class)
+
+    # Get path to config script, search for overrides in the same folder.
+    classpath = sys.modules[config_class.__module__].__file__
+
+    # Initialize hydra, adding the directory containing the config class to the search path.
+    with initialize_config_dir(config_dir=os.path.dirname(classpath)):
+        # Create an instance of the config class, with any overrides found.
+        config = compose(config_name=name)
+        return config
+
 def has_config(func=None, name="config", config_class=None):
     """
-    Decorator that injects the hyrdra config into the arguments of the function.
-    ```
+    Function decorator that injects the hyrdra config into the arguments of the function.
     """
 
     @functools.wraps(func)
     def function_wrapper(*args, **kwargs):
+        # Load the config instance.
+        config = load_config(name, config_class)
 
-        # Register Config class with Hydra.
-        cs = ConfigStore.instance()
-        cs.store(name=name, node=config_class)
-
-        # Get path to config script, search for overrides in the same folder.
-        classpath = sys.modules[config_class.__module__].__file__
-
-        # Initialize hydra, adding the directory containing the config class to the search path.
-        with initialize_config_dir(config_dir=os.path.dirname(classpath)):
-            # Create an instance of the config class, with any overrides found.
-            config = compose(config_name=name)
-
-            # Inject this instance into the function argument.
-            kwargs[name] = config
-            return func(*args, **kwargs)
+        # Inject this instance into the function argument.
+        kwargs[name] = config
+        return func(*args, **kwargs)
 
     if func:
         return function_wrapper

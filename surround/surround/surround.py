@@ -4,13 +4,16 @@ from .runners import RunMode
 LOGGER = logging.getLogger(__name__)
 
 class Surround:
-    def __init__(self, runners, assemblies, project_name, project_description, project_root):
+    def __init__(self, runners, assemblies, config, project_name, project_description, project_root):
         self.runners = runners
         self.assemblies = assemblies
         self.project_name = project_name
         self.project_root = project_root
 
-    def run(self, runner_key, assembler_key, mode, args=None):
+        for assembler in assemblies:
+            assembler.set_config(config)
+
+    def run(self, runner_key, assembler_key, mode):
         runner = self.__get_runner(runner_key)
 
         if not runner:
