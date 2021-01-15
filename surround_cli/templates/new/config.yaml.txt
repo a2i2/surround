@@ -1,5 +1,5 @@
+company: yourcompany
 image: {project_name}
 version: latest
 
-assembler:
-  default: baseline
+assembler: baseline

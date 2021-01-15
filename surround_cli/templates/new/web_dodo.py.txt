@@ -5,9 +5,11 @@ This module defines the tasks that can be executed using `surround run [task nam
 import os
 import sys
 import subprocess
-from surround import Config
 
-CONFIG = Config(os.path.dirname(__file__))
+from surround import load_config
+from {project_name}.config import Config
+
+CONFIG = load_config(name="config", config_class=Config)
 DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
@@ -26,7 +28,7 @@ PARAMS = [
 def task_status():
     """Show information about the project such as available runners and assemblers"""
     return {{
-        'actions': ["%s -m %s --status" % (sys.executable, PACKAGE_PATH)]
+        'actions': ["%s -m %s status=1" % (sys.executable, PACKAGE_PATH)]
     }}
 
 def task_build():
@@ -110,7 +112,7 @@ def task_train():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         "%s" % IMAGE,
-        "python3 -m {project_name} --mode train %(args)s"
+        "python3 -m {project_name} mode=train %(args)s"
     ]
 
     return {{
@@ -128,7 +130,7 @@ def task_batch():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         "%s" % IMAGE,
-        "python3 -m {project_name} --mode batch %(args)s"
+        "python3 -m {project_name} mode=batch %(args)s"
     ]
 
     return {{
@@ -141,8 +143,8 @@ def task_train_local():
     cmd = [
         sys.executable,
         "-m %s" % PACKAGE_PATH,
-        "--mode train",
-        "--runner 1",
+        "mode=train",
+        "runner=1",
         "%(args)s"
     ]
 
@@ -157,8 +159,8 @@ def task_batch_local():
     cmd = [
         sys.executable,
         "-m %s" % PACKAGE_PATH,
-        "--mode batch",
-        "--runner 1",
+        "mode=batch",
+        "runner=1",
         "%(args)s"
     ]
 
@@ -177,7 +179,7 @@ def task_web():
         "8080:8080",
         IMAGE,
         "python3 -m %s" % PACKAGE_PATH,
-        "--runner WebRunner",
+        "runner=WebRunner",
         "%(args)s"
     ]
 
@@ -191,7 +193,7 @@ def task_web_local():
     cmd = [
         sys.executable,
         "-m %s" % PACKAGE_PATH,
-        "--runner WebRunner",
+        "runner=WebRunner",
         "%(args)s"
     ]
 
