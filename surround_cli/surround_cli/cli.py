@@ -12,7 +12,6 @@ from .remote import cli as remote_cli
 from .split import cli as split_cli
 from .visualise import cli as visualise_cli
 from .data.cli import cli as data_cli
-from .configuration import cli as config_cli
 from .linter import Linter
 
 def process_directories(directories, project_dir, project_name):
@@ -392,7 +391,6 @@ def execute_cli():
 
     remote_parser = remote_cli.add_store_parser(sub_parser)
 
-    config_parser = sub_parser.add_parser('config', parents=[config_cli.get_parser()], add_help=False, help="Configure global/local configuration properties")
     split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
     visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
     data_parser = sub_parser.add_parser('data', parents=[data_cli.get_data_parser()], help="Surround Data Container Tool", add_help=False)
@@ -402,7 +400,6 @@ def execute_cli():
     # Tuple format: (tool_parser, func(parser, args, extra_args))
     # Where extra_args are arguments parsed but not known to argparse
     tools = {
-        "config": (config_parser, config_cli.execute_tool),
         "init": (init_parser, parse_init_args),
         "lint": (linter_parser, parse_lint_args),
         "run": (run_parser, parse_run_args),
