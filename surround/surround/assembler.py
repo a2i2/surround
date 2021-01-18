@@ -6,7 +6,7 @@ import sys
 from abc import ABC
 from datetime import datetime
 
-from .surround_config import BaseConfig
+from .config import BaseConfig
 from .run_modes import RunMode
 from .stage import Stage, Estimator
 
