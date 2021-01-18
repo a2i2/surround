@@ -1,9 +1,20 @@
 import unittest
 import os
-from surround import Assembler, Estimator, State, Config, Stage
+from dataclasses import dataclass
+from omegaconf import MISSING
+from typing import Optional
+from surround import Assembler, Estimator, State, BaseConfig, config, load_config, Stage
 
 test_text = "hello"
 
+@dataclass
+class HelloStageData:
+    suffix: Optional[str] = None
+
+@config(name="config")
+@dataclass
+class Config(BaseConfig):
+    helloStage: Optional[HelloStageData] = None
 
 class HelloStage(Estimator):
     def estimate(self, state, config):
@@ -13,7 +24,7 @@ class HelloStage(Estimator):
             raise Exception("Error!!")
 
         state.text = test_text
-        if "helloStage" in config:
+        if not isinstance(config, BaseConfig) and config.helloStage:
             state.config_value = config["helloStage"]["suffix"]
 
     def fit(self, state, config):
@@ -86,8 +97,7 @@ class TestSurround(unittest.TestCase):
 
     def test_surround_config(self):
         path = os.path.dirname(__file__)
-        config = Config()
-        config.read_config_files([os.path.join(path, "config.yaml")])
+        config = load_config(name="config", config_class=Config)
         data = AssemblerState()
         assembler = Assembler("Surround config").set_stages([InputValidator(), HelloStage()]).set_config(config)
         assembler.run(data)

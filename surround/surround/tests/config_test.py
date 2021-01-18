@@ -3,7 +3,9 @@ import unittest
 import os
 import tempfile
 import yaml
-from surround import Config
+from dataclasses import dataclass, field, MISSING
+from typing import List
+from surround import BaseConfig, config, load_config
 
 yaml1 = """
 main:
@@ -17,22 +19,21 @@ objects:
     size: 15
 """
 
-yaml2 = """
-main:
-  count: 15
+@dataclass
+class Main:
+  count: int = 0
 
-objects:
-  - node: 43
-    size: 355
+@dataclass
+class DataObject:
+  node: int = 0
+  size: int = 0
 
-enable_logging: true
-"""
-
-yaml3 = """
-main:
-  count: 15
-"""
-
+@config(name="test_config")
+@dataclass
+class Config(BaseConfig):
+  main: Main = Main()
+  objects: List[DataObject] = field(default_factory=lambda: [])
+  enable_logging: bool = False
 
 class TestConfig(unittest.TestCase):
 
@@ -49,7 +50,7 @@ class TestConfig(unittest.TestCase):
         os.mkdir("temp/.surround")
         os.mkdir("temp/temp")
 
-        with open("temp/temp/config.yaml", "w+") as f:
+        with open("temp/temp/test_config.yaml", "w+") as f:
             f.write(yaml2)
 
         self.owd = os.getcwd()
@@ -61,58 +62,27 @@ class TestConfig(unittest.TestCase):
 
         os.chdir(self.owd)
 
-        os.unlink("temp/temp/config.yaml")
+        os.unlink("temp/temp/test_config.yaml")
         os.rmdir("temp/temp")
         os.rmdir("temp/.surround")
         os.rmdir("temp")
 
     def test_auto_loading_project_config(self):
-        config = Config(auto_load=True)
+        config = load_config(name="test_config", config_dir=os.path.abspath('temp'), config_class=Config)
         self.assertEqual(config['main']['count'], 15)
         self.assertTrue(config['enable_logging'])
-        self.assertIsInstance(config['objects'], list)
         self.assertEqual(config['objects'][0]['node'], 43)
         self.assertEqual(config['objects'][0]['size'], 355)
-
-    def test_merging_config(self):
-        config = Config()
-        config.read_config_files([self.f1.name, self.f2.name])
-        output = {
-            'company': 'a2i2',
-            'version': 'latest',
-            'image': 'surround',
-            'surround': {
-                'enable_stage_output_dump': False
-            },
-            'main': {
-                'surround': 'au.com.first_stage.FirstStage',
-                'count': 15
-            },
-            'objects': [{
-                'node': 43,
-                'size': 355
-            }],
-            'enable_logging': True
-        }
-        self.assertDictEqual(config.__dict__["_storage"], output)
 
 
     def test_env_config(self):
         with patch.dict('os.environ', {
-                'SURROUND_MAIN_COUNT': str(45),
-                'SURROUND_TEMP': str(0.3),
-                'SURROUND_STRING': "this is a test string",
-                'SURROUND_BOOL': "true",
-                'SURROUND_BOOLTWO': "false",
-                "SURROUND_BOOLTHREE": "True",
-                "SURROUND_BOOLFOUR": "False"
+            'SURROUND_MAIN_COUNT': str(45),
         }):
-            config = Config()
-            config.read_from_dict(yaml.safe_load(yaml3))
+            config = load_config(
+                name="test_config", c
+                onfig_dir=os.path.abspath('temp'), 
+                config_class=Config, 
+                overrides=['main.count=${env:SURROUND_MAIN_COUNT}']
+            )
             self.assertEqual(config["main"]["count"], 45)
-            self.assertEqual(config["temp"], 0.3)
-            self.assertEqual(config["string"], "this is a test string")
-            self.assertTrue(config["bool"])
-            self.assertFalse(config["booltwo"])
-            self.assertTrue(config["boolthree"])
-            self.assertFalse(config["boolfour"])

@@ -6,7 +6,7 @@ import sys
 from abc import ABC
 from datetime import datetime
 
-from .config import Config, has_config
+from .surround_config import BaseConfig
 from .run_modes import RunMode
 from .stage import Stage, Estimator
 
@@ -51,8 +51,7 @@ class Assembler(ABC):
     """
 
     # pylint: disable=too-many-instance-attributes
-    @has_config
-    def __init__(self, assembler_name="", config=None):
+    def __init__(self, assembler_name="", config=BaseConfig()):
         """
         Constructor for an Assembler pipeline:
 
@@ -174,36 +173,6 @@ class Assembler(ABC):
             LOGGER.error(state.errors)
 
         state.thaw()
-
-    def load_config(self, module):
-        """
-        Given a module contained in the root of the project, create an instance of
-        :class:`surround.config.Config` loading configuration data from the ``config.yaml``
-        found in the project, and use this configuration for the pipeline.
-
-        .. note:: Should be called before :meth:`surround.assembler.Assemble.init_assembler`
-
-        :param module: name of the module
-        :type module: str
-        """
-
-        if module:
-            # Module already imported and has a file attribute
-            mod = sys.modules.get(module)
-            if mod and hasattr(mod, '__file__'):
-                package_path = os.path.dirname(os.path.abspath(mod.__file__))
-                root_path = os.path.dirname(package_path)
-            else:
-                raise ValueError("Invalid Python module %s" % module)
-
-            self.set_config(Config(root_path))
-
-            if not os.path.exists(self.config["output_path"]):
-                os.makedirs(self.config["output_path"])
-        else:
-            self.set_config(Config())
-
-        return self
 
     def set_config(self, config):
         """

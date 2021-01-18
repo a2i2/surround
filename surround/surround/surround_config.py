@@ -18,7 +18,6 @@ def get_project_root(current_directory: str = os.getcwd()) -> Optional[str]:
     :param current_directory: directory to start searching from
     :type current_directory: str
     """
-
     home = str(Path.home())
 
     while True:
@@ -41,10 +40,24 @@ def find_package_path(project_root: str = get_project_root()) -> Optional[str]:
     :rtype: str
     """
 
-    results = [path for path, _, files in os.walk(project_root) if 'config.yaml' in files]
-    results = [path for path in results if os.path.basename(path) not in PROJECTS['new']['dirs'] and ".hydra" not in path]
+    if project_root:
+        results = [path for path, _, files in os.walk(project_root) if 'config.yaml' in files]
+        results = [path for path in results if os.path.basename(path) not in PROJECTS['new']['dirs'] and ".hydra" not in path]
 
-    return results[0] if len(results) == 1 else None
+        return results[0] if len(results) == 1 else None
+
+def get_project_root_or_cwd():
+    """
+    Returns the project root when a project is found, otherwise returns the current working directory.
+
+    :return: path to either the project root or current working directory
+    :rtype: str
+    """
+    project_path = get_project_root()
+    if project_path:
+        return project_path
+    
+    return os.getcwd()
 
 @dataclass
 class SurroundConfig:
@@ -57,22 +70,22 @@ class SurroundConfig:
 @dataclass 
 class BaseConfig:
     # Absolute path to the root of the project.
-    project_root: str = field(default_factory=get_project_root)
+    project_root: Optional[str] = field(default_factory=get_project_root_or_cwd)
 
     # Absolute path to the package that will be executed to run the pipeline.
-    package_path: str = field(default_factory=lambda: find_package_path(get_project_root()))
+    package_path: Optional[str] = field(default_factory=lambda: find_package_path(get_project_root_or_cwd()))
 
     # Absolute path to the root of the project, formatted for use in Docker commands (auto generated via project_root).
-    volume_path: str = field(default_factory=lambda: generate_docker_volume_path(get_project_root()))
+    volume_path: Optional[str] = field(default_factory=lambda: generate_docker_volume_path(get_project_root_or_cwd()))
 
     # Absolute path to the inputs folder where data should be loaded from.
-    input_path: str = field(default_factory=lambda: os.path.join(get_project_root(), "input"))
+    input_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "input"))
 
     # Absolute path to the models folder where models should be loaded from.
-    model_path: str = field(default_factory=lambda: os.path.join(get_project_root(), "models"))
+    model_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "models"))
 
     # Absolute path to the output folder where outputs from the current run should be placed (timestamped folder). 
-    output_path: str = field(default_factory=lambda: os.path.join(get_project_root(), "output", str(datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))))
+    output_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "output", str(datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))))
 
     # Surround specific configuration.
     surround: SurroundConfig = SurroundConfig()
@@ -96,40 +109,44 @@ def config(config_class=None, name="config", group=None):
 
     return recursive_wrapper
 
-def load_config(name="config", config_class=BaseConfig, config_dir=None):
+def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=[]):
     """
     Loads the configuration instance using Hydra's Compose API.
     """
 
     config_search_path = config_dir
 
+    # User has not provided any config override search path...
+    if not config_search_path:
+        # Look for a Surround project in current working directory.
+        config_search_path = find_package_path()
+
+        # No project has been detected, use the specified config class directory instead.
+        if not config_search_path and config_class:
+            classpath = sys.modules[config_class.__module__].__file__
+            config_search_path = os.path.dirname(classpath)
+
     # Register Config class with Hydra.
     if config_class:
         cs = ConfigStore.instance()
         cs.store(name=name, node=config_class)
 
-        # Get path to config script, search for overrides in the same folder.
-        classpath = sys.modules[config_class.__module__].__file__
-        config_search_path = os.path.dirname(classpath)
-    elif not config_search_path: 
-        # Try to get the project package if no search path provided.
-        config_search_path = find_package_path()
-
     # Initialize hydra with the config search path.
     with initialize_config_dir(config_dir=config_search_path):
         # Create an instance of the config class, with any overrides found.
-        config = compose(config_name=name)
+        config = compose(config_name=name, overrides=overrides)
         return config
 
-def has_config(func=None, name="config", config_class=None):
+def has_config(func=None, name="config", config_class=None, overrides=[]):
     """
     Function decorator that injects the hyrdra config into the arguments of the function.
+
     """
 
     @functools.wraps(func)
     def function_wrapper(*args, **kwargs):
         # Load the config instance.
-        config = load_config(name, config_class)
+        config = load_config(name, config_class, overrides)
 
         # Inject this instance into the function argument.
         kwargs[name] = config
@@ -139,6 +156,6 @@ def has_config(func=None, name="config", config_class=None):
         return function_wrapper
 
     def recursive_wrapper(func):
-        return has_config(func, name, config_class)
+        return has_config(func, name, config_class, overrides)
 
     return recursive_wrapper
