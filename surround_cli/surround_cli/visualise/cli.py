@@ -4,6 +4,7 @@ import json
 import datetime
 import pkg_resources
 import pandas as pd
+from omegaconf import OmegaConf
 
 from .visualise_classifier import VisualiseClassifier, VisualiseClassifierData
 
@@ -129,7 +130,7 @@ def execute_visualise_tool(parser, args, extra_args):
 
     # Initialise the visualiser
     visualiser = VisualiseClassifier()
-    config = {'show_normalized_confusion_matrix': args.normalize}
+    config = OmegaConf.create({'show_normalized_confusion_matrix': args.normalize})
 
     results = []
 
