@@ -122,9 +122,13 @@ def load_config(name="config", config_class=BaseConfig, config_dir=None, overrid
         config_search_path = find_package_path()
 
         # No project has been detected, use the specified config class directory instead.
-        if not config_search_path and config_class:
+        if not config_search_path and config_class and config_class != BaseConfig:
             classpath = sys.modules[config_class.__module__].__file__
             config_search_path = os.path.dirname(classpath)
+
+    # Still no search path found, so search the current working directory.
+    if not config_search_path:
+        config_search_path = os.getcwd()
 
     # Register Config class with Hydra.
     if config_class:
