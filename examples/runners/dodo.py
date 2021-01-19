@@ -1,7 +1,7 @@
 import os
-from surround import Config
+from surround import load_config
 
-CONFIG = Config(os.path.dirname(__file__))
+CONFIG = load_config(name="config", config_dir="runners")
 DOIT_CONFIG = {'verbosity':2}
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 
