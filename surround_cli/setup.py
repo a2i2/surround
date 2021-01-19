@@ -25,7 +25,6 @@ setup(name='surround_cli',
           'surround_cli.visualise',
           'surround_cli.data',
           'surround_cli.data.cli',
-          'surround_cli.configuration',
           'templates'
       ],
       entry_points={
