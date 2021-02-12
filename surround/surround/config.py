@@ -56,19 +56,39 @@ def get_project_root_or_cwd():
     project_path = get_project_root()
     if project_path:
         return project_path
-    
+
     return os.getcwd()
 
 @dataclass
 class SurroundConfig:
+    """
+    Surround specific configuration that dictates how it runs the pipeline.
+
+    :cvar bool enable_stage_ouput_dump: Configures whether the dump_output method of Stage is called after its operation.
+    :cvar bool surface_exceptions: Configurs whether exceptions are thrown during pipeline execution or consumed.
+    """
+
     # Configures whether the dump_output method of Stage is called after its operation.
     enable_stage_output_dump: bool = False
 
     # Configures whether exceptions thrown during pipeline execution are surfaced.
     surface_exceptions: bool = False
 
-@dataclass 
+@dataclass
 class BaseConfig:
+    """
+    Base structured configuration class that should form the base of all custom
+    configuration classes. Contains properties required by all Surround pipelines.
+
+    :cvar Optional[str] project_root: Absolute path to the root of the Surround project.
+    :cvar Optional[str] package_path: Absolute path to the package of the Surround project.
+    :cvar Optional[str] volume_path: Absolute path to the root of the Surround project (formatted for use in Docker volume commands).
+    :cvar Optional[str] input_path: Absolute path to the input folder where data should be loaded from.
+    :cvar Optional[str] model_path: Absolute path to the models folder where models should be loaded from.
+    :cvar Optional[str] output_path: Generated (datetime naming) absolute path to the output folder where output artifacts should be saved.
+    :cvar SurroundConfig surround: Surround specific configuration that dictates how it runs the pipeline.
+    """
+
     # Absolute path to the root of the project.
     project_root: Optional[str] = field(default_factory=get_project_root_or_cwd)
 
@@ -92,7 +112,48 @@ class BaseConfig:
 
 def config(config_class=None, name="config", group=None):
     """
-    Class decorator that registers the config class with Hydra's ConfigStore.
+    Class decorator that registers a custom configuration class with 
+    `Hydra's ConfigStore API <https://hydra.cc/docs/tutorials/structured_config/config_store>`_.
+
+    If defining your own custom configuration class, your class must do the following:
+        * Register with `Hydra's ConfigStore API <https://hydra.cc/docs/tutorials/structured_config/config_store>`_ (which this decorator does for you).
+        * Register as a `@dataclass <https://docs.python.org/3/library/dataclasses.html>`_.
+
+    Example::
+
+        @config(name="db")
+        @dataclass
+        class DBConfig(BaseConfig):
+            host: str = "localhost"
+
+    .. note:: Make sure @dataclass comes after @config.
+
+    This also supports `Hydra Config Groups <https://hydra.cc/docs/tutorials/structured_config/config_groups>`_, example::
+
+        @config
+        @dataclass
+        class Config(BaseConfig):
+            db: Any = MISSING
+
+        @config(name="mysql", group="db")
+        @dataclass
+        class MySqlConfig:
+            host: str = "mysql://localhost"
+        
+        @config(name="postgres", group="db")
+        @dataclass
+        class PostgresConfig:
+            host: str = "postgres://localhost"
+            postgres_specific_data: str = "some special data"
+
+    Then when running the job you can do the following::
+
+        $ python3 -m project_package db=mysql
+
+    :param name: Name of the configuration, used to locate overrides.
+    :type name: str
+    :param group: Group name to support Hydra Config Groups.
+    :type group: str
     """
 
     @functools.wraps(config_class)
@@ -109,9 +170,34 @@ def config(config_class=None, name="config", group=None):
 
     return recursive_wrapper
 
-def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=[]):
+def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=None):
     """
-    Loads the configuration instance using Hydra's Compose API.
+    Loads the configuration instance using `Hydra's Compose API <https://hydra.cc/docs/experimental/compose_api>`_.
+
+    Example::
+
+        @config(name="db")
+        @dataclass
+        class DBConfig(BaseConfig):
+            host: str = "localhost"
+
+        config = load_config(name='db', config_class=DBConfig)
+        assembler = Assembler(name='Pipeline', config)
+        ...
+
+    You could then override the value of ``host`` by creating a YAML
+    file in the same working directory called ``db.yaml`` with the following::
+
+        host: mysql://192.168.1.2
+
+    :param name: Name of the configuration, used to locate overrides.
+    :type name: str
+    :param config_class: The class describing the schema of the configuration.
+    :type config_class: :class:`BaseConfig`
+    :param config_dir: Directory to search override config files for.
+    :type config_dir: str
+    :param overrides: Manual overrides of the configuration properties.
+    :type overrides: dict
     """
 
     config_search_path = config_dir
@@ -138,22 +224,21 @@ def load_config(name="config", config_class=BaseConfig, config_dir=None, overrid
     # Initialize hydra with the config search path.
     with initialize_config_dir(config_dir=config_search_path):
         # Create an instance of the config class, with any overrides found.
-        config = compose(config_name=name, overrides=overrides)
-        return config
+        config_instance = compose(config_name=name, overrides=overrides)
+        return config_instance
 
 def has_config(func=None, name="config", config_class=None, overrides=[]):
     """
     Function decorator that injects the hyrdra config into the arguments of the function.
-
     """
 
     @functools.wraps(func)
     def function_wrapper(*args, **kwargs):
         # Load the config instance.
-        config = load_config(name, config_class, overrides)
+        config_instance = load_config(name, config_class, overrides)
 
         # Inject this instance into the function argument.
-        kwargs[name] = config
+        kwargs[name] = config_instance
         return func(*args, **kwargs)
 
     if func:

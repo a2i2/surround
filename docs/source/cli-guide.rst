@@ -7,7 +7,7 @@ surround
 ^^^^^^^^
 
 .. argparse::
-    :module: surround.cli
+    :module: surround_cli.cli
     :func: execute_cli
     :prog: surround
     :nosubcommands:
@@ -18,7 +18,7 @@ init
 Initialize a new Surround project.
 
 .. argparse::
-    :module: surround.cli
+    :module: surround_cli.cli
     :func: execute_cli
     :prog: surround
     :path: init
@@ -53,7 +53,7 @@ Tasks are defined in the ``dodo.py`` file of the current project. Each project c
 - ``webLocal`` - Serve the specified assembler via HTTP endpoints locally. 
 
 .. argparse::
-    :module: surround.cli
+    :module: surround_cli.cli
     :func: execute_cli
     :prog: surround
     :path: run
@@ -61,24 +61,13 @@ Tasks are defined in the ``dodo.py`` file of the current project. Each project c
 lint
 ^^^^
 
-Run the Surround Linter on the current project.
-
-For more information on what this does, see :ref:`linter`.
+Run `Pylint <https://www.pylint.org/>`_ across the entire project, using rules defined by Surround.
 
 .. argparse::
-    :module: surround.cli
+    :module: surround_cli.cli
     :func: execute_cli
     :prog: surround
     :path: lint
-
-data
-^^^^
-
-.. argparse::
-    :module: surround.cli
-    :func: execute_cli
-    :prog: surround
-    :path: data
 
 split
 ^^^^^
@@ -105,7 +94,7 @@ Example - Splitting and resetting a CSV file::
     $ surround split --reset .
 
 .. argparse::
-    :module: surround.cli
+    :module: surround_cli.cli
     :func: execute_cli
     :prog: surround
     :path: split

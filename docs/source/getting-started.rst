@@ -21,11 +21,19 @@ Run the following command to install the latest version of Surround::
 
 .. note:: If this doesn't work make sure you have pip installed. See `here <https://pip.pypa.io/en/stable/installing/>`_ on how to install it.
 
+To be able to use the command-line interface (CLI), we will also need to install it::
+
+    $ pip3 install surround_cli
+
 Now the Surround library and command-line tool should be installed! To make sure run the following command to test::
 
     $ surround
 
 If it works then you are ready for the :ref:`project-setup` stage.
+
+.. note:: If you are having trouble running the above, it may be due to environment
+    configuration problems. An alternative way to run the CLI tool is ``python3 -m surround_cli.cli``. 
+
 
 .. _project-setup:
 
@@ -52,7 +60,7 @@ This will create a new folder called ``test_project`` with the following file st
     │   │   └── assembler_state.py
     │   ├── __main__.py
     │   ├── __init__.py    
-    │   ├── config.yaml
+    │   ├── config.py
     │   └── file_system_runner.py
     ├── input/
     ├── docs/

@@ -48,17 +48,17 @@ class Assembler(ABC):
 
         assembler.init_assembler(batch_mode=False)
         assembler.run(data, is_training=False)
+        
+    Constructor for an Assembler pipeline:
+
+    :param assembler_name: The name of the pipeline
+    :type assembler_name: str
+    :param config: Configuration instance
+    :type config: BaseConfig
     """
 
     # pylint: disable=too-many-instance-attributes
     def __init__(self, assembler_name="", config=BaseConfig()):
-        """
-        Constructor for an Assembler pipeline:
-
-        :param assembler_name: The name of the pipeline
-        :param config: Surround Config object
-        :type assembler_name: str
-        """
         self.assembler_name = assembler_name
         self.config = config
         self.stages = None
@@ -104,7 +104,7 @@ class Assembler(ABC):
         """
         Run the pipeline using the input data provided.
 
-        If ``is_training`` is set to ``True`` then when it gets to the execution of the estimator,
+        If ``mode`` is set to ``RunMode.TRAIN`` then when it gets to the execution of the estimator,
         it will use the :meth:`surround.stage.Estimator.fit` method instead.
 
         If ``surround.enable_stage_output_dump`` is enabled in the Config instance then each stage and
@@ -181,7 +181,7 @@ class Assembler(ABC):
         .. note:: Should be called before :meth:`surround.assembler.Assembler.init_assembler`.
 
         :param config: the configuration data
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
 
         self.config = config
@@ -220,6 +220,10 @@ class Assembler(ABC):
         return self
 
     def set_metrics(self, metrics):
+        """
+        When running batch or training jobs this stage is ran after all stages 
+        but the finaliser stage. The purpose of this stage is to calculate metrics. 
+        """
 
         if not metrics and not isinstance(metrics, Stage):
             raise TypeError("metrics should be of the Stage class")
