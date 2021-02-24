@@ -226,25 +226,3 @@ def load_config(name="config", config_class=BaseConfig, config_dir=None, overrid
         # Create an instance of the config class, with any overrides found.
         config_instance = compose(config_name=name, overrides=overrides)
         return config_instance
-
-def has_config(func=None, name="config", config_class=None, overrides=[]):
-    """
-    Function decorator that injects the hyrdra config into the arguments of the function.
-    """
-
-    @functools.wraps(func)
-    def function_wrapper(*args, **kwargs):
-        # Load the config instance.
-        config_instance = load_config(name, config_class, overrides)
-
-        # Inject this instance into the function argument.
-        kwargs[name] = config_instance
-        return func(*args, **kwargs)
-
-    if func:
-        return function_wrapper
-
-    def recursive_wrapper(func):
-        return has_config(func, name, config_class, overrides)
-
-    return recursive_wrapper
