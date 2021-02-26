@@ -13,7 +13,6 @@ from .split import cli as split_cli
 from .visualise import cli as visualise_cli
 from .data.cli import cli as data_cli
 from .configuration import cli as config_cli
-from .experiment.web import cli as experiment_cli
 from .linter import Linter
 
 def process_directories(directories, project_dir, project_name):
@@ -394,7 +393,6 @@ def execute_cli():
     remote_parser = remote_cli.add_store_parser(sub_parser)
 
     config_parser = sub_parser.add_parser('config', parents=[config_cli.get_parser()], add_help=False, help="Configure global/local configuration properties")
-    experiment_parser = sub_parser.add_parser('experimentation', parents=[experiment_cli.get_parser()], add_help=False, help="Start experimentation platform")
     split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
     visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
     data_parser = sub_parser.add_parser('data', parents=[data_cli.get_data_parser()], help="Surround Data Container Tool", add_help=False)
@@ -411,7 +409,6 @@ def execute_cli():
         "store": (remote_parser, remote_cli.parse_store_args),
         "split": (split_parser, split_cli.execute_split_tool),
         "viz": (visualise_parser, visualise_cli.execute_visualise_tool),
-        "experimentation": (experiment_parser, experiment_cli.execute_tool),
         "data": (data_parser, data_cli.execute_data_tool)
     }
 

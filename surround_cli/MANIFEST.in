@@ -1,7 +1,4 @@
 include VERSION
 include requirements.txt
-include surround/visualise/*.html.txt
-include surround/experiment/web/*.html
-include surround/experiment/web/*.ico
-include surround/experiment/web/*.js
+include surround_cli/visualise/*.html.txt
 graft templates

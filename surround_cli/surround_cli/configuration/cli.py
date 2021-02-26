@@ -9,12 +9,6 @@ REQUIRED_CONFIG = {
     "user.email": "Enter your email (user.email): "
 }
 
-DEFAULT_CONFIG = {
-    "experiment.url": os.path.join(str(Path.home()), ".experiments", "local"),
-    "experiment.location.local": os.path.join(str(Path.home()), ".experiments", "local"),
-    "experiment.location.shared": os.path.join(str(Path.home()), ".experiments", "shared")
-}
-
 def get_parser():
     parser = argparse.ArgumentParser(prog="config", description="Surround Configuration Tool")
 
@@ -66,11 +60,6 @@ def update_required_fields(config, config_path, answers=None, verbose=True):
             else:
                 value = input(prompt)
                 generate_data(data, key.split("."), value)
-
-    # Ensure default values are in the config
-    for key, value in DEFAULT_CONFIG.items():
-        if not config.get_path(key):
-            generate_data(data, key.split("."), value)
 
     if data:
         # Save the answers to the global config
