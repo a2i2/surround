@@ -5,10 +5,10 @@ from surround import BaseConfig, config
 @dataclass
 class Config(BaseConfig):
     # Docker image configuration
-    company: str = "testingcompany"
-    image: str = "testing"
+    company: str = "a2i2"
+    image: str = "hudra_example"
     version: str = "latest"
-    
+
     # Pipeline configuration
     runner: str = "0"
     assembler: str = "baseline"

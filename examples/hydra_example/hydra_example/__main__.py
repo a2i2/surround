@@ -26,8 +26,8 @@ def main(config: Config) -> None:
         RUNNERS,
         ASSEMBLIES,
         config,
-        "testing",
-        "Testing",
+        "hydra_example",
+        "Example showing the use of the Hydra framework.",
         os.path.dirname(os.path.dirname(__file__))
     )
 

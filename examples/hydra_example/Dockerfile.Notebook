@@ -1,4 +1,4 @@
-FROM a2i2/testing:latest
+FROM a2i2/hydra_example:latest
 
 RUN pip3 install jupyter -U && pip3 install jupyterlab
 

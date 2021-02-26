@@ -8,7 +8,7 @@ import subprocess
 
 from pathlib import Path
 
-from testing.config import Config
+from hydra_example.config import Config
 from surround import load_config
 
 CONFIG = load_config(name="config", config_class=Config)
@@ -102,7 +102,7 @@ def task_train():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         IMAGE,
-        "python3 -m testing mode=train %(args)s"
+        "python3 -m hydra_example mode=train %(args)s"
     ]
 
     return {
@@ -120,7 +120,7 @@ def task_batch():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         IMAGE,
-        "python3 -m testing mode=batch %(args)s"
+        "python3 -m hydra_example mode=batch %(args)s"
     ]
 
     return {

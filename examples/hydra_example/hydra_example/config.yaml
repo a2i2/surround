@@ -1,4 +1,4 @@
-image: testing
+image: hydra_example
 version: latest
 
 assembler: baseline
