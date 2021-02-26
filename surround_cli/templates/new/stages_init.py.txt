@@ -6,4 +6,3 @@ directly from the stages package e.g. `from .stages import Baseline`.
 from .baseline import Baseline
 from .input_validator import InputValidator
 from .assembler_state import AssemblerState
-from .report_generator import ReportGenerator

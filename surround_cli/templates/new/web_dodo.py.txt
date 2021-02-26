@@ -5,12 +5,7 @@ This module defines the tasks that can be executed using `surround run [task nam
 import os
 import sys
 import subprocess
-
-from pathlib import Path
-
 from surround import Config
-from surround.util import generate_docker_volume_path
-from surround_cli.experiment.util import get_surround_config
 
 CONFIG = Config(os.path.dirname(__file__))
 DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
@@ -110,27 +105,8 @@ def task_train():
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/input"
 
-    global_config = get_surround_config()
-
-    # Inject user's name and email into the env variables of the container
-    user_name = global_config.get_path("user.name")
-    user_email = global_config.get_path("user.email")
-    experiment_args = "-e \"SURROUND_USER_NAME=%s\" " % user_name
-    experiment_args += "-e \"SURROUND_USER_EMAIL=%s\"" % user_email
-
-    experiment_path = os.path.join(str(Path.home()), ".experiments")
-    experiment_volume_path = generate_docker_volume_path(experiment_path)
-
-    # Ensure experiments will work if using a local storage location (not in the cloud)
-    if os.path.join(experiment_path, "local") == global_config.get_path("experiment.url"):
-        experiment_args += " --volume \"%s\":/experiments " % experiment_volume_path
-        experiment_args += "-e \"SURROUND_EXPERIMENT_URL=/experiments/local\""
-    else:
-        current_url = global_config.get_path("experiment.url")
-        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % current_url
-
     cmd = [
-        "docker run %s" % experiment_args,
+        "docker run",
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         "%s" % IMAGE,
@@ -147,27 +123,8 @@ def task_batch():
     output_path = CONFIG["volume_path"] + "/output"
     data_path = CONFIG["volume_path"] + "/input"
 
-    global_config = get_surround_config()
-
-    # Inject user's name and email into the env variables of the container
-    user_name = global_config.get_path("user.name")
-    user_email = global_config.get_path("user.email")
-    experiment_args = "-e \"SURROUND_USER_NAME=%s\" " % user_name
-    experiment_args += "-e \"SURROUND_USER_EMAIL=%s\"" % user_email
-
-    experiment_path = os.path.join(str(Path.home()), ".experiments")
-    experiment_volume_path = generate_docker_volume_path(experiment_path)
-
-    # Ensure experiments will work if using a local storage location (not in the cloud)
-    if os.path.join(experiment_path, "local") == global_config.get_path("experiment.url"):
-        experiment_args += " --volume \"%s\":/experiments " % experiment_volume_path
-        experiment_args += "-e \"SURROUND_EXPERIMENT_URL=/experiments/local\""
-    else:
-        current_url = global_config.get_path("experiment.url")
-        experiment_args += " -e \"SURROUND_EXPERIMENT_URL=%s\"" % current_url
-
     cmd = [
-        "docker run %s" % experiment_args,
+        "docker run",
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         "%s" % IMAGE,
