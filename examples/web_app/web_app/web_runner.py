@@ -1,0 +1,67 @@
+"""
+This module is responsible for serving the pipeline via HTTP endpoints.
+"""
+
+import json
+import logging
+import tornado.httpserver
+import tornado.ioloop
+import tornado.options
+import tornado.web
+from surround import Runner, RunMode
+from .stages import AssemblerState
+
+logging.basicConfig(level=logging.INFO)
+
+
+class WebRunner(Runner):
+    def load_data(self, mode, config):
+        return None
+
+    def run(self, mode=RunMode.PREDICT):
+        # Setup web service
+        self.assembler.init_assembler()
+        self.application = Application(self.assembler)
+        self.application.listen(8080)
+        logging.info("Server started at http://localhost:8080")
+        logging.info("Available endpoints:")
+        logging.info("* GET   /info                      # Version info")
+        logging.info(
+            "* POST  /estimate                  # Send JSON data to the Surround pipeline"
+        )
+        tornado.ioloop.IOLoop.instance().start()
+
+
+class Application(tornado.web.Application):
+    def __init__(self, assembler):
+        handlers = [
+            (r"/estimate", EstimateHandler, {"assembler": assembler}),
+            (r"/info", InfoHandler, {"assembler": assembler}),
+        ]
+        tornado.web.Application.__init__(self, handlers)
+
+
+class EstimateHandler(tornado.web.RequestHandler):
+    def initialize(self, assembler):
+        self.assembler = assembler
+
+    def post(self):
+        req_data = json.loads(self.request.body)
+
+        # Prepare input_data for the assembler
+        data = AssemblerState(req_data["message"])
+
+        # Execute assembler
+        self.assembler.run(data)
+        logging.info("Message: %s", data.output_data)
+
+
+class InfoHandler(tornado.web.RequestHandler):
+    def initialize(self, assembler):
+        self.assembler = assembler
+
+        with open("VERSION") as version_file:
+            self.version = version_file.read().strip()
+
+    def get(self):
+        self.write({"version": self.version})

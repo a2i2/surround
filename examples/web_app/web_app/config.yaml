@@ -1,0 +1,5 @@
+image: web
+version: latest
+
+assembler:
+  default: baseline

@@ -1,0 +1,10 @@
+name: docker-example
+
+docker_env:
+  image:  a2i2/web:latest
+
+entry_points:
+  main: 
+    parameters:      
+      mode: {type: string, default: train}
+    command: "python3 -m web --mode {mode}"

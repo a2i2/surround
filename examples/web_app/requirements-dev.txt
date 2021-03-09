@@ -1,0 +1,4 @@
+pylint==2.4.3
+doit==0.31.1
+black==20.8b1
+mypy==0.790
