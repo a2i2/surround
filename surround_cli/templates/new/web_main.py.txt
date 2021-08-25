@@ -33,7 +33,7 @@ def main(config: Config):
         os.path.dirname(os.path.dirname(__file__))
     )
 
-    if args.status:
+    if config.status:
         surround.show_info()
     else:
         surround.run(config.runner, config.assembler, config.mode)

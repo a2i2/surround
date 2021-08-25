@@ -9,7 +9,7 @@ import subprocess
 from surround import load_config
 from {project_name}.config import Config
 
-CONFIG = load_config(name="config", config_class=Config)
+CONFIG = load_config(name="config", config_class=Config, overrides=[])
 DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])

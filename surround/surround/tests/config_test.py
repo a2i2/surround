@@ -80,8 +80,8 @@ class TestConfig(unittest.TestCase):
             'SURROUND_MAIN_COUNT': str(45),
         }):
             config = load_config(
-                name="test_config", c
-                onfig_dir=os.path.abspath('temp'), 
+                name="test_config", 
+                config_dir=os.path.abspath('temp'), 
                 config_class=Config, 
                 overrides=['main.count=${env:SURROUND_MAIN_COUNT}']
             )

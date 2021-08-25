@@ -5,10 +5,11 @@ This file is needed to make Python treat this directory as a package
 import logging
 import os
 
+from .config import Config
 from surround import load_config
 
 def setup():
-    config = load_config(name="config", config_class=Config)
+    config = load_config(name="config", config_class=Config, overrides=[])
     os.makedirs(config["output_path"], exist_ok=True)
 
 setup()
