@@ -9,14 +9,11 @@ from surround import BaseConfig, config, load_config
 
 yaml1 = """
 main:
-  surround: au.com.first_stage.FirstStage
-  count: 3
-
+  count: 15
 objects:
-  - node: 3
-    size: 4
-  - node: 8
-    size: 15
+  - node: 43
+    size: 355
+enable_logging: true
 """
 
 @dataclass
@@ -38,28 +35,17 @@ class Config(BaseConfig):
 class TestConfig(unittest.TestCase):
 
     def setUp(self):
-        self.f1 = tempfile.NamedTemporaryFile(delete=False)
-        self.f1.write(str.encode(yaml1))
-        self.f1.close()
-
-        self.f2 = tempfile.NamedTemporaryFile(delete=False)
-        self.f2.write(str.encode(yaml2))
-        self.f2.close()
-
         os.mkdir("temp")
         os.mkdir("temp/.surround")
         os.mkdir("temp/temp")
 
         with open("temp/temp/test_config.yaml", "w+") as f:
-            f.write(yaml2)
+            f.write(yaml1)
 
         self.owd = os.getcwd()
         os.chdir("temp/")
 
     def tearDown(self):
-        os.unlink(self.f1.name)
-        os.unlink(self.f2.name)
-
         os.chdir(self.owd)
 
         os.unlink("temp/temp/test_config.yaml")
