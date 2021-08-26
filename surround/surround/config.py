@@ -170,7 +170,7 @@ def config(config_class=None, name="config", group=None):
 
     return recursive_wrapper
 
-def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=None):
+def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=[]):
     """
     Loads the configuration instance using `Hydra's Compose API <https://hydra.cc/docs/experimental/compose_api>`_.
 
