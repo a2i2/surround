@@ -14,7 +14,7 @@ def get_project_root(current_directory: str = os.getcwd()) -> Optional[str]:
     """
     Attempts to find the root path of the project by looking for the .surround
     folder that should be present in all generated Surround projects.
-    
+
     :param current_directory: directory to start searching from
     :type current_directory: str
     """
@@ -104,7 +104,7 @@ class BaseConfig:
     # Absolute path to the models folder where models should be loaded from.
     model_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "models"))
 
-    # Absolute path to the output folder where outputs from the current run should be placed (timestamped folder). 
+    # Absolute path to the output folder where outputs from the current run should be placed (timestamped folder).
     output_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "output", str(datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))))
 
     # Surround specific configuration.
@@ -112,7 +112,7 @@ class BaseConfig:
 
 def config(config_class=None, name="config", group=None):
     """
-    Class decorator that registers a custom configuration class with 
+    Class decorator that registers a custom configuration class with
     `Hydra's ConfigStore API <https://hydra.cc/docs/tutorials/structured_config/config_store>`_.
 
     If defining your own custom configuration class, your class must do the following:
@@ -139,7 +139,7 @@ def config(config_class=None, name="config", group=None):
         @dataclass
         class MySqlConfig:
             host: str = "mysql://localhost"
-        
+
         @config(name="postgres", group="db")
         @dataclass
         class PostgresConfig:
@@ -170,7 +170,7 @@ def config(config_class=None, name="config", group=None):
 
     return recursive_wrapper
 
-def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=[]):
+def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=None):
     """
     Loads the configuration instance using `Hydra's Compose API <https://hydra.cc/docs/experimental/compose_api>`_.
 
@@ -199,6 +199,9 @@ def load_config(name="config", config_class=BaseConfig, config_dir=None, overrid
     :param overrides: Manual overrides of the configuration properties.
     :type overrides: dict
     """
+
+    if overrides is None:
+        overrides = []
 
     config_search_path = config_dir
 

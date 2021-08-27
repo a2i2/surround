@@ -1,9 +1,7 @@
 import unittest
-import os
 from dataclasses import dataclass
-from omegaconf import MISSING
 from typing import Optional
-from surround import Assembler, Estimator, State, BaseConfig, config, load_config, Stage
+from surround import Assembler, Estimator, State, BaseConfig, config as surround_config, load_config, Stage
 
 test_text = "hello"
 
@@ -11,7 +9,7 @@ test_text = "hello"
 class HelloStageData:
     suffix: Optional[str] = None
 
-@config(name="config")
+@surround_config(name="config")
 @dataclass
 class Config(BaseConfig):
     helloStage: Optional[HelloStageData] = None
@@ -96,7 +94,6 @@ class TestSurround(unittest.TestCase):
         self.assertRaises(AttributeError, getattr, data, "no_text")
 
     def test_surround_config(self):
-        path = os.path.dirname(__file__)
         config = load_config(name="config", config_class=Config)
         data = AssemblerState()
         assembler = Assembler("Surround config").set_stages([InputValidator(), HelloStage()]).set_config(config)

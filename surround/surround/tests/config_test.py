@@ -1,11 +1,9 @@
 from unittest.mock import patch
 import unittest
 import os
-import tempfile
-import yaml
-from dataclasses import dataclass, field, MISSING
+from dataclasses import dataclass, field
 from typing import List
-from surround import BaseConfig, config, load_config
+from surround import BaseConfig, config as surround_config, load_config
 
 yaml1 = """
 main:
@@ -18,19 +16,19 @@ enable_logging: true
 
 @dataclass
 class Main:
-  count: int = 0
+    count: int = 0
 
 @dataclass
 class DataObject:
-  node: int = 0
-  size: int = 0
+    node: int = 0
+    size: int = 0
 
-@config(name="test_config")
+@surround_config(name="test_config")
 @dataclass
 class Config(BaseConfig):
-  main: Main = Main()
-  objects: List[DataObject] = field(default_factory=lambda: [])
-  enable_logging: bool = False
+    main: Main = Main()
+    objects: List[DataObject] = field(default_factory=lambda: [])
+    enable_logging: bool = False
 
 class TestConfig(unittest.TestCase):
 
@@ -62,13 +60,11 @@ class TestConfig(unittest.TestCase):
 
 
     def test_env_config(self):
-        with patch.dict('os.environ', {
-            'SURROUND_MAIN_COUNT': str(45),
-        }):
+        with patch.dict('os.environ', {'SURROUND_MAIN_COUNT': str(45)}):
             config = load_config(
-                name="test_config", 
-                config_dir=os.path.abspath('temp'), 
-                config_class=Config, 
+                name="test_config",
+                config_dir=os.path.abspath('temp'),
+                config_class=Config,
                 overrides=['main.count=${env:SURROUND_MAIN_COUNT}']
             )
             self.assertEqual(config["main"]["count"], 45)

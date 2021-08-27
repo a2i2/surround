@@ -1,8 +1,6 @@
 # assembler.py
 
 import logging
-import os
-import sys
 from abc import ABC
 from datetime import datetime
 
@@ -48,7 +46,7 @@ class Assembler(ABC):
 
         assembler.init_assembler(batch_mode=False)
         assembler.run(data, is_training=False)
-        
+
     Constructor for an Assembler pipeline:
 
     :param assembler_name: The name of the pipeline
@@ -221,8 +219,8 @@ class Assembler(ABC):
 
     def set_metrics(self, metrics):
         """
-        When running batch or training jobs this stage is ran after all stages 
-        but the finaliser stage. The purpose of this stage is to calculate metrics. 
+        When running batch or training jobs this stage is ran after all stages
+        but the finaliser stage. The purpose of this stage is to calculate metrics.
         """
 
         if not metrics and not isinstance(metrics, Stage):
