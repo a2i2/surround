@@ -4,7 +4,6 @@ import json
 import datetime
 import pkg_resources
 import pandas as pd
-from omegaconf import OmegaConf
 
 from .visualise_classifier import VisualiseClassifier, VisualiseClassifierData
 

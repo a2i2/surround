@@ -1,4 +1,3 @@
-import os
 from surround import load_config
 
 CONFIG = load_config(name="config", config_dir="runners")
