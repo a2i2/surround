@@ -1,3 +1,7 @@
+"""
+Defines the configuration schema for the project.
+"""
+
 from dataclasses import dataclass
 from surround import BaseConfig, config
 
@@ -8,7 +12,7 @@ class Config(BaseConfig):
     company: str = "yourcompany"
     image: str = "{project_name}"
     version: str = "latest"
-    
+
     # Pipeline configuration
     runner: str = "0"
     assembler: str = "baseline"
