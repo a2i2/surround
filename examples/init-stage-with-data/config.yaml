@@ -1,2 +1,1 @@
-surround:
-    path_to_HelloWorld: data/HelloWorld.txt
+path_to_hello_world: data/HelloWorld.txt

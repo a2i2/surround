@@ -24,10 +24,11 @@
    "outputs": [],
    "source": [
     "# Package imports\n",
-    "from surround import Config\n",
+    "from surround import load_config\n",
+    "from {project_name}.config import Config\n",
     "from {project_name}.file_system_runner import FileSystemRunner\n",
     "\n",
-    "config = Config(auto_load=True)\n",
+    "config = load_config(name='config', config_class=Config)\n",
     "data = FileSystemRunner().load_data(None, config)"
    ]
   }}

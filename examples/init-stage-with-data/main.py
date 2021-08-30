@@ -1,7 +1,8 @@
 import logging
 import os
 
-from surround import Estimator, State, Assembler, Config, Stage
+from surround import Estimator, State, Assembler, Stage, load_config
+from config import Config
 
 prefix = ""
 
@@ -10,7 +11,7 @@ class HelloWorld(Estimator):
         self.file_ = None
 
     def initialise(self, config):
-        filename = config.get_path("surround.path_to_HelloWorld")
+        filename = config.path_to_hello_world
         self.file_ = open(prefix + filename, "r")
 
     def estimate(self, state, config):
@@ -37,8 +38,7 @@ if __name__ == "__main__":
     if dir_extension not in os.getcwd():
         prefix = dir_extension + "/"
 
-    app_config = Config()
-    app_config.read_config_files([prefix + "config.yaml"])
+    app_config = load_config(config_class=Config)
 
     data = AssemblerState()
     assembler = Assembler("Init state example").set_stages([InputValidator(), HelloWorld()]).set_config(app_config)

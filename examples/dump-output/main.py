@@ -1,9 +1,9 @@
 import logging
 import os
-from surround import Stage, Estimator, State, Assembler, Config
+from surround import Stage, Estimator, State, Assembler, load_config
 
-hello_file_path = "/stages/WriteHello/Output.txt"
-world_file_path = "/stages/WriteWorld/Output.txt"
+hello_file_path = "/HelloOutput.txt"
+world_file_path = "/WorldOutput.txt"
 
 class WriteHello(Stage):
     def __init__(self, dir_path):
@@ -24,7 +24,6 @@ class WriteWorld(Estimator):
     def dump_output(self, state, config):
         with open(self.dir_path + world_file_path, "w") as text_file:
             text_file.write(state.text)
-
 
     def estimate(self, state, config):
         state.text = "World"
@@ -47,8 +46,7 @@ if __name__ == "__main__":
 
     path = os.path.dirname(os.path.realpath(__file__))
 
-    app_config = Config()
-    app_config.read_config_files([path + "/config.yaml"])
+    app_config = load_config(name="config", config_dir=path)
     assembler = Assembler("Dump output example")
     assembler.set_stages([InputValidator(), WriteHello(path), WriteWorld(path)])
     assembler.set_config(app_config)

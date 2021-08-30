@@ -1,12 +1,10 @@
 # assembler.py
 
 import logging
-import os
-import sys
 from abc import ABC
 from datetime import datetime
 
-from .config import Config, has_config
+from .config import BaseConfig
 from .run_modes import RunMode
 from .stage import Stage, Estimator
 
@@ -48,18 +46,17 @@ class Assembler(ABC):
 
         assembler.init_assembler(batch_mode=False)
         assembler.run(data, is_training=False)
+
+    Constructor for an Assembler pipeline:
+
+    :param assembler_name: The name of the pipeline
+    :type assembler_name: str
+    :param config: Configuration instance
+    :type config: BaseConfig
     """
 
     # pylint: disable=too-many-instance-attributes
-    @has_config
-    def __init__(self, assembler_name="", config=None):
-        """
-        Constructor for an Assembler pipeline:
-
-        :param assembler_name: The name of the pipeline
-        :param config: Surround Config object
-        :type assembler_name: str
-        """
+    def __init__(self, assembler_name="", config=BaseConfig()):
         self.assembler_name = assembler_name
         self.config = config
         self.stages = None
@@ -95,7 +92,7 @@ class Assembler(ABC):
                 self.finaliser.initialise(self.config)
 
         except Exception as e:
-            if self.config.get_path("surround.surface_exceptions"):
+            if self.config.surround.surface_exceptions:
                 raise e
             LOGGER.exception(e)
             return False
@@ -105,7 +102,7 @@ class Assembler(ABC):
         """
         Run the pipeline using the input data provided.
 
-        If ``is_training`` is set to ``True`` then when it gets to the execution of the estimator,
+        If ``mode`` is set to ``RunMode.TRAIN`` then when it gets to the execution of the estimator,
         it will use the :meth:`surround.stage.Estimator.fit` method instead.
 
         If ``surround.enable_stage_output_dump`` is enabled in the Config instance then each stage and
@@ -147,11 +144,11 @@ class Assembler(ABC):
                 else:
                     a_stage.operate(state, self.config)
 
-                if self.config["surround"]["enable_stage_output_dump"]:
+                if self.config.surround.enable_stage_output_dump:
                     a_stage.dump_output(state, self.config)
 
             except Exception as e:
-                if self.config.get_path("surround.surface_exceptions"):
+                if self.config.surround.surface_exceptions:
                     raise e
                 state.errors.append(str(e))
                 LOGGER.exception(e)
@@ -175,36 +172,6 @@ class Assembler(ABC):
 
         state.thaw()
 
-    def load_config(self, module):
-        """
-        Given a module contained in the root of the project, create an instance of
-        :class:`surround.config.Config` loading configuration data from the ``config.yaml``
-        found in the project, and use this configuration for the pipeline.
-
-        .. note:: Should be called before :meth:`surround.assembler.Assemble.init_assembler`
-
-        :param module: name of the module
-        :type module: str
-        """
-
-        if module:
-            # Module already imported and has a file attribute
-            mod = sys.modules.get(module)
-            if mod and hasattr(mod, '__file__'):
-                package_path = os.path.dirname(os.path.abspath(mod.__file__))
-                root_path = os.path.dirname(package_path)
-            else:
-                raise ValueError("Invalid Python module %s" % module)
-
-            self.set_config(Config(root_path))
-
-            if not os.path.exists(self.config["output_path"]):
-                os.makedirs(self.config["output_path"])
-        else:
-            self.set_config(Config())
-
-        return self
-
     def set_config(self, config):
         """
         Set the configuration data to be used during pipeline execution.
@@ -212,11 +179,9 @@ class Assembler(ABC):
         .. note:: Should be called before :meth:`surround.assembler.Assembler.init_assembler`.
 
         :param config: the configuration data
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
 
-        if not config or not isinstance(config, Config):
-            raise TypeError("config should be of class Config")
         self.config = config
 
         return self
@@ -253,6 +218,10 @@ class Assembler(ABC):
         return self
 
     def set_metrics(self, metrics):
+        """
+        When running batch or training jobs this stage is ran after all stages
+        but the finaliser stage. The purpose of this stage is to calculate metrics.
+        """
 
         if not metrics and not isinstance(metrics, Stage):
             raise TypeError("metrics should be of the Stage class")

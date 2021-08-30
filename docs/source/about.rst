@@ -66,7 +66,7 @@ For example during project generation, the following structure is used::
     │   ├── __main__.py
     │   ├── web_runner.py
     │   ├── file_system_runner.py
-    │   └── config.yaml
+    │   └── config.py
     ├── docs
     ├── dodo.py
     ├── models
@@ -289,6 +289,8 @@ Example configuration file::
     celery:
         broker: pyamqp://guest@localhost
         backend: redis://localhost
+
+Recently we integrated Facebook's `Hydra <https://hydra.cc>`_ framework to manage loading of configuration.
 
 .. _data:
 

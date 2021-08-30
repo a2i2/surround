@@ -9,52 +9,63 @@ Here you can find documentation on all classes and their methods in Surround.
 Assembler
 ========
 
-.. autoclass:: surround.assembler.Assembler
-    :members:
+.. autodata:: surround.assembler.Assembler
+    :no-value:
+
+    .. automethod:: surround.assembler.Assembler.init_assembler
+    .. automethod:: surround.assembler.Assembler.run
+    .. automethod:: surround.assembler.Assembler.set_config
+    .. automethod:: surround.assembler.Assembler.set_stages
+    .. automethod:: surround.assembler.Assembler.set_finaliser
+    .. automethod:: surround.assembler.Assembler.set_metrics
+
 
 .. automodule:: surround
 
-    Config
-    ^^^^^^
+BaseConfig
+==========
     
-    .. autoclass:: surround.config.Config       
-        :members:          
+.. autodata:: surround.config.BaseConfig       
+    :no-value:
+
+SurroundConfig
+==============
+
+.. autodata:: surround.config.SurroundConfig       
+    :no-value:
+
+@config
+=======
+
+.. autodecorator:: surround.config.config
+
+load_config
+===========
+
+.. autofunction:: surround.config.load_config
  
-        .. automodule:: surround  
- 
-    State                              
-    ^^^^^   
+State                              
+=====
                 
-    .. autoclass:: surround.State        
-        :members:                   
+.. autoclass:: surround.State        
+    :members:                   
 
-    .. automodule:: surround.stage
+.. automodule:: surround.stage
 
-    Stage
-    ^^^^^
+Stage
+=====
     
-    .. autoclass:: surround.stage.Stage
-        :members:
+.. autoclass:: surround.stage.Stage
+    :members:
 
-    Estimator
-    ^^^^^^^^^
+Estimator
+=========
 
-    .. autoclass:: surround.stage.Estimator
-        :members:
+.. autoclass:: surround.stage.Estimator
+    :members:
 
 Runner
 =======
 .. autoclass:: surround.runners.Runner  
     :members:
 
-Data Container
-==============
-
-.. autoclass:: surround.data.container.DataContainer
-    :members:
-
-Metadata
-========
-
-.. autoclass:: surround.data.metadata.Metadata
-    :members:

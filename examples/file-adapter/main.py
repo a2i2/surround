@@ -2,7 +2,8 @@ import logging
 import os
 import csv
 
-from surround import Estimator, State, Assembler, Stage, Config, Runner, RunMode
+from surround import Estimator, State, Assembler, Stage, Runner, RunMode, load_config
+from config import Config
 
 prefix = ""
 
@@ -10,7 +11,7 @@ class MainRunner(Runner):
 
     def load_data(self, mode, config):
         state = AssemblerState()
-        input_path = prefix + self.assembler.config.get_path("Surround.Loader.input")
+        input_path = prefix + config.loader.input
 
         with open(input_path) as csv_file:
             state.rows = list(csv.DictReader(csv_file, delimiter=',', quotechar='"'))
@@ -22,7 +23,7 @@ class MainRunner(Runner):
         self.save_result(self.assembler.state, self.assembler.config)
 
     def save_result(self, state, config):
-        output_path = prefix + config.get_path("Surround.Loader.output")
+        output_path = prefix + config.loader.output
         with open(output_path, "w") as output_file:
             for a, b in state.outputs:
                 if b is None:
@@ -43,7 +44,7 @@ class ProcessCSV(Estimator):
         for row in state.rows:
             state.word_count = len(row['Consumer complaint narrative'].split())
 
-            if config and config.get_path("ProcessCSV.include_company"):
+            if config and config.process_csv.include_company:
                 state.company = row['Company']
 
             state.outputs.append((state.word_count, state.company))
@@ -67,8 +68,7 @@ if __name__ == "__main__":
     if dir_extension not in os.getcwd():
         prefix = dir_extension + "/"
 
-    app_config = Config()
-    app_config.read_config_files([prefix + "config.yaml"])
+    app_config = load_config(name="config", config_class=Config)
     assembler = Assembler("Loader example").set_stages([CSVValidator(), ProcessCSV()]).set_config(app_config)
 
     MainRunner(assembler).run()

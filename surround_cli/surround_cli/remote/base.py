@@ -2,7 +2,6 @@ import os
 from abc import abstractmethod
 from pathlib import Path
 import yaml
-from surround.config import Config
 
 __author__ = 'Akshat Bajaj'
 __date__ = '2019/02/18'
@@ -100,12 +99,11 @@ class BaseRemote():
         :rtype: any
         """
 
-        config = Config()
-
         if Path(".surround/config.yaml").exists():
-            config.read_config_files([".surround/config.yaml"])
-            read_items = config.get(what_to_read, None)
-            return read_items.get(key, None) if read_items is not None else None
+            with open(".surround/config.yaml") as f:
+                config = yaml.safe_load(f.read())
+                read_items = config.get(what_to_read, None)
+                return read_items.get(key, None) if read_items is not None else None
 
     def read_from_global_config(self, what_to_read, key):
         """
@@ -120,12 +118,14 @@ class BaseRemote():
         :rtype: any
         """
 
-        config = Config()
         home = str(Path.home())
-        if Path(os.path.join(home, ".surround/config.yaml")).exists():
-            config.read_config_files([os.path.join(home, ".surround/config.yaml")])
-            read_items = config.get(what_to_read, None)
-            return read_items.get(key, None) if read_items is not None else None
+        global_config_path = os.path.join(home, ".surround/config.yaml")
+
+        if Path(global_config_path).exists():
+            with open(global_config_path) as f:
+                config = yaml.safe_load(f.read())
+                read_items = config.get(what_to_read, None)
+                return read_items.get(key, None) if read_items is not None else None
 
     def read_all_from_local_config(self, what_to_read):
         """
@@ -138,12 +138,10 @@ class BaseRemote():
         :rtype: any
         """
 
-        config = Config()
-
         if Path(".surround/config.yaml").exists():
-            config.read_config_files([".surround/config.yaml"])
-            read_items = config.get(what_to_read, None)
-            return read_items
+            with open(".surround/config.yaml") as f:
+                config = yaml.safe_load(f.read())
+                return config.get(what_to_read, None)
 
     def read_all_from_global_config(self, what_to_read):
         """
@@ -156,13 +154,13 @@ class BaseRemote():
         :rtype: any
         """
 
-        config = Config()
         home = str(Path.home())
+        global_config_path = os.path.join(home, ".surround/config.yaml")
 
-        if Path(os.path.join(home, ".surround/config.yaml")).exists():
-            config.read_config_files([os.path.join(home, ".surround/config.yaml")])
-            read_items = config.get(what_to_read, None)
-            return read_items
+        if Path(global_config_path).exists():
+            with open(global_config_path) as f:
+                config = yaml.safe_load(f.read())
+                return config.get(what_to_read, None)
 
     def add(self, add_to, key):
         """

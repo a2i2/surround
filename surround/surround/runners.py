@@ -49,7 +49,7 @@ class Runner(ABC):
         :param mode: the mode the assembly was run in (batch, train, predict, web)
         :type mode: :class:`surround.runners.RunMode`
         :param config: the configuration of the assembly
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
 
     def set_assembler(self, assembler):

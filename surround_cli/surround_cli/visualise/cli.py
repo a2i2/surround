@@ -5,7 +5,6 @@ import datetime
 import pkg_resources
 import pandas as pd
 
-from surround.config import Config
 from .visualise_classifier import VisualiseClassifier, VisualiseClassifierData
 
 def get_failed_set(y_true, y_pred):
@@ -130,8 +129,7 @@ def execute_visualise_tool(parser, args, extra_args):
 
     # Initialise the visualiser
     visualiser = VisualiseClassifier()
-    config = Config()
-    config.read_from_dict({'show_normalized_confusion_matrix': args.normalize})
+    config = OmegaConf.create({'show_normalized_confusion_matrix': args.normalize})
 
     results = []
 

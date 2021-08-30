@@ -19,7 +19,7 @@ class Stage(ABC):
         :param state: Stores intermediate data from each stage in the pipeline
         :type state: Instance or child of the :class:`surround.State` class
         :param config: Config of the pipeline
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
 
     def operate(self, state, config):
@@ -37,7 +37,7 @@ class Stage(ABC):
         .. note:: This is called by :meth:`surround.assembler.Assembler.init_assembler`.
 
         :param config: Contains the settings for each stage
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
 
 class Estimator(Stage):
@@ -71,7 +71,7 @@ class Estimator(Stage):
         :param state: Stores intermediate data from each stage in the pipeline
         :type state: Instance or child of the :class:`surround.State` class
         :param config: Contains the settings for each stage
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
 
     def fit(self, state, config):
@@ -84,5 +84,5 @@ class Estimator(Stage):
         :param state: Stores intermediate data from each stage in the pipeline
         :type state: Instance or child of the :class:`surround.State` class
         :param config: Contains the settings for each stage
-        :type config: :class:`surround.config.Config`
+        :type config: :class:`surround.config.BaseConfig`
         """
