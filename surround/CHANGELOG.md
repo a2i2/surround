@@ -12,6 +12,20 @@ All notable changes to this project will be documented in this file.
 
 ### Limitation
 
+## [0.1.2] - 2021-08-30
+
+### Added
+
+- Create a @dataclass called SurroundConfig.
+- Create a @dataclass called BaseConfig.
+- Create a @config decorator that must be attached to custom Config classes.
+- Create a function called `load_config` which allows for loading Hydra without using @hydra.main.
+
+### Changed
+
+- Stop the Assembler class from requiring the config type to be class Config and change how properties are retrieved from the config instance.
+- Remove legacy Config class.
+
 ## [0.1.1] - 2021-01-06
 
 ### Changed
