@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file.
 
 ### Limitation
 
+## [0.0.5] - 2021-08-30
+
+### Changed
+
+- Update templates to work with new integrated Hydra config.
+
 ## [0.0.4] - 2021-01-07
 
 ### Changed
