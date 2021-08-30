@@ -4,7 +4,6 @@ Runners and assemblies are defined in here.
 """
 
 import os
-import argparse
 import hydra
 from surround import Surround, Assembler
 from .config import Config
@@ -37,4 +36,4 @@ def main(config: Config) -> None:
         surround.run(config.runner, config.assembler, config.mode)
 
 if __name__ == "__main__":
-    main()
+    main(None)

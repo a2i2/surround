@@ -6,8 +6,6 @@ import os
 import sys
 import subprocess
 
-from pathlib import Path
-
 from hydra_example.config import Config
 from surround import load_config
 
