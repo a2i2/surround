@@ -3,3 +3,8 @@ image: {project_name}
 version: latest
 
 assembler: baseline
+
+# Set Hydra log path to the target output path
+hydra:
+    run:
+        dir: ./output/${{now:%Y-%m-%d-%H-%M-%S}}

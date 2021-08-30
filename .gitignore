@@ -59,3 +59,5 @@ venv.bak/
 .doit*
 
 .idea
+
+output/
