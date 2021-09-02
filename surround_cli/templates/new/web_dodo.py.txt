@@ -133,7 +133,7 @@ def task_batch():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         "%s" % IMAGE,
-        "python3 -m {project_name} mode=batch %(args)s"
+        "python3 -m {project_name} mode=batch runner=1 %(args)s"
     ]
 
     return {{
