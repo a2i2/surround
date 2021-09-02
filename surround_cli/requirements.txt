@@ -1,6 +1,7 @@
 numpy==1.17.3
 pandas==0.25.2
 doit==0.31.1
-tornado==6.1.0
 pylint==2.4.3
+fastapi==0.68.1
+uvicorn==0.13.3
 surround==0.1.2

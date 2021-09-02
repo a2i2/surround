@@ -91,7 +91,9 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
                                               author_name=author_name, author_email=author_email,
                                               version=pkg_resources.get_distribution("surround").version)
             if require_web and afile == "pyproject.toml":
-                actual_contents = actual_contents.replace("\n[build-system]", "tornado =\"6.1.0\"\n\n[build-system]")
+                actual_contents = actual_contents.replace(
+                    "\n[build-system]",
+                    "fastapi = \"0.68.1\"\nuvicorn = \"0.13.3\"\n\n[build-system]")
 
             file_path = os.path.join(project_dir, actual_file)
         with open(file_path, 'w') as f:
