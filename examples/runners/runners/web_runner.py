@@ -1,11 +1,15 @@
 import logging
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel # pylint: disable=E0611
 from surround import Runner, RunMode
-from .stages import AssemblerState
+from .stages import AssemblyState
 
-app = FastAPI()
+app = FastAPI() # pylint: disable=C0103
+
+# Global variable to store the assembler instance (so FastAPI endpoint handlers can access it).
+assembler = None # pylint: disable=C0103
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -16,24 +20,25 @@ class WebRunner(Runner):
 
     def run(self, mode=RunMode.PREDICT):
         self.assembler.init_assembler()
-        global assembler
+        global assembler # pylint: disable=C0103, W0603
 
         # Get the Config instance from the Assembler.
         assembler = self.assembler
-        config = assembler.config
         uvicorn.run(
             app, port=8080, log_level="info"
         )
 
 
-class EstimateBody(BaseModel):
+class EstimateBody(BaseModel): # pylint: disable=R0903
     message: str
 
 
 @app.post("/message")
 def post_message(body: EstimateBody):
     # Prepare input_data for the assembler
-    data = AssemblerState(body.message)
+    data = AssemblyState()
+    data.output_data = ""
+    data.input_data = body.message
 
     # Execute assembler
     assembler.run(data)
