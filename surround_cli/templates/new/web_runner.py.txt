@@ -37,7 +37,7 @@ class EstimateBody(BaseModel):
 
 
 @app.post("/estimate")
-def EstimateHandler(body: EstimateBody):
+def post_estimate(body: EstimateBody):
     # Prepare input_data for the assembler
     data = AssemblerState(body.message)
 
