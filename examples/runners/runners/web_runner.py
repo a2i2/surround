@@ -1,14 +1,15 @@
+# pylint: disable=E0611, W0603, R0903
 import logging
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel # pylint: disable=E0611
+from pydantic import BaseModel
 from surround import Runner, RunMode
 from .stages import AssemblyState
 
-app = FastAPI() # pylint: disable=C0103
+APP = FastAPI()
 
 # Global variable to store the assembler instance (so FastAPI endpoint handlers can access it).
-assembler = None # pylint: disable=C0103
+ASSEMBLER = None
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,32 +21,40 @@ class WebRunner(Runner):
 
     def run(self, mode=RunMode.PREDICT):
         self.assembler.init_assembler()
-        global assembler # pylint: disable=C0103, W0603
+        global ASSEMBLER
 
         # Get the Config instance from the Assembler.
-        assembler = self.assembler
+        ASSEMBLER = self.assembler
         uvicorn.run(
-            app, port=8080, log_level="info"
+            APP, port=8080, log_level="info"
         )
 
 
-class EstimateBody(BaseModel): # pylint: disable=R0903
+class MessageInput(BaseModel):
     message: str
 
 
-@app.post("/message")
-def post_message(body: EstimateBody):
+class MessageOutput(BaseModel):
+    output: str
+
+
+@APP.post("/message", response_model=MessageOutput)
+def post_message(request_input: MessageInput):
     # Prepare input_data for the assembler
     data = AssemblyState()
     data.output_data = ""
-    data.input_data = body.message
+    data.input_data = request_input.message
 
     # Execute assembler
-    assembler.run(data)
+    ASSEMBLER.run(data)
     logging.info("Message: %s", data.output_data)
-    return {"output": data.output_data}
+    return MessageOutput(output=data.output_data)
 
 
-@app.get("/info")
+class VersionOutput(BaseModel):
+    version: str
+
+
+@APP.get("/info", response_model=VersionOutput)
 def get_info():
-    return {"version": "0.0.1"}
+    return VersionOutput(version="0.0.1")
