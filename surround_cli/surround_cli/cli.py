@@ -311,6 +311,15 @@ def run_locally(args, extra_args):
     run_process = subprocess.Popen(run_args)
     run_process.wait()
 
+def parse_to_bool(bool_value):
+    valid = {'true': True, 't': True, '1': True, 'false': False, 'f': False, '0': False}
+
+    lower_value = bool_value.lower()
+    if lower_value in valid:
+        return valid[lower_value]
+    else:
+        raise ValueError('Failed parsing "%s" for boolean' % bool_value)
+
 # pylint: disable=too-many-branches
 def parse_init_args(parser, args, extra_args):
     """
@@ -342,14 +351,17 @@ def parse_init_args(parser, args, extra_args):
         else:
             author_name = input("What is the author name?: ")
 
-
         if args.author_email:
             author_email = args.author_email
         else:
             author_email = input("What is the author email?: ")
 
         if args.require_web:
-            require_web = args.require_web
+            try:
+                require_web = parse_to_bool(args.require_web)
+            except ValueError as e:
+                print(str(e))
+                sys.exit(1)
         else:
             while True:
                 require_web_string = input("Does it require a web runner? (y/n) ")
