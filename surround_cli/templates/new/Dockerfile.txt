@@ -1,4 +1,4 @@
-FROM python:3.6.5
+FROM python:3.8.10
 
 # Set the working directory to /app
 WORKDIR /app

@@ -1,4 +1,4 @@
-FROM a2i2/{project_name}:latest
+FROM python:3.8.10
 
 RUN pip3 install jupyter -U && pip3 install jupyterlab
 
