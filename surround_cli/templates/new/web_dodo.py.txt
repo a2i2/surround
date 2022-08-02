@@ -33,11 +33,9 @@ def task_status():
 
 def task_build():
     """Build the Docker image for the current project"""
-    cmd = [
-            'poetry install &&',    # Installing dependencies
-            'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
-            'docker build --tag=%s .' % IMAGE
-        ]
+    cmd = ['poetry install &&',    # Installing dependencies
+           'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
+           'docker build --tag=%s .' % IMAGE]
     return {{
         'actions': [" ".join(cmd)],
         'params': PARAMS
@@ -222,11 +220,9 @@ def task_web_local():
 
 def task_build_jupyter():
     """Build the Docker image for a Jupyter Lab notebook"""
-    cmd = [
-            'poetry install &&',                                # Installing dependencies
-            'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
-            'docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)
-        ]
+    cmd = ['poetry install &&',                                # Installing dependencies
+           'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
+           'docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)]
     return {{
         'basename': 'buildJupyter',
         'actions': [" ".join(cmd)],
