@@ -12,7 +12,8 @@ class RemoteTest(unittest.TestCase):
         process = subprocess.run(['surround', 'store', 'remote'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertEqual(process.stdout, "error: not a surround project\n")
 
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertRegex(process.stdout, 'info: project created at .*temp\\n')
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
@@ -22,7 +23,8 @@ class RemoteTest(unittest.TestCase):
         self.assertEqual(process.stdout, "info: no remote found\n")
 
     def test_remote_add(self):
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertRegex(process.stdout, 'info: project created at .*temp\\n')
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))

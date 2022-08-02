@@ -57,7 +57,7 @@ steps:
           - pip install tox==3.20.1
 
           # Run tests through tox
-          #- tox  # Skip tox test for now since it is running forever
+          - tox
 
           # Run examples
           - pip install ../surround

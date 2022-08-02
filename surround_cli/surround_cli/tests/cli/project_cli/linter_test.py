@@ -8,7 +8,8 @@ class LinterTest(unittest.TestCase):
         Generate a temp project
         """
 
-        process = subprocess.Popen(['surround', 'init', '-p', 'test_proj', '-d', 'testing', '-w', 'y'], encoding='utf-8', stdout=subprocess.PIPE)
+        process = subprocess.Popen(['surround', 'init', '-p', 'test_proj', '-d', 'testing', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'True'],
+                                   encoding='utf-8', stdout=subprocess.PIPE)
         self.assertIn('info: project created', process.communicate()[0])
 
     def tearDown(self):

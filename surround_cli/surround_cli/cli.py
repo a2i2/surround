@@ -317,8 +317,7 @@ def parse_to_bool(bool_value):
     lower_value = bool_value.lower()
     if lower_value in valid:
         return valid[lower_value]
-    else:
-        raise ValueError('Failed parsing "%s" for boolean' % bool_value)
+    raise ValueError('Failed parsing "%s" for boolean' % bool_value)
 
 # pylint: disable=too-many-branches
 def parse_init_args(parser, args, extra_args):
