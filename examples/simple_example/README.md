@@ -31,3 +31,21 @@ And when you are finished developing, you can exit the virtual env with this
 ```python
 $ deactivate
 ```
+
+### Doit
+An alternative to run your project is by using `doit`. Firstly, you'll need to install it first if it doesn't exist.
+```python
+$ pip install doit==0.31.1
+```
+
+Once it is installed, you can see all available tasks by running
+```python
+$ doit list
+```
+
+And run the task by using
+```python
+$ doit <task name>
+```
+
+More information can be found [here](https://pydoit.org/)
