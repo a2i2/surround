@@ -30,7 +30,7 @@ class WebRunner(Runner):
         self.assembler.init_assembler()
         HELPER.assembler = self.assembler
         uvicorn.run(
-            APP, host="0.0.0.0", port=8080, log_level="info"
+            APP, host="0.0.0.0", port=8081, log_level="info"
         )
 
 
