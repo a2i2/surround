@@ -2,7 +2,6 @@
 This module is responsible for serving the pipeline via HTTP endpoints.
 """
 
-# pylint: disable=E0611, R0903
 import logging
 import uvicorn
 from fastapi import FastAPI
