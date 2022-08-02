@@ -33,7 +33,8 @@ PROJECTS = {
             ("{project_name}/config.yaml", "config.yaml.txt", False, False),
             (".gitignore", ".gitignore.txt", False, False),
             ("VERSION", "VERSION.txt", False, False),
-            ("pyproject.toml", "pyproject.txt", False, False)
+            ("pyproject.toml", "pyproject.txt", False, False),
+            (".pylintrc", ".pylintrc.txt", False, True)
         ]
     }
 }
