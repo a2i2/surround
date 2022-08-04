@@ -19,12 +19,14 @@ import argparse
 import random
 import shutil
 
+
 def is_valid_dir(arg_parser, arg):
     """A simple function to validate a directory"""
     if not os.path.isdir(arg):
         arg_parser.error("Invalid directory %s" % arg)
         return arg
     return arg
+
 
 def prepare_folder(directory, file_extension):
     if not os.path.isdir(directory):
@@ -45,7 +47,7 @@ def prepare_folder(directory, file_extension):
 
 def main(directory, file_extension, train, test, validate):
     """Main function for randomly assigning files in a directory to test,
-        train and validate folders.
+    train and validate folders.
 
     """
     files, test_dir, train_dir, validate_dir = prepare_folder(directory, file_extension)
@@ -76,7 +78,11 @@ def main(directory, file_extension, train, test, validate):
 
 
 def undo(directory, file_extension):
-    if not os.path.isdir(os.path.join(directory, "test")) or not os.path.isdir(os.path.join(directory, "train")) or not os.path.isdir(os.path.join(directory, "validate")):
+    if (
+        not os.path.isdir(os.path.join(directory, "test"))
+        or not os.path.isdir(os.path.join(directory, "train"))
+        or not os.path.isdir(os.path.join(directory, "validate"))
+    ):
         print("test, train or validate folders missing from %s" % directory)
         return
 
@@ -91,24 +97,37 @@ def undo(directory, file_extension):
 
     print("File count %d" % len(files))
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=
-        'Randomly assign files in a directory to test, train and validate folders.'
+        description="Randomly assign files in a directory to test, train and validate folders."
     )
 
     parser.add_argument(
         "directory",
         help="Directory with files to process",
-        type=lambda x: is_valid_dir(parser, x))
+        type=lambda x: is_valid_dir(parser, x),
+    )
     parser.add_argument(
-        "file_extension", help="File extension for files to process", type=str)
+        "file_extension", help="File extension for files to process", type=str
+    )
 
-
-    parser.add_argument("-r", "--reset", action='store_true', help="Reset the directory structure")
-    parser.add_argument("-tr", "--train", type=int, help="Percentage of files for training", default=80)
-    parser.add_argument("-te", "--test", type=int, help="Percentage of files for training", default=10)
-    parser.add_argument("-va", "--validate", type=int, help="Percentage of files for training", default=10)
+    parser.add_argument(
+        "-r", "--reset", action="store_true", help="Reset the directory structure"
+    )
+    parser.add_argument(
+        "-tr", "--train", type=int, help="Percentage of files for training", default=80
+    )
+    parser.add_argument(
+        "-te", "--test", type=int, help="Percentage of files for training", default=10
+    )
+    parser.add_argument(
+        "-va",
+        "--validate",
+        type=int,
+        help="Percentage of files for training",
+        default=10,
+    )
 
     args = parser.parse_args()
 
@@ -120,6 +139,12 @@ if __name__ == "__main__":
         if args.reset:
             undo(args.directory, args.file_extension)
         else:
-            main(args.directory, args.file_extension, args.train, args.test, args.validate)
+            main(
+                args.directory,
+                args.file_extension,
+                args.train,
+                args.test,
+                args.validate,
+            )
     except FileExistsError:
         print("test, train or validate already exist in %s" % args.directory)

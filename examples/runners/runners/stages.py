@@ -6,6 +6,7 @@ class AssemblyState(State):
     output_data = ""
     lines = []
 
+
 class InputValidator(Stage):
     def operate(self, state, config):
         if not state.input_data:

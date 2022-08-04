@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from surround import BaseConfig, config
 
+
 @config(name="config")
 @dataclass
 class Config(BaseConfig):

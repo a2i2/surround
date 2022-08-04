@@ -6,10 +6,11 @@ from .lint import get_data_lint_parser, execute_data_lint_tool
 
 # Dictionary of functions which execute their respective tool
 TOOLS = {
-    'create': execute_data_create_tool,
-    'inspect': execute_data_inspect_tool,
-    'lint': execute_data_lint_tool
+    "create": execute_data_create_tool,
+    "inspect": execute_data_inspect_tool,
+    "lint": execute_data_lint_tool,
 }
+
 
 def get_data_parser():
     """
@@ -19,14 +20,33 @@ def get_data_parser():
     :rtype: :class:`argparse.ArgumentParser`
     """
 
-    parser = argparse.ArgumentParser(description='Surround Data Container Tool')
-    sub_parser = parser.add_subparsers(description='This tool must be called with one of the following commands', dest='command')
+    parser = argparse.ArgumentParser(description="Surround Data Container Tool")
+    sub_parser = parser.add_subparsers(
+        description="This tool must be called with one of the following commands",
+        dest="command",
+    )
 
-    sub_parser.add_parser('create', parents=[get_data_create_parser()], help='Capture new data into a container with metadata', description='Create a data container from a file or directory')
-    sub_parser.add_parser('inspect', parents=[get_data_inspect_parser()], help='Inspect a data containers contents and/or metadata', description='Inspect the metadata and/or contents of a data container')
-    sub_parser.add_parser('lint', parents=[get_data_lint_parser()], help='Check the validity of a data container', description='Check the validity of a data container')
+    sub_parser.add_parser(
+        "create",
+        parents=[get_data_create_parser()],
+        help="Capture new data into a container with metadata",
+        description="Create a data container from a file or directory",
+    )
+    sub_parser.add_parser(
+        "inspect",
+        parents=[get_data_inspect_parser()],
+        help="Inspect a data containers contents and/or metadata",
+        description="Inspect the metadata and/or contents of a data container",
+    )
+    sub_parser.add_parser(
+        "lint",
+        parents=[get_data_lint_parser()],
+        help="Check the validity of a data container",
+        description="Check the validity of a data container",
+    )
 
     return parser
+
 
 def execute_data_tool(parser, args, extra_args):
     """
@@ -48,6 +68,7 @@ def execute_data_tool(parser, args, extra_args):
     else:
         parser.print_usage()
 
+
 def main():
     """
     Entry point used when this script is executed directly, parses the arguments and executes
@@ -58,6 +79,7 @@ def main():
     args = parser.parse_args()
 
     execute_data_tool(parser, args, [])
+
 
 if __name__ == "__main__":
     main()

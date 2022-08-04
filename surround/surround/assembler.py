@@ -194,7 +194,9 @@ class Assembler(ABC):
         :type stages: list of :class:`surround.stage.Stage`
         """
 
-        if not isinstance(stages, list) or not all([issubclass(type(x), Stage) for x in stages]):
+        if not isinstance(stages, list) or not all(
+            [issubclass(type(x), Stage) for x in stages]
+        ):
             raise ValueError("stages must be a list of Stages's only!")
 
         self.stages = stages

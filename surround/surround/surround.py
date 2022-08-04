@@ -3,8 +3,17 @@ from .runners import RunMode
 
 LOGGER = logging.getLogger(__name__)
 
+
 class Surround:
-    def __init__(self, runners, assemblies, config, project_name, project_description, project_root):
+    def __init__(
+        self,
+        runners,
+        assemblies,
+        config,
+        project_name,
+        project_description,
+        project_root,
+    ):
         self.runners = runners
         self.assemblies = assemblies
         self.project_name = project_name
@@ -67,7 +76,10 @@ class Surround:
 
         # Try and get the assember via key (name)
         if not assembler:
-            assembler = next((x for x in self.assemblies if x.assembler_name.lower() == key.lower()), None)
+            assembler = next(
+                (x for x in self.assemblies if x.assembler_name.lower() == key.lower()),
+                None,
+            )
 
         return assembler
 
@@ -85,6 +97,8 @@ class Surround:
 
         # Try and get the assember via key (name)
         if not runner:
-            runner = next((x for x in self.runners if x.name.lower() == key.lower()), None)
+            runner = next(
+                (x for x in self.runners if x.name.lower() == key.lower()), None
+            )
 
         return runner

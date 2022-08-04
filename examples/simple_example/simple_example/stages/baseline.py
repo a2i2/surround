@@ -7,6 +7,7 @@ from surround import Estimator
 
 LOGGER = logging.getLogger(__name__)
 
+
 class Baseline(Estimator):
     def estimate(self, state, config):
         state.output_data = state.input_data

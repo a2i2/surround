@@ -3,6 +3,7 @@ import argparse
 
 from ..container import DataContainer
 
+
 def is_valid_file(parser, x):
     """
     Checks argument from parser is a valid container file path (*.data.zip)
@@ -30,6 +31,7 @@ def is_valid_file(parser, x):
 
     return x
 
+
 def get_data_inspect_parser():
     """
     Generates the parser for the inspector sub-command of the data container CLI tool.
@@ -38,15 +40,33 @@ def get_data_inspect_parser():
     :rtype: :class:`argparse.ArgumentParser`
     """
 
-    parser = argparse.ArgumentParser(description='Inspect the metadata and/or contents of a data container', add_help=False)
+    parser = argparse.ArgumentParser(
+        description="Inspect the metadata and/or contents of a data container",
+        add_help=False,
+    )
 
-    parser.add_argument("container_file", type=lambda x: is_valid_file(parser, x), help="Path to the data container to inspect")
+    parser.add_argument(
+        "container_file",
+        type=lambda x: is_valid_file(parser, x),
+        help="Path to the data container to inspect",
+    )
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-m", "--metadata-only", action='store_true', help="Inspect the metadata of the container only")
-    group.add_argument("-c", "--content-only", action='store_true', help="Inspect the contents of the container only")
+    group.add_argument(
+        "-m",
+        "--metadata-only",
+        action="store_true",
+        help="Inspect the metadata of the container only",
+    )
+    group.add_argument(
+        "-c",
+        "--content-only",
+        action="store_true",
+        help="Inspect the contents of the container only",
+    )
 
     return parser
+
 
 def perform_metadata_inspection(container):
     """
@@ -57,29 +77,30 @@ def perform_metadata_inspection(container):
     """
 
     metadata = container.metadata
-    print("Metadata format version: %s" % metadata['version'])
+    print("Metadata format version: %s" % metadata["version"])
     print("Summary Metadata:")
-    print("  Title:          %s" % metadata['summary']['title'])
-    print("  Description:    %s" % metadata['summary']['description'])
-    print("  Creator:        %s" % metadata['summary']['creator'])
-    print("  Date:           %s" % metadata['summary']['date'])
-    print("  Publisher:      %s" % metadata['summary']['publisher'])
-    print("  Contributor:    %s" % metadata['summary']['contributor'])
-    print("  Subject:        %s" % metadata['summary']['subject'])
-    print("  Formats:        %s" % metadata['summary']['formats'])
-    print("  Types:          %s" % metadata['summary']['types'])
-    print("  Identifier:     %s" % metadata['summary']['identifier'])
-    print("  Rights:         %s" % metadata['summary']['rights'])
-    print("  Under Ethics:   %s" % metadata['summary']['under-ethics'])
-    print("  Language:       %s\n" % metadata['summary']['language'])
+    print("  Title:          %s" % metadata["summary"]["title"])
+    print("  Description:    %s" % metadata["summary"]["description"])
+    print("  Creator:        %s" % metadata["summary"]["creator"])
+    print("  Date:           %s" % metadata["summary"]["date"])
+    print("  Publisher:      %s" % metadata["summary"]["publisher"])
+    print("  Contributor:    %s" % metadata["summary"]["contributor"])
+    print("  Subject:        %s" % metadata["summary"]["subject"])
+    print("  Formats:        %s" % metadata["summary"]["formats"])
+    print("  Types:          %s" % metadata["summary"]["types"])
+    print("  Identifier:     %s" % metadata["summary"]["identifier"])
+    print("  Rights:         %s" % metadata["summary"]["rights"])
+    print("  Under Ethics:   %s" % metadata["summary"]["under-ethics"])
+    print("  Language:       %s\n" % metadata["summary"]["language"])
 
-    if metadata.get_property('manifests'):
-        for manifest in metadata['manifests']:
-            print("'%s' Group Metadata:" % manifest['path'])
-            print("  Description:   %s" % manifest['description'])
-            print("  Language:      %s" % manifest['language'])
-            print("  Formats:       %s" % manifest['formats'])
-            print("  Types:         %s\n" % manifest['types'])
+    if metadata.get_property("manifests"):
+        for manifest in metadata["manifests"]:
+            print("'%s' Group Metadata:" % manifest["path"])
+            print("  Description:   %s" % manifest["description"])
+            print("  Language:      %s" % manifest["language"])
+            print("  Formats:       %s" % manifest["formats"])
+            print("  Types:         %s\n" % manifest["types"])
+
 
 def perform_content_inspection(container):
     """
@@ -92,6 +113,7 @@ def perform_content_inspection(container):
     print("Contents:")
     for content in container.get_files():
         print(content)
+
 
 def execute_data_inspect_tool(parser, args):
     """
@@ -120,6 +142,7 @@ def execute_data_inspect_tool(parser, args):
     if not args.metadata_only:
         perform_content_inspection(container)
 
+
 def main():
     """
     Entry point used when this script is executed directly.
@@ -129,6 +152,7 @@ def main():
     args = parser.parse_args()
 
     execute_data_inspect_tool(parser, args)
+
 
 if __name__ == "__main__":
     main()

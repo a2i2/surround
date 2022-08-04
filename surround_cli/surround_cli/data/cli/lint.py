@@ -3,6 +3,7 @@ import argparse
 
 from ..linter import DataLinter
 
+
 def is_valid_file(parser, x):
     """
     Checks whether argument is a valid path to a container (.data.zip)
@@ -16,11 +17,11 @@ def is_valid_file(parser, x):
     """
 
     if not os.path.exists(x):
-        parser.error('Unable to locate the file!')
+        parser.error("Unable to locate the file!")
         return False
 
     if not os.path.isfile(x):
-        parser.error('The path specified must be to a file!')
+        parser.error("The path specified must be to a file!")
         return False
 
     splitext = os.path.splitext(x)
@@ -29,6 +30,7 @@ def is_valid_file(parser, x):
         return False
 
     return x
+
 
 def is_valid_check_id(parser, x):
     """
@@ -45,7 +47,7 @@ def is_valid_check_id(parser, x):
     try:
         x = int(x)
     except Exception:
-        parser.error('The check id value must be a number!')
+        parser.error("The check id value must be a number!")
         return False
 
     if x < 1 or x > len(DataLinter().stages):
@@ -53,6 +55,7 @@ def is_valid_check_id(parser, x):
         return False
 
     return x
+
 
 def get_data_lint_parser():
     """
@@ -62,13 +65,30 @@ def get_data_lint_parser():
     :rtype: :class:`argparse.ArgumentParser`
     """
 
-    parser = argparse.ArgumentParser(description='Check the validity of a data container', add_help=False)
+    parser = argparse.ArgumentParser(
+        description="Check the validity of a data container", add_help=False
+    )
 
-    parser.add_argument("container_path", help="Path to the container to perform checks on", type=lambda x: is_valid_file(parser, x))
-    parser.add_argument("-l", "--list", action='store_true', help="List the checks the linter will perform")
-    parser.add_argument("-c", "--check-id", help="Specify a single check to perform (get id from --list)", type=lambda x: is_valid_check_id(parser, x))
+    parser.add_argument(
+        "container_path",
+        help="Path to the container to perform checks on",
+        type=lambda x: is_valid_file(parser, x),
+    )
+    parser.add_argument(
+        "-l",
+        "--list",
+        action="store_true",
+        help="List the checks the linter will perform",
+    )
+    parser.add_argument(
+        "-c",
+        "--check-id",
+        help="Specify a single check to perform (get id from --list)",
+        type=lambda x: is_valid_check_id(parser, x),
+    )
 
     return parser
+
 
 def execute_data_lint_tool(parser, args):
     """
@@ -85,6 +105,7 @@ def execute_data_lint_tool(parser, args):
     else:
         linter.lint(args.container_path, verbose=True)
 
+
 def main():
     """
     Entry point used when this script is executed directly.
@@ -94,6 +115,7 @@ def main():
     args = parser.parse_args()
 
     execute_data_lint_tool(parser, args)
+
 
 if __name__ == "__main__":
     main()

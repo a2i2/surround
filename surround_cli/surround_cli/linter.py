@@ -1,9 +1,9 @@
-
 import os
 from pathlib import Path
 from pylint.lint import Run
 
-class Linter():
+
+class Linter:
     """
     Represents the Surround linter which performs multiple checks on the surround project
     and displays warnings/errors found during the linting process.
@@ -24,7 +24,7 @@ class Linter():
         print("=============================")
 
         try:
-            Run(['--list-msgs-enabled'])
+            Run(["--list-msgs-enabled"])
         except SystemExit:
             pass
 
@@ -38,24 +38,26 @@ class Linter():
         :rtype: (list of error strings, list of warning strings)
         """
 
-        ignore_dirs = ['scripts', 'spikes', 'notebooks']
+        ignore_dirs = ["scripts", "spikes", "notebooks"]
         args = [str(p) for p in Path(project_root).glob("**/*.py")]
-        args = [p for p in args if os.path.basename(os.path.dirname(p)) not in ignore_dirs]
+        args = [
+            p for p in args if os.path.basename(os.path.dirname(p)) not in ignore_dirs
+        ]
 
         if extra_args:
             args.extend(extra_args)
 
         disable_msgs = [
-            'missing-class-docstring',
-            'missing-function-docstring',
-            'abstract-method',
-            'attribute-defined-outside-init'
+            "missing-class-docstring",
+            "missing-function-docstring",
+            "abstract-method",
+            "attribute-defined-outside-init",
         ]
 
         args.append("--load-plugins=surround_cli.checkers.surround_checker")
 
         for msg in disable_msgs:
-            args.append('--disable=%s' % msg)
+            args.append("--disable=%s" % msg)
 
         result = Run(args, do_exit=False)
         return result.linter.msg_status == 0

@@ -4,7 +4,12 @@ import os
 import json
 import yaml
 
-from .util import get_formats_from_directory, get_formats_from_files, get_types_from_formats
+from .util import (
+    get_formats_from_directory,
+    get_formats_from_files,
+    get_types_from_formats,
+)
+
 
 class Metadata(Mapping):
     """
@@ -20,35 +25,43 @@ class Metadata(Mapping):
 
     # 'key_name': (TYPE, REQUIRED, SUB_SCHEMA)
     SCHEMA = {
-        'v0.1': {
-            'version': (str, True, None),
-            'summary': (dict, True, {
-                'title': (str, True, None),
-                'creator': (str, True, None),
-                'subject': (list, True, None),
-                'description': (str, True, None),
-                'publisher': (str, True, None),
-                'contributor': (str, True, None),
-                'date': (str, True, None),
-                'types': (list, True, None),
-                'formats': (list, True, None),
-                'identifier': (str, True, None),
-                'source': (str, False, None),
-                'language': (str, True, None),
-                'rights': (str, True, None),
-                'under-ethics': (bool, True, None),
-            }),
-            'manifests': (list, False, {
-                'path': (str, True, None),
-                'description': (str, True, None),
-                'types': (list, True, None),
-                'formats': (list, True, None),
-                'language': (str, True, None),
-            })
+        "v0.1": {
+            "version": (str, True, None),
+            "summary": (
+                dict,
+                True,
+                {
+                    "title": (str, True, None),
+                    "creator": (str, True, None),
+                    "subject": (list, True, None),
+                    "description": (str, True, None),
+                    "publisher": (str, True, None),
+                    "contributor": (str, True, None),
+                    "date": (str, True, None),
+                    "types": (list, True, None),
+                    "formats": (list, True, None),
+                    "identifier": (str, True, None),
+                    "source": (str, False, None),
+                    "language": (str, True, None),
+                    "rights": (str, True, None),
+                    "under-ethics": (bool, True, None),
+                },
+            ),
+            "manifests": (
+                list,
+                False,
+                {
+                    "path": (str, True, None),
+                    "description": (str, True, None),
+                    "types": (list, True, None),
+                    "formats": (list, True, None),
+                    "language": (str, True, None),
+                },
+            ),
         }
     }
 
-    def __init__(self, version='v0.1'):
+    def __init__(self, version="v0.1"):
         """
         :param version: the version of the schema to use (default: v0.1)
         :type version: str
@@ -77,7 +90,7 @@ class Metadata(Mapping):
 
                 if required and typ is dict:
                     result[key] = gen_dict(sub_schema)
-                elif key == 'version':
+                elif key == "version":
                     result[key] = version
                 elif required:
                     result[key] = typ()
@@ -108,26 +121,28 @@ class Metadata(Mapping):
         if root_level_dirs:
             types.append("Collection")
 
-        self.__storage['summary']['formats'] = formats
-        self.__storage['summary']['types'] = types
+        self.__storage["summary"]["formats"] = formats
+        self.__storage["summary"]["types"] = types
 
         if root_level_dirs:
-            self.__storage['manifests'] = []
+            self.__storage["manifests"] = []
 
             for root_dir in root_level_dirs:
                 formats = get_formats_from_directory(os.path.join(root, root_dir))
                 types = get_types_from_formats(formats)
 
-                if 'Collection' not in types:
-                    types.append('Collection')
+                if "Collection" not in types:
+                    types.append("Collection")
 
-                self.__storage['manifests'].append({
-                    'path': root_dir,
-                    'description': None,
-                    'formats': formats,
-                    'types': types,
-                    'language': None,
-                })
+                self.__storage["manifests"].append(
+                    {
+                        "path": root_dir,
+                        "description": None,
+                        "formats": formats,
+                        "types": types,
+                        "language": None,
+                    }
+                )
 
     def generate_from_directory(self, directory):
         """
@@ -164,8 +179,8 @@ class Metadata(Mapping):
         formats = get_formats_from_files([filepath])
         types = get_types_from_formats(formats)
 
-        self.__storage['summary']['formats'] = formats
-        self.__storage['summary']['types'] = types
+        self.__storage["summary"]["formats"] = formats
+        self.__storage["summary"]["types"] = types
 
     def generate_manifest_for_group(self, group_name, files, formats=None):
         """
@@ -196,21 +211,23 @@ class Metadata(Mapping):
         types = get_types_from_formats(formats)
 
         # Add collection to types if more than one file or format
-        if 'Collection' not in types and (len(files) > 1 or (formats and len(formats) > 1)):
-            types.append('Collection')
+        if "Collection" not in types and (
+            len(files) > 1 or (formats and len(formats) > 1)
+        ):
+            types.append("Collection")
 
-        if 'manifests' not in self.__storage:
-            self.__storage['manifests'] = []
+        if "manifests" not in self.__storage:
+            self.__storage["manifests"] = []
 
         manifest = {
-            'path': group_name,
-            'description': None,
-            'language': None,
-            'formats': formats,
-            'types': types
+            "path": group_name,
+            "description": None,
+            "language": None,
+            "formats": formats,
+            "types": types,
         }
 
-        self.__storage['manifests'].append(manifest)
+        self.__storage["manifests"].append(manifest)
 
         return manifest
 

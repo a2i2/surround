@@ -7,6 +7,7 @@ import pandas as pd
 
 from .visualise_classifier import VisualiseClassifier, VisualiseClassifierData
 
+
 def get_failed_set(y_true, y_pred):
     """
     Get incorrect/failed records from the ground truth & predict values.
@@ -24,6 +25,7 @@ def get_failed_set(y_true, y_pred):
     pred = [pair[1] for pair in values]
     return true, pred
 
+
 def is_valid_file(arg_parser, arg):
     """
     A simple function to validate a file path
@@ -38,6 +40,7 @@ def is_valid_file(arg_parser, arg):
         arg_parser.error("Invalid file path %s" % arg)
         return arg
     return arg
+
 
 def is_valid_directory(arg_parser, arg):
     """
@@ -54,6 +57,7 @@ def is_valid_directory(arg_parser, arg):
         return arg
     return arg
 
+
 def str2bool(v):
     """
     Convert string to boolean value. Used in boolean arguments.
@@ -67,7 +71,8 @@ def str2bool(v):
     if isinstance(v, bool):
         return v
 
-    return v.lower() in ('yes', 'true', 't', 'y', '1')
+    return v.lower() in ("yes", "true", "t", "y", "1")
+
 
 def get_visualise_parser():
     """
@@ -78,23 +83,78 @@ def get_visualise_parser():
     """
 
     parser = argparse.ArgumentParser(
-        description='Visualise the output from a classifier.',
-        epilog="Note: The first column in the --ground-truth flag maps to the frist column in the --predictions flag.")
+        description="Visualise the output from a classifier.",
+        epilog="Note: The first column in the --ground-truth flag maps to the frist column in the --predictions flag.",
+    )
 
-    parser.add_argument("data_file", help="CSV file with ground truth and predicted labels", type=lambda x: is_valid_file(parser, x))
+    parser.add_argument(
+        "data_file",
+        help="CSV file with ground truth and predicted labels",
+        type=lambda x: is_valid_file(parser, x),
+    )
 
-    parser.add_argument("-g", "--ground-truth", help="Comma separated list of columns containing ground truth values (default: ground_truth)", default="ground_truth")
-    parser.add_argument("-p", "--predictions", help="Comma separated list of columns containing predictions (default: predictions)", default="predictions")
-    parser.add_argument("-s", "--separater", help="File separator (default: ',')", default=",")
-    parser.add_argument("--header", type=int, help="Row of the file to use as a header (default: 0)", default=0)
-    parser.add_argument('-o', "--output-directory", help="Path to directory to export JSON/HTML results to", default=os.path.abspath("."), type=lambda x: is_valid_directory(parser, x))
-    parser.add_argument('-i', '--output-incorrect', help="Output file containing incorrect records (default: true)", default=True, type=str2bool)
-    parser.add_argument('-n', '--normalize', action="store_true", help="Show the normalized confusion matrix in reports")
-    parser.add_argument('-no', '--no-output', action="store_true", help="Don't output reports to JSON/HTML files")
-    parser.add_argument('-jo', '--json-only', action="store_true", help="Output visualisations to JSON files")
-    parser.add_argument('-ho', '--html-only', action="store_true", help="Output visualisations to HTML files")
+    parser.add_argument(
+        "-g",
+        "--ground-truth",
+        help="Comma separated list of columns containing ground truth values (default: ground_truth)",
+        default="ground_truth",
+    )
+    parser.add_argument(
+        "-p",
+        "--predictions",
+        help="Comma separated list of columns containing predictions (default: predictions)",
+        default="predictions",
+    )
+    parser.add_argument(
+        "-s", "--separater", help="File separator (default: ',')", default=","
+    )
+    parser.add_argument(
+        "--header",
+        type=int,
+        help="Row of the file to use as a header (default: 0)",
+        default=0,
+    )
+    parser.add_argument(
+        "-o",
+        "--output-directory",
+        help="Path to directory to export JSON/HTML results to",
+        default=os.path.abspath("."),
+        type=lambda x: is_valid_directory(parser, x),
+    )
+    parser.add_argument(
+        "-i",
+        "--output-incorrect",
+        help="Output file containing incorrect records (default: true)",
+        default=True,
+        type=str2bool,
+    )
+    parser.add_argument(
+        "-n",
+        "--normalize",
+        action="store_true",
+        help="Show the normalized confusion matrix in reports",
+    )
+    parser.add_argument(
+        "-no",
+        "--no-output",
+        action="store_true",
+        help="Don't output reports to JSON/HTML files",
+    )
+    parser.add_argument(
+        "-jo",
+        "--json-only",
+        action="store_true",
+        help="Output visualisations to JSON files",
+    )
+    parser.add_argument(
+        "-ho",
+        "--html-only",
+        action="store_true",
+        help="Output visualisations to HTML files",
+    )
 
     return parser
+
 
 def execute_visualise_tool(parser, args, extra_args):
     """
@@ -111,10 +171,12 @@ def execute_visualise_tool(parser, args, extra_args):
     prediction_columns = args.predictions.split(",")
 
     if args.separater == "t":
-        args.separater = '\t'
+        args.separater = "\t"
 
     # Read the CSV file and strip the headings of the columns
-    file_contents = pd.read_csv(args.data_file, sep=args.separater, header=args.header, engine='python')
+    file_contents = pd.read_csv(
+        args.data_file, sep=args.separater, header=args.header, engine="python"
+    )
     file_contents.columns = [i.strip() for i in file_contents.columns]
 
     # Replace empty values with UNKNOWN
@@ -124,12 +186,14 @@ def execute_visualise_tool(parser, args, extra_args):
     for column in ground_truth_columns + prediction_columns:
         if column not in file_contents.columns:
             print("error: the column %s was not found in %s" % (column, args.data_file))
-            print("Please check you have specified the right separator and/or column names")
+            print(
+                "Please check you have specified the right separator and/or column names"
+            )
             return
 
     # Initialise the visualiser
     visualiser = VisualiseClassifier()
-    config = OmegaConf.create({'show_normalized_confusion_matrix': args.normalize})
+    config = OmegaConf.create({"show_normalized_confusion_matrix": args.normalize})
 
     results = []
 
@@ -138,7 +202,10 @@ def execute_visualise_tool(parser, args, extra_args):
         data.y_true = file_contents[ground_truth_columns[i]]
         data.y_pred = file_contents[prediction_columns[i]]
 
-        print("Results for columns %s & %s" % (ground_truth_columns[i], prediction_columns[i]))
+        print(
+            "Results for columns %s & %s"
+            % (ground_truth_columns[i], prediction_columns[i])
+        )
         print("Ground truth column label: %s" % ground_truth_columns[i])
         print("Predict column label: %s" % prediction_columns[i])
 
@@ -148,16 +215,24 @@ def execute_visualise_tool(parser, args, extra_args):
         print()
 
         # Keep the results in a list
-        results.append({
-            "input_file": os.path.basename(args.data_file),
-            "ground_truth_label": ground_truth_columns[i],
-            "predict_label": prediction_columns[i],
-            "results": data.visualise_output
-        })
+        results.append(
+            {
+                "input_file": os.path.basename(args.data_file),
+                "ground_truth_label": ground_truth_columns[i],
+                "predict_label": prediction_columns[i],
+                "results": data.visualise_output,
+            }
+        )
 
     # If requested, generate a file containing only the incorrect data
     if args.output_incorrect and not args.no_output:
-        export_incorrect_results(os.path.abspath(args.output_directory), file_contents, args.separater, ground_truth_columns, prediction_columns)
+        export_incorrect_results(
+            os.path.abspath(args.output_directory),
+            file_contents,
+            args.separater,
+            ground_truth_columns,
+            prediction_columns,
+        )
 
     # If requested, write results to an output file
     if not args.no_output:
@@ -167,7 +242,10 @@ def execute_visualise_tool(parser, args, extra_args):
 
         if not args.json_only:
             # Write the results to a HTML file
-            export_results_html(results, os.path.abspath(args.output_directory), args.normalize)
+            export_results_html(
+                results, os.path.abspath(args.output_directory), args.normalize
+            )
+
 
 def main():
     """
@@ -180,7 +258,10 @@ def main():
 
     execute_visualise_tool(parser, args, [])
 
-def export_incorrect_results(dir_path, file_contents, sep, ground_truth_columns, prediction_columns):
+
+def export_incorrect_results(
+    dir_path, file_contents, sep, ground_truth_columns, prediction_columns
+):
     """
     Export ONLY the incorrect values in the ground truth - predict value pairs.
 
@@ -196,7 +277,9 @@ def export_incorrect_results(dir_path, file_contents, sep, ground_truth_columns,
     :type prediction_columns: list
     """
 
-    incorrect_records_df = pd.DataFrame(data=None, index=None, columns=ground_truth_columns + prediction_columns)
+    incorrect_records_df = pd.DataFrame(
+        data=None, index=None, columns=ground_truth_columns + prediction_columns
+    )
 
     for i, ground_truth_column in enumerate(ground_truth_columns):
         prediction_column = prediction_columns[i]
@@ -204,12 +287,18 @@ def export_incorrect_results(dir_path, file_contents, sep, ground_truth_columns,
         y_pred = file_contents[prediction_column]
 
         fail_true, fail_pred = get_failed_set(y_true, y_pred)
-        df = pd.DataFrame({ground_truth_columns[i]: fail_true, prediction_columns[i]: fail_pred}, columns=[ground_truth_columns[i], prediction_columns[i]])
+        df = pd.DataFrame(
+            {ground_truth_columns[i]: fail_true, prediction_columns[i]: fail_pred},
+            columns=[ground_truth_columns[i], prediction_columns[i]],
+        )
         incorrect_records_df = incorrect_records_df.append(df, sort=False)
 
-    path = os.path.join(dir_path, 'incorrect_records.csv')
-    incorrect_records_df.to_csv(path, index=None, header=True, sep='\t' if sep == '\\t' else sep)
+    path = os.path.join(dir_path, "incorrect_records.csv")
+    incorrect_records_df.to_csv(
+        path, index=None, header=True, sep="\t" if sep == "\\t" else sep
+    )
     print("Exported incorrect values to file: %s" % path)
+
 
 def export_results_json(results, output_dir):
     """
@@ -223,11 +312,15 @@ def export_results_json(results, output_dir):
 
     for data in results:
         # Write the results to a JSON file
-        output_path = os.path.join(output_dir, "report_%s_%s.json" % (data["ground_truth_label"], data["predict_label"]))
+        output_path = os.path.join(
+            output_dir,
+            "report_%s_%s.json" % (data["ground_truth_label"], data["predict_label"]),
+        )
         with open(output_path, "w+") as outfile:
             json.dump(data, outfile, indent=4)
 
         print("Exported a JSON report to file: %s" % output_path)
+
 
 def export_results_html(results, output_dir, normalize):
     """
@@ -246,11 +339,20 @@ def export_results_html(results, output_dir, normalize):
         category_metric_rows = generate_category_metric_rows(data)
 
         # Generate HTML report for data set using the report template
-        template_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "visualise_classifier_template.html.txt")
+        template_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "visualise_classifier_template.html.txt",
+        )
         with open(template_path, "r") as f:
             contents = f.read()
             new_contents = contents.format(
-                conf_matrix=str(data["results"]["confusion_matrix" if not normalize else "normalized_confusion_matrix"]),
+                conf_matrix=str(
+                    data["results"][
+                        "confusion_matrix"
+                        if not normalize
+                        else "normalized_confusion_matrix"
+                    ]
+                ),
                 class_list=str(data["results"]["classes"]),
                 overall_rows=overall_metric_rows,
                 category_rows=category_metric_rows,
@@ -260,14 +362,19 @@ def export_results_html(results, output_dir, normalize):
                 predict_label=data["predict_label"],
                 input_path=data["input_file"],
                 date_string=datetime.datetime.now(),
-                version='v%s' % pkg_resources.get_distribution('surround').version)
+                version="v%s" % pkg_resources.get_distribution("surround").version,
+            )
 
         # Write new HTML file to directory specified
-        output_path = os.path.join(output_dir, "report_%s_%s.html" % (data["ground_truth_label"], data["predict_label"]))
+        output_path = os.path.join(
+            output_dir,
+            "report_%s_%s.html" % (data["ground_truth_label"], data["predict_label"]),
+        )
         with open(output_path, "w+") as f:
             f.write(new_contents)
 
         print("Exported a HTML report to file: %s" % os.path.abspath(output_path))
+
 
 def generate_overall_metric_rows(data):
     """
@@ -315,6 +422,7 @@ def generate_overall_metric_rows(data):
 
     return result
 
+
 def generate_category_metric_rows(data):
     """
     Render HTML for a table showing metrics for all categories/classes.
@@ -352,6 +460,7 @@ def generate_category_metric_rows(data):
         result += "</td></tr>\n"
 
     return result
+
 
 if __name__ == "__main__":
     main()

@@ -18,6 +18,7 @@ import numpy as np
 from surround.state import State
 from surround.stage import Stage
 
+
 class VisualiseClassifierData(State):
     """
     The data object used when running the VisualiseClassifier in the command line.
@@ -26,6 +27,7 @@ class VisualiseClassifierData(State):
     y_true = []
     y_pred = []
     visualise_output = {}
+
 
 class VisualiseClassifier(Stage):
     """
@@ -56,7 +58,9 @@ class VisualiseClassifier(Stage):
             state.errors.append("No prediction data provided.")
 
         if not state.errors and len(state.y_true) != len(state.y_pred):
-            state.errors.append("Length of ground truth data and prediction data mismatch")
+            state.errors.append(
+                "Length of ground truth data and prediction data mismatch"
+            )
 
         if not state.visualise_output:
             state.errors.append("No field defined for the output of the visualiser")
@@ -76,17 +80,20 @@ class VisualiseClassifier(Stage):
         """
 
         template = "{:8}|{:10}|{:10}|{:10}|{:10}|{:10}\n"
-        result = template.format("", "accuracy", "precision", "recall", "f1-score", "support")
+        result = template.format(
+            "", "accuracy", "precision", "recall", "f1-score", "support"
+        )
 
         for category in classes:
             values = report_dict[category]
             result += template.format(
                 category,
-                "{:.2f}".format(values['accuracy']),
-                "{:.2f}".format(values['precision']),
-                "{:.2f}".format(values['recall']),
-                "{:.2f}".format(values['f1-score']),
-                "{:.2f}".format(values['support']))
+                "{:.2f}".format(values["accuracy"]),
+                "{:.2f}".format(values["precision"]),
+                "{:.2f}".format(values["recall"]),
+                "{:.2f}".format(values["f1-score"]),
+                "{:.2f}".format(values["support"]),
+            )
 
         return result
 
@@ -103,19 +110,21 @@ class VisualiseClassifier(Stage):
         template = "{:14}|{:10}|{:10}|{:10}\n"
         result = template.format("", "precision", "recall", "f1-score")
 
-        macro_avg = report_dict['macro avg']
+        macro_avg = report_dict["macro avg"]
         result += template.format(
             "macro avg",
-            "{:.2f}".format(macro_avg['precision']),
-            "{:.2f}".format(macro_avg['recall']),
-            "{:.2f}".format(macro_avg['f1-score']))
+            "{:.2f}".format(macro_avg["precision"]),
+            "{:.2f}".format(macro_avg["recall"]),
+            "{:.2f}".format(macro_avg["f1-score"]),
+        )
 
-        weighted_avg = report_dict['weighted avg']
+        weighted_avg = report_dict["weighted avg"]
         result += template.format(
             "weighted avg",
-            "{:.2f}".format(weighted_avg['precision']),
-            "{:.2f}".format(weighted_avg['recall']),
-            "{:.2f}".format(weighted_avg['f1-score']))
+            "{:.2f}".format(weighted_avg["precision"]),
+            "{:.2f}".format(weighted_avg["recall"]),
+            "{:.2f}".format(weighted_avg["f1-score"]),
+        )
 
         return result
 
@@ -136,12 +145,14 @@ class VisualiseClassifier(Stage):
             return
 
         # Calculate metrics using the y_true and y_pred values
-        state.visualise_output = calculate_classifier_metrics(state.y_true, state.y_pred)
+        state.visualise_output = calculate_classifier_metrics(
+            state.y_true, state.y_pred
+        )
 
-        report_dict = state.visualise_output['report']
-        classes = state.visualise_output['classes']
-        conf_matrix = state.visualise_output['confusion_matrix']
-        norm_conf_matrix = state.visualise_output['normalized_confusion_matrix']
+        report_dict = state.visualise_output["report"]
+        classes = state.visualise_output["classes"]
+        conf_matrix = state.visualise_output["confusion_matrix"]
+        norm_conf_matrix = state.visualise_output["normalized_confusion_matrix"]
 
         # Generate pretty tables for the console
         overall_metrics = self.generate_table_from_overall_report(report_dict)
@@ -150,8 +161,8 @@ class VisualiseClassifier(Stage):
         print("============[Classification Report]===================")
         print("Overall Metrics:")
         print(overall_metrics)
-        print("Accuracy: %s" % state.visualise_output['accuracy_score'])
-        print("Cohen Kappa: %s" % state.visualise_output['cohen_kappa_score'])
+        print("Accuracy: %s" % state.visualise_output["accuracy_score"])
+        print("Cohen Kappa: %s" % state.visualise_output["cohen_kappa_score"])
         print("==========================")
         print("Metrics per category:")
         print(per_category_table)
@@ -164,22 +175,34 @@ class VisualiseClassifier(Stage):
 
         # Print rows of confusion matrix, with labels
         template = "{:>{:}}|" + "{:^8}|" * len(classes)
-        cm = conf_matrix if not config['show_normalized_confusion_matrix'] else norm_conf_matrix
+        cm = (
+            conf_matrix
+            if not config["show_normalized_confusion_matrix"]
+            else norm_conf_matrix
+        )
         for i, _ in enumerate(classes):
             print(template.format(classes[i], max_len, *cm[i]))
 
         print("============[End of visualisation]===================")
 
+
 def safe_div(a, b):
     return a / b if b else 0
+
 
 def classification_report(y_true, y_pred, classes):
     results = {}
 
     for name in classes:
-        tp = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt == yp and yt == name])
-        fp = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt != yp and yp == name])
-        fn = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt != yp and yt == name])
+        tp = len(
+            [(yt, yp) for yt, yp in zip(y_true, y_pred) if yt == yp and yt == name]
+        )
+        fp = len(
+            [(yt, yp) for yt, yp in zip(y_true, y_pred) if yt != yp and yp == name]
+        )
+        fn = len(
+            [(yt, yp) for yt, yp in zip(y_true, y_pred) if yt != yp and yt == name]
+        )
 
         precision = safe_div(tp, (tp + fp))
         recall = safe_div(tp, tp + fn)
@@ -192,7 +215,7 @@ def classification_report(y_true, y_pred, classes):
             "recall": recall,
             "f1-score": f1_score,
             "support": support,
-            "accuracy": accuracy
+            "accuracy": accuracy,
         }
 
     total_tp_plus_tn = len([(yt, yp) for yt, yp in zip(y_true, y_pred) if yt == yp])
@@ -208,13 +231,20 @@ def classification_report(y_true, y_pred, classes):
     weights = [results[name]["support"] for name in classes]
 
     results["weighted avg"] = {
-        "precision": np.average([results[name]["precision"] for name in classes], weights=weights),
-        "recall": np.average([results[name]["recall"] for name in classes], weights=weights),
-        "f1-score": np.average([results[name]["f1-score"] for name in classes], weights=weights),
+        "precision": np.average(
+            [results[name]["precision"] for name in classes], weights=weights
+        ),
+        "recall": np.average(
+            [results[name]["recall"] for name in classes], weights=weights
+        ),
+        "f1-score": np.average(
+            [results[name]["f1-score"] for name in classes], weights=weights
+        ),
         "support": len(y_true),
     }
 
     return results
+
 
 def calculate_confusion_matrix(y_true, y_pred, classes):
     result = np.empty([len(classes), len(classes)], dtype=np.int)
@@ -225,6 +255,7 @@ def calculate_confusion_matrix(y_true, y_pred, classes):
             result[i][j] = pairs.count((true_label, pred_label))
 
     return result
+
 
 def calculate_cohen_kappa(confusion_matrix):
     n_classes = confusion_matrix.shape[0]
@@ -239,6 +270,7 @@ def calculate_cohen_kappa(confusion_matrix):
 
     k = safe_div(np.sum(w_mat * confusion_matrix), np.sum(w_mat * expected))
     return 1 - k
+
 
 def calculate_classifier_metrics(y_true, y_pred):
     """
@@ -270,21 +302,24 @@ def calculate_classifier_metrics(y_true, y_pred):
 
     classes = sorted(classes, key=y_true_list.count, reverse=True)
     conf_matrix = calculate_confusion_matrix(y_true, y_pred, classes)
-    normal_conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
+    normal_conf_matrix = (
+        conf_matrix.astype("float") / conf_matrix.sum(axis=1)[:, np.newaxis]
+    )
     normal_conf_matrix = np.nan_to_num(normal_conf_matrix)
 
     cohen_kappa = calculate_cohen_kappa(conf_matrix)
 
     output = {
-        'report': report_dict,
-        'confusion_matrix': conf_matrix.tolist(),
-        'normalized_confusion_matrix': normal_conf_matrix.tolist(),
-        'accuracy_score': accuracy,
-        'cohen_kappa_score': cohen_kappa,
-        'classes': classes
+        "report": report_dict,
+        "confusion_matrix": conf_matrix.tolist(),
+        "normalized_confusion_matrix": normal_conf_matrix.tolist(),
+        "accuracy_score": accuracy,
+        "cohen_kappa_score": cohen_kappa,
+        "classes": classes,
     }
 
     return round_dict(output, 4)
+
 
 def round_dict(data, n_digits):
     """
@@ -309,6 +344,7 @@ def round_dict(data, n_digits):
             result[key] = round_list(value, n_digits)
 
     return result
+
 
 def round_list(data, n_digits):
     """

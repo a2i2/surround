@@ -3,10 +3,11 @@ from abc import abstractmethod
 from pathlib import Path
 import yaml
 
-__author__ = 'Akshat Bajaj'
-__date__ = '2019/02/18'
+__author__ = "Akshat Bajaj"
+__date__ = "2019/02/18"
 
-class BaseRemote():
+
+class BaseRemote:
     """
     Abstract base class for all different types of remotes.
     Provides an interface for pushing and pulling data from a remote irrespective of the service used.
@@ -64,9 +65,7 @@ class BaseRemote():
             if what_to_write in read_config:
                 read_config[what_to_write][name] = path
             else:
-                read_config[what_to_write] = {
-                    name: path
-                }
+                read_config[what_to_write] = {name: path}
 
         with open(file_, "w") as f:
             yaml.dump(read_config, f, default_flow_style=False)
@@ -84,7 +83,11 @@ class BaseRemote():
         """
 
         local = self.read_from_local_config(what_to_read, key)
-        return local if local is not None else self.read_from_global_config(what_to_read, key)
+        return (
+            local
+            if local is not None
+            else self.read_from_global_config(what_to_read, key)
+        )
 
     def read_from_local_config(self, what_to_read, key):
         """
@@ -222,11 +225,19 @@ class BaseRemote():
                 return self.message
 
             os.makedirs(what_to_pull, exist_ok=True)
-            if self.file_exists_on_remote(path_to_remote, relative_path_to_remote_file, False):
+            if self.file_exists_on_remote(
+                path_to_remote, relative_path_to_remote_file, False
+            ):
                 # Ensure the file is being tracked in config
                 self.add(what_to_pull, key)
 
-                response = self.pull_file(what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
+                response = self.pull_file(
+                    what_to_pull,
+                    key,
+                    path_to_remote,
+                    relative_path_to_remote_file,
+                    path_to_local_file,
+                )
                 self.add_message(response)
             else:
                 self.add_message("error: file does not exist")
@@ -242,7 +253,14 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def pull_file(self, what_to_pull, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def pull_file(
+        self,
+        what_to_pull,
+        key,
+        path_to_remote,
+        relative_path_to_remote_file,
+        path_to_local_file,
+    ):
         """
         Get the file stored on the remote and save it locally.
 
@@ -287,11 +305,19 @@ class BaseRemote():
 
             path_to_local_file = os.path.join(what_to_push, key)
             os.makedirs(os.path.dirname(path_to_remote_file), exist_ok=True)
-            if path_to_remote_file and self.file_exists_locally(path_to_local_file, False):
+            if path_to_remote_file and self.file_exists_locally(
+                path_to_local_file, False
+            ):
                 # Ensure the file is being tracked in config
                 self.add(what_to_push, key)
 
-                response = self.push_file(what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file)
+                response = self.push_file(
+                    what_to_push,
+                    key,
+                    path_to_remote,
+                    relative_path_to_remote_file,
+                    path_to_local_file,
+                )
                 self.add_message(response)
             else:
                 self.add_message("error: file does not exist")
@@ -307,7 +333,14 @@ class BaseRemote():
         return self.messages
 
     @abstractmethod
-    def push_file(self, what_to_push, key, path_to_remote, relative_path_to_remote_file, path_to_local_file):
+    def push_file(
+        self,
+        what_to_push,
+        key,
+        path_to_remote,
+        relative_path_to_remote_file,
+        path_to_local_file,
+    ):
         """Get the file stored on the remote
 
         :param what_to_push: what to push to remote
@@ -412,7 +445,9 @@ class BaseRemote():
             self.messages.append(self.message)
 
     @abstractmethod
-    def file_exists_on_remote(self, path_to_remote, relative_path_to_remote_file, append_to=True):
+    def file_exists_on_remote(
+        self, path_to_remote, relative_path_to_remote_file, append_to=True
+    ):
         """
         Check if file is already present on remote. This is used to prevent overwriting of files.
 

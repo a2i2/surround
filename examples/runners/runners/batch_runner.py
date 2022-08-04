@@ -5,10 +5,12 @@ from .stages import AssemblyState
 
 class BatchRunner(Runner):
     def load_data(self, mode, config):
-        path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "input/data.txt")
+        path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "input/data.txt"
+        )
         data = AssemblyState()
 
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             data.lines = f.readlines()
 
         return data

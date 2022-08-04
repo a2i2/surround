@@ -40,6 +40,7 @@ class Stage(ABC):
         :type config: :class:`surround.config.BaseConfig`
         """
 
+
 class Estimator(Stage):
     """
     Base class for an estimator in a Surround pipeline. Responsible for performing estimation

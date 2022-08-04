@@ -7,14 +7,14 @@ from config import Config
 
 prefix = ""
 
-class MainRunner(Runner):
 
+class MainRunner(Runner):
     def load_data(self, mode, config):
         state = AssemblerState()
         input_path = prefix + config.loader.input
 
         with open(input_path) as csv_file:
-            state.rows = list(csv.DictReader(csv_file, delimiter=',', quotechar='"'))
+            state.rows = list(csv.DictReader(csv_file, delimiter=",", quotechar='"'))
 
         return state
 
@@ -29,7 +29,7 @@ class MainRunner(Runner):
                 if b is None:
                     output_file.write("%d\n" % a)
                 else:
-                    output_file.write("%d,\"%s\"\n" % (a, b))
+                    output_file.write('%d,"%s"\n' % (a, b))
         logging.info("File written to %s", output_path)
 
 
@@ -42,10 +42,10 @@ class CSVValidator(Stage):
 class ProcessCSV(Estimator):
     def estimate(self, state, config):
         for row in state.rows:
-            state.word_count = len(row['Consumer complaint narrative'].split())
+            state.word_count = len(row["Consumer complaint narrative"].split())
 
             if config and config.process_csv.include_company:
-                state.company = row['Company']
+                state.company = row["Company"]
 
             state.outputs.append((state.word_count, state.company))
 
@@ -61,6 +61,7 @@ class AssemblerState(State):
     company = None
     csv_file = None
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
@@ -69,6 +70,10 @@ if __name__ == "__main__":
         prefix = dir_extension + "/"
 
     app_config = load_config(name="config", config_class=Config)
-    assembler = Assembler("Loader example").set_stages([CSVValidator(), ProcessCSV()]).set_config(app_config)
+    assembler = (
+        Assembler("Loader example")
+        .set_stages([CSVValidator(), ProcessCSV()])
+        .set_config(app_config)
+    )
 
     MainRunner(assembler).run()

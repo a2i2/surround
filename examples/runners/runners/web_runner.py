@@ -9,8 +9,8 @@ from .stages import AssemblyState
 
 logging.basicConfig(level=logging.INFO)
 
-class WebRunner(Runner):
 
+class WebRunner(Runner):
     def load_data(self, mode, config):
         return None
 
@@ -24,9 +24,7 @@ class WebRunner(Runner):
 
 class Application(tornado.web.Application):
     def __init__(self, assembler):
-        handlers = [
-            (r"/message", MessageHandler, {'assembler': assembler})
-        ]
+        handlers = [(r"/message", MessageHandler, {"assembler": assembler})]
         tornado.web.Application.__init__(self, handlers)
 
 

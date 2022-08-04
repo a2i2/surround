@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from .container import DataContainer
 from .util import hash_zip, get_formats_from_files
 
+
 class DataLinterStage(ABC):
     """
     Represents a stage in the Data Linter's linting pipeline.
@@ -65,6 +66,7 @@ class DataLinterStage(ABC):
         :type metadata: :class:`surround.data.metadata.Metadata`
         """
 
+
 class CheckDataIntegrity(DataLinterStage):
     """
     Represents the data integrity stage of the Data Linter.
@@ -72,21 +74,27 @@ class CheckDataIntegrity(DataLinterStage):
     """
 
     def __init__(self):
-        super().__init__("Data Integrity", "Checks whether the contents of the container are the same as when it was genererated.")
+        super().__init__(
+            "Data Integrity",
+            "Checks whether the contents of the container are the same as when it was genererated.",
+        )
 
     def execute(self, container, metadata):
         self.log_info("Calculating hash of the contents...")
-        current_hash = hash_zip(container.path, skip_files=['manifest.yaml'])
+        current_hash = hash_zip(container.path, skip_files=["manifest.yaml"])
         self.log_info("Calculated hash: %s" % current_hash)
 
         self.log_info("Comparing calculated hash with the hash in the metadata...")
-        metadata_hash = metadata['summary']['identifier']
+        metadata_hash = metadata["summary"]["identifier"]
 
         if current_hash != metadata_hash:
             self.log_error("Hash mismatch detected!")
-            self.log_error("The original contents of the container have changed since it was created!")
+            self.log_error(
+                "The original contents of the container have changed since it was created!"
+            )
         else:
             self.log_info("OK!")
+
 
 class CheckFormats(DataLinterStage):
     """
@@ -95,7 +103,10 @@ class CheckFormats(DataLinterStage):
     """
 
     def __init__(self):
-        super().__init__("Formats", "Checks whether the formats listed in the metadata are actually present in the container.")
+        super().__init__(
+            "Formats",
+            "Checks whether the formats listed in the metadata are actually present in the container.",
+        )
 
     def execute(self, container, metadata):
         self.log_info("Detecting formats in content...")
@@ -103,7 +114,7 @@ class CheckFormats(DataLinterStage):
         formats = set(formats)
         self.log_info("Done")
 
-        metadata_formats = metadata['summary']['formats']
+        metadata_formats = metadata["summary"]["formats"]
         metadata_formats = set(metadata_formats)
 
         self.log_info("Comparing detected formats with formats stored in metadata...")
@@ -114,6 +125,7 @@ class CheckFormats(DataLinterStage):
             self.log_error("Formats detected:       %s" % formats)
             self.log_error("Formats from metadata:  %s" % metadata_formats)
 
+
 class CheckMetadata(DataLinterStage):
     """
     Represents the metadata checking stage of the Data Linter.
@@ -121,7 +133,10 @@ class CheckMetadata(DataLinterStage):
     """
 
     def __init__(self):
-        super().__init__("Metadata", "Checks whether the metadata contains the required fields and whether their values are the correct format.")
+        super().__init__(
+            "Metadata",
+            "Checks whether the metadata contains the required fields and whether their values are the correct format.",
+        )
 
     def check_dictionary(self, schema, dictionary):
         for field, value in schema.items():
@@ -132,7 +147,10 @@ class CheckMetadata(DataLinterStage):
             if required and prop_value is None:
                 self.log_error("Missing required field '%s'!" % field)
             elif prop_value is not None and not isinstance(prop_value, typ):
-                self.log_error("Expected value type %s for field %s, got %s instead!" % (typ, field, type(prop_value)))
+                self.log_error(
+                    "Expected value type %s for field %s, got %s instead!"
+                    % (typ, field, type(prop_value))
+                )
             elif sub_schema is not None and typ == list and prop_value is not None:
                 self.check_list(sub_schema, prop_value)
             elif sub_schema is not None and typ == dict and prop_value is not None:
@@ -167,7 +185,10 @@ class CheckMetadata(DataLinterStage):
             if required and prop_value is None:
                 self.log_error("Missing required field '%s'!" % field)
             elif prop_value is not None and not isinstance(prop_value, typ):
-                self.log_error("Expected value type %s for field %s, got %s instead!" % (typ, field, type(prop_value)))
+                self.log_error(
+                    "Expected value type %s for field %s, got %s instead!"
+                    % (typ, field, type(prop_value))
+                )
             elif sub_schema is not None and typ == list and prop_value is not None:
                 self.check_list(sub_schema, prop_value)
             elif sub_schema is not None and typ == dict and prop_value is not None:
@@ -175,6 +196,7 @@ class CheckMetadata(DataLinterStage):
 
         if not self.errors:
             self.log_info("OK!")
+
 
 class DataLinter:
     """
@@ -259,7 +281,9 @@ class DataLinter:
             if self.errors:
                 print("Looks like there is something wrong with your container!")
             elif self.warnings:
-                print("Looks like there are a couple minor issues with your container, but usable!")
+                print(
+                    "Looks like there are a couple minor issues with your container, but usable!"
+                )
             else:
                 print("Your container looks good.")
 

@@ -8,8 +8,8 @@ from .stages import AssemblerState
 
 logging.basicConfig(level=logging.INFO)
 
-class FileSystemRunner(Runner):
 
+class FileSystemRunner(Runner):
     def load_data(self, mode, config):
         raw_data = "Prepare data here"
         if mode == RunMode.BATCH_PREDICT:

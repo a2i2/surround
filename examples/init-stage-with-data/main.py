@@ -6,6 +6,7 @@ from config import Config
 
 prefix = ""
 
+
 class HelloWorld(Estimator):
     def __init__(self):
         self.file_ = None
@@ -41,7 +42,11 @@ if __name__ == "__main__":
     app_config = load_config(config_class=Config)
 
     data = AssemblerState()
-    assembler = Assembler("Init state example").set_stages([InputValidator(), HelloWorld()]).set_config(app_config)
+    assembler = (
+        Assembler("Init state example")
+        .set_stages([InputValidator(), HelloWorld()])
+        .set_config(app_config)
+    )
     assembler.init_assembler()
     assembler.run(data)
 

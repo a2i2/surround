@@ -6,6 +6,7 @@ the data contained in the State object is valid.
 
 from surround import Stage
 
+
 class InputValidator(Stage):
     def operate(self, state, config):
         if not state.input_data:

@@ -10,6 +10,7 @@ from hydra.experimental import compose, initialize_config_dir
 from .project import PROJECTS
 from .util import generate_docker_volume_path
 
+
 def get_project_root(current_directory: str = os.getcwd()) -> Optional[str]:
     """
     Attempts to find the root path of the project by looking for the .surround
@@ -29,6 +30,7 @@ def get_project_root(current_directory: str = os.getcwd()) -> Optional[str]:
             return current_directory
         current_directory = parent_directory
 
+
 def find_package_path(project_root: str = get_project_root()) -> Optional[str]:
     """
     Attempts to find the projects package path by looking for the config.yaml file.
@@ -41,10 +43,18 @@ def find_package_path(project_root: str = get_project_root()) -> Optional[str]:
     """
 
     if project_root:
-        results = [path for path, _, files in os.walk(project_root) if 'config.yaml' in files]
-        results = [path for path in results if os.path.basename(path) not in PROJECTS['new']['dirs'] and ".hydra" not in path]
+        results = [
+            path for path, _, files in os.walk(project_root) if "config.yaml" in files
+        ]
+        results = [
+            path
+            for path in results
+            if os.path.basename(path) not in PROJECTS["new"]["dirs"]
+            and ".hydra" not in path
+        ]
 
         return results[0] if len(results) == 1 else None
+
 
 def get_project_root_or_cwd():
     """
@@ -58,6 +68,7 @@ def get_project_root_or_cwd():
         return project_path
 
     return os.getcwd()
+
 
 @dataclass
 class SurroundConfig:
@@ -73,6 +84,7 @@ class SurroundConfig:
 
     # Configures whether exceptions thrown during pipeline execution are surfaced.
     surface_exceptions: bool = False
+
 
 @dataclass
 class BaseConfig:
@@ -93,22 +105,37 @@ class BaseConfig:
     project_root: Optional[str] = field(default_factory=get_project_root_or_cwd)
 
     # Absolute path to the package that will be executed to run the pipeline.
-    package_path: Optional[str] = field(default_factory=lambda: find_package_path(get_project_root_or_cwd()))
+    package_path: Optional[str] = field(
+        default_factory=lambda: find_package_path(get_project_root_or_cwd())
+    )
 
     # Absolute path to the root of the project, formatted for use in Docker commands (auto generated via project_root).
-    volume_path: Optional[str] = field(default_factory=lambda: generate_docker_volume_path(get_project_root_or_cwd()))
+    volume_path: Optional[str] = field(
+        default_factory=lambda: generate_docker_volume_path(get_project_root_or_cwd())
+    )
 
     # Absolute path to the inputs folder where data should be loaded from.
-    input_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "input"))
+    input_path: Optional[str] = field(
+        default_factory=lambda: os.path.join(get_project_root_or_cwd(), "input")
+    )
 
     # Absolute path to the models folder where models should be loaded from.
-    model_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "models"))
+    model_path: Optional[str] = field(
+        default_factory=lambda: os.path.join(get_project_root_or_cwd(), "models")
+    )
 
     # Absolute path to the output folder where outputs from the current run should be placed (timestamped folder).
-    output_path: Optional[str] = field(default_factory=lambda: os.path.join(get_project_root_or_cwd(), "output", str(datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))))
+    output_path: Optional[str] = field(
+        default_factory=lambda: os.path.join(
+            get_project_root_or_cwd(),
+            "output",
+            str(datetime.now().strftime("%Y-%m-%d-%H-%M-%S")),
+        )
+    )
 
     # Surround specific configuration.
     surround: SurroundConfig = SurroundConfig()
+
 
 def config(config_class=None, name="config", group=None):
     """
@@ -170,7 +197,10 @@ def config(config_class=None, name="config", group=None):
 
     return recursive_wrapper
 
-def load_config(name="config", config_class=BaseConfig, config_dir=None, overrides=None):
+
+def load_config(
+    name="config", config_class=BaseConfig, config_dir=None, overrides=None
+):
     """
     Loads the configuration instance using `Hydra's Compose API <https://hydra.cc/docs/experimental/compose_api>`_.
 

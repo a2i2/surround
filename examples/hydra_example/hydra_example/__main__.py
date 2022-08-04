@@ -10,14 +10,10 @@ from .config import Config
 from .stages import Baseline, InputValidator
 from .file_system_runner import FileSystemRunner
 
-RUNNERS = [
-    FileSystemRunner()
-]
+RUNNERS = [FileSystemRunner()]
 
-ASSEMBLIES = [
-    Assembler("baseline")
-        .set_stages([InputValidator(), Baseline()])
-]
+ASSEMBLIES = [Assembler("baseline").set_stages([InputValidator(), Baseline()])]
+
 
 @hydra.main(config_name="config")
 def main(config: Config) -> None:
@@ -27,13 +23,14 @@ def main(config: Config) -> None:
         config,
         "hydra_example",
         "Example showing the use of the Hydra framework.",
-        os.path.dirname(os.path.dirname(__file__))
+        os.path.dirname(os.path.dirname(__file__)),
     )
 
     if config.status:
         surround.show_info()
     else:
         surround.run(config.runner, config.assembler, config.mode)
+
 
 if __name__ == "__main__":
     main(None)

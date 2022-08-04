@@ -5,7 +5,8 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-class Frozen():
+
+class Frozen:
     """
     A class that can toggle the ability of adding new attributes.
     When the class is considered frozen, adding new attributes will

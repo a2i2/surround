@@ -10,7 +10,6 @@ class HelloWorld(Estimator):
         else:
             state.text = "Hello world"
 
-
     def fit(self, state, config):
         state.training_message = "Training message"
 
@@ -32,11 +31,10 @@ if __name__ == "__main__":
     assembler.set_stages([HelloWorld(), Formatter()])
     assembler.init_assembler()
 
-
     # Run assembler before training
     assembler.run(data, RunMode.TRAIN)
     print("Text before training is '%s'" % data.text)
-    data.text = None    # Clear text to prevent validation raising error
+    data.text = None  # Clear text to prevent validation raising error
 
     # Run training mode
     assembler.run(data)

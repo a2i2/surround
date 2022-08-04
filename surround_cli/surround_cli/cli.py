@@ -14,6 +14,7 @@ from .visualise import cli as visualise_cli
 from .data.cli import cli as data_cli
 from .linter import Linter
 
+
 def process_directories(directories, project_dir, project_name):
     """
     Creates new directories in the project folder according to the list provided.
@@ -30,6 +31,7 @@ def process_directories(directories, project_dir, project_name):
         actual_directory = directory.format(project_name=project_name)
         os.makedirs(os.path.join(project_dir, actual_directory))
 
+
 def process_files(files, project_dir, project_name, project_description, require_web):
     """
     Create new files in the project directory, inserting the project name and description into their content.
@@ -45,17 +47,32 @@ def process_files(files, project_dir, project_name, project_description, require
     """
 
     for afile, content in files:
-        actual_file = afile.format(project_name=project_name, project_description=project_description)
-        actual_content = content.format(project_name=project_name, project_description=project_description, version=pkg_resources.get_distribution("surround").version)
+        actual_file = afile.format(
+            project_name=project_name, project_description=project_description
+        )
+        actual_content = content.format(
+            project_name=project_name,
+            project_description=project_description,
+            version=pkg_resources.get_distribution("surround").version,
+        )
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             f.write(actual_content)
 
+
 # pylint: disable=too-many-locals
-def process_templates(templates, folder, project_dir, project_name, project_description,
-                      author_name, author_email, require_web):
+def process_templates(
+    templates,
+    folder,
+    project_dir,
+    project_name,
+    project_description,
+    author_name,
+    author_email,
+    require_web,
+):
     """
     Creates files from templates into the project directory with the project name and description inserted.
 
@@ -78,7 +95,9 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
     """
 
     for afile, template, capitalize, web_component in templates:
-        actual_file = afile.format(project_name=project_name, project_description=project_description)
+        actual_file = afile.format(
+            project_name=project_name, project_description=project_description
+        )
         path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
         if not require_web and web_component:
@@ -87,17 +106,33 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
         with open(os.path.join(path, "templates", folder, template)) as f:
             contents = f.read()
             name = project_name.capitalize() if capitalize else project_name
-            actual_contents = contents.format(project_name=name, project_description=project_description,
-                                              author_name=author_name, author_email=author_email,
-                                              version=pkg_resources.get_distribution("surround").version)
+            actual_contents = contents.format(
+                project_name=name,
+                project_description=project_description,
+                author_name=author_name,
+                author_email=author_email,
+                version=pkg_resources.get_distribution("surround").version,
+            )
             if require_web and afile == "pyproject.toml":
-                actual_contents = actual_contents.replace("\n[build-system]", "tornado =\"6.1.0\"\n\n[build-system]")
+                actual_contents = actual_contents.replace(
+                    "\n[build-system]", 'tornado ="6.1.0"\n\n[build-system]'
+                )
 
             file_path = os.path.join(project_dir, actual_file)
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             f.write(actual_contents)
 
-def process(project_dir, project, project_name, project_description, author_name, author_email, require_web, folder):
+
+def process(
+    project_dir,
+    project,
+    project_name,
+    project_description,
+    author_name,
+    author_email,
+    require_web,
+    folder,
+):
     """
     Creates a new Surround project using the directory and template provided.
 
@@ -125,9 +160,21 @@ def process(project_dir, project, project_name, project_description, author_name
         return False
     os.makedirs(project_dir)
     process_directories(project["dirs"], project_dir, project_name)
-    process_files(project["files"], project_dir, project_name, project_description, require_web)
-    process_templates(project["templates"], folder, project_dir, project_name, project_description, author_name, author_email, require_web)
+    process_files(
+        project["files"], project_dir, project_name, project_description, require_web
+    )
+    process_templates(
+        project["templates"],
+        folder,
+        project_dir,
+        project_name,
+        project_description,
+        author_name,
+        author_email,
+        require_web,
+    )
     return True
+
 
 def is_valid_dir(aparser, arg):
     """
@@ -147,6 +194,7 @@ def is_valid_dir(aparser, arg):
         aparser.error("Can't write to %s" % arg)
     else:
         return arg
+
 
 def allowed_to_access_dir(path):
     """
@@ -168,6 +216,7 @@ def allowed_to_access_dir(path):
         return True
     return False
 
+
 def is_valid_name(aparser, arg):
     """
     Checks whether a name passed in arguments is valid for use in Surround.
@@ -185,6 +234,7 @@ def is_valid_name(aparser, arg):
     else:
         return arg
 
+
 def load_modules_from_path(path, module_name):
     """
     Import all modules from the given directory.
@@ -196,8 +246,8 @@ def load_modules_from_path(path, module_name):
     """
 
     # Check and fix the path
-    if path[-1:] != '/':
-        path += '/'
+    if path[-1:] != "/":
+        path += "/"
 
     # Get a list of files in the directory, if the directory exists
     if not os.path.exists(path):
@@ -213,7 +263,8 @@ def load_modules_from_path(path, module_name):
     modname = module_name
 
     # Import the module
-    __import__(modname, globals(), locals(), ['*'])
+    __import__(modname, globals(), locals(), ["*"])
+
 
 def load_class_from_name(modulename, classname):
     """
@@ -226,7 +277,7 @@ def load_class_from_name(modulename, classname):
     """
 
     # Import the module
-    __import__(modulename, globals(), locals(), ['*'])
+    __import__(modulename, globals(), locals(), ["*"])
 
     # Get the class
     cls = getattr(sys.modules[modulename], classname)
@@ -236,6 +287,7 @@ def load_class_from_name(modulename, classname):
         raise TypeError("%s is not a class" % classname)
 
     return cls
+
 
 def parse_lint_args(parser, args, extra_args):
     """
@@ -257,6 +309,7 @@ def parse_lint_args(parser, args, extra_args):
     else:
         print("error: .surround does not exist")
 
+
 def parse_run_args(parser, args, extra_args):
     """
     Executes the "run" sub-command which will run the surround pipeline
@@ -275,6 +328,7 @@ def parse_run_args(parser, args, extra_args):
         os.chdir(actual_current_dir)
     else:
         print("error: not a surround project")
+
 
 def run_locally(args, extra_args):
     """
@@ -295,29 +349,35 @@ def run_locally(args, extra_args):
     :type args: <class 'argparse.Namespace'>
     """
 
-    run_args = [sys.executable, '-m', 'doit']
+    run_args = [sys.executable, "-m", "doit"]
 
     if args.task:
         run_args.append(args.task)
 
         if extra_args:
             run_args.append("--args")
-            run_args.append(" ".join([arg if " " not in arg else "\"%s\"" % arg for arg in extra_args]))
+            run_args.append(
+                " ".join(
+                    [arg if " " not in arg else '"%s"' % arg for arg in extra_args]
+                )
+            )
     else:
         # No arguments provided, so list the tasks available
         print("Project tasks:")
-        run_args.append('list')
+        run_args.append("list")
 
     run_process = subprocess.Popen(run_args)
     run_process.wait()
 
+
 def parse_to_bool(bool_value):
-    valid = {'true': True, 't': True, '1': True, 'false': False, 'f': False, '0': False}
+    valid = {"true": True, "t": True, "1": True, "false": False, "f": False, "0": False}
 
     lower_value = bool_value.lower()
     if lower_value in valid:
         return valid[lower_value]
     raise ValueError('Failed parsing "%s" for boolean' % bool_value)
+
 
 # pylint: disable=too-many-branches
 def parse_init_args(parser, args, extra_args):
@@ -335,8 +395,13 @@ def parse_init_args(parser, args, extra_args):
         else:
             while True:
                 project_name = input("Name of project: ")
-                if not re.match("^[A-Za-z_]*$", project_name) or not project_name.islower():
-                    print("error: project name requires lowercase letters and underscores only")
+                if (
+                    not re.match("^[A-Za-z_]*$", project_name)
+                    or not project_name.islower()
+                ):
+                    print(
+                        "error: project name requires lowercase letters and underscores only"
+                    )
                 else:
                     break
 
@@ -372,12 +437,25 @@ def parse_init_args(parser, args, extra_args):
                     break
 
         new_dir = os.path.join(args.path, project_name)
-        if process(new_dir, PROJECTS["new"], project_name, project_description, author_name, author_email, require_web, "new"):
-            print("info: project created at %s" % os.path.join(os.path.abspath(args.path), project_name))
+        if process(
+            new_dir,
+            PROJECTS["new"],
+            project_name,
+            project_description,
+            author_name,
+            author_email,
+            require_web,
+            "new",
+        ):
+            print(
+                "info: project created at %s"
+                % os.path.join(os.path.abspath(args.path), project_name)
+            )
         else:
             print("error: directory %s already exists" % new_dir)
     else:
         print("error: permission denied")
+
 
 def print_version():
     """
@@ -385,6 +463,7 @@ def print_version():
     """
 
     print("Surround v" + pkg_resources.get_distribution("surround").version)
+
 
 def execute_cli():
     """
@@ -403,32 +482,82 @@ def execute_cli():
     - split - splits a directory/file into test/train/validate sets
     """
 
-    parser = argparse.ArgumentParser(prog='surround', description="The Surround Command Line Interface")
-    parser.add_argument('-v', '--version', action='store_true', help="Show the current version of Surround")
+    parser = argparse.ArgumentParser(
+        prog="surround", description="The Surround Command Line Interface"
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="store_true",
+        help="Show the current version of Surround",
+    )
 
-    sub_parser = parser.add_subparsers(description="Surround must be called with one of the following commands")
+    sub_parser = parser.add_subparsers(
+        description="Surround must be called with one of the following commands"
+    )
 
-    init_parser = sub_parser.add_parser('init', help="Initialise a new Surround project")
-    init_parser.add_argument('path', help="Path for creating a Surround project", nargs='?', default="./")
-    init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
-    init_parser.add_argument('-d', '--description', help="A description for the project")
-    init_parser.add_argument('-n', '--author-name', help="A name of the author")
-    init_parser.add_argument('-e', '--author-email', help="An email of the author")
-    init_parser.add_argument('-w', '--require-web', help="Is web service required for the project")
+    init_parser = sub_parser.add_parser(
+        "init", help="Initialise a new Surround project"
+    )
+    init_parser.add_argument(
+        "path", help="Path for creating a Surround project", nargs="?", default="./"
+    )
+    init_parser.add_argument(
+        "-p",
+        "--project-name",
+        help="Name of the project",
+        type=lambda x: is_valid_name(parser, x),
+    )
+    init_parser.add_argument(
+        "-d", "--description", help="A description for the project"
+    )
+    init_parser.add_argument("-n", "--author-name", help="A name of the author")
+    init_parser.add_argument("-e", "--author-email", help="An email of the author")
+    init_parser.add_argument(
+        "-w", "--require-web", help="Is web service required for the project"
+    )
 
-    run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")
-    run_parser.add_argument('task', help="Task defined in dodo.py file of your project", nargs='?')
+    run_parser = sub_parser.add_parser(
+        "run",
+        help="Run a Surround project task, witout an argument all tasks will be shown",
+    )
+    run_parser.add_argument(
+        "task", help="Task defined in dodo.py file of your project", nargs="?"
+    )
 
-    linter_parser = sub_parser.add_parser('lint', help="Run the Surround linter")
+    linter_parser = sub_parser.add_parser("lint", help="Run the Surround linter")
     linter_group = linter_parser.add_mutually_exclusive_group(required=False)
-    linter_group.add_argument('-l', '--list', help="List all Surround checkers", action='store_true')
-    linter_group.add_argument('path', type=lambda x: is_valid_dir(parser, x), help="Path for running the Surround linter", nargs='?', default="./")
+    linter_group.add_argument(
+        "-l", "--list", help="List all Surround checkers", action="store_true"
+    )
+    linter_group.add_argument(
+        "path",
+        type=lambda x: is_valid_dir(parser, x),
+        help="Path for running the Surround linter",
+        nargs="?",
+        default="./",
+    )
 
     remote_parser = remote_cli.add_store_parser(sub_parser)
 
-    split_parser = sub_parser.add_parser('split', parents=[split_cli.get_split_parser()], add_help=False, help="Split data into train/test/validate sets")
-    visualise_parser = sub_parser.add_parser('viz', parents=[visualise_cli.get_visualise_parser()], add_help=False, help="Visualise results of a pipeline")
-    data_parser = sub_parser.add_parser('data', parents=[data_cli.get_data_parser()], help="Surround Data Container Tool", add_help=False)
+    split_parser = sub_parser.add_parser(
+        "split",
+        parents=[split_cli.get_split_parser()],
+        add_help=False,
+        help="Split data into train/test/validate sets",
+    )
+    visualise_parser = sub_parser.add_parser(
+        "viz",
+        parents=[visualise_cli.get_visualise_parser()],
+        add_help=False,
+        help="Visualise results of a pipeline",
+    )
+    data_parser = sub_parser.add_parser(
+        "data",
+        parents=[data_cli.get_data_parser()],
+        help="Surround Data Container Tool",
+        add_help=False,
+    )
 
     # Check for valid sub commands as 'add_subparsers' in Python < 3.7
     # is missing the 'required' keyword
@@ -441,13 +570,13 @@ def execute_cli():
         "store": (remote_parser, remote_cli.parse_store_args),
         "split": (split_parser, split_cli.execute_split_tool),
         "viz": (visualise_parser, visualise_cli.execute_visualise_tool),
-        "data": (data_parser, data_cli.execute_data_tool)
+        "data": (data_parser, data_cli.execute_data_tool),
     }
 
     try:
-        if len(sys.argv) == 1 or sys.argv[1] in ['-h', '--help']:
+        if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help"]:
             parser.print_help()
-        elif sys.argv[1] in ['-v', '--version']:
+        elif sys.argv[1] in ["-v", "--version"]:
             print_version()
         elif len(sys.argv) < 2 or not sys.argv[1] in tools:
             print("Invalid subcommand, must be one of %s" % tools)
@@ -463,6 +592,7 @@ def execute_cli():
 
     return parser
 
+
 def main():
     """
     Entry-point for the Surround Command Line Interface (CLI).
@@ -470,6 +600,7 @@ def main():
     """
 
     execute_cli()
+
 
 if __name__ == "__main__":
     main()

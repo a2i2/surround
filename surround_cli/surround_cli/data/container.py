@@ -3,10 +3,12 @@ import zipfile
 from .metadata import Metadata
 from .util import hash_zip
 
+
 class MetadataNotFoundError(Exception):
     """
     Thrown when no metadata was found in the data container loaded
     """
+
 
 class DataContainer:
     """
@@ -19,7 +21,7 @@ class DataContainer:
     - Extract files
     """
 
-    def __init__(self, path=None, metadata_version='v0.1'):
+    def __init__(self, path=None, metadata_version="v0.1"):
         """
         :param path: path for container to load (default: None)
         :type path: str
@@ -46,12 +48,12 @@ class DataContainer:
         self.path = path
 
         # Open the zip file and get all the contents
-        with zipfile.ZipFile(path, 'r', compression=zipfile.ZIP_DEFLATED) as container:
+        with zipfile.ZipFile(path, "r", compression=zipfile.ZIP_DEFLATED) as container:
             self.__loaded_files = container.namelist()
 
         # If we have metadata, get the information, otherwise throw an exception
-        if self.file_exists('manifest.yaml'):
-            self.metadata.load_from_data(self.extract_file_bytes('manifest.yaml'))
+        if self.file_exists("manifest.yaml"):
+            self.metadata.load_from_data(self.extract_file_bytes("manifest.yaml"))
         else:
             self.__loaded_files = []
             raise MetadataNotFoundError
@@ -69,12 +71,18 @@ class DataContainer:
         self.__loaded_files.clear()
 
         # Import all the files waiting
-        with zipfile.ZipFile(self.path, 'w', compression=zipfile.ZIP_DEFLATED) as container:
+        with zipfile.ZipFile(
+            self.path, "w", compression=zipfile.ZIP_DEFLATED
+        ) as container:
             for path, internal_path, data in self.__imported_files:
                 if path:
-                    container.write(path, internal_path, compress_type=zipfile.ZIP_DEFLATED)
+                    container.write(
+                        path, internal_path, compress_type=zipfile.ZIP_DEFLATED
+                    )
                 elif data:
-                    container.writestr(internal_path, data, compress_type=zipfile.ZIP_DEFLATED)
+                    container.writestr(
+                        internal_path, data, compress_type=zipfile.ZIP_DEFLATED
+                    )
 
                 self.__loaded_files.append(internal_path)
 
@@ -83,13 +91,13 @@ class DataContainer:
         # Hash the zip file without the metadata
         container_hash = hash_zip(self.path)
 
-        with zipfile.ZipFile(self.path, 'a') as container:
+        with zipfile.ZipFile(self.path, "a") as container:
             # Set the identifier field to the calculated hash
             self.metadata.set_property("summary.identifier", container_hash)
 
             # Write the metadata yaml file to the container
             metadata = self.metadata.save_to_data()
-            container.writestr('manifest.yaml', metadata)
+            container.writestr("manifest.yaml", metadata)
 
     def import_files(self, files, generate_metadata=True):
         """
@@ -130,7 +138,9 @@ class DataContainer:
                 internal_path = os.path.relpath(filepath, start=path)
 
                 # If requested, don't reimport already imported files
-                if not reimport and any([f[0] == filepath for f in self.__imported_files]):
+                if not reimport and any(
+                    [f[0] == filepath for f in self.__imported_files]
+                ):
                     continue
 
                 self.import_file(filepath, internal_path, False)
@@ -152,7 +162,9 @@ class DataContainer:
             self.metadata.generate_from_file(import_path)
 
         # Add them to a queue for the next export call
-        self.__imported_files.append((import_path, internal_path.replace('\\', '/'), None))
+        self.__imported_files.append(
+            (import_path, internal_path.replace("\\", "/"), None)
+        )
 
     def import_data(self, data, internal_path, generate_metadata=True):
         if generate_metadata:
@@ -160,7 +172,7 @@ class DataContainer:
             self.metadata.generate_from_file(internal_path)
 
         # Add the data to a queue for the next export call
-        self.__imported_files.append((None, internal_path.replace('\\', '/'), data))
+        self.__imported_files.append((None, internal_path.replace("\\", "/"), data))
 
     def extract_file_bytes(self, path):
         """
@@ -226,7 +238,7 @@ class DataContainer:
         """
 
         if self.path:
-            with zipfile.ZipFile(self.path, 'r') as container:
+            with zipfile.ZipFile(self.path, "r") as container:
                 container.extractall(extract_to)
                 return True
         else:

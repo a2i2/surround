@@ -6,13 +6,14 @@ import zipfile
 
 # Format to Type mapping via regular expression
 TYPE_FORMAT_MAPPING = {
-    'Text': ['text/.*', 'application/pdf'],
-    'StillImage': ['image/.*', 'application/pdf'],
-    'MovingImage': ['video/.*'],
-    'Dataset': ['application/vnd.ms-excel', 'application/json', 'text/csv'],
-    'Sound': ['audio/.*'],
-    'Collection': ['application/x-zip-compressed']
+    "Text": ["text/.*", "application/pdf"],
+    "StillImage": ["image/.*", "application/pdf"],
+    "MovingImage": ["video/.*"],
+    "Dataset": ["application/vnd.ms-excel", "application/json", "text/csv"],
+    "Sound": ["audio/.*"],
+    "Collection": ["application/x-zip-compressed"],
 }
+
 
 def get_formats_from_directory(directory):
     results = []
@@ -24,10 +25,14 @@ def get_formats_from_directory(directory):
 
     return results
 
+
 def get_formats_from_files(files):
-    formats = [t for t in [mimetypes.guess_type(name)[0] for name in files] if t is not None]
+    formats = [
+        t for t in [mimetypes.guess_type(name)[0] for name in files] if t is not None
+    ]
     formats = list(dict.fromkeys(formats))
     return formats
+
 
 def get_types_from_formats(formats):
     types = []
@@ -40,7 +45,16 @@ def get_types_from_formats(formats):
 
     return types
 
-def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, please try again!', validator=None, default=None, help_msg=None):
+
+def prompt(
+    question,
+    required=True,
+    answer_type=str,
+    error_msg="Invalid answer, please try again!",
+    validator=None,
+    default=None,
+    help_msg=None,
+):
     if required and default:
         required = False
 
@@ -48,7 +62,7 @@ def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, 
         answer = input(question)
 
         if answer == "" and required:
-            print('This field is required!\n')
+            print("This field is required!\n")
             continue
 
         if answer == "" and not required:
@@ -56,34 +70,35 @@ def prompt(question, required=True, answer_type=str, error_msg='Invalid answer, 
             return default
 
         if answer == "?" and help_msg:
-            print(help_msg, '\n')
+            print(help_msg, "\n")
             continue
 
         if answer_type != bool:
             try:
                 answer = answer_type(answer)
             except ValueError:
-                print(error_msg, '\n')
+                print(error_msg, "\n")
                 continue
         else:
-            if 'y' in answer.lower() or 'n' in answer.lower():
-                return answer.lower() == 'y'
+            if "y" in answer.lower() or "n" in answer.lower():
+                return answer.lower() == "y"
 
-            print(error_msg, '\n')
+            print(error_msg, "\n")
             continue
 
         if validator and not validator(answer):
-            print(error_msg, '\n')
+            print(error_msg, "\n")
             continue
 
         print()
         return answer
 
+
 def hash_file(path):
     sha1 = hashlib.sha1()
     block_size = 256 * 1024 * 1024
 
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         while True:
             data = f.read(block_size)
             if not data:
@@ -91,6 +106,7 @@ def hash_file(path):
             sha1.update(data)
 
     return sha1.hexdigest()
+
 
 def hash_zip(path, skip_files=None):
     sha1 = hashlib.sha1()
@@ -111,6 +127,7 @@ def hash_zip(path, skip_files=None):
                     sha1.update(data)
 
     return sha1.hexdigest()
+
 
 def split_unique(pattern, data, strip=False):
     return list({d.strip() if strip else d for d in re.split(pattern, data)})

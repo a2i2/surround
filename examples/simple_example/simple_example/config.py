@@ -5,6 +5,7 @@ Defines the configuration schema for the project.
 from dataclasses import dataclass
 from surround import BaseConfig, config
 
+
 @config(name="config")
 @dataclass
 class Config(BaseConfig):

@@ -5,6 +5,7 @@ from surround import Stage, Estimator, State, Assembler, load_config
 hello_file_path = "/HelloOutput.txt"
 world_file_path = "/WorldOutput.txt"
 
+
 class WriteHello(Stage):
     def __init__(self, dir_path):
         self.dir_path = dir_path
@@ -40,6 +41,7 @@ class InputValidator(Stage):
     def operate(self, state, config):
         if state.text:
             raise ValueError("'text' is not None")
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

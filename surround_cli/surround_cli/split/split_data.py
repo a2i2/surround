@@ -48,12 +48,20 @@ def split_file(filepath, train, test, validate, no_validate, no_shuffle, no_head
         test_count = int(len(values) * test / 100 + 0.5)
 
     # Create paths to train/test/validate sets
-    train_path = os.path.join(os.path.dirname(os.path.abspath(filepath)), "train", os.path.basename(filepath))
-    test_path = os.path.join(os.path.dirname(os.path.abspath(filepath)), "test", os.path.basename(filepath))
+    train_path = os.path.join(
+        os.path.dirname(os.path.abspath(filepath)), "train", os.path.basename(filepath)
+    )
+    test_path = os.path.join(
+        os.path.dirname(os.path.abspath(filepath)), "test", os.path.basename(filepath)
+    )
 
     if not no_validate:
         validate_count = len(values) - train_count - test_count
-        validate_path = os.path.join(os.path.dirname(os.path.abspath(filepath)), "validate", os.path.basename(filepath))
+        validate_path = os.path.join(
+            os.path.dirname(os.path.abspath(filepath)),
+            "validate",
+            os.path.basename(filepath),
+        )
         os.mkdir(os.path.dirname(validate_path))
 
     # Make their dirs
@@ -78,6 +86,7 @@ def split_file(filepath, train, test, validate, no_validate, no_shuffle, no_head
         values = process_data(validate_count, values, validate_path)
         print("Validate count: %d" % validate_count)
 
+
 def undo_split_file(filepath, no_header):
     """
     Undo splitting of CSV file.
@@ -93,7 +102,9 @@ def undo_split_file(filepath, no_header):
     name = os.path.basename(filepath)
     train_path = os.path.join(os.path.dirname(os.path.abspath(filepath)), "train", name)
     test_path = os.path.join(os.path.dirname(os.path.abspath(filepath)), "test", name)
-    validate_path = os.path.join(os.path.dirname(os.path.abspath(filepath)), "validate", name)
+    validate_path = os.path.join(
+        os.path.dirname(os.path.abspath(filepath)), "validate", name
+    )
 
     with open(train_path) as f:
         train_frame = f.readlines()
@@ -142,6 +153,7 @@ def undo_split_file(filepath, no_header):
 
     print("Record count: %d" % len(original))
 
+
 def prepare_folder(directory, file_extension):
     """
     Generates a files list and train/test/validate paths for the specified directory.
@@ -167,8 +179,11 @@ def prepare_folder(directory, file_extension):
 
     return files, test_dir, train_dir, validate_dir
 
+
 # pylint: disable=too-many-locals
-def split_directory(directory, file_extension, train, test, validate, no_validate, no_shuffle):
+def split_directory(
+    directory, file_extension, train, test, validate, no_validate, no_shuffle
+):
     """
     Splits a directory of files (of a certain extension) into 2-3 separate sets (test/train/validate).
 
@@ -227,6 +242,7 @@ def split_directory(directory, file_extension, train, test, validate, no_validat
     if not no_validate:
         print("Validate count: %d" % validate_count)
 
+
 def undo_split_directory(directory, file_extension):
     """
     Undo splitting of a directory into 2-3 different sets. Restores directory back to
@@ -238,7 +254,9 @@ def undo_split_directory(directory, file_extension):
     :type file_extension: str
     """
 
-    if not os.path.isdir(os.path.join(directory, "test")) or not os.path.isdir(os.path.join(directory, "train")):
+    if not os.path.isdir(os.path.join(directory, "test")) or not os.path.isdir(
+        os.path.join(directory, "train")
+    ):
         print("test, train or validate folders missing from %s" % directory)
         return
 

@@ -11,22 +11,19 @@ from ..util import get_types_from_formats, prompt, split_unique
 
 # Dictionary of language options (display_name, language_code)
 language_options = [
-    ('English', 'en'),
-    ('Spanish', 'es'),
-    ('French', 'fr'),
-    ('Chinese', 'zh'),
-    ('Japanese', 'ja'),
-    ('Italian', 'it'),
-    ('Language not relevant', 'N/A'),
-    ('Other (ISO 639-1)', '')
+    ("English", "en"),
+    ("Spanish", "es"),
+    ("French", "fr"),
+    ("Chinese", "zh"),
+    ("Japanese", "ja"),
+    ("Italian", "it"),
+    ("Language not relevant", "N/A"),
+    ("Other (ISO 639-1)", ""),
 ]
 
 # List of options used when asking for rights
-rights_options = [
-    'Confidential',
-    'Open',
-    'Defence'
-]
+rights_options = ["Confidential", "Open", "Defence"]
+
 
 def is_valid_file(parser, x):
     """
@@ -45,6 +42,7 @@ def is_valid_file(parser, x):
         return False
 
     return x
+
 
 def is_valid_dir(parser, x):
     """
@@ -68,6 +66,7 @@ def is_valid_dir(parser, x):
 
     return x
 
+
 def is_valid_output_file(parser, x):
     """
     Checks argument from parser is a valid output file path (*.data.zip)
@@ -81,19 +80,20 @@ def is_valid_output_file(parser, x):
     """
 
     if os.path.isdir(x):
-        parser.error('The output argument must be a file path!')
+        parser.error("The output argument must be a file path!")
         return False
 
     if os.path.exists(x):
-        parser.error('The output file already exists!')
+        parser.error("The output file already exists!")
         return False
 
     split_path = os.path.splitext(x)
     if ".data" not in split_path[0] or split_path[1] != ".zip":
-        parser.error('The output file must have the extension .data.zip')
+        parser.error("The output file must have the extension .data.zip")
         return False
 
     return x
+
 
 def is_valid_json_output(parser, x):
     """
@@ -108,10 +108,11 @@ def is_valid_json_output(parser, x):
     """
 
     if not os.path.exists(os.path.dirname(os.path.abspath(x))):
-        parser.error('Cannot export the metadata to that path!')
+        parser.error("Cannot export the metadata to that path!")
         return False
 
     return x
+
 
 def get_data_create_parser():
     """
@@ -121,17 +122,45 @@ def get_data_create_parser():
     :rtype: :class:`argparse.ArgumentParser`
     """
 
-    parser = argparse.ArgumentParser(description='Create a data container from a file or directory', add_help=False)
+    parser = argparse.ArgumentParser(
+        description="Create a data container from a file or directory", add_help=False
+    )
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-f', '--file', type=lambda x: is_valid_file(parser, x), help="Path to file to import into container")
-    group.add_argument('-d', '--directory', type=lambda x: is_valid_dir(parser, x), help="Path to directory to import into container")
-    group.add_argument('-m', '--metadata-only', action='store_true', help="Generate metadata without a file system")
+    group.add_argument(
+        "-f",
+        "--file",
+        type=lambda x: is_valid_file(parser, x),
+        help="Path to file to import into container",
+    )
+    group.add_argument(
+        "-d",
+        "--directory",
+        type=lambda x: is_valid_dir(parser, x),
+        help="Path to directory to import into container",
+    )
+    group.add_argument(
+        "-m",
+        "--metadata-only",
+        action="store_true",
+        help="Generate metadata without a file system",
+    )
 
-    parser.add_argument('-o', '--output', type=lambda x: is_valid_output_file(parser, x), help="Path to file to export container to (default: specified-path.data.zip)")
-    parser.add_argument('-e', '--export-metadata', type=lambda x: is_valid_json_output(parser, x), help="Path to JSON file to export metadata to")
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=lambda x: is_valid_output_file(parser, x),
+        help="Path to file to export container to (default: specified-path.data.zip)",
+    )
+    parser.add_argument(
+        "-e",
+        "--export-metadata",
+        type=lambda x: is_valid_json_output(parser, x),
+        help="Path to JSON file to export metadata to",
+    )
 
     return parser
+
 
 def validate_language_code(language_code):
     """
@@ -143,9 +172,10 @@ def validate_language_code(language_code):
     :rtype: bool
     """
 
-    return re.match('[a-z]{2}', language_code)
+    return re.match("[a-z]{2}", language_code)
 
-def prompt_language(default='en'):
+
+def prompt_language(default="en"):
     """
     Prompts the user on which language is most relevant to the data.
     Will return the default if the user skips the question.
@@ -156,28 +186,41 @@ def prompt_language(default='en'):
     :rtype: str
     """
 
-    default_lang = next((i + 1 for i, l in enumerate(language_options) if l[1] == default), 1)
+    default_lang = next(
+        (i + 1 for i, l in enumerate(language_options) if l[1] == default), 1
+    )
 
     print("Language codes:")
     for i, option in enumerate(language_options):
-        print("%i. %s (%s) %s" % (i + 1, option[0], option[1] if option[1] != '' else 'N/A', ("[DEFAULT]" if i + 1 == default_lang else "")))
+        print(
+            "%i. %s (%s) %s"
+            % (
+                i + 1,
+                option[0],
+                option[1] if option[1] != "" else "N/A",
+                ("[DEFAULT]" if i + 1 == default_lang else ""),
+            )
+        )
 
     language = prompt(
         "Select the langauge most relevant to the data: ",
         help_msg="Select the language code most relevant to the contents, or select not relevant.",
         validator=lambda x: 0 < x <= len(language_options),
         answer_type=int,
-        default=default_lang)
+        default=default_lang,
+    )
 
-    if 'Other' in language_options[language - 1][0]:
+    if "Other" in language_options[language - 1][0]:
         language = prompt(
             "Enter a language code following the ISO-639-1 standard: ",
             help_msg="Enter the ISO-639-1 representation of the language the data is in.",
-            validator=validate_language_code)
+            validator=validate_language_code,
+        )
     else:
         language = language_options[language - 1][1]
 
     return language
+
 
 def get_summary_metadata_from_user(metadata):
     """
@@ -192,29 +235,36 @@ def get_summary_metadata_from_user(metadata):
 
     name = prompt(
         "What is your name: ",
-        validator=lambda x: re.match('[A-Za-z]+', x),
+        validator=lambda x: re.match("[A-Za-z]+", x),
         error_msg="Must contain letters only!",
-        help_msg="Enter your full name, so you can be tracked down later if needed.")
+        help_msg="Enter your full name, so you can be tracked down later if needed.",
+    )
 
     title = prompt(
         "Give this data a short title: ",
-        help_msg="Enter a short title that describes this data as a whole, e.g. Face Dataset")
+        help_msg="Enter a short title that describes this data as a whole, e.g. Face Dataset",
+    )
 
     description = prompt(
         "Provide a brief description of this data: ",
-        help_msg="Enter a brief description of this data that describes it's contents and what it is used for.")
+        help_msg="Enter a brief description of this data that describes it's contents and what it is used for.",
+    )
 
     publisher = prompt(
         "What organisation is behind the creation of this data: ",
-        help_msg="Enter the name of the organisation that created this data, so they can be tracked down later.")
+        help_msg="Enter the name of the organisation that created this data, so they can be tracked down later.",
+    )
 
     contributor = prompt(
         "What is the name of the individual who sent you this data: ",
-        validator=lambda x: re.match('[A-Za-z]+', x),
-        error_msg='Must contain letters only!',
-        help_msg="Enter the full name of the person who sent you this data, so they can be tracked down later.")
+        validator=lambda x: re.match("[A-Za-z]+", x),
+        error_msg="Must contain letters only!",
+        help_msg="Enter the full name of the person who sent you this data, so they can be tracked down later.",
+    )
 
-    print("When did they send you this data? Hit [ENTER] to use the current date & time.")
+    print(
+        "When did they send you this data? Hit [ENTER] to use the current date & time."
+    )
     print("Date formatting (ISO 8601): YYYY-MM-DDThh:mm")
 
     date_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}"
@@ -226,12 +276,14 @@ def get_summary_metadata_from_user(metadata):
         help_msg="Enter the date & time you received this data, in the ISO format (YYYY-MM-DDThh:mm) - 24 hour time.",
         validator=lambda x: re.match(date_pattern, x),
         required=False,
-        default=current_date)
+        default=current_date,
+    )
 
     subject = prompt(
         "List meaningful keywords related to this data (comma separated): ",
-        help_msg="Enter a comma separated list of keywords that relate to the data, for example: faces, recognition, dogs, cats")
-    subject = split_unique(',| ,', subject, strip=True)
+        help_msg="Enter a comma separated list of keywords that relate to the data, for example: faces, recognition, dogs, cats",
+    )
+    subject = split_unique(",| ,", subject, strip=True)
 
     language = prompt_language()
 
@@ -243,26 +295,29 @@ def get_summary_metadata_from_user(metadata):
         help_msg="Enter the number corresponding to the right that best fits what you are allowed to do with the data.",
         validator=lambda x: 0 < x < 5,
         answer_type=int,
-        default=1)
+        default=1,
+    )
     rights = rights_options[rights - 1]
 
     under_ethics = prompt(
         "Is this data under any type of ethics (y/n): ",
         help_msg="Is this data under any ethical rules that make this data sensitive or impose any type of restrictions?",
-        answer_type=bool)
+        answer_type=bool,
+    )
 
-    metadata.set_property('summary.creator', name)
-    metadata.set_property('summary.title', title)
-    metadata.set_property('summary.date', date)
-    metadata.set_property('summary.description', description)
-    metadata.set_property('summary.publisher', publisher)
-    metadata.set_property('summary.contributor', contributor)
-    metadata.set_property('summary.subject', subject)
-    metadata.set_property('summary.language', language)
-    metadata.set_property('summary.rights', rights)
-    metadata.set_property('summary.under-ethics', under_ethics)
+    metadata.set_property("summary.creator", name)
+    metadata.set_property("summary.title", title)
+    metadata.set_property("summary.date", date)
+    metadata.set_property("summary.description", description)
+    metadata.set_property("summary.publisher", publisher)
+    metadata.set_property("summary.contributor", contributor)
+    metadata.set_property("summary.subject", subject)
+    metadata.set_property("summary.language", language)
+    metadata.set_property("summary.rights", rights)
+    metadata.set_property("summary.under-ethics", under_ethics)
 
     print("Summary metadata collection done!\n")
+
 
 def get_metadata_for_group(manifest, default_lang, group_number, group_count):
     """
@@ -279,18 +334,23 @@ def get_metadata_for_group(manifest, default_lang, group_number, group_count):
     :type group_count: int
     """
 
-    print("============[Creating individual metadata (%i/%i)]============" % (group_number, group_count))
-    print("Create metadata for group: %s\n" % manifest['path'])
+    print(
+        "============[Creating individual metadata (%i/%i)]============"
+        % (group_number, group_count)
+    )
+    print("Create metadata for group: %s\n" % manifest["path"])
 
     # Get answers from the user
     description = prompt(
         "Provide a breif description of this group: ",
-        help_msg="Enter a breif description of this data that describes its contents and what it is used for.")
+        help_msg="Enter a breif description of this data that describes its contents and what it is used for.",
+    )
     language = prompt_language(default_lang)
 
     # Set the manual fields to the manifest
-    manifest['description'] = description
-    manifest['language'] = language
+    manifest["description"] = description
+    manifest["language"] = language
+
 
 def attempt_detect_sequences(metadata, root_files):
     """
@@ -324,7 +384,8 @@ def attempt_detect_sequences(metadata, root_files):
         name = prompt(
             "Enter a name if you would like to group them (or hit [ENTER] to skip): ",
             help_msg="Enter a name for the collection of files, the files will then be put in a folder of this name in the container.",
-            required=False)
+            required=False,
+        )
 
         if name:
             # Create a manifest for the group in the metadata
@@ -332,6 +393,7 @@ def attempt_detect_sequences(metadata, root_files):
             return (name, group)
 
     return None
+
 
 def attempt_detect_large_count(metadata, root_files):
     """
@@ -352,7 +414,9 @@ def attempt_detect_large_count(metadata, root_files):
     for extension in unique_extensions:
         group = [f for f in root_files if os.path.splitext(f)[1] == extension]
         if len(group) > 4:
-            print("Possible group with %i files detected (via extensions)!" % len(group))
+            print(
+                "Possible group with %i files detected (via extensions)!" % len(group)
+            )
             print("Here are the first few detected:")
             for name in group[:5]:
                 print(name)
@@ -361,7 +425,8 @@ def attempt_detect_large_count(metadata, root_files):
             name = prompt(
                 "Enter a name if you would like to group them (or hit [ENTER] to skip): ",
                 help_msg="Enter a name for the collection of files, the files will then be put in a folder of this name in the container.",
-                required=False)
+                required=False,
+            )
 
             if name:
                 # Create a manifest for this group
@@ -369,6 +434,7 @@ def attempt_detect_large_count(metadata, root_files):
                 groups.append((name, group))
 
     return groups
+
 
 def create_custom_groups(metadata, directory, existing_groups):
     """
@@ -389,30 +455,44 @@ def create_custom_groups(metadata, directory, existing_groups):
     print("============[Creating custom groups]================")
     groups = []
     while True:
-        pattern = prompt("Would you like to group files in the root by a regex pattern? If so enter one or press enter to skip: ", required=False)
+        pattern = prompt(
+            "Would you like to group files in the root by a regex pattern? If so enter one or press enter to skip: ",
+            required=False,
+        )
 
         if pattern:
-            files = [os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f)) and re.match(pattern, f)]
+            files = [
+                os.path.join(directory, f)
+                for f in os.listdir(directory)
+                if os.path.isfile(os.path.join(directory, f)) and re.match(pattern, f)
+            ]
 
             if files:
                 # Check if the files in this group aren't already in another, if so skip
                 file_set = set(files)
-                if any([bool(file_set & set(f)) for _, f in groups]) or any([bool(file_set & set(f)) for _, f in existing_groups]):
-                    print("This pattern matches with files in another group! Try again.\n")
+                if any([bool(file_set & set(f)) for _, f in groups]) or any(
+                    [bool(file_set & set(f)) for _, f in existing_groups]
+                ):
+                    print(
+                        "This pattern matches with files in another group! Try again.\n"
+                    )
                     continue
 
                 print("Found %i files that follow this pattern!" % len(files))
                 print("Here are the first few found:")
                 for f in files[:5]:
                     print(os.path.basename(f))
-                print('...')
+                print("...")
 
                 name = prompt(
                     "\nEnter a name for this group (or press enter to skip this group): ",
                     help_msg="Enter a name for the collection of files, the files will then be put in a folder of this name in the container.",
                     required=False,
-                    validator=lambda x: not any([m['path'] == x for m in metadata['manifests']]),
-                    error_msg='This name is already taken! Please try again.')
+                    validator=lambda x: not any(
+                        [m["path"] == x for m in metadata["manifests"]]
+                    ),
+                    error_msg="This name is already taken! Please try again.",
+                )
 
                 if name:
                     # Create a manifest in the metadata for this group
@@ -429,6 +509,7 @@ def create_custom_groups(metadata, directory, existing_groups):
         break
 
     return groups
+
 
 def get_metadata_for_groups(metadata, directory):
     """
@@ -448,7 +529,11 @@ def get_metadata_for_groups(metadata, directory):
     """
 
     print("================[Attempting to auto-detect groups]===================")
-    root_files = [os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    root_files = [
+        os.path.join(directory, f)
+        for f in os.listdir(directory)
+        if os.path.isfile(os.path.join(directory, f))
+    ]
 
     # Attempt to detect large numbers of the same extensions
     groups = attempt_detect_large_count(metadata, root_files)
@@ -463,11 +548,17 @@ def get_metadata_for_groups(metadata, directory):
     groups.extend(create_custom_groups(metadata, directory, groups))
 
     # Fill in metadata for folders & groups in the directory
-    if metadata.get_property('manifests'):
-        for i, manifest in enumerate(metadata['manifests']):
-            get_metadata_for_group(manifest, metadata['summary']['language'], i + 1, len(metadata['manifests']))
+    if metadata.get_property("manifests"):
+        for i, manifest in enumerate(metadata["manifests"]):
+            get_metadata_for_group(
+                manifest,
+                metadata["summary"]["language"],
+                i + 1,
+                len(metadata["manifests"]),
+            )
 
     return groups
+
 
 def generate_metadata_from_data(args):
     """
@@ -496,6 +587,7 @@ def generate_metadata_from_data(args):
 
     return metadata, groups
 
+
 def is_valid_mime_type(mime_type):
     """
     Checks if mime type given is valid
@@ -506,8 +598,14 @@ def is_valid_mime_type(mime_type):
     :rtype: bool
     """
 
-    types = re.split(',| ,', mime_type)
-    return all([re.match(r'^.+/.+$', m) and m.strip() in mimetypes.types_map.values() for m in types])
+    types = re.split(",| ,", mime_type)
+    return all(
+        [
+            re.match(r"^.+/.+$", m) and m.strip() in mimetypes.types_map.values()
+            for m in types
+        ]
+    )
+
 
 def generate_metadata():
     """
@@ -528,13 +626,15 @@ def generate_metadata():
     formats = prompt(
         "What data formats make up the data? (MIME type e.g. text/plain)\nAnswer (comma separated): ",
         help_msg="Enter a comma separated list of MIME types that this data contains, e.g. text/plain, image/png",
-        validator=is_valid_mime_type)
+        validator=is_valid_mime_type,
+    )
     groups = prompt(
         "What groups (folders, collections) are in the data?\nAnswer (comma separated): ",
         help_msg="Enter a comma separated list of group names that this data contains, e.g. image, documents",
-        required=False)
+        required=False,
+    )
 
-    formats = [f.strip() for f in re.split(',| ,', formats)]
+    formats = [f.strip() for f in re.split(",| ,", formats)]
     types = get_types_from_formats(formats)
 
     # Set the formats and types to the summary metadata
@@ -543,32 +643,36 @@ def generate_metadata():
     metadata.set_property("summary.identifier", str(uuid.uuid4()))
 
     if groups:
-        groups = [g.strip() for g in re.split(',| ,', groups)]
-        metadata.set_property('manifests', [])
+        groups = [g.strip() for g in re.split(",| ,", groups)]
+        metadata.set_property("manifests", [])
 
         # Get all the metadata for each group
         for i, group in enumerate(groups):
             user_fields = {
-                'description': None,
-                'language': None,
+                "description": None,
+                "language": None,
             }
 
             # Get the description and language from the user
-            get_metadata_for_group(user_fields, metadata['summary']['language'], i + 1, len(groups))
+            get_metadata_for_group(
+                user_fields, metadata["summary"]["language"], i + 1, len(groups)
+            )
 
             # Get the formats from the user
             formats = prompt(
                 "What data formats make up the group? (MIME type e.g. text/plain)\nAnswer (comma separated): ",
                 help_msg="Enter a comma separated list of MIME types that this container will have. E.g. text/plain, image/png",
-                validator=is_valid_mime_type)
-            formats = [f.strip() for f in re.split(',| ,', formats)]
+                validator=is_valid_mime_type,
+            )
+            formats = [f.strip() for f in re.split(",| ,", formats)]
 
             # Generate the manifest
             manifest = metadata.generate_manifest_for_group(group, [], formats)
-            manifest['description'] = user_fields['description']
-            manifest['language'] = user_fields['language']
+            manifest["description"] = user_fields["description"]
+            manifest["language"] = user_fields["language"]
 
     return metadata
+
 
 def create_container(metadata, groups, args):
     """
@@ -589,7 +693,10 @@ def create_container(metadata, groups, args):
         if args.file:
             output_file = os.path.splitext(args.file)[0] + ".data.zip"
         else:
-            output_file = os.path.join(os.path.dirname(args.directory), os.path.basename(args.directory) + ".data.zip")
+            output_file = os.path.join(
+                os.path.dirname(args.directory),
+                os.path.basename(args.directory) + ".data.zip",
+            )
     else:
         output_file = args.output
 
@@ -600,13 +707,20 @@ def create_container(metadata, groups, args):
     if args.directory:
         # Import the custom groups
         for name, files in groups:
-            container.import_files([(f, os.path.join(name, os.path.basename(f))) for f in files], generate_metadata=False)
+            container.import_files(
+                [(f, os.path.join(name, os.path.basename(f))) for f in files],
+                generate_metadata=False,
+            )
 
         # Import the entire directory (without re-importing the custom files)
-        container.import_directory(args.directory, generate_metadata=False, reimport=False)
+        container.import_directory(
+            args.directory, generate_metadata=False, reimport=False
+        )
     else:
         # Import the single file
-        container.import_file(args.file, os.path.basename(args.file), generate_metadata=False)
+        container.import_file(
+            args.file, os.path.basename(args.file), generate_metadata=False
+        )
 
     print("Importing the data...")
 
@@ -614,6 +728,7 @@ def create_container(metadata, groups, args):
     container.export(output_file)
 
     print("Success! Data container exported to path %s" % output_file)
+
 
 def execute_data_create_tool(parser, args):
     """
@@ -656,6 +771,7 @@ def execute_data_create_tool(parser, args):
         metadata.save_to_json_file(args.export_metadata)
         print("Exported the metadata to a JSON file: %s" % args.export_metadata)
 
+
 def main():
     """
     Entry point that executes the create sub-command when this script is executed directly.
@@ -665,6 +781,7 @@ def main():
     args = parser.parse_args()
 
     execute_data_create_tool(parser, args)
+
 
 if __name__ == "__main__":
     main()
