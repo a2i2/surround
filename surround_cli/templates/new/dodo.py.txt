@@ -133,7 +133,6 @@ def task_train_local():
     cmd = [
         "poetry install &&",                                # Installing dependencies
         "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        "poetry run",
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "mode=train",
@@ -152,7 +151,6 @@ def task_batch_local():
     cmd = [
         "poetry install &&",                                # Installing dependencies
         "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        "poetry run",
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "mode=batch",

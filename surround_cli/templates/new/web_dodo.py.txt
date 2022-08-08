@@ -53,7 +53,7 @@ def task_dev():
     cmd = [
         "docker",
         "run",
-        "-p 8080:8080",
+        "-p 8081:8081",
         "--volume",
         "\"%s/\":/app" % CONFIG["volume_path"],
         "%s" % IMAGE,
@@ -71,7 +71,7 @@ def task_interactive():
             'docker',
             'run',
             '-p',
-            '8080:8080',
+            '8081:8081',
             '-it',
             '--rm',
             '-w',
@@ -93,7 +93,7 @@ def task_prod():
     cmd = [
         "docker",
         "run",
-        "-p 8080:8080",
+        "-p 8081:8081",
         IMAGE,
         "python3 -m %s" % PACKAGE_PATH,
         "%(args)s"
@@ -146,7 +146,6 @@ def task_train_local():
     cmd = [
         "poetry install &&",                                # Installing dependencies
         "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        "poetry run",
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "mode=train",
@@ -166,7 +165,6 @@ def task_batch_local():
     cmd = [
         "poetry install &&",                                # Installing dependencies
         "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        "poetry run",
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "mode=batch",
@@ -187,7 +185,7 @@ def task_web():
         "docker",
         "run",
         "-p",
-        "8080:8080",
+        "8081:8081",
         IMAGE,
         "python3 -m %s" % PACKAGE_PATH,
         "runner=WebRunner",
@@ -204,7 +202,6 @@ def task_web_local():
     cmd = [
         "poetry install &&",                                # Installing dependencies
         "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        "poetry run",
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "runner=WebRunner",
