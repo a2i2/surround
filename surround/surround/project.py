@@ -1,6 +1,6 @@
 PROJECTS = {
-    "new" : {
-        "dirs" : [
+    "new": {
+        "dirs": [
             ".surround",
             "input",
             "output",
@@ -10,10 +10,9 @@ PROJECTS = {
             "tests",
         ],
         "files": [
-            ("requirements.txt", "surround=={version}"),
             (".surround/config.yaml", "project-info:\n  project-name: {project_name}")
         ],
-        "templates" : [
+        "templates": [
             # File name, template name, capitalize project name, is web component
             ("README.md", "README.md.txt", False, False),
             ("{project_name}/stages/__init__.py", "stages_init.py.txt", False, False),
@@ -33,7 +32,8 @@ PROJECTS = {
             ("Dockerfile.Notebook", "Dockerfile.Notebook.txt", False, False),
             ("{project_name}/config.yaml", "config.yaml.txt", False, False),
             (".gitignore", ".gitignore.txt", False, False),
-            ("VERSION", "VERSION.txt", False, False)
+            ("VERSION", "VERSION.txt", False, False),
+            ("pyproject.toml", "pyproject.txt", False, False)
         ]
     }
 }

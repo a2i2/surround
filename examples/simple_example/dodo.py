@@ -7,45 +7,45 @@ import sys
 import subprocess
 
 from surround import load_config
-from {project_name}.config import Config
+from simple_example.config import Config
 CONFIG = load_config(name="config", config_class=Config)
-DOIT_CONFIG = {{'verbosity':2, 'backend':'sqlite3'}}
+DOIT_CONFIG = {'verbosity':2, 'backend':'sqlite3'}
 PACKAGE_PATH = os.path.basename(CONFIG["package_path"])
 IMAGE = "%s/%s:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 IMAGE_JUPYTER = "%s/%s-jupyter:%s" % (CONFIG["company"], CONFIG["image"], CONFIG["version"])
 DOCKER_JUPYTER = "Dockerfile.Notebook"
 
 PARAMS = [
-    {{
+    {
         'name': 'args',
         'long': 'args',
         'type': str,
         'default': ""
-    }}
+    }
 ]
 
 def task_status():
     """Show information about the project such as available runners and assemblers"""
-    return {{
+    return {
         'actions': ["%s -m %s status=1" % (sys.executable, PACKAGE_PATH)]
-    }}
+    }
 
 def task_build():
     """Build the Docker image for the current project"""
     cmd = ['poetry install &&',    # Installing dependencies
            'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
            'docker build --tag=%s .' % IMAGE]
-    return {{
+    return {
         'actions': [" ".join(cmd)],
         'params': PARAMS
-    }}
+    }
 
 def task_remove():
     """Remove the Docker image for the current project"""
-    return {{
+    return {
         'actions': ['docker rmi %s %s -f' % (IMAGE, IMAGE_JUPYTER)],
         'params': PARAMS
-    }}
+    }
 
 def task_dev():
     """Run the main task for the project"""
@@ -57,10 +57,10 @@ def task_dev():
         "%s" % IMAGE,
         "python3 -m %s %s" % (PACKAGE_PATH, "%(args)s")
     ]
-    return {{
+    return {
         'actions': [" ".join(cmd)],
         'params': PARAMS
-    }}
+    }
 
 def task_interactive():
     """Run the Docker container in interactive mode"""
@@ -80,17 +80,17 @@ def task_interactive():
         process = subprocess.Popen(cmd, encoding='utf-8')
         process.wait()
 
-    return {{
+    return {
         'actions': [run]
-    }}
+    }
 
 def task_prod():
     """Run the main task inside a Docker container for use in production """
-    return {{
+    return {
         'actions': ["docker run %s python3 -m %s %s" % (IMAGE, PACKAGE_PATH, "%(args)s")],
         'task_dep': ["build"],
         'params': PARAMS
-    }}
+    }
 
 def task_train():
     """Run training mode inside the container"""
@@ -102,13 +102,13 @@ def task_train():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         IMAGE,
-        "python3 -m {project_name} mode=train %(args)s"
+        "python3 -m simple_example mode=train %(args)s"
     ]
 
-    return {{
+    return {
         'actions': [" ".join(cmd)],
         'params': PARAMS
-    }}
+    }
 
 def task_batch():
     """Run batch mode inside the container"""
@@ -120,13 +120,13 @@ def task_batch():
         "--volume \"%s\":/app/output" % output_path,
         "--volume \"%s\":/app/input" % data_path,
         IMAGE,
-        "python3 -m {project_name} mode=batch %(args)s"
+        "python3 -m simple_example mode=batch %(args)s"
     ]
 
-    return {{
+    return {
         'actions': [" ".join(cmd)],
         'params': PARAMS
-    }}
+    }
 
 def task_train_local():
     """Run training mode locally"""
@@ -141,11 +141,11 @@ def task_train_local():
         "&& deactivate"                                     # Exiting virtual env
     ]
 
-    return {{
+    return {
         'basename': 'trainLocal',
         'actions': [" ".join(cmd)],
         'params': PARAMS
-    }}
+    }
 
 def task_batch_local():
     """Run batch mode locally"""
@@ -160,23 +160,23 @@ def task_batch_local():
         "&& deactivate"                                     # Exiting virtual env
     ]
 
-    return {{
+    return {
         'basename': 'batchLocal',
         'actions': [" ".join(cmd)],
         'params': PARAMS
-    }}
+    }
 
 def task_build_jupyter():
     """Build the Docker image for a Jupyter Lab notebook"""
     cmd = ['poetry install &&',                                # Installing dependencies
            'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
            'docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)]
-    return {{
+    return {
         'basename': 'buildJupyter',
         'actions': [" ".join(cmd)],
         'task_dep': ['build'],
         'params': PARAMS
-    }}
+    }
 
 def task_jupyter():
     """Run a Jupyter Lab notebook"""
@@ -191,6 +191,6 @@ def task_jupyter():
         "\"%s/\":/app" % CONFIG["volume_path"],
         IMAGE_JUPYTER
     ]
-    return {{
+    return {
         'actions': [" ".join(cmd)],
-    }}
+    }

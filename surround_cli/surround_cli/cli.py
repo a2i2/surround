@@ -50,14 +50,12 @@ def process_files(files, project_dir, project_name, project_description, require
         file_path = os.path.join(project_dir, actual_file)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        if require_web and afile == "requirements.txt":
-            actual_content += "\ntornado==6.1.0"
-
         with open(file_path, 'w') as f:
             f.write(actual_content)
 
 # pylint: disable=too-many-locals
-def process_templates(templates, folder, project_dir, project_name, project_description, require_web):
+def process_templates(templates, folder, project_dir, project_name, project_description,
+                      author_name, author_email, require_web):
     """
     Creates files from templates into the project directory with the project name and description inserted.
 
@@ -71,6 +69,10 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
     :type project_name: string
     :param project_description: description of the project
     :type project_description: string
+    :param author_name: name of the author
+    :type author_name: string
+    :param author_email: email of the author
+    :type author_email: string
     :param require_web: whether the project requires web components
     :type require_web: bool
     """
@@ -85,12 +87,17 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
         with open(os.path.join(path, "templates", folder, template)) as f:
             contents = f.read()
             name = project_name.capitalize() if capitalize else project_name
-            actual_contents = contents.format(project_name=name, project_description=project_description)
+            actual_contents = contents.format(project_name=name, project_description=project_description,
+                                              author_name=author_name, author_email=author_email,
+                                              version=pkg_resources.get_distribution("surround").version)
+            if require_web and afile == "pyproject.toml":
+                actual_contents = actual_contents.replace("\n[build-system]", "tornado =\"6.1.0\"\n\n[build-system]")
+
             file_path = os.path.join(project_dir, actual_file)
         with open(file_path, 'w') as f:
             f.write(actual_contents)
 
-def process(project_dir, project, project_name, project_description, require_web, folder):
+def process(project_dir, project, project_name, project_description, author_name, author_email, require_web, folder):
     """
     Creates a new Surround project using the directory and template provided.
 
@@ -102,6 +109,10 @@ def process(project_dir, project, project_name, project_description, require_web
     :type project_name: string
     :param project_description: description of the new project
     :type project_description: string
+    :param author_name: name of the author
+    :type author_name: string
+    :param author_email: email of the author
+    :type author_email: string
     :param require_web: whether the project requires web components
     :type require_web: bool
     :param folder: name of the folder in the templates folder to use
@@ -115,7 +126,7 @@ def process(project_dir, project, project_name, project_description, require_web
     os.makedirs(project_dir)
     process_directories(project["dirs"], project_dir, project_name)
     process_files(project["files"], project_dir, project_name, project_description, require_web)
-    process_templates(project["templates"], folder, project_dir, project_name, project_description, require_web)
+    process_templates(project["templates"], folder, project_dir, project_name, project_description, author_name, author_email, require_web)
     return True
 
 def is_valid_dir(aparser, arg):
@@ -300,6 +311,14 @@ def run_locally(args, extra_args):
     run_process = subprocess.Popen(run_args)
     run_process.wait()
 
+def parse_to_bool(bool_value):
+    valid = {'true': True, 't': True, '1': True, 'false': False, 'f': False, '0': False}
+
+    lower_value = bool_value.lower()
+    if lower_value in valid:
+        return valid[lower_value]
+    raise ValueError('Failed parsing "%s" for boolean' % bool_value)
+
 # pylint: disable=too-many-branches
 def parse_init_args(parser, args, extra_args):
     """
@@ -326,8 +345,22 @@ def parse_init_args(parser, args, extra_args):
         else:
             project_description = input("What is the purpose of this project?: ")
 
+        if args.author_name:
+            author_name = args.author_name
+        else:
+            author_name = input("What is the author name?: ")
+
+        if args.author_email:
+            author_email = args.author_email
+        else:
+            author_email = input("What is the author email?: ")
+
         if args.require_web:
-            require_web = args.require_web
+            try:
+                require_web = parse_to_bool(args.require_web)
+            except ValueError as e:
+                print(str(e))
+                sys.exit(1)
         else:
             while True:
                 require_web_string = input("Does it require a web runner? (y/n) ")
@@ -339,7 +372,7 @@ def parse_init_args(parser, args, extra_args):
                     break
 
         new_dir = os.path.join(args.path, project_name)
-        if process(new_dir, PROJECTS["new"], project_name, project_description, require_web, "new"):
+        if process(new_dir, PROJECTS["new"], project_name, project_description, author_name, author_email, require_web, "new"):
             print("info: project created at %s" % os.path.join(os.path.abspath(args.path), project_name))
         else:
             print("error: directory %s already exists" % new_dir)
@@ -379,6 +412,8 @@ def execute_cli():
     init_parser.add_argument('path', help="Path for creating a Surround project", nargs='?', default="./")
     init_parser.add_argument('-p', '--project-name', help="Name of the project", type=lambda x: is_valid_name(parser, x))
     init_parser.add_argument('-d', '--description', help="A description for the project")
+    init_parser.add_argument('-n', '--author-name', help="A name of the author")
+    init_parser.add_argument('-e', '--author-email', help="An email of the author")
     init_parser.add_argument('-w', '--require-web', help="Is web service required for the project")
 
     run_parser = sub_parser.add_parser('run', help="Run a Surround project task, witout an argument all tasks will be shown")

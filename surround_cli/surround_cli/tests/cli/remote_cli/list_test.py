@@ -9,7 +9,8 @@ __date__ = '2019/03/08'
 class ListTest(unittest.TestCase):
 
     def test_rejecting_path(self):
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertRegex(process.stdout, 'info: project created at .*temp\\n')
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
@@ -19,7 +20,8 @@ class ListTest(unittest.TestCase):
         self.assertEqual(process.stdout, "error: no remote named temp\n")
 
     def test_happy_path(self):
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'True'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertRegex(process.stdout, 'info: project created at .*temp\\n')
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))

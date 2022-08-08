@@ -16,4 +16,4 @@ COPY . /app
 EXPOSE 8080
 
 # List all tasks when the container launches
-CMD ["python3", "-m", "{project_name}"]
+CMD ["python3", "-m", "simple_example"]

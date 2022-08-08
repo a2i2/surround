@@ -11,7 +11,8 @@ __date__ = '2019/03/04'
 class AddTest(unittest.TestCase):
 
     def test_rejecting_path(self):
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertIn("info: project created at", process.stdout)
         self.assertIn("temp", process.stdout)
 
@@ -33,7 +34,8 @@ class AddTest(unittest.TestCase):
         self.assertEqual(result, "error: temp.jpg not found.")
 
     def test_happy_path(self):
-        process = subprocess.run(['surround', 'init', os.getcwd(), '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', os.getcwd(), '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertIn("info: project created at", process.stdout)
         self.assertIn("temp", process.stdout)
 

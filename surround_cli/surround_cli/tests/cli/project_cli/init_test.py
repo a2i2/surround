@@ -9,13 +9,15 @@ __date__ = '2019/03/01'
 class InitTest(unittest.TestCase):
 
     def test_happy_path(self):
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertRegex(process.stdout, 'info: project created at .*temp\\n')
 
         is_temp = os.path.isdir(os.path.join(os.getcwd() + "/temp"))
         self.assertEqual(is_temp, True)
 
-        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-w', 'no'], encoding='utf-8', stdout=subprocess.PIPE, check=True)
+        process = subprocess.run(['surround', 'init', './', '-p', 'temp', '-d', 'temp', '-n', 'Stefanus Kurniawan', '-e', 'stefanus.kurniawan@deakin.edu.au', '-w', 'False'],
+                                 encoding='utf-8', stdout=subprocess.PIPE, check=True)
         self.assertEqual(process.stdout, "error: directory ./temp already exists\n")
 
     def tearDown(self):

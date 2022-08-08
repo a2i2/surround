@@ -26,7 +26,7 @@ steps:
       test_lib:
         title: "Test Surround Library"
         type: "freestyle" # Run any command
-        image: "python:3.7.5" # The image in which command will be executed
+        image: "python:3.8.10" # The image in which command will be executed
         working_directory: "${{clone}}"
         commands:
           # Go inside the surround library
@@ -44,7 +44,7 @@ steps:
       test_cli:
         title: "Test Surround CLI"
         type: "freestyle" # Run any command
-        image: "python:3.7.5" # The image in which command will be executed
+        image: "python:3.8.10" # The image in which command will be executed
         working_directory: "${{clone}}"
         commands:
           # Go inside the cli
