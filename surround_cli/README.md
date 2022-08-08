@@ -26,7 +26,7 @@ $ pip3 install surround_cli
 ### Generating projects
 For example you can use the sub-command ``init`` to generate a new project:
 ```
-$ surround init <path-to-dir> --project-name sample --description "Sample description" --require-web
+$ surround init <path-to-dir> --project-name sample --description "Sample description" --author-name <AUTHOR_NAME> --author-email <AUTHOR_EMAIL> --require-web <True/False>
 ```
 
 Where a new folder in `path-to-dir` (current directory if left blank) will be created with the name of the project. In this folder will be a collection of scripts and folders typically needed for a Surround project. For more information on what is generated, see our [Getting Started](https://surround.readthedocs.io/getting-started.html) guide.
@@ -47,7 +47,7 @@ If you would like to serve your pipeline via Web endpoints (`--require-web` is r
 ```
 $ surround run web
 ```
-Which (by default) will accept input data as JSON via HTTP POST to the endpoint `http://localhost:8080/estimate` in the following format:
+Which (by default) will accept input data as JSON via HTTP POST to the endpoint `http://localhost:8081/estimate` in the following format:
 ```
 { "message": "this data will be processed by the pipeline" }
 ```
