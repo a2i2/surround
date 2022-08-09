@@ -33,8 +33,11 @@ def task_status():
 
 def task_build():
     """Build the Docker image for the current project"""
+    cmd = ['poetry install &&',    # Installing dependencies
+           'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
+           'docker build --tag=%s .' % IMAGE]
     return {
-        'actions': ['docker build --tag=%s .' % IMAGE],
+        'actions': [" ".join(cmd)],
         'params': PARAMS
     }
 
@@ -50,7 +53,7 @@ def task_dev():
     cmd = [
         "docker",
         "run",
-        "-p 8080:8080",
+        "-p 8081:8081",
         "--volume",
         "\"%s/\":/app" % CONFIG["volume_path"],
         "%s" % IMAGE,
@@ -68,7 +71,7 @@ def task_interactive():
             'docker',
             'run',
             '-p',
-            '8080:8080',
+            '8081:8081',
             '-it',
             '--rm',
             '-w',
@@ -90,7 +93,7 @@ def task_prod():
     cmd = [
         "docker",
         "run",
-        "-p 8080:8080",
+        "-p 8081:8081",
         IMAGE,
         "python3 -m %s" % PACKAGE_PATH,
         "%(args)s"
@@ -141,11 +144,14 @@ def task_batch():
 def task_train_local():
     """Run training mode locally"""
     cmd = [
+        "poetry install &&",                                # Installing dependencies
+        "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "mode=train",
         "runner=1",
-        "%(args)s"
+        "%(args)s",
+        "&& deactivate"                                     # Exiting virtual env
     ]
 
     return {
@@ -157,11 +163,14 @@ def task_train_local():
 def task_batch_local():
     """Run batch mode locally"""
     cmd = [
+        "poetry install &&",                                # Installing dependencies
+        "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "mode=batch",
         "runner=1",
-        "%(args)s"
+        "%(args)s",
+        "&& deactivate"                                     # Exiting virtual env
     ]
 
     return {
@@ -176,7 +185,7 @@ def task_web():
         "docker",
         "run",
         "-p",
-        "8080:8080",
+        "8081:8081",
         IMAGE,
         "python3 -m %s" % PACKAGE_PATH,
         "runner=WebRunner",
@@ -191,10 +200,13 @@ def task_web():
 def task_web_local():
     """Run web mode locally"""
     cmd = [
+        "poetry install &&",                                # Installing dependencies
+        "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
         sys.executable,
         "-m %s" % PACKAGE_PATH,
         "runner=WebRunner",
-        "%(args)s"
+        "%(args)s",
+        "&& deactivate"                                     # Exiting virtual env
     ]
 
     return {
@@ -205,9 +217,12 @@ def task_web_local():
 
 def task_build_jupyter():
     """Build the Docker image for a Jupyter Lab notebook"""
+    cmd = ['poetry install &&',                                # Installing dependencies
+           'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
+           'docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)]
     return {
         'basename': 'buildJupyter',
-        'actions': ['docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)],
+        'actions': [" ".join(cmd)],
         'task_dep': ['build'],
         'params': PARAMS
     }

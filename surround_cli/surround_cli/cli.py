@@ -93,7 +93,7 @@ def process_templates(templates, folder, project_dir, project_name, project_desc
             if require_web and afile == "pyproject.toml":
                 actual_contents = actual_contents.replace(
                     "\n[build-system]",
-                    "fastapi = \"0.68.1\"\nuvicorn = \"0.13.3\"\n\n[build-system]")
+                    "fastapi = \"0.79.0\"\nuvicorn = \"0.18.2\"\n\n[build-system]")
 
             file_path = os.path.join(project_dir, actual_file)
         with open(file_path, 'w') as f:

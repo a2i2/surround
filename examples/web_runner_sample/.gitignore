@@ -102,3 +102,6 @@ $RECYCLE.BIN/
 
 # Doit files
 .doit*
+
+# Ignoring requirements file now since we are using Poetry
+requirements.txt

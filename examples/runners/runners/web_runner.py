@@ -1,4 +1,3 @@
-# pylint: disable=E0611, R0903
 import logging
 import uvicorn
 from fastapi import FastAPI
