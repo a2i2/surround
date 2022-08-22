@@ -1,0 +1,159 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+# Cancel in-progress workflow runs on new PR commits.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-library:
+    name: Build library
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.7.5
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.7.5"
+      - name: Install tox
+        run: |
+          # Install tox
+          pip install tox==3.20.1
+      - name: Run tests using tox
+        run: |
+          # Go inside the surround library
+          cd surround
+
+          # Remove generated tox directory
+          rm -rf .tox
+
+          # Run tests through tox
+          tox
+
+  test-cli:
+    name: Build cli
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.7.5
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.7.5"
+      - name: Install tox
+        run: |
+          # Install tox
+          pip install tox==3.20.1
+      - name: Run tests using tox
+        run: |
+          # Go inside the surround cli
+          cd surround_cli
+
+          # Remove generated tox directory
+          rm -rf .tox
+
+          # Run tests through tox
+          tox
+
+          # Run examples
+          pip install ../surround
+          python setup.py install
+          cd ..
+          find examples/ -iname "*.py" | xargs pylint
+          ls examples/ | xargs -n 1 -I '{}' python3 examples/'{}'/main.py
+
+  release-library:
+    name: Release library
+    runs-on: ubuntu-20.04
+    needs:
+      - test-library
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref_type == 'tag' &&
+      startsWith(github.ref_name, 'surround-v')
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.7.5
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.7.5"
+      - name: Publish
+        run: |
+          cd surround
+
+          # Remove generated files from last release
+          rm -rf dist
+
+          # Install required packages
+          python -m pip install --user --upgrade setuptools wheel twine
+
+          # Setup Pypi config
+          echo "[distutils]" >> ~/.pypirc
+          echo "index-servers =" >> ~/.pypirc
+          echo "pypi" >> ~/.pypirc
+          echo "surround" >> ~/.pypirc
+          echo "" >> ~/.pypirc
+          echo "[pypi]" >> ~/.pypirc
+          echo "username=__token__" >> ~/.pypirc
+          echo "password=${{ secrets.PYPI_API_LIB_TOKEN }}" >> ~/.pypirc
+          echo "" >> ~/.pypirc
+          echo "[surround]"  >> ~/.pypirc
+          echo "repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+          echo "username=__token__" >> ~/.pypirc
+          echo "password=${{ secrets.PYPI_API_LIB_TOKEN }}" >> ~/.pypirc
+
+          # Build package
+          python setup.py sdist bdist_wheel
+
+          # Upload package for distribution
+          python -m twine upload --repository pypi dist/*
+
+  release-cli:
+    name: Release library
+    runs-on: ubuntu-20.04
+    needs:
+      - test-cli
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref_type == 'tag' &&
+      startsWith(github.ref_name, 'surround-cli-v')
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.7.5
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.7.5"
+      - name: Publish
+        run: |
+          cd surround_cli
+
+          # Remove generated files from last release
+          rm -rf dist
+
+          # Install required packages
+          python -m pip install --user --upgrade setuptools wheel twine
+
+          # Setup Pypi config
+          echo "[distutils]" >> ~/.pypirc
+          echo "index-servers =" >> ~/.pypirc
+          echo "pypi" >> ~/.pypirc
+          echo "surround-cli" > ~/.pypirc
+          echo "" >> ~/.pypirc
+          echo "[pypi]" >> ~/.pypirc
+          echo "username=__token__" >> ~/.pypirc
+          echo "password=${{ secrets.PYPI_API_CLI_TOKEN }}" >> ~/.pypirc
+          echo "" >> ~/.pypirc
+          echo "[surround-cli]"  >> ~/.pypirc
+          echo "repository = https://upload.pypi.org/legacy/" >> ~/.pypirc
+          echo "username=__token__" >> ~/.pypirc
+          echo "password=${{ secrets.PYPI_API_CLI_TOKEN }}" >> ~/.pypirc
+
+          # Build package
+          python setup.py sdist bdist_wheel
+
+          # Upload package for distribution
+          python -m twine upload --repository pypi dist/*
