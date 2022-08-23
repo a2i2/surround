@@ -3,7 +3,6 @@ This module defines the tasks that can be executed using `surround run [task nam
 """
 
 import os
-import sys
 import subprocess
 
 from surround import load_config
@@ -26,13 +25,18 @@ PARAMS = [
 
 def task_status():
     """Show information about the project such as available runners and assemblers"""
+    cmd = [
+        "poetry install &&",        # Installing dependencies
+        "poetry run",
+        "python -m %s status=1" % PACKAGE_PATH
+    ]
     return {{
-        'actions': ["%s -m %s status=1" % (sys.executable, PACKAGE_PATH)]
+        'actions': [" ".join(cmd)]
     }}
 
 def task_build():
     """Build the Docker image for the current project"""
-    cmd = ['poetry install &&',    # Installing dependencies
+    cmd = ['poetry install &&',     # Installing dependencies
            'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
            'docker build --tag=%s .' % IMAGE]
     return {{
@@ -131,13 +135,12 @@ def task_batch():
 def task_train_local():
     """Run training mode locally"""
     cmd = [
-        "poetry install &&",                                # Installing dependencies
-        "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        sys.executable,
+        "poetry install &&",        # Installing dependencies
+        "poetry run",
+        "python",
         "-m %s" % PACKAGE_PATH,
         "mode=train",
-        "%(args)s",
-        "&& deactivate"                                     # Exiting virtual env
+        "%(args)s"
     ]
 
     return {{
@@ -149,13 +152,12 @@ def task_train_local():
 def task_batch_local():
     """Run batch mode locally"""
     cmd = [
-        "poetry install &&",                                # Installing dependencies
-        "source `poetry env info --path`/bin/activate &&",  # Entering virtual env
-        sys.executable,
+        "poetry install &&",        # Installing dependencies
+        "poetry run",
+        "python",
         "-m %s" % PACKAGE_PATH,
         "mode=batch",
-        "%(args)s",
-        "&& deactivate"                                     # Exiting virtual env
+        "%(args)s"
     ]
 
     return {{
@@ -166,7 +168,7 @@ def task_batch_local():
 
 def task_build_jupyter():
     """Build the Docker image for a Jupyter Lab notebook"""
-    cmd = ['poetry install &&',                                # Installing dependencies
+    cmd = ['poetry install &&',     # Installing dependencies
            'poetry export -f requirements.txt --output requirements.txt --dev --without-hashes &&',
            'docker build --tag=%s . -f %s' % (IMAGE_JUPYTER, DOCKER_JUPYTER)]
     return {{

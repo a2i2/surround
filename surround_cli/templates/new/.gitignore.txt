@@ -105,3 +105,6 @@ $RECYCLE.BIN/
 
 # Ignoring requirements file now since we are using Poetry
 requirements.txt
+
+#Ignore Poetry lock file
+poetry.lock
