@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "web_runner_sample"
+version = "0.0.1"
+description = "Web runner sample"
+authors = ["Stefanus Kurniawan <stefanus.kurniawan@deakin.edu.au>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+surround = "0.1.2"
+doit = "0.31.1"
+fastapi = "0.79.0"
+uvicorn = "0.18.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

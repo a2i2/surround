@@ -1,49 +1,58 @@
-import json
 import logging
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
-import tornado.web
+import uvicorn
+from fastapi import FastAPI
+from pydantic import BaseModel
 from surround import Runner, RunMode
 from .stages import AssemblyState
 
+
+class APIHelper:
+    assembler = None
+
+
+APP = FastAPI()
+HELPER = APIHelper()
 logging.basicConfig(level=logging.INFO)
+
 
 class WebRunner(Runner):
 
     def load_data(self, mode, config):
         return None
 
-    def run(self, mode=RunMode.BATCH_PREDICT):
+    def run(self, mode=RunMode.PREDICT):
         self.assembler.init_assembler()
-        self.application = Application(self.assembler)
-        self.application.listen(8080)
-        logging.info("Server started at http://localhost:8080")
-        tornado.ioloop.IOLoop.instance().start()
+        HELPER.assembler = self.assembler
+        uvicorn.run(
+            APP, port=8080, log_level="info"
+        )
 
 
-class Application(tornado.web.Application):
-    def __init__(self, assembler):
-        handlers = [
-            (r"/message", MessageHandler, {'assembler': assembler})
-        ]
-        tornado.web.Application.__init__(self, handlers)
+class MessageInput(BaseModel):
+    message: str
 
 
-class MessageHandler(tornado.web.RequestHandler):
-    def initialize(self, assembler):
-        self.assembler = assembler
-        self.data = AssemblyState()
+class MessageOutput(BaseModel):
+    output: str
 
-    def post(self):
-        req_data = json.loads(self.request.body)
 
-        # Clean output_data on every request
-        self.data.output_data = ""
+@APP.post("/message", response_model=MessageOutput)
+def post_message(request_input: MessageInput):
+    # Prepare input_data for the assembler
+    data = AssemblyState()
+    data.output_data = ""
+    data.input_data = request_input.message
 
-        # Prepare input_date for the assembler
-        self.data.input_data = req_data["message"]
+    # Execute assembler
+    HELPER.assembler.run(data)
+    logging.info("Message: %s", data.output_data)
+    return MessageOutput(output=data.output_data)
 
-        # Execute assembler
-        self.assembler.run(self.data)
-        logging.info("Message: %s", self.data.output_data)
+
+class VersionOutput(BaseModel):
+    version: str
+
+
+@APP.get("/info", response_model=VersionOutput)
+def get_info():
+    return VersionOutput(version="0.0.1")

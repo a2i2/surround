@@ -1,0 +1,4 @@
+surround==0.1.2
+doit==0.31.1; python_version >= "3.4"
+fastapi==0.79.0; python_full_version >= "3.6.1"
+uvicorn==0.18.2; python_version >= "3.7"
