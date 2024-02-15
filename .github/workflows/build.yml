@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.7.5
+      - name: Set up Python 3.8.0
         uses: actions/setup-python@v3
         with:
-          python-version: "3.7.5"
+          python-version: "3.8.0"
       - name: Install tox
         run: |
           # Install tox
@@ -40,10 +40,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.7.5
+      - name: Set up Python 3.8.0
         uses: actions/setup-python@v3
         with:
-          python-version: "3.7.5"
+          python-version: "3.8.0"
       - name: Install tox
         run: |
           # Install tox
@@ -77,10 +77,10 @@ jobs:
       startsWith(github.ref_name, 'surround-v')
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.7.5
+      - name: Set up Python 3.8.0
         uses: actions/setup-python@v3
         with:
-          python-version: "3.7.5"
+          python-version: "3.8.0"
       - name: Publish
         run: |
           cd surround
@@ -123,10 +123,10 @@ jobs:
       startsWith(github.ref_name, 'surround-cli-v')
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.7.5
+      - name: Set up Python 3.8.0
         uses: actions/setup-python@v3
         with:
-          python-version: "3.7.5"
+          python-version: "3.8.0"
       - name: Publish
         run: |
           cd surround_cli
