@@ -11,7 +11,7 @@ For more information about Surround library, see [Surround Library](https://surr
 ## Installation
 
 ### Prerequisites
-- [Python](https://www.python.org/) 3+ (Tested on 3.6.5)
+- [Python](https://www.python.org/) 3.9+ (Tested on 3.9.5)
 
 Use package manager [pip](https://pip.pypa.io/en/stable/) to install the latest (stable) version:
 ```
