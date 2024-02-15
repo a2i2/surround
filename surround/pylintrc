@@ -12,4 +12,5 @@ disable = missing-docstring,
     attribute-defined-outside-init,
     relative-beyond-top-level,
     unused-argument,
-    too-many-arguments
+    too-many-arguments,
+    unsubscriptable-object
