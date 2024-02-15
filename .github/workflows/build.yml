@@ -8,8 +8,8 @@ on:
     branches:
       - main
     tags:
-      - "surround-v+[0-9]+.[0-9]+.[0-9]*$"
-      - "surround-cli-v+[0-9]+.[0-9]+.[0-9]*$"
+      - "surround-v[0-9]+.[0-9]+.[0-9]+*"
+      - "surround-cli-v[0-9]+.[0-9]+.[0-9]+*"
 
 # Cancel in-progress workflow runs on new PR commits.
 concurrency:
