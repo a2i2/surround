@@ -14,7 +14,7 @@ $ surround -h
 ## Installation
 
 ### Prerequisites
-- [Python](https://www.python.org/) 3+ (Tested on 3.6.5)
+- [Python](https://www.python.org/) 3.9+ (Tested on 3.9.5)
 - [Docker](https://www.docker.com/) (required for running in containers)
 - [Tornado](https://www.tornadoweb.org/en/stable/) (optional, needed if serving via Web)
 
