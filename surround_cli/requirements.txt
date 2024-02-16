@@ -1,4 +1,4 @@
-numpy==1.23.2
+numpy==1.26.4
 pandas==2.2.0
 doit==0.31.1
 pylint==2.4.3
